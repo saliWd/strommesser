@@ -1,17 +1,12 @@
 <?php declare(strict_types=1);
 // This file is a pure function definition file. It is included in other sites
-
-// function list: 
-// 20 - initialize ()
-// 22 - printErrorAndDie (string $heading, string $text): void
-
   
 // this function is called on every (user related) page on the very start  
 // it does the session start and opens connection to the data base. Returns the dbConn variable or a boolean
 function initialize () {
   require_once('dbConn.php'); // this will return the $dbConn variable as 'new mysqli'
   if ($dbConn->connect_error) {
-    printErrorAndDie('Connection to the data base failed', 'Please try again later and/or send me an email: sali@widmedia.ch');
+    printErrorAndDie('Connection to the data base failed', 'Please try again later and/or send me an email: info@strommesser.ch');
   }
   $dbConn->set_charset('utf8');
   return $dbConn;
@@ -30,6 +25,44 @@ function printErrorAndDie (string $heading, string $text): void {
   echo '</head><body><div class="row twelve columns textBox"><h4>'.$heading.'</h4><p>'.$text.'</p></div></body></html>';
   die();
 }
+
+function printRawErrorAndDie (string $heading, string $text): void {
+  echo $heading.': '.$text;
+  die();
+}  
+
+function validDevice ($dbConn, string $postIndicator): array {        
+  $unsafeDevice = safeStrFromExt('POST', $postIndicator, 8); // maximum length of 8
+  $result = $dbConn->query('SELECT `device` FROM `wmeter_user` WHERE 1 ORDER BY `id`;');
+  while ($row = $result->fetch_assoc()) {
+      if ($unsafeDevice === $row['device']) {
+          return array(TRUE, $row['device']);
+      }
+  }
+  return array(FALSE, ''); // valid/deviceString
+}
+
+function checkHash ($dbConn, string $device): bool {
+  $unsafeRandNum = safeIntFromExt('POST', 'randNum', 8); // range 1 to 10'000 (0 excluded)
+  $unsafePostHash = safeHexFromExt('POST', 'hash', 64); 
+  if ($unsafeRandNum === 0 or $unsafePostHash === '') {
+      return FALSE;
+  }
+  $result = $dbConn->query('SELECT * FROM `wmeter_user` WHERE `device` = "'.$device.'" ORDER BY `id` DESC LIMIT 1');
+  if ($result->num_rows !== 1) {
+      return FALSE;
+  }
+  $row = $result->fetch_assoc();
+  // now do a hash over randNum and the post_key. if that one matches the transmitted hash, we are ok.
+  $unsafeRandNum = (string)$unsafeRandNum; // convert the int to a string
+  $rxSideHash = hash('sha256',$unsafeRandNum.$row['post_key']);
+  if ($rxSideHash === $unsafePostHash) {
+      return TRUE;
+  } else {
+      return FALSE;
+  }
+}
+
 
 function printNavMenu (string $siteSafe): void {   
   $home   = ($siteSafe === 'index.php') ? '<li class="menuCurrentPage">Home</li>' : '<li><a href="index.php">Home</a></li>';
@@ -60,6 +93,26 @@ function getCurrentSite (): string {
         return $siteUnsafe;
       }
   return ''; 
+}
+
+// checks the params retrieved over get and returns TRUE if they are ok
+function verifyGetParams (): bool {  
+  if (safeStrFromExt('GET','TX', 4) !== 'pico') {                
+      return FALSE;
+  }
+  if (safeIntFromExt('GET','TXVER', 1) !== 2) { // don't accept other interface version numbers
+      return FALSE;
+  }
+  return TRUE;
+}
+
+// sql sanitation and length limitation
+function sqlSafeStrFromPost ($dbConn, string $varName, int $length): string {
+  if (isset($_POST[$varName])) {
+     return mysqli_real_escape_string($dbConn, (substr($_POST[$varName], 0, $length))); // length-limited variable           
+  } else {
+     return '';
+  }
 }
 
 // returns a 'safe' integer. Return value is 0 if the checks did not work out

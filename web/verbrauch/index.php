@@ -14,7 +14,7 @@ function printBeginOfPage_index(bool $enableAutoReload, string $timerange):void 
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>';
   if ($enableAutoReload) {
-    echo '<meta http-equiv="refresh" content="40; url=https://widmedia.ch/wmeter/index.php?autoreload=1'.$timerange.'">';
+    echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?autoreload=1'.$timerange.'">';
   }
   echo '
   </head><body>';
