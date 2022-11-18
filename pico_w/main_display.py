@@ -15,7 +15,7 @@ def send_message_get_response(wdt, DBGCFG:dict, message:dict):
     if (DBGCFG["wlan_sim"]):
         return("1|57") # valid|57W
     
-    URL = "https://widmedia.ch/wmeter/getRaw.php?TX=pico&TXVER=2"
+    URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     urlenc = urlencode(message)
     debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG) # before the urequest (has a timeout of 30s, so wdt will trigger)

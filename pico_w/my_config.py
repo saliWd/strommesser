@@ -1,8 +1,8 @@
 # returns the ssid and the password of the WLAN connection
 def get_wlan_config():
     config_wlan = dict([
-        ("ssid","widmedia_mobile"),
-        ("pw","publicPassword")
+        ("ssid","strommesser"),
+        ("pw","publicPW")
         ])
     return(config_wlan)
 
