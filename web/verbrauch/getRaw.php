@@ -17,7 +17,7 @@
         printRawErrorAndDie('Error', 'access key not ok');
     }
 
-    $result = $dbConn->query('SELECT * FROM `wmeter` WHERE `device` = "'.$device.'" ORDER BY `id` DESC LIMIT 1');
+    $result = $dbConn->query('SELECT * FROM `verbrauch` WHERE `device` = "'.$device.'" ORDER BY `id` DESC LIMIT 1');
     $queryCount = $result->num_rows; // this may be 0 or 1
     if ($queryCount !== 1) {
         printRawErrorAndDie('Error', 'no data');

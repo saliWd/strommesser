@@ -8,7 +8,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 
-CREATE TABLE `wmeter` (
+CREATE TABLE `verbrauch` (
   `id` bigint(20) NOT NULL,
   `device` varchar(8) DEFAULT NULL,
   `consumption` decimal(10,3) NOT NULL,
@@ -20,24 +20,24 @@ CREATE TABLE `wmeter` (
   `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `wmeter_user` (
+CREATE TABLE `verbrauch_user` (
   `id` int(11) NOT NULL,
   `device` varchar(8) NOT NULL,
   `post_key` varchar(32) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-ALTER TABLE `wmeter`
+ALTER TABLE `verbrauch`
   ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `wmeter_user`
+ALTER TABLE `verbrauch_user`
   ADD PRIMARY KEY (`id`);
 
 
-ALTER TABLE `wmeter`
+ALTER TABLE `verbrauch`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `wmeter_user`
+ALTER TABLE `verbrauch_user`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 

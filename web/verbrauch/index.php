@@ -42,8 +42,8 @@ $timeSelected = getTimeRange();
 $enableAutoReload = ($autoreload === 1);
 $device = 'austr10'; // TODO: device as variable
 
-$resultCnt = $dbConn->query('SELECT COUNT(*) as `total` FROM `wmeter` WHERE `device` = "'.$device.'" LIMIT 1;'); // guaranteed to return one row
-$resultFreshest = $dbConn->query('SELECT `zeit` FROM `wmeter` WHERE `device` = "'.$device.'" ORDER BY `zeit` DESC LIMIT 1;'); // cannot combine those two
+$resultCnt = $dbConn->query('SELECT COUNT(*) as `total` FROM `verbrauch` WHERE `device` = "'.$device.'" LIMIT 1;'); // guaranteed to return one row
+$resultFreshest = $dbConn->query('SELECT `zeit` FROM `verbrauch` WHERE `device` = "'.$device.'" ORDER BY `zeit` DESC LIMIT 1;'); // cannot combine those two
 
 $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
@@ -64,7 +64,7 @@ if ($totalCount > 0) {// this may be 0. Can't
   $GRAPH_LIMIT = 3; // does not make sense to display a graph otherwise
 
   $sql = 'SELECT `consumption`, `zeit`, `aveConsDiff`, `aveZeitDiff` ';
-  $sql .= 'from `wmeter` WHERE `device` = "'.$device.'" AND `zeit` > "'.$zeitOldestString.'" ';
+  $sql .= 'from `verbrauch` WHERE `device` = "'.$device.'" AND `zeit` > "'.$zeitOldestString.'" ';
   $sql .= 'ORDER BY `zeit` DESC LIMIT '.$QUERY_LIMIT.';';    
 
   $result = $dbConn->query($sql);

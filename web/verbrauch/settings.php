@@ -39,7 +39,7 @@ if ($doSafe === 0) { // entry point of this site
   printBeginOfPage_settings();
   echo '<div class="row twelve columns">Sorry, diese Funktion ist aktuell deaktiviert... <a href="settings.php">zurück</a>...</div>';
   /*
-  $result = $dbConn->query('DELETE FROM `wmeter` WHERE `device` = "'.$device.'"');
+  $result = $dbConn->query('DELETE FROM `verbrauch` WHERE `device` = "'.$device.'"');
   if ($result) {
     echo '<div class="row twelve columns">...alle Einträge gelöscht. <a href="settings.php">zurück</a>...</div>';
   } else {

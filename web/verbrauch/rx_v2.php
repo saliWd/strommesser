@@ -41,7 +41,7 @@
     }
     
     // no meaningful (=HTML) output is generated. Use index.php to monitor the value itself
-    // db structure is stored in wmeter.sql-file
+    // db structure is stored in sql-file
     if (! verifyGetParams()) { // now I can look the post variables        
         printRawErrorAndDie('Error', 'invalid params');
     }
@@ -63,13 +63,13 @@
     }
     $total_consumption = $values[1];
 
-    if (! $result = $dbConn->query('INSERT INTO `wmeter` (`device`, `consumption`) VALUES ("'.$device.'", "'.$total_consumption.'")')) {
+    if (! $result = $dbConn->query('INSERT INTO `verbrauch` (`device`, `consumption`) VALUES ("'.$device.'", "'.$total_consumption.'")')) {
         printRawErrorAndDie('Error', 'db insert not ok');
     }
 
 
     //NB: not using last inserted ID as other inserts may have happened in the meantime
-    $result = $dbConn->query('SELECT * FROM `wmeter` WHERE `device` = "'.$device.'" ORDER BY `id` DESC LIMIT 2');
+    $result = $dbConn->query('SELECT * FROM `verbrauch` WHERE `device` = "'.$device.'" ORDER BY `id` DESC LIMIT 2');
     $queryCount = $result->num_rows; // this may be 1 or 2
     if ($queryCount === 2) {
         $row_now = $result->fetch_assoc();
@@ -78,17 +78,17 @@
         $zeitDiff = date_diff(date_create($row_before['zeit']), date_create($row_now['zeit']));
         $zeitSecs = ($zeitDiff->d * 24 * 3600) + ($zeitDiff->h*3600) + ($zeitDiff->i * 60) + ($zeitDiff->s);
         if ($zeitSecs < 9000) { // doesn't make sense otherwise, too long between measurements
-            $result = $dbConn->query('UPDATE `wmeter` SET `consDiff` = "'.$consDiff.'", `zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'"');
+            $result = $dbConn->query('UPDATE `verbrauch` SET `consDiff` = "'.$consDiff.'", `zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'"');
             // let sql calculate the moving average over 5 entries and then store that in the table
             $sql = 'SELECT `id`, ';
             $sql = $sql.'avg(`consDiff`) OVER(ORDER BY `zeit` DESC ROWS BETWEEN 5 PRECEDING AND CURRENT ROW ) as `movAveConsDiff`, ';
             $sql = $sql.'avg(`zeitDiff`) OVER(ORDER BY `zeit` DESC ROWS BETWEEN 5 PRECEDING AND CURRENT ROW ) as `movAveZeitDiff` ';
-            $sql = $sql.'from `wmeter` WHERE `device` = "'.$device.'" ';
+            $sql = $sql.'from `verbrauch` WHERE `device` = "'.$device.'" ';
             $sql = $sql.'ORDER BY `zeit` DESC LIMIT 3;';
             $result = $dbConn->query($sql); // gets me at least one result
             // update the last 3 ones (moving average for the newest does not differ)
             while ($row = $result->fetch_assoc()) {  
-                $dbConn->query('UPDATE `wmeter` SET `aveConsDiff` = "'.$row['movAveConsDiff'].'", `aveZeitDiff` = "'.$row['movAveZeitDiff'].'" WHERE `id` = "'.$row['id'].'"');
+                $dbConn->query('UPDATE `verbrauch` SET `aveConsDiff` = "'.$row['movAveConsDiff'].'", `aveZeitDiff` = "'.$row['movAveZeitDiff'].'" WHERE `id` = "'.$row['id'].'"');
             }
             echo 'update ok';
             

@@ -33,7 +33,7 @@ function printRawErrorAndDie (string $heading, string $text): void {
 
 function validDevice ($dbConn, string $postIndicator): array {        
   $unsafeDevice = safeStrFromExt('POST', $postIndicator, 8); // maximum length of 8
-  $result = $dbConn->query('SELECT `device` FROM `wmeter_user` WHERE 1 ORDER BY `id`;');
+  $result = $dbConn->query('SELECT `device` FROM `verbrauch_user` WHERE 1 ORDER BY `id`;');
   while ($row = $result->fetch_assoc()) {
       if ($unsafeDevice === $row['device']) {
           return array(TRUE, $row['device']);
@@ -48,7 +48,7 @@ function checkHash ($dbConn, string $device): bool {
   if ($unsafeRandNum === 0 or $unsafePostHash === '') {
       return FALSE;
   }
-  $result = $dbConn->query('SELECT * FROM `wmeter_user` WHERE `device` = "'.$device.'" ORDER BY `id` DESC LIMIT 1');
+  $result = $dbConn->query('SELECT * FROM `verbrauch_user` WHERE `device` = "'.$device.'" ORDER BY `id` DESC LIMIT 1');
   if ($result->num_rows !== 1) {
       return FALSE;
   }
@@ -188,7 +188,7 @@ function doDbThinning($dbConn, string $device, bool $talkative, int $timeRangeMi
   if ($timeRangeMins === 240) {
     $sqlWhereDeviceThin = '`device` = "'.$device.'" AND `thin` < "240"';
   }
-  $sql = 'SELECT `zeit` FROM `wmeter` WHERE '.$sqlWhereDeviceThin.' ORDER BY `id` ASC LIMIT 1;';
+  $sql = 'SELECT `zeit` FROM `verbrauch` WHERE '.$sqlWhereDeviceThin.' ORDER BY `id` ASC LIMIT 1;';
   $result = $dbConn->query($sql);
   $row = $result->fetch_assoc();
   // get the time, add 15 minutes  
@@ -208,7 +208,7 @@ function doDbThinning($dbConn, string $device, bool $talkative, int $timeRangeMi
     return;
   }
   // get the last one where thinning was not yet applied
-  $sql = 'SELECT `id` FROM `wmeter` WHERE '.$sqlWhereDeviceThin.' AND `zeit` < "'.$zeitToThinString.'" ORDER BY `id` ASC LIMIT 240;';
+  $sql = 'SELECT `id` FROM `verbrauch` WHERE '.$sqlWhereDeviceThin.' AND `zeit` < "'.$zeitToThinString.'" ORDER BY `id` ASC LIMIT 240;';
   $result = $dbConn->query($sql);
   if ($result->num_rows < 14) { // otherwise I can't really compact stuff
     // I have an issue when there are gaps in the entries. I then have less than 14 entries per 15 minutes
@@ -225,16 +225,16 @@ function doDbThinning($dbConn, string $device, bool $talkative, int $timeRangeMi
   $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
   $idToUpdate = $row['id'];
   
-  $sql = 'SELECT SUM(`aveConsDiff`) as `sumAveConsDiff`, SUM(`aveZeitDiff`) as `sumAveZeitDiff` FROM `wmeter`';
+  $sql = 'SELECT SUM(`aveConsDiff`) as `sumAveConsDiff`, SUM(`aveZeitDiff`) as `sumAveZeitDiff` FROM `verbrauch`';
   $sql = $sql. ' WHERE '.$sqlWhereDeviceThin.' AND `zeit` < "'.$zeitToThinString.'";';
   $result = $dbConn->query($sql);
   $row = $result->fetch_assoc(); 
 
   // now do the update and then delete the others. Number 15 means: a ratio of about 1/15 was implemented 
-  $sql = 'UPDATE `wmeter` SET `aveConsDiff` = "'.$row['sumAveConsDiff'].'", `aveZeitDiff` = "'.$row['sumAveZeitDiff'].'", `thin` = "'.$timeRangeMins.'" WHERE `id` = "'.$idToUpdate.'";';
+  $sql = 'UPDATE `verbrauch` SET `aveConsDiff` = "'.$row['sumAveConsDiff'].'", `aveZeitDiff` = "'.$row['sumAveZeitDiff'].'", `thin` = "'.$timeRangeMins.'" WHERE `id` = "'.$idToUpdate.'";';
   $result = $dbConn->query($sql);
   
-  $sql = 'DELETE FROM `wmeter` WHERE '.$sqlWhereDeviceThin.' AND `zeit` < "'.$zeitToThinString.'";';
+  $sql = 'DELETE FROM `verbrauch` WHERE '.$sqlWhereDeviceThin.' AND `zeit` < "'.$zeitToThinString.'";';
   $result = $dbConn->query($sql);
   echo $dbConn->affected_rows.' entries have been deleted';
 }      
