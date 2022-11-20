@@ -139,7 +139,7 @@ while True:
         ('hash', randNum_hash['hash'])
         ])
         
-    wlan_connect(wdt=wdt, DBGCFG=DBGCFG, wlan=wlan, tim=False, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
+    wlan_connect(wdt=wdt, DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
     debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
     wattValueString = send_message_get_response(wdt=wdt, DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
 
