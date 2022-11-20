@@ -9,7 +9,7 @@ import my_config
 def debug_wdtFeed(wdt, DBGCFG:dict):
     if DBGCFG["wdt_dis"]:
         return
-    debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
+    wdt.feed()
 
 def debug_print(DBGCFG:dict, text:str):
     if(DBGCFG["print"]):
@@ -34,18 +34,12 @@ def get_wlan_ok(DBGCFG:dict, wlan):
         return(True)
     return(wlan.isconnected())
 
-def blink(led_onboard):
-    led_onboard.toggle()
-
-def wlan_connect(wdt, DBGCFG:dict, wlan, tim, led_onboard):
+def wlan_connect(wdt, DBGCFG:dict, wlan, led_onboard, meas:bool):
     debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
     wlan_ok_flag = get_wlan_ok(DBGCFG=DBGCFG, wlan=wlan)        
     if(wlan_ok_flag):
         return() # nothing to do
     else: # wlan is not ok
-        if(led_onboard): # pimoroni does not have the led_onboard
-            tim.init(freq=4.0, mode=Timer.PERIODIC, callback=blink) # signals I'm searching for WLAN    
-    
         for i in range(10): # set the time out
             debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
             config_wlan = my_config.get_wlan_config() # stored in external file
@@ -54,9 +48,8 @@ def wlan_connect(wdt, DBGCFG:dict, wlan, tim, led_onboard):
             wlan_ok_flag = get_wlan_ok(DBGCFG=DBGCFG, wlan=wlan)
             print("WLAN connected? "+str(wlan_ok_flag)+", loop var: "+str(i)) # debug output
             if (wlan_ok_flag):
-                if(led_onboard): # pimoroni does not have the led_onboard
-                    tim.deinit()
-                    led_onboard.on()
+                if(meas): # pimoroni does not have the led_onboard
+                    led_onboard.toggle()
                 debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
                 return 
         # timeout, did not manage to get a working WLAN
