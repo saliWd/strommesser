@@ -93,7 +93,7 @@ if ($totalCount > 0) {// this may be 0. Can't
     while ($row = $result->fetch_assoc()) { // did already fetch the newest one. At least 2 remaining  
       $consumption = $row['consumption'] - $rowOldest['consumption']; // to get a relative value (and not some huge numbers)
       if ($row['aveZeitDiff'] > 0) { // divide by 0 exception
-        $watt = max(round($row['aveConsDiff']*3600*1000 / $row['aveZeitDiff']), 1.0); // max(val,1.0) because 0 in log will not be displayed correctly
+        $watt = max(round($row['aveConsDiff']*3600*1000 / $row['aveZeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
       } else { $watt = 0; }
       
       // revert the ordering

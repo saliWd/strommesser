@@ -17,7 +17,7 @@
    1. meas   
       1. current consumption
          1. monitor: about 26 mA (10 Ah = 3 days)? 5Ah did also work for 3 days?
-         2. check solar panel setup: min consumption of 40 mA an issue?
+         2. check solar panel setup: min consumption of 40 mA is an issue. add GPIO to high and 100 Ohm to ground: GPIO10.
       1. stability
          1. check again with WD feature enabled
    1. disp
@@ -25,4 +25,4 @@
 4. div
 
 
-Next:  3.1.1 wd remove again (debug issues, timeout is short, display did have an issue where it didn't help, ???) 
+Next:  3.1.1 wd remove again? (debug issues, timeout is short, display did have an issue where it didn't help, ???) 
