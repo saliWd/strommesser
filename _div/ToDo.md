@@ -23,7 +23,6 @@
    1. disp
       1. [case?](https://www.thingiverse.com/thing:4767008)
 4. div
-   1. re-org of git repo
-   1. db, switch devices
 
-Next:  4.2 
+
+Next:  3.1.1 wd remove again (debug issues, timeout is short, display did have an issue where it didn't help, ???) 
