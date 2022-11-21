@@ -73,18 +73,12 @@ LOOP_WAIT_TIME = 40
 
 # pins
 led_onboard = Pin("LED", Pin.OUT)
-enable3v3_pin = Pin(28, Pin.OUT) # solder pin GP28 to '3V3_EN'-pin
 
 # machine specific stuff
-# uart_ir = UART(0, baudrate=300, bits=7, parity=0, stop=1, tx=Pin(0), rx=Pin(1), timeout=6000)
-uart_ir = UART(0, baudrate=300, bits=7, parity=0, stop=1, tx=Pin(0), rx=Pin(1))
-
-# normal variables
-wlan_ok = False
+uart_ir = UART(0, baudrate=300, bits=7, parity=0, stop=1, tx=Pin(0), rx=Pin(1), timeout=6000)
 
 ## program starts here
 led_onboard.on()
-enable3v3_pin.off()
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
@@ -94,13 +88,9 @@ device_config = my_config.get_device_config()
 
 while True:
     debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
-    enable3v3_pin.on() # power on IR head
-    debug_sleep(wdt=wdt, DBGCFG=DBGCFG, time=2) # make sure 3.3V power is stable
     uart_received_str = uart_ir_e350(DBGCFG=DBGCFG, uart_ir=uart_ir, wdt=wdt) # this takes some seconds
     
-    
     debug_print(DBGCFG=DBGCFG, text=uart_received_str)
-    enable3v3_pin.off() # power down IR head
 
     # basic check, based on string length
     if (invalidUartStr(uart_received_str=uart_received_str)):
