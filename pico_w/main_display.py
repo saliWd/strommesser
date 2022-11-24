@@ -63,16 +63,16 @@ class RgbControl(object):
             self.led_rgb.set_rgb(*(255, 0, 0))
         self.tick = not(self.tick)
 
-    def pulse_green_cb(self, noIdeaWhyThisIsNeeded):
+    def pulse_blue_cb(self, noIdeaWhyThisIsNeeded):
         if self.tick:
             self.led_rgb.set_rgb(*(0, 0, 0))
         else:
-            self.led_rgb.set_rgb(*(0, 127, 0))
+            self.led_rgb.set_rgb(*(0, 0, 127))
         self.tick = not(self.tick)    
 
-    def start_pulse(self, green:bool):
-        if green:
-            self.timer_rgb.init(freq=2, callback=self.pulse_green_cb)
+    def start_pulse(self, blue:bool):
+        if blue:
+            self.timer_rgb.init(freq=2, callback=self.pulse_blue_cb)
         else:
             self.timer_rgb.init(freq=2, callback=self.pulse_red_cb)
 
@@ -119,7 +119,7 @@ def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting i
     display.text(text, x+1, y, scale=1.1)
 
 rgb_control = RgbControl()
-rgb_control.start_pulse(green=False) # signal startup
+rgb_control.start_pulse(blue=False) # signal startup
 
 while True:
     randNum_hash = get_randNum_hash(device_config)
@@ -177,11 +177,11 @@ while True:
 
     # lets also set the LED to match
     if (valid == 0):
-        rgb_control.start_pulse(green=False) # pulsate red
+        rgb_control.start_pulse(blue=False) # pulsate red
     else:
         rgb_control.set_const_color(value_to_color(wattValue,disp=False))
         if (wattValueNonMaxed == 0):
-            rgb_control.start_pulse(green=True)
+            rgb_control.start_pulse(blue=True)
     
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
     
