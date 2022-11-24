@@ -1,38 +1,30 @@
 import network # type: ignore (this is a pylance ignore warning directive)
 import urequests # type: ignore
 from time import sleep
-from machine import Timer, WDT # type: ignore
+from machine import Timer # type: ignore
 from pimoroni import RGBLED  # type: ignore
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
 
 # my own files
 import my_config
-from my_functions import debug_wdtFeed, debug_print, debug_sleep, wlan_connect, urlencode, get_randNum_hash
+from my_functions import debug_print, debug_sleep, wlan_connect, urlencode, get_randNum_hash
 
 
-def send_message_get_response(wdt, DBGCFG:dict, message:dict):
-    debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
+def send_message_get_response(DBGCFG:dict, message:dict):
     if (DBGCFG["wlan_sim"]):
         return("1|57") # valid|57W
     
     URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     urlenc = urlencode(message)
-    debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG) # before the urequest (has a timeout of 30s, so wdt will trigger)
     response = urequests.post(URL, data=urlenc, headers=HEADERS)
     debug_print(DBGCFG, response.text)
     returnText = response.text
     response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
-    debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
     return(returnText)
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
 LOOP_WAIT_TIME = 60
-if DBGCFG["wdt_dis"]:
-    wdt = 0
-else:
-    wdt = WDT(timeout=8300)  # enable it with a timeout of 8s. NB: maximum timeout is 8.388 seconds
-debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True) # activate it. NB: disabling does not work correctly
 sleep(1)
@@ -130,7 +122,6 @@ rgb_control = RgbControl()
 rgb_control.start_pulse(green=False) # signal startup
 
 while True:
-    debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
     randNum_hash = get_randNum_hash(device_config)
     
     message = dict([
@@ -139,9 +130,8 @@ while True:
         ('hash', randNum_hash['hash'])
         ])
         
-    wlan_connect(wdt=wdt, DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
-    debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
-    wattValueString = send_message_get_response(wdt=wdt, DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
+    wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
+    wattValueString = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
 
     validValue = wattValueString.split("|")
     if (len(validValue) != 2 ):
@@ -175,7 +165,6 @@ while True:
 
     display.set_pen(WHITE)
     display.rectangle(1, 1, 137, 41) # draws a white background for the text
-    debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
     expand = right_align(wattValueNonMaxed) # string formatting does not work correctly. Do it myself
     wattValueNonMaxed = min(wattValueNonMaxed, 9999) # limit it to 4 digits
 
@@ -194,5 +183,5 @@ while True:
         if (wattValueNonMaxed == 0):
             rgb_control.start_pulse(green=True)
     
-    debug_sleep(wdt, DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
+    debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
     

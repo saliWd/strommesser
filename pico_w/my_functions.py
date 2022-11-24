@@ -1,32 +1,23 @@
 from time import sleep
-from machine import Timer # type: ignore
 from hashlib import sha256
 from binascii import hexlify
 from random import randint
 
 import my_config
 
-def debug_wdtFeed(wdt, DBGCFG:dict):
-    if DBGCFG["wdt_dis"]:
-        return
-    wdt.feed()
-
 def debug_print(DBGCFG:dict, text:str):
     if(DBGCFG["print"]):
         print(text)
     return # otherwise just return
 
-def debug_sleep(wdt, DBGCFG:dict, time:int):
-    debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
+def debug_sleep(DBGCFG:dict, time:int):
     if(DBGCFG["sleep"]): # minimize wait times by sleeping only one second instead of the normal amount
         sleep(1)
         return
     remainingTime = time
     while remainingTime > 0:
-        debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
         sleep(min(7,remainingTime)) # wdt is set to 8 secs
         remainingTime = remainingTime - 7
-    debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
     return
 
 def get_wlan_ok(DBGCFG:dict, wlan):
@@ -34,14 +25,12 @@ def get_wlan_ok(DBGCFG:dict, wlan):
         return(True)
     return(wlan.isconnected())
 
-def wlan_connect(wdt, DBGCFG:dict, wlan, led_onboard, meas:bool):
-    debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
+def wlan_connect(DBGCFG:dict, wlan, led_onboard, meas:bool):
     wlan_ok_flag = get_wlan_ok(DBGCFG=DBGCFG, wlan=wlan)        
     if(wlan_ok_flag):
         return() # nothing to do
     else: # wlan is not ok
         for i in range(10): # set the time out
-            debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
             config_wlan = my_config.get_wlan_config() # stored in external file
             wlan.connect(config_wlan['ssid'], config_wlan['pw'])
             sleep(3)
@@ -50,10 +39,10 @@ def wlan_connect(wdt, DBGCFG:dict, wlan, led_onboard, meas:bool):
             if (wlan_ok_flag):
                 if(meas): # pimoroni does not have the led_onboard
                     led_onboard.toggle()
-                debug_wdtFeed(wdt=wdt, DBGCFG=DBGCFG)
                 return 
         # timeout, did not manage to get a working WLAN
-        sleep(10) # sleep. This will trigger a wdt (and do a reboot). NB: connection to whatever device is getting lost. complicates debugging
+        from machine import reset # type: ignore
+        reset() # NB: connection to whatever device is getting lost; complicates debugging
 
 
 def urlencode(dictionary:dict):
