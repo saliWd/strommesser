@@ -9,7 +9,7 @@ function printBeginOfPage_index(bool $enableAutoReload, string $timerange):void 
   <meta name="description" content="zeigt deinen Energieverbrauch" />  
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/font.css" type="text/css" />
-  <link rel="stylesheet" href="css/skeleton.css" type="text/css" />
+  <link rel="stylesheet" href="css/verbrauch.css" type="text/css" />
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>';
@@ -22,7 +22,7 @@ function printBeginOfPage_index(bool $enableAutoReload, string $timerange):void 
   echo '
   <div class="section noBottom">
   <div class="container">
-  <h3>StromMesser</h3>';
+  <h1>StromMesser</h1>';
   return;
 }
 
