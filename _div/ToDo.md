@@ -9,7 +9,6 @@
       1. design
          * full width for canvas
          * check on mobile
-         * css clean-up
       1. range selection, disable non-available ones
    3. rx_v2.php
    4. settings.php
@@ -26,4 +25,4 @@
 4. div
 
 
-Next:  3.1.1.2, 2.2.1 css
+Next:  2.1. password. 3.1.1.2

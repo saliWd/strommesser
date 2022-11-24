@@ -195,7 +195,7 @@ hr {
   }  
 
 .noBottom {
-  padding: 0rem;
+  padding: 1rem 0rem 0rem;
   margin-bottom: 0rem;
 }
 #menuToggle {
