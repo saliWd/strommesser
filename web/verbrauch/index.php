@@ -2,7 +2,7 @@
 require_once('functions.php');
 $dbConn = initialize();
 
-function printBeginOfPage_index(bool $enableAutoReload, string $timerange):void {
+function printBeginOfPage_index(bool $enableReload, string $timerange):void {
   echo '<!DOCTYPE html><html><head>
   <meta charset="utf-8" />
   <title>StromMesser</title>
@@ -13,8 +13,8 @@ function printBeginOfPage_index(bool $enableAutoReload, string $timerange):void 
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>';
-  if ($enableAutoReload) {
-    echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?autoreload=1'.$timerange.'">';
+  if ($enableReload) {
+    echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1'.$timerange.'">';
   }
   echo '
   </head><body>';
@@ -37,9 +37,9 @@ function getTimeRange():int {
   return $returnVal;
 }
 
-$autoreload = safeIntFromExt('GET', 'autoreload', 1);
+$reload = safeIntFromExt('GET', 'reload', 1);
 $timeSelected = getTimeRange();
-$enableAutoReload = ($autoreload === 1);
+$enableReload = ($reload === 1);
 $device = 'austr10'; // TODO: device as variable
 
 $resultCnt = $dbConn->query('SELECT COUNT(*) as `total` FROM `verbrauch` WHERE `device` = "'.$device.'" LIMIT 1;'); // guaranteed to return one row
@@ -49,7 +49,7 @@ $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
-printBeginOfPage_index($enableAutoReload, '&rangeSelect='.$timeSelected);
+printBeginOfPage_index($enableReload, '&rangeSelect='.$timeSelected);
 if ($totalCount > 0) {// this may be 0. Can't 
   $zeitNewest = date_create($rowFreshest['zeit']);    
   if ($timeSelected < 25) {
@@ -161,7 +161,7 @@ if ($totalCount > 0) {// this may be 0. Can't
 }
 
 $checkedText = '';
-if($enableAutoReload) {
+if($enableReload) {
   $checkedText = ' checked';
 }
 
@@ -182,7 +182,7 @@ function setValAndSubmit(valueString){
 }
 </script>';
 echo '<div class="row twelve columns"><form id="timerangeform" action="index.php" method="get">
-<input type="checkbox" id="autoreload" name="autoreload" value="1" onChange="setValAndSubmit(\''.$timeSelected.'\')" '.$checkedText.'> reload';
+<input type="checkbox" id="reload" name="reload" value="1" onChange="setValAndSubmit(\''.$timeSelected.'\')" '.$checkedText.'> reload';
 foreach ($submitTexts as $submitText) {
   echo '<button type="button" onclick="setValAndSubmit(\''.$submitText[0].'\')" '.$submitText[2].'>'.$submitText[1].'</button>';
 }

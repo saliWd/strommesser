@@ -7,8 +7,8 @@
    1. password / device as variable
    2. index.php
       1. design
-         * full width for canvas
-         * check on mobile
+         * menu colors
+         * 'smaller' graph on mobile
       1. range selection, disable non-available ones
    3. rx_v2.php
    4. settings.php

@@ -21,9 +21,9 @@
 Type=Application
 Hidden=false
 X-GNOME-Autostart-enabled=true
-Comment=Start des Cromium Browsers
+Comment=Chromium Browser Fullscreen
 Name=chromiumstart
-Exec=/usr/bin/chromium-browser --noerrdialogs --disable-session-crashed-bubble --disable-infobars --start-fullscreen https://strommesser.ch/verbrauch/index.php?autoreload=1
+Exec=/usr/bin/chromium-browser --noerrdialogs --disable-session-crashed-bubble --disable-infobars --start-fullscreen https://strommesser.ch/verbrauch/index.php?reload=1
 ```
 
 ### Volkszähler info

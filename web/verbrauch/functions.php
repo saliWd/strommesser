@@ -63,10 +63,26 @@ function checkHash ($dbConn, string $device): bool {
   }
 }
 
+function printInlineCss(): void {    
+  // TODO: choose different colors
+  $txtLight = 'rgba(241,217,135,1.00)';
+  $txtDark =  'rgba(10,10,10,0.95)';
+  $bg_norm2 = 'rgba(103,43,36,0.70)';
+  echo '
+  <style>
+    #menu { background-color: '.$bg_norm2.'; border-color: '.$txtDark.'; }
+    #menu a { color: '.$txtLight.'; }
+    .menuCurrentPage { color: '.$txtDark.'; }
+    #menuToggle input:checked ~ span { background: '.$txtLight.'; }
+  </style>';
+}
 
-function printNavMenu (string $siteSafe): void {   
-  $home   = ($siteSafe === 'index.php') ? '<li class="menuCurrentPage">Home</li>' : '<li><a href="index.php">Home</a></li>';
-  $links  = ($siteSafe === 'settings.php') ? '<li class="menuCurrentPage">Settings</li>' : '<li><a href="settings.php">Settings</a></li>';
+
+function printNavMenu (string $siteSafe): void {
+  printInlineCss();
+  $wpHome = '<li><a href="../wp/">Home</a></li>'; // I don't display this menu on the wp site
+  $home   = ($siteSafe === 'index.php') ? '<li class="menuCurrentPage">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
+  $links  = ($siteSafe === 'settings.php') ? '<li class="menuCurrentPage">Einstellungen</li>' : '<li><a href="settings.php">Einstellungen</a></li>';
   
   echo '
   <nav style="width:400px">
@@ -76,6 +92,7 @@ function printNavMenu (string $siteSafe): void {
       <span></span>
       <span></span>
       <ul id="menu">
+        '.$wpHome.'
         '.$home.'
         '.$links.'
       </ul>
@@ -85,7 +102,7 @@ function printNavMenu (string $siteSafe): void {
 
 // returns the current site in the format 'about.php' in a safe way. Any do=xy parameters are obmitted
 function getCurrentSite (): string {  
-  $siteUnsafe = substr($_SERVER['SCRIPT_NAME'],7); // SERVER[...] is something like /start/links.php (without any parameters)   
+  $siteUnsafe = substr($_SERVER['SCRIPT_NAME'],11); // SERVER[...] is something like /verbrauch/settings.php (without any parameters)
   if (
       ($siteUnsafe === 'index.php') or 
       ($siteUnsafe === 'settings.php')

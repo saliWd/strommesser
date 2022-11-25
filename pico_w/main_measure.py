@@ -3,7 +3,6 @@ import urequests # type: ignore
 from time import sleep
 from machine import Pin, UART, freq # type: ignore
 
-
 # my own files
 import my_config
 from my_functions import debug_print, debug_sleep, wlan_connect, urlencode, get_randNum_hash
@@ -54,19 +53,20 @@ def send_message_and_wait_post(DBGCFG:dict, message:dict, wait_time:int, led_onb
     led_onboard.toggle() # signal success
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
-
-PWR_INCR = True # need a higher power consumption as the solar power manager shuts itself down when output is less than ~40 mA
-if PWR_INCR:
-    Pio10 = Pin(10, Pin.OUT)
-    Pio18 = Pin(18, Pin.OUT)
-    Pio10.on() # connect a resistor to ground on those two pins to drain more power
-    Pio18.on()
-    freq(240000000) # set CPU clock to 240 MHz to consume more power
-
 LOOP_WAIT_TIME = 40
 
 # pins
 led_onboard = Pin("LED", Pin.OUT)
+Pio10 = Pin(10, Pin.OUT)
+Pio18 = Pin(18, Pin.OUT)
+Pio10.off()
+Pio18.off()
+
+PWR_INCR = True # need a higher power consumption as the solar power manager shuts itself down when output is less than ~40 mA
+if PWR_INCR:
+    Pio10.on() # connect a resistor to ground on those two pins to drain more power
+    Pio18.on()
+    freq(240000000) # set CPU clock to 240 MHz to consume more power
 
 # machine specific stuff
 uart_ir = UART(0, baudrate=300, bits=7, parity=0, stop=1, tx=Pin(0), rx=Pin(1), timeout=6000)
@@ -76,7 +76,7 @@ led_onboard.on()
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-sleep(3)
+sleep(1)
 
 device_config = my_config.get_device_config()
 
