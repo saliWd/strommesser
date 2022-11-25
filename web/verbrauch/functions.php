@@ -63,23 +63,7 @@ function checkHash ($dbConn, string $device): bool {
   }
 }
 
-function printInlineCss(): void {    
-  // TODO: choose different colors
-  $txtLight = 'rgb(72,117,144)';
-  $txtDark  = 'rgb(10,10,10)';
-  $bg_menu  = 'rgba(113,43,36,0.20)';
-  echo '
-  <style>
-    #menu { background-color: '.$bg_menu.'; border-color: '.$txtDark.'; }
-    #menu a { color: '.$txtLight.'; }
-    .menuCurrentPage { color: '.$txtDark.'; }
-    #menuToggle input:checked ~ span { background: '.$txtLight.'; }
-  </style>';
-}
-
-
-function printNavMenu (string $siteSafe): void {
-  printInlineCss();
+function printNavMenu (string $siteSafe): void {  
   $wpHome = '<li><a href="../wp/">Home</a></li>'; // I don't display this menu on the wp site
   $home   = ($siteSafe === 'index.php') ? '<li class="menuCurrentPage">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
   $links  = ($siteSafe === 'settings.php') ? '<li class="menuCurrentPage">Einstellungen</li>' : '<li><a href="settings.php">Einstellungen</a></li>';

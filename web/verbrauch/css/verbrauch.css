@@ -246,8 +246,12 @@ hr {
   transform-origin: 0% 0%;
   transform: translate(-100%, 0);
   transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+  background-color: rgba(113,43,36,0.20); 
+  border-color: rgb(10,10,10);
 }
-#menu a { background: transparent; color: inherit; }
+#menu a { background: transparent; color: rgb(72,117,144); }
 #menu li { padding: 5px 0; font-size: 18px; margin-bottom: 0rem; }
 #menu ul { margin-bottom: 0rem; }
-#menuToggle input:checked ~ ul { transform: none; }    
+#menuToggle input:checked ~ ul { transform: none; }
+.menuCurrentPage { color: rgb(10,10,10); }
+#menuToggle input:checked ~ span { background: rgb(72,117,144); }
