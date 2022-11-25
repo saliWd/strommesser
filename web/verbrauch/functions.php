@@ -65,12 +65,12 @@ function checkHash ($dbConn, string $device): bool {
 
 function printInlineCss(): void {    
   // TODO: choose different colors
-  $txtLight = 'rgba(241,217,135,1.00)';
-  $txtDark =  'rgba(10,10,10,0.95)';
-  $bg_norm2 = 'rgba(103,43,36,0.70)';
+  $txtLight = 'rgb(72,117,144)';
+  $txtDark  = 'rgb(10,10,10)';
+  $bg_menu  = 'rgba(113,43,36,0.20)';
   echo '
   <style>
-    #menu { background-color: '.$bg_norm2.'; border-color: '.$txtDark.'; }
+    #menu { background-color: '.$bg_menu.'; border-color: '.$txtDark.'; }
     #menu a { color: '.$txtLight.'; }
     .menuCurrentPage { color: '.$txtDark.'; }
     #menuToggle input:checked ~ span { background: '.$txtLight.'; }

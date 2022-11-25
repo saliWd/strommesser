@@ -5,7 +5,7 @@ $dbConn = initialize();
 function printBeginOfPage_index(bool $enableReload, string $timerange):void {
   echo '<!DOCTYPE html><html><head>
   <meta charset="utf-8" />
-  <title>StromMesser</title>
+  <title>StromMesser Verbrauch</title>
   <meta name="description" content="zeigt deinen Energieverbrauch" />  
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/font.css" type="text/css" />
@@ -22,7 +22,7 @@ function printBeginOfPage_index(bool $enableReload, string $timerange):void {
   echo '
   <div class="section noBottom">
   <div class="container">
-  <h1>StromMesser</h1>';
+  <h1>Verbrauch</h1>';
   return;
 }
 
