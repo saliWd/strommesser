@@ -20,7 +20,6 @@ function printErrorAndDie (string $heading, string $text): void {
     <title>Error page</title>
     <meta name="description" content="a generic error page" />  
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="css/font.css" type="text/css" />    
     <link rel="stylesheet" href="css/verbrauch.css" type="text/css" />';    
   echo '</head><body><div class="row twelve columns textBox"><h4>'.$heading.'</h4><p>'.$text.'</p></div></body></html>';
   die();
@@ -76,6 +75,7 @@ function printNavMenu (string $siteSafe): void {
       <span></span>
       <span></span>
       <ul id="menu">
+        <li>&nbsp;</li>
         '.$wpHome.'
         '.$home.'
         '.$links.'

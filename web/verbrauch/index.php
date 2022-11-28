@@ -8,7 +8,6 @@ function printBeginOfPage_index(bool $enableReload, string $timerange):void {
   <title>StromMesser Verbrauch</title>
   <meta name="description" content="zeigt deinen Energieverbrauch" />  
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/font.css" type="text/css" />
   <link rel="stylesheet" href="css/verbrauch.css" type="text/css" />
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>

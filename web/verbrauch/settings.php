@@ -8,14 +8,13 @@ function printBeginOfPage_settings():void {
   <title>StromMesser Einstellungen</title>
   <meta name="description" content="zeigt deinen Energieverbrauch" />  
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/font.css" type="text/css" />
   <link rel="stylesheet" href="css/verbrauch.css" type="text/css" />
   </head><body>';
   printNavMenu(getCurrentSite());
   echo '
   <div class="section noBottom">
   <div class="container">
-  <h1>StromMesser Einstellungen</h1>
+  <h1>Einstellungen</h1>
   <p>&nbsp;</p>
   <hr>';
   return;

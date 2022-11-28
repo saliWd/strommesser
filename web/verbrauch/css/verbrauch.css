@@ -1,3 +1,33 @@
+/* raleway-300 - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Raleway Light'), local('Raleway-Light'),
+       url('../fonts/raleway-v12-latin-300.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('../fonts/raleway-v12-latin-300.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* raleway-regular - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Raleway'), local('Raleway-Regular'),
+       url('../fonts/raleway-v12-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('../fonts/raleway-v12-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* raleway-600 - latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Raleway SemiBold'), local('Raleway-SemiBold'),
+       url('../fonts/raleway-v12-latin-600.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+       url('../fonts/raleway-v12-latin-600.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
 .container {
   position: relative;
   width: 100%;
@@ -246,12 +276,14 @@ hr {
   transform-origin: 0% 0%;
   transform: translate(-100%, 0);
   transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
-  background-color: rgba(113,43,36,0.20); 
-  border-color: rgb(10,10,10);
+  background-color: rgba(255, 255, 255,0.85); 
+  border-color: rgb(111, 10, 168);
 }
-#menu a { background: transparent; color: rgb(72,117,144); }
+/* bg: 245,217,164. violet-dark: 111,10,168. violet-bright: 170,39,245. green-dark:19,168,89. green-light:15,245,123 */ 
+#menu a { background: transparent; color: rgb(111, 10, 168); }
+#menu a:hover, #menu a:focus { color: rgb( 170,39,245); }
 #menu li { padding: 5px 0; font-size: 18px; margin-bottom: 0rem; }
 #menu ul { margin-bottom: 0rem; }
 #menuToggle input:checked ~ ul { transform: none; }
-.menuCurrentPage { color: rgb(10,10,10); }
-#menuToggle input:checked ~ span { background: rgb(72,117,144); }
+.menuCurrentPage { color: rgb(19, 168, 89); }
+#menuToggle input:checked ~ span { background: rgb(111, 10, 168); }
