@@ -7,7 +7,6 @@
    1. password / device as variable
    2. index.php
       1. design
-         * menu colors
          * 'smaller' graph on mobile
       1. range selection, disable non-available ones
    3. rx_v2.php
