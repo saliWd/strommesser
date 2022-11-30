@@ -30,7 +30,7 @@ def uart_ir_e350(DBGCFG:dict, uart_ir):
         if (uart_str_id != None): print('error, id='+uart_str_id.decode())
         if (uart_str_values_0 != None): print('error, uart_str_values_0='+uart_str_values_0.decode())
         if (uart_str_values_1 != None): print('error, uart_str_values_1='+uart_str_values_1.decode())
-        return('uart communication did not work') # still a string, will not be transmitted ()
+        return('uart communication did not work') # still a string, will not be transmitted
     else:
         return(uart_str_values_0.decode()+uart_str_values_1.decode())
 
@@ -69,14 +69,14 @@ if PWR_INCR:
     freq(240000000) # set CPU clock to 240 MHz to consume more power
 
 # machine specific stuff
-uart_ir = UART(0, baudrate=300, bits=7, parity=0, stop=1, tx=Pin(0), rx=Pin(1), timeout=6000)
+uart_ir = UART(0, baudrate=300, bits=7, parity=0, stop=1, tx=Pin(0), rx=Pin(1))
 
 ## program starts here
 led_onboard.on()
 
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-sleep(1)
+sleep(3)
 
 device_config = my_config.get_device_config()
 
