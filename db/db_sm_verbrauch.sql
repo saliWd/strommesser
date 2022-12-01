@@ -8,6 +8,16 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL,
+  `device` varchar(8) NOT NULL,
+  `post_key` varchar(32) NOT NULL,
+  `email` varchar(127) NOT NULL,
+  `lastLogin` timestamp NOT NULL DEFAULT current_timestamp(),
+  `pwHash` char(255) NOT NULL,
+  `randCookie` char(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE `verbrauch` (
   `id` bigint(20) NOT NULL,
   `device` varchar(8) DEFAULT NULL,
@@ -20,25 +30,19 @@ CREATE TABLE `verbrauch` (
   `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `verbrauch_user` (
-  `id` int(11) NOT NULL,
-  `device` varchar(8) NOT NULL,
-  `post_key` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `verbrauch`
   ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `verbrauch_user`
-  ADD PRIMARY KEY (`id`);
 
+ALTER TABLE `user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `verbrauch`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `verbrauch_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -39,7 +39,6 @@ function processLoginData(object $dbConn, string $emailUnsafe, string $passwordU
   function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid, $passwordUnsafe, $randCookieInput) : bool {
     $_SESSION['userid'] = 0; // clear it just to make sure    
     
-    /*
     if (!($result = $dbConn->query('SELECT `pwHash`, `randCookie` FROM `user` WHERE `id` = "'.$userid.'"'))) {
       return error(112004);
     }
@@ -50,7 +49,7 @@ function processLoginData(object $dbConn, string $emailUnsafe, string $passwordU
     $row = $result->fetch_assoc();        
     $pwHash = $row['pwHash'];
     $randCookie = $row['randCookie'];
-    */
+    
     if ($authMethodPw) { // with a pw
       if (!(($userid === 1) or (password_verify($passwordUnsafe, $pwHash)))) {
         printErrorAndDie('Error','falsches Passwort');
@@ -94,14 +93,14 @@ if ($doSafe === 0) {
     echo '   
     <form action="login.php?do=1" method="post">
     <div class="row">
-        <div class="three columns"><span class="bgCol">email:</span> </div>
-        <div class="nine columns"><input name="email" type="email" maxlength="127" value="" required size="20"></div>
+        <div class="six columns" style="text-align: right">Email: </div>
+        <div class="six columns" style="text-align: left"><input name="email" type="email" maxlength="127" value="" required size="20"></div>
     </div>    
     <div class="row" id="pwRow">
-        <div class="three columns"><span class="bgCol">Passwort:</span> </div>
-        <div class="nine columns"><input name="password" type="password" maxlength="63" value="" required size="20"></div>
+        <div class="six columns" style="text-align: right">Passwort: </div>
+        <div class="six columns" style="text-align: left"><input name="password" type="password" maxlength="63" value="" required size="20"></div>
     </div>
-    <div class="row twelve columns" style="font-size: smaller;"><input type="checkbox" name="setCookie" value="1" checked><span class="bgCol">auf diesem Gerät speichern</span></div>
+    <div class="row twelve columns" style="font-size: smaller;"><input type="checkbox" name="setCookie" value="1" checked>auf diesem Gerät speichern</div>
     <div class="row twelve columns">&nbsp;</div>
     <div class="row twelve columns"><input name="create" type="submit" value="log in"></div>
     <div class="row twelve columns">&nbsp;</div>
