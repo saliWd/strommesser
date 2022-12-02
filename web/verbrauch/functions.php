@@ -5,13 +5,11 @@
 // it does the session start and opens connection to the data base. Returns the dbConn variable or a boolean
 function initialize () {
   session_start(); // this code must precede any HTML output
-
-  /*
   if (!getUserid()) {
     redirectRelative('login.php');    
     die(); // this code is not reached because redirect does an exit but it's anyhow cleaner like this
   }
-  */
+  
   return get_dbConn();  
 }
 
@@ -24,7 +22,7 @@ function get_dbConn() {
   return $dbConn;
 }
 
-// returns the userid integer from the session variable
+// returns the userid integer from the session variable. userid 1 is special (the demo account)
 function getUserid (): int {
   if (isset($_SESSION)) {
 	  if (isset($_SESSION['userid'])) {

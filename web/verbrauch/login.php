@@ -1,5 +1,6 @@
 <?php declare(strict_types=1); 
 require_once('functions.php');
+session_start(); // this code must precede any HTML output
 $dbConn = get_dbConn(); // do not use initialize here
 
 function sessionAndCookieDelete (): void {
@@ -8,8 +9,8 @@ function sessionAndCookieDelete (): void {
 }
 
 // returns the userid which matches to the email given. Returns 0 if something went wrong
-function mail2userid (object $dbConn, string $emailSafe) : int {    
-  if (!($result = $dbConn->query('SELECT `id` FROM `user` WHERE `email` = "'.mysqli_real_escape_string($dbConn, $emailSafe).'"'))) {
+function mail2userid (object $dbConn, string $emailUnsafe) : int {    
+  if (!($result = $dbConn->query('SELECT `id` FROM `user` WHERE `email` = "'.mysqli_real_escape_string($dbConn, $emailUnsafe).'";'))) {
     return 0;
   }
   if (!($result->num_rows == 1)) {
@@ -24,15 +25,13 @@ function processLoginData(object $dbConn, string $emailUnsafe, string $passwordU
   if (!(filter_var($emailUnsafe, FILTER_VALIDATE_EMAIL))) { // have a valid email
       printErrorAndDie('Error','Email ungültig');      
   }
-  $userid = mail2userid($dbConn, $emailUnsafe);
-  /*  
+  $userid = mail2userid(dbConn:$dbConn, emailUnsafe:$emailUnsafe);
   if (!($userid > 0) ) { // email found in db
     printErrorAndDie('Error','Falsches Passwort oder Email... Nochmals versuchen? <a href="login.php">zurück zur Login-Seite</a>');
     return FALSE; 
-  } */
-  $userid = 1; // TODO
+  } 
 
-  if (!(verifyCredentials($dbConn, TRUE, $userid, $passwordUnsafe, ''))) { // verification ok
+  if (!(verifyCredentials(dbConn:$dbConn, authMethodPw:TRUE, userid:$userid, passwordUnsafe:$passwordUnsafe))) { // verification ok
     return FALSE; // This already prints an error message
   }
   if ($setCookieSafe === 1) {
@@ -51,13 +50,13 @@ function processLoginData(object $dbConn, string $emailUnsafe, string $passwordU
 }
 
 // function to do the login. Several options are available to log in
-function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid, $passwordUnsafe, $randCookieInput) : bool {
+function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid=0, string $passwordUnsafe='', string $randCookieInput='') : bool {
   $_SESSION['userid'] = 0; // clear it just to make sure    
   
   if (!($result = $dbConn->query('SELECT `pwHash`, `randCookie` FROM `user` WHERE `id` = "'.$userid.'"'))) {
     return error(112004);
   }
-  if (!($result->num_rows == 1)) {
+  if (!($result->num_rows === 1)) {
     return error(112003);
   }
 
@@ -66,9 +65,9 @@ function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid, $pa
   $randCookie = $row['randCookie'];
   
   if ($authMethodPw) { // with a pw
-    if (!(($userid === 1) or (password_verify($passwordUnsafe, $pwHash)))) {
+    if (!(password_verify($passwordUnsafe, $pwHash))) {
       printErrorAndDie('Error','falsches Passwort');
-      return FALSE;        
+      return FALSE;
     } 
   } else { // with a Cookie
     if (!(($randCookie) and ($randCookie == $randCookieInput))) { // there is no zero in the data base and 64hex value is correct
@@ -150,8 +149,7 @@ if ($doSafe === 0) {
   // check cookie
   $useridCookieSafe = safeIntFromExt('COOKIE', 'userIdCookie', 11);
   $randCookieSafe   = safeHexFromExt('COOKIE', 'randCookie', 64); 
-  
-  if (($useridCookieSafe > 0) and (verifyCredentials($dbConn, FALSE, $useridCookieSafe, '', $randCookieSafe))){
+  if (($useridCookieSafe > 0) and (verifyCredentials(dbConn:$dbConn, authMethodPw:FALSE, userid:$useridCookieSafe, randCookieInput:$randCookieSafe))){
     redirectRelative('index.php'); // always going back to the main page after login   
     die(); // will not be executed
   } // no cookie present and no userid. print the login form
