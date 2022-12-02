@@ -8,9 +8,8 @@ function initialize () {
 
   /*
   if (!getUserid()) {
-    redirectRelative('login.php');
-    return false;  // this code is not reached because redirect does an exit but it's anyhow cleaner like this
-    die(); // another safety measure. Will not be executed
+    redirectRelative('login.php');    
+    die(); // this code is not reached because redirect does an exit but it's anyhow cleaner like this
   }
   */
   return get_dbConn();  
@@ -130,12 +129,11 @@ function printNavMenu (string $siteSafe): void {
 // returns the current site in the format 'about.php' in a safe way. Any do=xy parameters are obmitted
 function getCurrentSite (): string {  
   $siteUnsafe = substr($_SERVER['SCRIPT_NAME'],11); // SERVER[...] is something like /verbrauch/settings.php (without any parameters)
-  if (
-      ($siteUnsafe === 'index.php') or 
-      ($siteUnsafe === 'settings.php')
-     ) {
-        return $siteUnsafe;
-      }
+  require_once('constants.php');
+
+  if (in_array($siteUnsafe, $VALID_SITES)) {
+    return $siteUnsafe;
+  }
   return ''; 
 }
 
