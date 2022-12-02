@@ -4,13 +4,49 @@
 // this function is called on every (user related) page on the very start  
 // it does the session start and opens connection to the data base. Returns the dbConn variable or a boolean
 function initialize () {
+  session_start(); // this code must precede any HTML output
+  if (!getUserid()) {
+    redirectRelative('login.php');    
+    die(); // this code is not reached because redirect does an exit but it's anyhow cleaner like this
+  }
+  
+  return get_dbConn();  
+}
+
+function get_dbConn() {
   require_once('dbConn.php'); // this will return the $dbConn variable as 'new mysqli'
   if ($dbConn->connect_error) {
-    printErrorAndDie('Connection to the data base failed', 'Please try again later and/or send me an email: info@strommesser.ch');
+    printErrorAndDie('Connection to the data base failed', 'Please try again later and/or send me an email: web@strommesser.ch');
   }
   $dbConn->set_charset('utf8');
   return $dbConn;
 }
+
+// returns the userid integer from the session variable. userid 1 is special (the demo account)
+function getUserid (): int {
+  if (isset($_SESSION)) {
+	  if (isset($_SESSION['userid'])) {
+    	return (int)$_SESSION['userid'];
+	  }
+  }
+  return 0;  // rather return 0 (means userid is not valid) than FALSE
+}
+
+// does a (relative) redirect
+function redirectRelative (string $page): void {
+  // redirecting relative to current page NB: some clients require absolute paths
+  $host  = $_SERVER['HTTP_HOST'];
+  $uri   = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');  
+  header('Location: https://'.$host.htmlentities($uri).'/'.$page);
+  exit;
+}
+
+// displays some very generic failure message
+function error (int $errorMsgNum): bool {  
+  printErrorAndDie('Error', 'Fehlernummer: '.$errorMsgNum.'. Probier doch später nochmals oder schreib mir an web@strommesser.ch');  
+  return FALSE; // (not executed). always returning FALSE to simplify coding. Can write "return error(1234);" which will return FALSE.
+}
+
 
 // prints a valid html error page and stops php execution
 function printErrorAndDie (string $heading, string $text): void {
@@ -32,7 +68,7 @@ function printRawErrorAndDie (string $heading, string $text): void {
 
 function validDevice ($dbConn, string $postIndicator): array {        
   $unsafeDevice = safeStrFromExt('POST', $postIndicator, 8); // maximum length of 8
-  $result = $dbConn->query('SELECT `device` FROM `verbrauch_user` WHERE 1 ORDER BY `id`;');
+  $result = $dbConn->query('SELECT `device` FROM `user` WHERE 1 ORDER BY `id`;');
   while ($row = $result->fetch_assoc()) {
       if ($unsafeDevice === $row['device']) {
           return array(TRUE, $row['device']);
@@ -47,7 +83,7 @@ function checkHash ($dbConn, string $device): bool {
   if ($unsafeRandNum === 0 or $unsafePostHash === '') {
       return FALSE;
   }
-  $result = $dbConn->query('SELECT * FROM `verbrauch_user` WHERE `device` = "'.$device.'" ORDER BY `id` DESC LIMIT 1');
+  $result = $dbConn->query('SELECT * FROM `user` WHERE `device` = "'.$device.'" ORDER BY `id` DESC LIMIT 1');
   if ($result->num_rows !== 1) {
       return FALSE;
   }
@@ -65,7 +101,9 @@ function checkHash ($dbConn, string $device): bool {
 function printNavMenu (string $siteSafe): void {  
   $wpHome = '<li><a href="../wp/">Home</a></li>'; // I don't display this menu on the wp site
   $home   = ($siteSafe === 'index.php') ? '<li class="menuCurrentPage">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
-  $links  = ($siteSafe === 'settings.php') ? '<li class="menuCurrentPage">Einstellungen</li>' : '<li><a href="settings.php">Einstellungen</a></li>';
+  $links  = ($siteSafe === 'settings.php') ? '<li class="menuCurrentPage">Einstellungen</li>' : '<li><a href="settings.php">Einstellungen</a></li>';  
+  // will be redirected to login anyhow... $login  = ($siteSafe === 'login.php') ? '<li class="menuCurrentPage">Log in</li>' : '<li><a href="settings.php">Log in</a></li>';
+  $logout = '<li><a href="login.php?do=2">Log out</a></li>'; 
   
   echo '
   <nav style="width:400px">
@@ -79,6 +117,8 @@ function printNavMenu (string $siteSafe): void {
         '.$wpHome.'
         '.$home.'
         '.$links.'
+        <li>&nbsp;</li>
+        '.$logout.'
       </ul>
     </div>
   </nav>';
@@ -87,12 +127,11 @@ function printNavMenu (string $siteSafe): void {
 // returns the current site in the format 'about.php' in a safe way. Any do=xy parameters are obmitted
 function getCurrentSite (): string {  
   $siteUnsafe = substr($_SERVER['SCRIPT_NAME'],11); // SERVER[...] is something like /verbrauch/settings.php (without any parameters)
-  if (
-      ($siteUnsafe === 'index.php') or 
-      ($siteUnsafe === 'settings.php')
-     ) {
-        return $siteUnsafe;
-      }
+  require_once('constants.php');
+
+  if (in_array($siteUnsafe, $VALID_SITES)) {
+    return $siteUnsafe;
+  }
   return ''; 
 }
 

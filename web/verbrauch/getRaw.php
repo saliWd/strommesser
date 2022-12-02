@@ -1,6 +1,6 @@
 <?php declare(strict_types=1); 
     require_once('functions.php');
-    $dbConn = initialize();
+    $dbConn = get_dbConn(); // do not use initialize as I don't use sessions
     // expecting a call like "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2" including POST data (url encoded)
     
     // no meaningful (=HTML) output is generated. Use index.php to monitor the value itself

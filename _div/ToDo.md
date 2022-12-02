@@ -11,17 +11,15 @@
       1. range selection, disable non-available ones
    3. rx_v2.php
    4. settings.php
+   5. clear all TODOs
+   6. average numbers: per day, per week, per month (additional page/graph)
 3. pico devices
    1. meas   
-      1. current consumption
-         1. monitor: about 26 mA (10 Ah = 3 days)? 5Ah did also work for 3 days?
-         2. check solar panel setup: min consumption of 40 mA is an issue. 
-            * with adding 110 Ohm on two pins (actually 2 x 30 mA) and setting the CPU to 240 MHz, it's working. Without either of those, it's shutting off (200 MHz works for some time but not reliably). Had one shutdown also with the 240 MHz. But apart from that, was working nicely. Will need several resistor options
-      2. stability
-         1. monitor, again...
+      1. current consumption         
+         1. check solar panel setup: min consumption of 40 mA is an issue (did solder the additional load on GPIOs). Check again about freq increase             
    2. disp
       1. [case?](https://www.thingiverse.com/thing:4767008)
 4. div
 
 
-Next:  2.1. password. 3.1.1.2
+Next:  2.1. password. 3.1.1, 1.1
