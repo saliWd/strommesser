@@ -66,7 +66,7 @@ PWR_INCR = True # need a higher power consumption as the solar power manager shu
 if PWR_INCR:
     Pio10.on() # connect a resistor to ground on those two pins to drain more power
     Pio18.on()
-    freq(240000000) # set CPU clock to 240 MHz to consume more power
+    freq(240000000) # increase CPU clock to consume more power, default 120 MHz
 
 # machine specific stuff
 uart_ir = UART(0, baudrate=300, bits=7, parity=0, stop=1, tx=Pin(0), rx=Pin(1))
