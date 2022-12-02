@@ -31,7 +31,7 @@ function getUserid (): int {
     	return (int)$_SESSION['userid'];
 	  }
   }
-  return 0;  // rather return 0 (means userid is not valid) than false
+  return 0;  // rather return 0 (means userid is not valid) than FALSE
 }
 
 // does a (relative) redirect
@@ -46,7 +46,7 @@ function redirectRelative (string $page): void {
 // displays some very generic failure message
 function error (int $errorMsgNum): bool {  
   printErrorAndDie('Error', 'Fehlernummer: '.$errorMsgNum.'. Probier doch später nochmals oder schreib mir an web@strommesser.ch');  
-  return false; // (not executed). always returning false to simplify coding. Can write "return error(1234);" which will return false.
+  return FALSE; // (not executed). always returning FALSE to simplify coding. Can write "return error(1234);" which will return FALSE.
 }
 
 

@@ -1,9 +1,10 @@
 <?php declare(strict_types=1); 
 require_once('functions.php');
+$dbConn = get_dbConn(); // do not use initialize here
 
 function sessionAndCookieDelete (): void {
   $_SESSION['userid'] = 0; // the most important one, make sure it's really 0
-  setcookie('userIdCookie', '0', (time() - 42000), '/verbrauch/', 'strommesser.ch', true, true); // some big enough value in the past to make sure things like summer time changes do not affect it  
+  setcookie('userIdCookie', '0', (time() - 42000), '/verbrauch/', 'strommesser.ch', TRUE, TRUE); // some big enough value in the past to make sure things like summer time changes do not affect it  
 }
 
 // returns the userid which matches to the email given. Returns 0 if something went wrong
@@ -27,26 +28,26 @@ function processLoginData(object $dbConn, string $emailUnsafe, string $passwordU
   /*  
   if (!($userid > 0) ) { // email found in db
     printErrorAndDie('Error','Falsches Passwort oder Email... Nochmals versuchen? <a href="login.php">zurück zur Login-Seite</a>');
-    return false; 
+    return FALSE; 
   } */
   $userid = 1; // TODO
 
   if (!(verifyCredentials($dbConn, TRUE, $userid, $passwordUnsafe, ''))) { // verification ok
-    return false; // This already prints an error message
+    return FALSE; // This already prints an error message
   }
   if ($setCookieSafe === 1) {
     $expire = time() + (3600 * 24 * 7 * 52); // valid for a year
-    setcookie('userIdCookie', (string)$userid, $expire, '/verbrauch/', 'strommesser.ch', true, true);
+    setcookie('userIdCookie', (string)$userid, $expire, '/verbrauch/', 'strommesser.ch', TRUE, TRUE);
 
     // this is just a random number which has been set at user creation. To make sure one cannot read out others data by changing its cookie
     if (!($result = $dbConn->query('SELECT `randCookie` FROM `user` WHERE `id` = "'.$userid.'"' ))) {
       return error(110400); 
     }
     $row = $result->fetch_row();
-    setcookie('randCookie', $row[0], $expire, '/verbrauch/', 'strommesser.ch', true, true);
+    setcookie('randCookie', $row[0], $expire, '/verbrauch/', 'strommesser.ch', TRUE, TRUE);
   } // setCookie is selected
   redirectRelative('index.php');
-  return true;
+  return TRUE;
 }
 
 // function to do the login. Several options are available to log in
@@ -67,7 +68,7 @@ function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid, $pa
   if ($authMethodPw) { // with a pw
     if (!(($userid === 1) or (password_verify($passwordUnsafe, $pwHash)))) {
       printErrorAndDie('Error','falsches Passwort');
-      return false;        
+      return FALSE;        
     } 
   } else { // with a Cookie
     if (!(($randCookie) and ($randCookie == $randCookieInput))) { // there is no zero in the data base and 64hex value is correct
@@ -78,9 +79,23 @@ function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid, $pa
     return error(112005);
   }
   $_SESSION['userid'] = $userid;
-  return true;
+  return TRUE;
 } // function
 
+/*
+function newUserLoginAndLinks (object $dbConn, int $newUserid, string $pw) : bool {       
+  // password_hash("messerPW", PASSWORD_DEFAULT) returns '$2y$10$zd4qDdeg59iqGV7GrviV9eLw.B9OD/JVTIul8rr1IPp9oWJd4AZAy';
+  $pwHash = password_hash($pw, PASSWORD_DEFAULT); // $pw is potentially unsafe. Shouldn't be an issue as I store the hash
+  
+  // NB: set a cookie for some random big number. Not the password itself and not the pwHash!
+  // NB: will use this number on every cookie for this user, to login on several devices. One cannot guess other users random number                  
+  $hexStr64 = bin2hex(random_bytes(32)); // some random value, used for cookie     
+  if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'", `randCookie` = "'.$hexStr64.'" WHERE `id` = "'.$newUserid.'"'))) { 
+    return FALSE;
+  }
+  return TRUE;
+} 
+*/
 
 function printBeginOfPage(string $head):void { // does not print the nav menu
   echo '<!DOCTYPE html><html><head>
@@ -96,11 +111,40 @@ function printBeginOfPage(string $head):void { // does not print the nav menu
   <div class="row twelve columns">&nbsp;</div>';
   return;
 }
-  
+
+function printLoginForm(bool $demoAccount):void {
+  if ($demoAccount) {
+    $emailPreFilled = 'messer@strommesser.ch';
+    $pwPreFilled = 'messerPW';
+    $cookieChecked = '';      
+  } else {
+    $emailPreFilled = '';
+    $pwPreFilled = '';
+    $cookieChecked = ' checked';
+  }
+  echo '   
+  <form action="login.php?do=1" method="post">
+  <div class="row">
+      <div class="six columns" style="text-align: right">Email: </div>
+      <div class="six columns" style="text-align: left"><input name="email" type="email" maxlength="127" value="'.$emailPreFilled.'" required size="20"></div>
+  </div>    
+  <div class="row" id="pwRow">
+      <div class="six columns" style="text-align: right">Passwort: </div>
+      <div class="six columns" style="text-align: left"><input name="password" type="password" maxlength="63" value="'.$pwPreFilled.'" required size="20"></div>
+  </div>
+  <div class="row twelve columns" style="font-size: smaller;"><input type="checkbox" name="setCookie" value="1"'.$cookieChecked.'>auf diesem Gerät speichern</div>
+  <div class="row twelve columns">&nbsp;</div>
+  <div class="row twelve columns"><input name="create" type="submit" value="log in"></div>
+  <div class="row twelve columns">&nbsp;</div>
+  <div class="row twelve columns">&nbsp;</div>
+  </form>';
+}
+
 $doSafe = safeIntFromExt('GET', 'do', 1); // this is an integer (range 1 to 9) or non-existing
 // do = 0: entry point
 // do = 1: process login form
 // do = 2: logout
+// do = 3: print login form with demo account (do not check cookies)
 
 if ($doSafe === 0) {
   // check cookie
@@ -112,32 +156,22 @@ if ($doSafe === 0) {
     die(); // will not be executed
   } // no cookie present and no userid. print the login form
 
-  printBeginOfPage('Log in');
-  echo '   
-  <form action="login.php?do=1" method="post">
-  <div class="row">
-      <div class="six columns" style="text-align: right">Email: </div>
-      <div class="six columns" style="text-align: left"><input name="email" type="email" maxlength="127" value="" required size="20"></div>
-  </div>    
-  <div class="row" id="pwRow">
-      <div class="six columns" style="text-align: right">Passwort: </div>
-      <div class="six columns" style="text-align: left"><input name="password" type="password" maxlength="63" value="" required size="20"></div>
-  </div>
-  <div class="row twelve columns" style="font-size: smaller;"><input type="checkbox" name="setCookie" value="1" checked>auf diesem Gerät speichern</div>
-  <div class="row twelve columns">&nbsp;</div>
-  <div class="row twelve columns"><input name="create" type="submit" value="log in"></div>
-  <div class="row twelve columns">&nbsp;</div>
-  <div class="row twelve columns">&nbsp;</div>
-  </form>';
+  printBeginOfPage(head:'Log in');
+  printLoginForm(demoAccount:FALSE);
 } elseif ($doSafe === 1) {
-  $emailUnsafe = filter_var(safeStrFromExt('POST', 'email', 127), FILTER_SANITIZE_EMAIL);    // email string, max length 127    
-  $passwordUnsafe = filter_var(safeStrFromExt('POST', 'password', 63), FILTER_SANITIZE_STRING); // generic string, max length 63    
-  $setCookieSafe = safeIntFromExt('POST', 'setCookie', 1);  
-  processLoginData($dbConn, $emailUnsafe, $passwordUnsafe, $setCookieSafe); // this redirects on success 
+  processLoginData(
+    dbConn:$dbConn,
+    emailUnsafe:filter_var(safeStrFromExt('POST', 'email', 127), FILTER_SANITIZE_EMAIL), // email string, max length 127
+    passwordUnsafe:filter_var(safeStrFromExt('POST', 'password', 63), FILTER_SANITIZE_STRING), // generic string, max length 63
+    setCookieSafe:safeIntFromExt('POST', 'setCookie', 1)
+  ); // this redirects on success
 } elseif ($doSafe === 2) {
   sessionAndCookieDelete();
-  printBeginOfPage('Log out');    
+  printBeginOfPage(head:'Log out');    
   echo '<div class="row twelve columns">log out ok, zurück zur <a href="../wp/index.php">Startseite</a></div>';
+} elseif ($doSafe === 3) {
+  printBeginOfPage(head:'Log in');
+  printLoginForm(demoAccount:TRUE);
 } else {
   printErrorAndDie('Error','unsupported do on login.php');
 }
