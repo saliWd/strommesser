@@ -121,15 +121,19 @@ function printLoginForm(bool $demoAccount):void {
     $pwPreFilled = '';
     $cookieChecked = ' checked';
   }
-  echo '   
+  echo '
   <form action="login.php?do=1" method="post">
-  <div class="row">
-      <div class="six columns" style="text-align: right">Email: </div>
-      <div class="six columns" style="text-align: left"><input name="email" type="email" maxlength="127" value="'.$emailPreFilled.'" required size="20"></div>
-  </div>    
-  <div class="row" id="pwRow">
-      <div class="six columns" style="text-align: right">Passwort: </div>
-      <div class="six columns" style="text-align: left"><input name="password" type="password" maxlength="63" value="'.$pwPreFilled.'" required size="20"></div>
+  <div class="row twelve columns">
+  <table width="100%" style="line-height:4.6;">
+  <tr>
+    <td width="50%" align="right">Email:</td>
+    <td width="50%" align="left"><input name="email" type="email" maxlength="127" value="'.$emailPreFilled.'" required size="22"></td>
+  </tr>
+  <tr>
+    <td width="50%" align="right">Passwort:</td>
+    <td width="50%" align="left"><input name="password" type="password" maxlength="63" value="'.$pwPreFilled.'" required size="22"></td>
+  </tr>
+  </table>
   </div>
   <div class="row twelve columns" style="font-size: smaller;"><input type="checkbox" name="setCookie" value="1"'.$cookieChecked.'>auf diesem Gerät speichern</div>
   <div class="row twelve columns">&nbsp;</div>
