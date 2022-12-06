@@ -17,7 +17,7 @@ wlan = network.WLAN(network.STA_IF)
 wlan.active(True) # to have comparable consumption
 sleep(1)
 
-freq(200000000) # set CPU clock to 200 MHz to consume more power
+#freq(200000000) # set CPU clock to 200 MHz to consume more power
 
 while True:
     led_onboard.on()

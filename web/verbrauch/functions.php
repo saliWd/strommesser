@@ -100,9 +100,9 @@ function checkHash ($dbConn, string $device): bool {
 
 function printNavMenu (string $siteSafe): void {  
   $wpHome = '<li><a href="../wp/">Home</a></li>'; // I don't display this menu on the wp site
-  $home   = ($siteSafe === 'index.php') ? '<li class="menuCurrentPage">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
-  $links  = ($siteSafe === 'settings.php') ? '<li class="menuCurrentPage">Einstellungen</li>' : '<li><a href="settings.php">Einstellungen</a></li>';  
-  // will be redirected to login anyhow... $login  = ($siteSafe === 'login.php') ? '<li class="menuCurrentPage">Log in</li>' : '<li><a href="settings.php">Log in</a></li>';
+  $home   = ($siteSafe === 'index.php') ? '<li class="differentColor">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
+  $links  = ($siteSafe === 'settings.php') ? '<li class="differentColor">Einstellungen</li>' : '<li><a href="settings.php">Einstellungen</a></li>';  
+  // login site not available as list item, will be redirected to login site from various pages
   $logout = '<li><a href="login.php?do=2">Log out</a></li>'; 
   
   echo '

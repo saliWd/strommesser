@@ -63,7 +63,8 @@ C.5.0(0400)
 
 #### Electrical setup
 ![electrical connections](./pictures/pico_w_setup_w500.png)
-Also connect GP28 to 3V3_EN to save some power (works though without it)
+~~Also connect GP28 to 3V3_EN to save some power (works though without it)~~
+Have 2 x 33 Ohm connectors on GPIOs to increase power for waveshare solar power manager.
 
 
 ## Sources

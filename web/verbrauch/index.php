@@ -29,7 +29,7 @@ function printBeginOfPage_index(bool $enableReload, string $timerange):void {
 // returns the time range to be displayed as int. Possible values are: 1 (for last 1 hour), 6, 24, 25. 25 means: all data
 function getTimeRange():int {
   $returnVal = 6;  // default time range
-  $unsafeInt = safeIntFromExt('GET', 'rangeSelect', 2);
+  $unsafeInt = safeIntFromExt('GET', 'range', 2);
   if (($unsafeInt === 1) or ($unsafeInt === 6) or ($unsafeInt === 24) or ($unsafeInt === 25)) {
     $returnVal = $unsafeInt; 
   }
@@ -48,7 +48,7 @@ $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
-printBeginOfPage_index($enableReload, '&rangeSelect='.$timeSelected);
+printBeginOfPage_index($enableReload, '&range='.$timeSelected);
 if ($totalCount > 0) {// this may be 0. Can't 
   $zeitNewest = date_create($rowFreshest['zeit']);    
   if ($timeSelected < 25) {
@@ -172,7 +172,7 @@ $submitTexts = array (
   '24' => array('24','24 h',''),
   '25' => array('25','alles','')
 );
-$submitTexts[$timeSelected][2]  = ' class="active"'; // highlight the selected one
+$submitTexts[$timeSelected][2]  = ' class="differentColor"'; // highlight the selected one
 echo '
 <script>
 function setValAndSubmit(valueString){
@@ -185,7 +185,7 @@ echo '<div class="row twelve columns"><form id="timerangeform" action="index.php
 foreach ($submitTexts as $submitText) {
   echo '<button type="button" onclick="setValAndSubmit(\''.$submitText[0].'\')" '.$submitText[2].'>'.$submitText[1].'</button>';
 }
-echo '<input type="text" id="hiddentext" name="rangeSelect" value="invalidRange" hidden></form></div>
+echo '<input type="text" id="hiddentext" name="range" value="invalidRange" hidden></form></div>
 <div class="row twelve columns">Insgesamt '.$totalCount.' Einträge</div>';
 
 ?>

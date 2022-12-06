@@ -287,5 +287,5 @@ hr {
 #menu li { padding: 5px 0; font-size: 18px; margin-bottom: 0rem; }
 #menu ul { margin-bottom: 0rem; }
 #menuToggle input:checked ~ ul { transform: none; }
-.menuCurrentPage { color: rgb(19, 168, 89); }
+.differentColor { color: rgb(19, 168, 89); }
 #menuToggle input:checked ~ span { background: rgb(111, 10, 168); }
