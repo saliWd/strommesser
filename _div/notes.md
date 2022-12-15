@@ -67,6 +67,15 @@ C.5.0(0400)
 Have 2 x 33 Ohm connectors on GPIOs to increase power for waveshare solar power manager.
 
 
+## Website
+
+### strommesser.ch/verbrauch: Design
+
+#### Tailwindcss
+* using version 3.2.4, standalone file, stored in _div/tailwindcss/
+
+
+
 ## Sources
 
 

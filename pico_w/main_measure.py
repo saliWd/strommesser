@@ -79,6 +79,7 @@ wlan.active(True)
 sleep(3)
 
 device_config = my_config.get_device_config()
+reset_counter = 60 # do a reboot about once an hour (stability increase work around)
 
 while True:
     uart_received_str = uart_ir_e350(DBGCFG=DBGCFG, uart_ir=uart_ir) # this takes some seconds
@@ -102,4 +103,10 @@ while True:
     debug_print(DBGCFG=DBGCFG, text=str(message))
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=led_onboard, meas=True) # try to connect to the WLAN. Hangs there if no connection can be made
     send_message_and_wait_post(DBGCFG=DBGCFG, message=message, wait_time=LOOP_WAIT_TIME, led_onboard=led_onboard) # does not send anything when in simulation
+
+    if reset_counter > 0:
+        reset_counter -= 1
+    else:
+        from machine import reset # type: ignore
+        reset() # NB: connection to whatever device is getting lost; complicates debugging
 # end while

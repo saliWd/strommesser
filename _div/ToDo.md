@@ -12,13 +12,15 @@
    4. settings.php
    5. clear all TODOs
    6. average numbers: per day, per week, per month (additional page/graph)
+   7. tailwind css: try
 3. pico devices
    1. meas   
+      1. stability: not good enough. Add reset every 1h -> check again
       1. current consumption         
-         1. check solar panel setup: min consumption of 40 mA is an issue (add 2x33 Ohm additional load on GPIOs, freq increase not necessary)             
+         1. solar panel setup: works fine. long term consumption to be verified (charging also in bad weather)      
    2. disp
       1. [case?](https://www.thingiverse.com/thing:4767008)
 4. div
 
 
-Next:  2.1. password. 3.1.1, 1.1
+Next:  3.1 / 1.1+1.2 / 2.1 / 
