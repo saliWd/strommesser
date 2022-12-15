@@ -190,4 +190,6 @@ echo '<input type="text" id="hiddentext" name="range" value="invalidRange" hidde
 
 ?>
 <div class="row twelve columns">&nbsp;</div>
+<div class="row twelve columns">&nbsp;</div>
+<div class="row twelve columns">&nbsp;</div>
 </div></div></body></html>
