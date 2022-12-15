@@ -1,0 +1,1 @@
+tailwindcss.exe -i ./input.css -o ./../../web/verbrauch/css/strommesser.css --watch --minify
