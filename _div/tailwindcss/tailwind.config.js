@@ -2,7 +2,9 @@
 module.exports = {
   content: ["./../../web/verbrauch/**/*.{html,js}"],
   theme: {
-    extend: {},
+	fontFamily: {
+	  'sans': ['Raleway', 'Helvetica', 'Arial', 'sans-serif'],  
+	},	
   },
   plugins: [],
 }

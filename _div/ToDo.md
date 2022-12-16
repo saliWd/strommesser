@@ -15,12 +15,10 @@
    7. tailwind css: try
 3. pico devices
    1. meas   
-      1. stability: not good enough. Add reset every 1h -> check again
-      1. current consumption         
-         1. solar panel setup: works fine. long term consumption to be verified (charging also in bad weather)      
+      1. stability / supply: not good enough. Supply did turn off during the night. Cold weather issue?. Long term consumption to be verified (charging also in bad weather)      
    2. disp
       1. [case?](https://www.thingiverse.com/thing:4767008)
 4. div
 
 
-Next:  3.1 / 1.1+1.2 / 2.1 / 
+Next:  3.1 / 1.1+1.2 / 2.7 / 
