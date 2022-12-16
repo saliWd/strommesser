@@ -8,7 +8,7 @@ function printBeginOfPage_index(bool $enableReload, string $timerange):void {
   <title>StromMesser Verbrauch</title>
   <meta name="description" content="zeigt deinen Energieverbrauch" />  
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/verbrauch.css" type="text/css" />
+  <link rel="stylesheet" href="css/strommesser.css" type="text/css" />
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>';
@@ -19,9 +19,8 @@ function printBeginOfPage_index(bool $enableReload, string $timerange):void {
   </head><body>';
   printNavMenu(getCurrentSite());
   echo '
-  <div class="section noBottom">
-  <div class="container">
-  <h1>Verbrauch</h1>';
+  <div class="container mx-auto px-4 py-2 lg text-center">
+  <h1 class="text-2xl m-1">Verbrauch</h1>';
   return;
 }
 
@@ -82,7 +81,7 @@ if ($totalCount > 0) {// this may be 0. Can't
   if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
     $zeitString = 'heute um '.$zeitNewest->format('H:i:s');
   }
-  echo '<div class="row twelve columns"><hr>Verbrauch: <b>'.$newestConsumption.'W</b> '.$zeitString.'<hr></div>';
+  echo '<hr>Verbrauch: <b>'.$newestConsumption.'W</b> '.$zeitString.'<hr>';
 
   if ($queryCount >= $GRAPH_LIMIT) {
     $axis_x = ''; // rightmost value comes first. Remove something again after the while loop
@@ -106,8 +105,8 @@ if ($totalCount > 0) {// this may be 0. Can't
     $val_y1_watt = '[ '.substr($val_y1_watt, 0, -2).' ]';
     
     // TODO: add some text about the absolute value (of kWh)
-
-    echo '<div class="row twelve columns"><canvas id="myChart" width="600" height="300"></canvas></div>      
+    echo '
+    <canvas id="myChart" width="600" height="300"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
     const labels = '.$axis_x.';
@@ -153,26 +152,24 @@ if ($totalCount > 0) {// this may be 0. Can't
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>';
   } else {
-    echo '<div class="row twelve columns"> - weniger als '.$GRAPH_LIMIT.' Einträge - </div>';
+    echo ' - weniger als '.$GRAPH_LIMIT.' Einträge - ';
   }    
 } else {
-  echo '<div class="row twelve columns"> - noch keine Einträge - </div>';
+  echo ' - noch keine Einträge - ';
 }
 
 $checkedText = '';
 if($enableReload) {
   $checkedText = ' checked';
 }
-
-// TODO: add icons, change design, spacing of buttons
 // TODO: depending on the number of entries, some ranges cannot be selected
 $submitTexts = array (
-  '1' => array('1','1 h',''),
-  '6' => array('6','6 h',''),
-  '24' => array('24','24 h',''),
-  '25' => array('25','alles','')
+  '1' => array('1','1 h','class="btn"'),
+  '6' => array('6','6 h','class="btn"'),
+  '24' => array('24','24 h','class="btn"'),
+  '25' => array('25','alles','class="btn"')
 );
-$submitTexts[$timeSelected][2]  = ' class="differentColor"'; // highlight the selected one
+$submitTexts[$timeSelected][2]  = 'class="btn-diff"'; // highlight the selected one
 echo '
 <script>
 function setValAndSubmit(valueString){
@@ -180,16 +177,15 @@ function setValAndSubmit(valueString){
     document.getElementById(\'timerangeform\').submit();
 }
 </script>';
-echo '<div class="row twelve columns"><form id="timerangeform" action="index.php" method="get">
+echo '
+<form id="timerangeform" action="index.php" method="get">
 <input type="checkbox" id="reload" name="reload" value="1" onChange="setValAndSubmit(\''.$timeSelected.'\')" '.$checkedText.'> reload';
 foreach ($submitTexts as $submitText) {
   echo '<button type="button" onclick="setValAndSubmit(\''.$submitText[0].'\')" '.$submitText[2].'>'.$submitText[1].'</button>';
 }
-echo '<input type="text" id="hiddentext" name="range" value="invalidRange" hidden></form></div>
-<div class="row twelve columns">Insgesamt '.$totalCount.' Einträge</div>';
+echo '<input type="text" id="hiddentext" name="range" value="invalidRange" hidden>
+</form>
+<hr>Insgesamt '.$totalCount.' Einträge';
 
 ?>
-<div class="row twelve columns">&nbsp;</div>
-<div class="row twelve columns">&nbsp;</div>
-<div class="row twelve columns">&nbsp;</div>
-</div></div></body></html>
+</div></body></html>
