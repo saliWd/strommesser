@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
-// This file is a pure function definition file. It is included in other sites
-  
+// This file is included in other sites
+
 // this function is called on every (user related) page on the very start  
 // it does the session start and opens connection to the data base. Returns the dbConn variable or a boolean
 function initialize () {
@@ -123,6 +123,41 @@ function printNavMenu (string $siteSafe): void {
     </div>
   </nav>';
 }
+
+function printBeginOfPage(bool $enableReload, string $timerange, string $site):void {
+  require_once('constants.php');
+  if (! in_array($site, $VALID_SITES)) {
+    return;
+  }
+  echo '<!DOCTYPE html><html><head><meta charset="utf-8" />';
+  
+  $scripts = '';
+  if ($site === "index.php") {
+    $title = 'Verbrauch';
+    $scripts = '<script src="script/chart.min.js"></script>
+  <script src="script/moment.min.mine.js"></script>
+  <script src="script/chartjs-adapter-moment.mine.js"></script>';
+  } elseif ($site === "settings.php") {
+    $title = 'Einstellungen';    
+  }
+  echo '<title>StromMesser '.$title.'</title>';
+  echo '
+  <meta name="description" content="zeigt deinen Energieverbrauch" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/strommesser.css" type="text/css" />
+  '.$scripts;  
+  if ($enableReload) {
+    echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1'.$timerange.'">';
+  }
+  echo '
+  </head><body>';
+  printNavMenu($site);
+  echo '
+  <div class="container mx-auto px-4 py-2 lg text-center">
+  <h1 class="text-2xl m-1">'.$title.'</h1>';
+  return;
+}
+
 
 // returns the current site in the format 'about.php' in a safe way. Any do=xy parameters are obmitted
 function getCurrentSite (): string {  

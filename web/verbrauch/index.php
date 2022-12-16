@@ -2,29 +2,6 @@
 require_once('functions.php');
 $dbConn = initialize();
 
-function printBeginOfPage_index(bool $enableReload, string $timerange):void {
-  echo '<!DOCTYPE html><html><head>
-  <meta charset="utf-8" />
-  <title>StromMesser Verbrauch</title>
-  <meta name="description" content="zeigt deinen Energieverbrauch" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/strommesser.css" type="text/css" />
-  <script src="script/chart.min.js"></script>
-  <script src="script/moment.min.mine.js"></script>
-  <script src="script/chartjs-adapter-moment.mine.js"></script>';
-  if ($enableReload) {
-    echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1'.$timerange.'">';
-  }
-  echo '
-  </head><body>';
-  printNavMenu(getCurrentSite());
-  echo '
-  <div class="container mx-auto px-4 py-2 lg text-center">
-  <h1 class="text-2xl m-1">Verbrauch</h1>';
-  return;
-}
-
-
 // returns the time range to be displayed as int. Possible values are: 1 (for last 1 hour), 6, 24, 25. 25 means: all data
 function getTimeRange():int {
   $returnVal = 6;  // default time range
@@ -47,7 +24,7 @@ $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
-printBeginOfPage_index($enableReload, '&range='.$timeSelected);
+printBeginOfPage(enableReload:$enableReload, timerange:'&range='.$timeSelected, site:'index.php');
 if ($totalCount > 0) {// this may be 0. Can't 
   $zeitNewest = date_create($rowFreshest['zeit']);    
   if ($timeSelected < 25) {

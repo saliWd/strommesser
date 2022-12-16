@@ -15,7 +15,7 @@
    7. tailwind css: try
 3. pico devices
    1. meas   
-      1. stability / supply: not good enough. Supply did turn off during the night. Cold weather issue?. Long term consumption to be verified (charging also in bad weather)      
+      1. stability / supply: not good enough. Supply did turn off during the night. Cold weather issue?. Long term consumption to be verified (charging also in bad weather, panel frozen over).      
    2. disp
       1. [case?](https://www.thingiverse.com/thing:4767008)
 4. div
