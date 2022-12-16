@@ -7,7 +7,10 @@ module.exports = {
 	},
     extend: {
       colors: {
-        differentColor: '#43302b',        
+        diffColor: {
+          300: '#9ae6b4',
+          700: '#2f855a',          
+        },        
       }
     },
   },
