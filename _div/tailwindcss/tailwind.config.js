@@ -4,7 +4,12 @@ module.exports = {
   theme: {
 	fontFamily: {
 	  'sans': ['Raleway', 'Helvetica', 'Arial', 'sans-serif'],  
-	},	
+	},
+    extend: {
+      colors: {
+        differentColor: '#43302b',        
+      }
+    },
   },
   plugins: [],
 }
