@@ -83,7 +83,7 @@ if ($totalCount > 0) {// this may be 0. Can't
     
     // TODO: add some text about the absolute value (of kWh)
     echo '
-    <canvas id="myChart" width="600" height="300"></canvas>
+    <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
     const labels = '.$axis_x.';
@@ -156,7 +156,7 @@ function setValAndSubmit(valueString){
 </script>';
 echo '
 <form id="timerangeform" action="index.php" method="get">
-<input type="checkbox" id="reload" name="reload" value="1" onChange="setValAndSubmit(\''.$timeSelected.'\')" '.$checkedText.'> reload';
+<input type="checkbox" id="reload" name="reload" value="1" onChange="setValAndSubmit(\''.$timeSelected.'\')" '.$checkedText.'> reload&nbsp;';
 foreach ($submitTexts as $submitText) {
   echo '<button type="button" onclick="setValAndSubmit(\''.$submitText[0].'\')" '.$submitText[2].'>'.$submitText[1].'</button>';
 }

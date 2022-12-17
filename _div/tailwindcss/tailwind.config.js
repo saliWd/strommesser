@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./../../web/verbrauch/**/*.{html,js}"],
+  content: ["./../../web/verbrauch/**/*.{html,js,php}"],
   theme: {
 	fontFamily: {
 	  'sans': ['Raleway', 'Helvetica', 'Arial', 'sans-serif'],  
