@@ -96,7 +96,7 @@ function newUserLoginAndLinks (object $dbConn, int $newUserid, string $pw) : boo
 } 
 */
 
-function printBeginOfPage(string $head):void { // does not print the nav menu
+function printBeginOfPage_login(string $head):void { // does not print the nav menu
   echo '<!DOCTYPE html><html><head>
   <meta charset="utf-8" />
   <title>StromMesser Log in</title>
@@ -158,7 +158,7 @@ if ($doSafe === 0) {
     die(); // will not be executed
   } // no cookie present and no userid. print the login form
 
-  printBeginOfPage(head:'Log in');
+  printBeginOfPage_login(head:'Log in');
   printLoginForm(demoAccount:FALSE);
 } elseif ($doSafe === 1) {
   processLoginData(
@@ -169,10 +169,10 @@ if ($doSafe === 0) {
   ); // this redirects on success
 } elseif ($doSafe === 2) {
   sessionAndCookieDelete();
-  printBeginOfPage(head:'Log out');    
+  printBeginOfPage_login(head:'Log out');    
   echo '<div class="row twelve columns">log out ok, zurück zur <a href="../wp/index.php">Startseite</a></div>';
 } elseif ($doSafe === 3) {
-  printBeginOfPage(head:'Log in');
+  printBeginOfPage_login(head:'Log in');
   printLoginForm(demoAccount:TRUE);
 } else {
   printErrorAndDie('Error','unsupported do on login.php');
