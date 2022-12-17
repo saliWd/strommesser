@@ -96,21 +96,6 @@ function newUserLoginAndLinks (object $dbConn, int $newUserid, string $pw) : boo
 } 
 */
 
-function printBeginOfPage_login(string $head):void { // does not print the nav menu
-  echo '<!DOCTYPE html><html><head>
-  <meta charset="utf-8" />
-  <title>StromMesser Log in</title>
-  <meta name="description" content="zeigt deinen Energieverbrauch" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/verbrauch.css" type="text/css" />
-  </head><body>
-  <div class="section noBottom">
-  <div class="container">
-  <h1>'.$head.'</h1>
-  <div class="row twelve columns">&nbsp;</div>';
-  return;
-}
-
 function printLoginForm(bool $demoAccount):void {
   if ($demoAccount) {
     $emailPreFilled = 'messer@strommesser.ch';
@@ -123,23 +108,23 @@ function printLoginForm(bool $demoAccount):void {
   }
   echo '
   <form action="login.php?do=1" method="post">
-  <div class="row twelve columns">
   <table width="100%" style="line-height:4.6;">
   <tr>
     <td width="50%" align="right">Email:</td>
-    <td width="50%" align="left"><input name="email" type="email" maxlength="127" value="'.$emailPreFilled.'" required size="22"></td>
+    <td width="50%" align="left"><input class="input-text" name="email" type="email" maxlength="127" value="'.$emailPreFilled.'" required></td>
   </tr>
   <tr>
     <td width="50%" align="right">Passwort:</td>
-    <td width="50%" align="left"><input name="password" type="password" maxlength="63" value="'.$pwPreFilled.'" required size="22"></td>
+    <td width="50%" align="left"><input class="input-text" name="password" type="password" maxlength="63" value="'.$pwPreFilled.'" required></td>
+  </tr>
+  <tr>
+    <td width="50%" align="right"><input class="w-10" type="checkbox" name="setCookie" value="1"'.$cookieChecked.'></td>
+    <td width="50%" align="left" class="text-sm">auf diesem Gerät speichern</td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><input class="mt-8 input-text" name="create" type="submit" value="log in"></td>
   </tr>
   </table>
-  </div>
-  <div class="row twelve columns" style="font-size: smaller;"><input type="checkbox" name="setCookie" value="1"'.$cookieChecked.'>auf diesem Gerät speichern</div>
-  <div class="row twelve columns">&nbsp;</div>
-  <div class="row twelve columns"><input name="create" type="submit" value="log in"></div>
-  <div class="row twelve columns">&nbsp;</div>
-  <div class="row twelve columns">&nbsp;</div>
   </form>';
 }
 
@@ -158,7 +143,7 @@ if ($doSafe === 0) {
     die(); // will not be executed
   } // no cookie present and no userid. print the login form
 
-  printBeginOfPage_login(head:'Log in');
+  printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', logInOut:'Log in');
   printLoginForm(demoAccount:FALSE);
 } elseif ($doSafe === 1) {
   processLoginData(
@@ -169,14 +154,13 @@ if ($doSafe === 0) {
   ); // this redirects on success
 } elseif ($doSafe === 2) {
   sessionAndCookieDelete();
-  printBeginOfPage_login(head:'Log out');    
-  echo '<div class="row twelve columns">log out ok, zurück zur <a href="../wp/index.php">Startseite</a></div>';
+  printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', logInOut:'Log out');
+  echo '<p>log out ok, zurück zur <a href="../wp/index.php">Startseite</a></p>';
 } elseif ($doSafe === 3) {
-  printBeginOfPage_login(head:'Log in');
+  printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', logInOut:'Log in');
   printLoginForm(demoAccount:TRUE);
 } else {
   printErrorAndDie('Error','unsupported do on login.php');
 }
 ?>
-<div class="row twelve columns">&nbsp;</div>
-</div></div></body></html>
+</div></body></html>

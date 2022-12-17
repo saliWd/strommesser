@@ -160,7 +160,7 @@ echo '
 foreach ($submitTexts as $submitText) {
   echo '<button type="button" onclick="setValAndSubmit(\''.$submitText[0].'\')" '.$submitText[2].'>'.$submitText[1].'</button>';
 }
-echo '<input type="text" id="hiddentext" name="range" value="invalidRange" hidden>
+echo '<input type="text" id="hiddentext" name="range" value="invalidRange" hidden class="w-min">
 </form>
 <hr>Insgesamt '.$totalCount.' Einträge';
 

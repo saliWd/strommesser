@@ -124,13 +124,14 @@ function printNavMenu (string $siteSafe): void {
   </nav>';
 }
 
-function printBeginOfPage(bool $enableReload, string $timerange, string $site):void {
+function printBeginOfPage(bool $enableReload, string $timerange, string $site, string $logInOut = ''):void {
   require_once('constants.php');
   if (! in_array($site, $VALID_SITES)) {
     return;
   }
   echo '<!DOCTYPE html><html><head><meta charset="utf-8" />';
   
+  $title = '';
   $scripts = '';
   if ($site === "index.php") {
     $title = 'Verbrauch';
@@ -139,12 +140,14 @@ function printBeginOfPage(bool $enableReload, string $timerange, string $site):v
   <script src="script/chartjs-adapter-moment.mine.js"></script>';
   } elseif ($site === "settings.php") {
     $title = 'Einstellungen';    
+  } elseif ($site === 'login.php') {
+    $title = $logInOut;
   }
   echo '<title>StromMesser '.$title.'</title>';
   echo '
   <meta name="description" content="zeigt deinen Energieverbrauch" />  
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="css/strommesser.css" type="text/css" />
+  <link rel="stylesheet" href="strommesser.css" type="text/css" />
   '.$scripts;  
   if ($enableReload) {
     echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1'.$timerange.'">';
