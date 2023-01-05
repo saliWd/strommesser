@@ -14,10 +14,7 @@ def debug_sleep(DBGCFG:dict, time:int):
     if(DBGCFG["sleep"]): # minimize wait times by sleeping only one second instead of the normal amount
         sleep(1)
         return
-    remainingTime = time
-    while remainingTime > 0:
-        sleep(min(7,remainingTime)) # wdt is set to 8 secs
-        remainingTime = remainingTime - 7
+    sleep(time)
     return
 
 def get_wlan_ok(DBGCFG:dict, wlan):

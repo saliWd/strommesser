@@ -1,7 +1,22 @@
 import network # type: ignore (this is a pylance ignore warning directive)
 import urequests # type: ignore
 from time import sleep
-from machine import Pin, UART, freq # type: ignore
+from machine import Pin, UART # type: ignore
+import _thread
+
+sLock = _thread.allocate_lock()
+
+def SecondCoreTask(): # reboots every hour
+    reset_counter = 60 # do a reboot about once an hour (stability increase work around)
+    while True:
+        sleep(60) # 60 seconds
+        if reset_counter > 0:
+            reset_counter -= 1
+        else:
+            from machine import reset # type: ignore
+            reset() # NB: connection to whatever device is getting lost; complicates debugging
+
+_thread.start_new_thread(SecondCoreTask, ())
 
 # my own files
 import my_config
@@ -57,16 +72,6 @@ LOOP_WAIT_TIME = 40
 
 # pins
 led_onboard = Pin("LED", Pin.OUT)
-Pio10 = Pin(10, Pin.OUT)
-Pio18 = Pin(18, Pin.OUT)
-Pio10.off()
-Pio18.off()
-
-PWR_INCR = True # need a higher power consumption as the solar power manager shuts itself down when output is less than ~40 mA
-if PWR_INCR:
-    Pio10.on() # connect a resistor to ground on those two pins to drain more power
-    Pio18.on()
-    # freq(240000000) # increase CPU clock to consume more power, default 120 MHz
 
 # machine specific stuff
 uart_ir = UART(0, baudrate=300, bits=7, parity=0, stop=1, tx=Pin(0), rx=Pin(1))
@@ -79,7 +84,6 @@ wlan.active(True)
 sleep(3)
 
 device_config = my_config.get_device_config()
-reset_counter = 60 # do a reboot about once an hour (stability increase work around)
 
 while True:
     uart_received_str = uart_ir_e350(DBGCFG=DBGCFG, uart_ir=uart_ir) # this takes some seconds
@@ -102,11 +106,5 @@ while True:
         ])
     debug_print(DBGCFG=DBGCFG, text=str(message))
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=led_onboard, meas=True) # try to connect to the WLAN. Hangs there if no connection can be made
-    send_message_and_wait_post(DBGCFG=DBGCFG, message=message, wait_time=LOOP_WAIT_TIME, led_onboard=led_onboard) # does not send anything when in simulation
-
-    if reset_counter > 0:
-        reset_counter -= 1
-    else:
-        from machine import reset # type: ignore
-        reset() # NB: connection to whatever device is getting lost; complicates debugging
+    send_message_and_wait_post(DBGCFG=DBGCFG, message=message, wait_time=LOOP_WAIT_TIME, led_onboard=led_onboard) # does not send anything when in simulation 
 # end while
