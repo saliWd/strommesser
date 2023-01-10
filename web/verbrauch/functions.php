@@ -256,8 +256,8 @@ function safeStrFromExt (string $source, string $varName, int $length): string {
 }
 
 function doDbThinning($dbConn, string $device, bool $talkative, int $timeRangeMins):void {
-  // 24h-old: thin with a rate of 1 entry per 15 minutes (about a 1/15 rate)
-  // 72h-old: thin with a rate of 1 entry per 4 hours (about a 1/240 rate), resulting in 6 entries per day  
+  // 24h-old: thin with a rate of 1 entry per 15 minutes (about a 2/15 rate)
+  // 72h-old: thin with a rate of 1 entry per 4 hours (about a 2/240 rate), resulting in 6 entries per day  
   if (($timeRangeMins !== 15) and ($timeRangeMins !== 240)) { // $timeRangeMins is either 15 or 240
     return;
   }
@@ -288,15 +288,15 @@ function doDbThinning($dbConn, string $device, bool $talkative, int $timeRangeMi
   // get the last one where thinning was not yet applied
   $sql = 'SELECT `id` FROM `verbrauch` WHERE '.$sqlWhereDeviceThin.' AND `zeit` < "'.$zeitToThinString.'" ORDER BY `id` ASC LIMIT 240;';
   $result = $dbConn->query($sql);
-  if ($result->num_rows < 14) { // otherwise I can't really compact stuff
-    // I have an issue when there are gaps in the entries. I then have less than 14 entries per 15 minutes
+  if ($result->num_rows < 7) { // otherwise I can't really compact stuff
+    // I have an issue when there are gaps in the entries. I then have less than 7 entries per 15 minutes
     $zeitThinStartWithMargin = $zeitThinStart;
     $zeitThinStartWithMargin->modify('- 2 hours');
     if ($zeitToThin < $zeitThinStartWithMargin) {
       // proceed normally
-      if($talkative) { echo '...prozessiere '.$result->num_rows.' Einträge (weniger als 14 aber schon alt) seit '.$zeitToThinString; }
+      if($talkative) { echo '...prozessiere '.$result->num_rows.' Einträge (weniger als 7 aber schon alt) seit '.$zeitToThinString; }
     } else {
-      if($talkative) { echo 'nur '.$result->num_rows.' Einträge (weniger als 14) seit '.$zeitToThinString; }
+      if($talkative) { echo 'nur '.$result->num_rows.' Einträge (weniger als 7) seit '.$zeitToThinString; }
       return;
     }
   }
@@ -308,7 +308,7 @@ function doDbThinning($dbConn, string $device, bool $talkative, int $timeRangeMi
   $result = $dbConn->query($sql);
   $row = $result->fetch_assoc(); 
 
-  // now do the update and then delete the others. Number 15 means: a ratio of about 1/15 was implemented 
+  // now do the update and then delete the others. Number 15 means: a ratio of about one data item per 15min was implemented 
   $sql = 'UPDATE `verbrauch` SET `aveConsDiff` = "'.$row['sumAveConsDiff'].'", `aveZeitDiff` = "'.$row['sumAveZeitDiff'].'", `thin` = "'.$timeRangeMins.'" WHERE `id` = "'.$idToUpdate.'";';
   $result = $dbConn->query($sql);
   
