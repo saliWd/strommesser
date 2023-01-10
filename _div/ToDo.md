@@ -13,7 +13,7 @@
    6. average numbers: per day, per week, per month (additional page/graph)
 3. pico devices
    1. meas   
-      1. stability: not good enough. add reset every hour on second core
+      1. stability: not good enough. verify reset every hour on second core. Do on disp as well
    2. disp
       1. [case?](https://www.thingiverse.com/thing:4767008)
 4. div

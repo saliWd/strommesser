@@ -5,8 +5,6 @@ from machine import Pin, UART # type: ignore
 from random import randint
 import _thread
 
-sLock = _thread.allocate_lock()
-
 def SecondCoreTask(): # reboots every ~8h
     reset_counter = 240 # do a regular reboot (stability increase work around)
     while True:
