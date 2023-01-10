@@ -107,7 +107,7 @@ function printLoginForm(bool $demoAccount):void {
     $cookieChecked = ' checked';
   }
   echo '
-  <form action="login.php?do=1" method="post">
+  <form action="login.php?do=1" method="post" id="loginForm">
   <table width="100%" style="line-height:4.6;">
   <tr>
     <td width="50%" align="right">Email:</td>
@@ -122,7 +122,7 @@ function printLoginForm(bool $demoAccount):void {
     <td width="50%" align="left" class="text-sm">auf diesem Gerät speichern</td>
   </tr>
   <tr>
-    <td colspan="2" align="center"><input class="mt-8 input-text" name="create" type="submit" value="log in"></td>
+    <td colspan="2" align="center"><input id="loginFormSubmit" class="mt-8 input-text" name="create" type="submit" value="log in"></td>
   </tr>
   </table>
   </form>';
@@ -159,6 +159,11 @@ if ($doSafe === 0) {
 } elseif ($doSafe === 3) {
   printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', logInOut:'Log in');
   printLoginForm(demoAccount:TRUE);
+  echo '
+  <script>
+    document.getElementById(\'loginForm\').submit();
+  </script>
+';
 } else {
   printErrorAndDie('Error','unsupported do on login.php');
 }
