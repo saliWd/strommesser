@@ -56,8 +56,6 @@ BLACK = display.create_pen(0, 0, 0)
 WHITE = display.create_pen(255, 255, 255)
 BAR_WIDTH = 5
 wattValues = []
-RGB_BRIGHTNESS = 80 # TODO: adjust this according to the time of the day...
-COLORS_LED = [(0, 0, RGB_BRIGHTNESS), (0, RGB_BRIGHTNESS, 0), (RGB_BRIGHTNESS, RGB_BRIGHTNESS, 0), (RGB_BRIGHTNESS, 0, 0)]
 COLORS_DISP = [(0, 0, 255), (0, 255, 0), (255, 255, 0), (255, 0, 0)]
 # fills the screen with black
 display.set_pen(BLACK)
@@ -99,11 +97,7 @@ class RgbControl(object):
         self.led_rgb.set_rgb(*color)
 
 
-def value_to_color(value, disp:bool, value_max:int): # value must be between 0 and value_max
-    if disp:
-        colors = COLORS_DISP
-    else:
-        colors = COLORS_LED
+def value_to_color(value, colors:list, value_max:int): # value must be between 0 and value_max
     f_index = float(value) / float(value_max)
     f_index *= len(colors) - 1
     index = int(f_index)
@@ -201,7 +195,7 @@ while True:
 
     i = 0
     for t in wattValues:        
-        VALUE_COLOUR = display.create_pen(*value_to_color(value=t,disp=True,value_max=ledConfig["max"]))
+        VALUE_COLOUR = display.create_pen(*value_to_color(value=t,colors=COLORS_DISP,value_max=ledConfig["max"]))
         display.set_pen(VALUE_COLOUR)
         display.rectangle(i, int(HEIGHT - (float(t) / float(ledConfig["max"] / HEIGHT))), BAR_WIDTH, HEIGHT)
         i += BAR_WIDTH
@@ -221,8 +215,9 @@ while True:
     # lets also set the LED to match
     if (measurement["valid"] == 0):
         rgb_control.start_pulse(blue=False) # pulsate red
-    else:
-        rgb_control.set_const_color(value_to_color(value=measurement["wattValue"],disp=False,value_max=ledConfig["max"]))
+    else:        
+        COLORS_LED = [(0, 0, ledConfig["brightness"]), (0, ledConfig["brightness"], 0), (ledConfig["brightness"], ledConfig["brightness"], 0), (ledConfig["brightness"], 0, 0)]
+        rgb_control.set_const_color(value_to_color(value=measurement["wattValue"],colors=COLORS_LED,value_max=ledConfig["max"]))
         if (wattValueNonMaxed == 0):
             rgb_control.start_pulse(blue=True)
     
