@@ -20,11 +20,19 @@ def SecondCoreTask(): # reboots after about ~1h
             from machine import reset # type: ignore
             reset() # NB: connection to whatever device is getting lost; complicates debugging
 
-def send_message_get_response(DBGCFG:dict, message:dict):
+def send_message_get_response(DBGCFG:dict, message:dict, getValue:bool):
+    # getValue == false means I'm getting the configuration
     if (DBGCFG["wlan_sim"]):
-        return("1|57|2023|01|27|18|22|09") # valid|57W|someDateTime
+        if getValue:
+            return("1|57|2023|01|27|18|22|09") # valid|57W|someDateTime
+        else:
+            return("30|500|100") # min|max|brightness
     
-    URL = "https://strommesser.ch/verbrauch/getRaw_v2.php?TX=pico&TXVER=2"
+    if getValue:
+        URL = "https://strommesser.ch/verbrauch/getRaw_v2.php?TX=pico&TXVER=2"
+    else:
+        URL = "https://strommesser.ch/verbrauch/getConfigDisp_v1.php?TX=pico&TXVER=2"
+
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     urlenc = urlencode(message)
     response = urequests.post(URL, data=urlenc, headers=HEADERS)
@@ -49,7 +57,6 @@ display.set_font("sans")
 WIDTH, HEIGHT = display.get_bounds() # 240x135
 BLACK = display.create_pen(0, 0, 0)
 WHITE = display.create_pen(255, 255, 255)
-VALUE_MAX = 3 * HEIGHT # 405
 BAR_WIDTH = 5
 wattValues = []
 RGB_BRIGHTNESS = 80 # TODO: adjust this according to the time of the day...
@@ -95,12 +102,12 @@ class RgbControl(object):
         self.led_rgb.set_rgb(*color)
 
 
-def value_to_color(value, disp:bool): # value must be between 0 and VALUE_MAX
+def value_to_color(value, disp:bool, value_max:int): # value must be between 0 and value_max
     if disp:
         colors = COLORS_DISP
     else:
         colors = COLORS_LED
-    f_index = float(value) / float(VALUE_MAX)
+    f_index = float(value) / float(value_max)
     f_index *= len(colors) - 1
     index = int(f_index)
 
@@ -143,9 +150,12 @@ while True:
         ])
         
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
-    wattValueString = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
+    wattValueString = send_message_get_response(DBGCFG=DBGCFG, message=message, getValue=True) # does not send anything when in simulation
+    configString = send_message_get_response(DBGCFG=DBGCFG, message=message, getValue=False) # does not send anything when in simulation
 
     validValue = wattValueString.split("|") # Format: $valid|$newestConsumption|Y|m|d|H|i|s
+    configValue = configString.split("|")
+
     if (len(validValue) < 2 ):
         valid = 0
         wattValue = 999
@@ -154,11 +164,6 @@ while True:
         valid = int(validValue[0])
         wattValue = int(validValue[1])
         hour = int(validValue[5])
-    
-    # normalize the value
-    wattValueNonMaxed = wattValue
-    wattValue = min(wattValue, VALUE_MAX)
-    wattValue = max(wattValue, 0)
 
     # at two o'clock in the morning (or when receiving invalid data) I start a timer to reset 80mins later
     if (hour == 2) or (valid == 0):
@@ -167,8 +172,24 @@ while True:
             second_core_idle = False
             debug_print(DBGCFG, "did start the second core")
 
+    # I'm assuming some things: min is >= 0, min is smaller than max, max is reasonable (e.g. < 100'000), brightness is between 1 and 255
+    if (len(configValue) < 3 ):
+        led_value_min = 0
+        led_value_max = 405
+        led_brightness = 80
+    else:
+        led_value_min = int(configValue[0])
+        led_value_max = int(configValue[1])
+        led_brightness = int(configValue[2])
 
-    debug_print(DBGCFG, "watt value: "+str(wattValue))
+    # normalize the value. Is between 0 and (max-min)
+    wattValueNonMaxed = wattValue
+    led_value_max = led_value_max - led_value_min
+    wattValue = wattValue - led_value_min
+    wattValue = min(wattValue, led_value_max)
+    wattValue = max(wattValue, 0)
+
+    debug_print(DBGCFG, "normalized watt value: "+str(wattValue)+", min/max/bright: "+str(led_value_min)+"/"+str(led_value_max)+"/"+str(led_brightness))
 
     # fills the screen with black
     display.set_pen(BLACK)
@@ -180,9 +201,9 @@ while True:
 
     i = 0
     for t in wattValues:        
-        VALUE_COLOUR = display.create_pen(*value_to_color(t,disp=True))
+        VALUE_COLOUR = display.create_pen(*value_to_color(value=t,disp=True,value_max=led_value_max))
         display.set_pen(VALUE_COLOUR)
-        display.rectangle(i, int(HEIGHT - (float(t) / 3.0)), BAR_WIDTH, HEIGHT) # TODO: height-t needs to match with min/max scaling
+        display.rectangle(i, int(HEIGHT - (float(t) / float(led_value_max / HEIGHT))), BAR_WIDTH, HEIGHT)
         i += BAR_WIDTH
 
     display.set_pen(WHITE)
@@ -193,7 +214,7 @@ while True:
     # writes the reading as text in the white rectangle
     display.set_pen(BLACK)
     make_bold(display, expand+str(wattValueNonMaxed), 7, 23) # str.format does not work as intended
-    make_bold(display, "W", 104, 23) 
+    make_bold(display, "W", 104, 23)
     
     display.update()
 
@@ -201,7 +222,7 @@ while True:
     if (valid == 0):
         rgb_control.start_pulse(blue=False) # pulsate red
     else:
-        rgb_control.set_const_color(value_to_color(wattValue,disp=False))
+        rgb_control.set_const_color(value_to_color(value=wattValue,disp=False,value_max=led_value_max))
         if (wattValueNonMaxed == 0):
             rgb_control.start_pulse(blue=True)
     
