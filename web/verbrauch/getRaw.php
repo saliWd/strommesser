@@ -1,7 +1,7 @@
 <?php declare(strict_types=1); 
     require_once('functions.php');
     $dbConn = get_dbConn(); // do not use initialize as I don't use sessions
-    // expecting a call like "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2" including POST data (url encoded)
+    // expecting a call like "https://strommesser.ch/verbrauch/getRaw_v2.php?TX=pico&TXVER=2" including POST data (url encoded)
     
     // no meaningful (=HTML) output is generated. Use index.php to monitor the value itself
     if (! verifyGetParams()) { // now I can look the post variables        
@@ -20,7 +20,7 @@
     $result = $dbConn->query('SELECT * FROM `verbrauch` WHERE `device` = "'.$device.'" ORDER BY `id` DESC LIMIT 1');
     $queryCount = $result->num_rows; // this may be 0 or 1
     if ($queryCount !== 1) {
-        printRawErrorAndDie('Error', 'no data');
+        printRawErrorAndDie('Error', 'no meas data');
     } 
     $row = $result->fetch_assoc();
     if ($row['aveZeitDiff'] > 0) { // divide by 0 exception
@@ -34,5 +34,13 @@
     } else {
         $valid = 0;
     }
-    echo $valid.'|'.$newestConsumption;    
+
+    $result = $dbConn->query('SELECT `ledMinValue`,`ledMaxValue`,`ledBrightness` FROM `user` WHERE `device` = "'.$device.'" ORDER BY `id` LIMIT 1');
+    if ($result->num_rows !== 1) {
+        printRawErrorAndDie('Error', 'no config data');
+    } 
+    $row = $result->fetch_assoc();
+    // not doing consistency checks (min < max and stuff) because this is done at edit/insert of the values
+    
+    echo $valid.'|'.$newestConsumption.date_format($zeitNewest,"|Y|m|d|H|i|s|").$row['ledMinValue'].'|'.$row['ledMaxValue'].'|'.$row['ledBrightness'];
 ?>

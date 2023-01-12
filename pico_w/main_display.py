@@ -20,15 +20,11 @@ def SecondCoreTask(): # reboots after about ~1h
             from machine import reset # type: ignore
             reset() # NB: connection to whatever device is getting lost; complicates debugging
 
-def send_message_get_response(DBGCFG:dict, message:dict, isMeasurement:bool):    
-    if isMeasurement:
-        URL = "https://strommesser.ch/verbrauch/getRaw_v2.php?TX=pico&TXVER=2"
-        SIM_STR = "1|57|2023|01|27|18|22|09"
-    else:
-        URL = "https://strommesser.ch/verbrauch/getConfigDisp_v1.php?TX=pico&TXVER=2"
-        SIM_STR = "30|500|100"
+def send_message_get_response(DBGCFG:dict, message:dict):    
+    URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
+    SIM_STR = "1|57|2023|01|27|18|22|09|30|500|100"
     if (DBGCFG["wlan_sim"]):        
-        return(sepStrToArr(separatedString=SIM_STR, isMeasurement=isMeasurement))            
+        return(sepStrToArr(separatedString=SIM_STR))            
 
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     urlenc = urlencode(message)
@@ -36,7 +32,7 @@ def send_message_get_response(DBGCFG:dict, message:dict, isMeasurement:bool):
     debug_print(DBGCFG, response.text)
     returnText = response.text
     response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
-    return(sepStrToArr(separatedString=returnText, isMeasurement=isMeasurement))
+    return(sepStrToArr(separatedString=returnText))
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
 LOOP_WAIT_TIME = 80
@@ -126,29 +122,23 @@ def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting i
     display.text(text, x, y, scale=1.1)
     display.text(text, x+1, y, scale=1.1)
 
-def sepStrToArr(separatedString:str, isMeasurement:bool):
+def sepStrToArr(separatedString:str):
     valueArray = separatedString.split("|") # Format: $valid|$newestConsumption|Y|m|d|H|i|s    
-    if isMeasurement:
-        retVal = dict([
+    retVal = dict([
             ('valid', 0),
             ('wattValue', 999),
-            ('hour', 99)
-        ])
-        if (len(valueArray) > 5 ):
-            retVal["valid"] = int(valueArray[0])
-            retVal["wattValue"] = int(valueArray[1])
-            retVal["hour"] = int(valueArray[5])
-    else:
-        # I'm assuming some things: min is >= 0, min is smaller than max, max is reasonable (e.g. < 100'000), brightness is between 1 and 255
-        retVal = dict([
+            ('hour', 99),
             ('min', 0),
             ('max', 405),
             ('brightness', 80)
-        ])
-        if (len(valueArray) > 2 ):
-            retVal["min"] = int(valueArray[0])
-            retVal["max"] = int(valueArray[1])
-            retVal["brightness"] = int(valueArray[2])
+    ])
+    if (len(valueArray) > 10 ):
+            retVal["valid"] = int(valueArray[0])
+            retVal["wattValue"] = int(valueArray[1])
+            retVal["hour"] = int(valueArray[5])
+            retVal["min"] = int(valueArray[8])
+            retVal["max"] = int(valueArray[9])
+            retVal["brightness"] = int(valueArray[10])            
     return retVal
 
 rgb_control = RgbControl()
@@ -166,38 +156,37 @@ while True:
         ])
         
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
-    measurement = send_message_get_response(DBGCFG=DBGCFG, message=message, isMeasurement=True) # does not send anything when in simulation
-    ledConfig = send_message_get_response(DBGCFG=DBGCFG, message=message, isMeasurement=False) # does not send anything when in simulation   
+    meas = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
     
     # at two o'clock in the morning (or when receiving invalid data) I start a timer to reset 80mins later
-    if (measurement["hour"] == 2) or (measurement["valid"] == 0):
+    if (meas["hour"] == 2) or (meas["valid"] == 0):
         if second_core_idle: # start it only once
             _thread.start_new_thread(SecondCoreTask, ())
             second_core_idle = False
             debug_print(DBGCFG, "did start the second core")
 
     # normalize the value. Is between 0 and (max-min)
-    wattValueNonMaxed = measurement["wattValue"]
-    ledConfig["max"] = ledConfig["max"] - ledConfig["min"]
-    measurement["wattValue"] = measurement["wattValue"] - ledConfig["min"]
-    measurement["wattValue"] = min(measurement["wattValue"], ledConfig["max"])
-    measurement["wattValue"] = max(measurement["wattValue"], 0)
+    wattValueNonMaxed = meas["wattValue"]
+    meas["max"] = meas["max"] - meas["min"]
+    meas["wattValue"] = meas["wattValue"] - meas["min"]
+    meas["wattValue"] = min(meas["wattValue"], meas["max"])
+    meas["wattValue"] = max(meas["wattValue"], 0)
 
-    debug_print(DBGCFG, "normalized watt value: "+str(measurement["wattValue"])+", min/max/bright: "+str(ledConfig["min"])+"/"+str(ledConfig["max"])+"/"+str(ledConfig["brightness"]))
+    debug_print(DBGCFG, "normalized watt value: "+str(meas["wattValue"])+", min/max/bright: "+str(meas["min"])+"/"+str(meas["max"])+"/"+str(meas["brightness"]))
 
     # fills the screen with black
     display.set_pen(BLACK)
     display.clear()
 
-    wattValues.append(measurement["wattValue"])
+    wattValues.append(meas["wattValue"])
     if len(wattValues) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
         wattValues.pop(0)
 
     i = 0
     for t in wattValues:        
-        VALUE_COLOUR = display.create_pen(*value_to_color(value=t,colors=COLORS_DISP,value_max=ledConfig["max"]))
+        VALUE_COLOUR = display.create_pen(*value_to_color(value=t,colors=COLORS_DISP,value_max=meas["max"]))
         display.set_pen(VALUE_COLOUR)
-        display.rectangle(i, int(HEIGHT - (float(t) / float(ledConfig["max"] / HEIGHT))), BAR_WIDTH, HEIGHT)
+        display.rectangle(i, int(HEIGHT - (float(t) / float(meas["max"] / HEIGHT))), BAR_WIDTH, HEIGHT)
         i += BAR_WIDTH
 
     display.set_pen(WHITE)
@@ -213,11 +202,11 @@ while True:
     display.update()
 
     # lets also set the LED to match
-    if (measurement["valid"] == 0):
+    if (meas["valid"] == 0):
         rgb_control.start_pulse(blue=False) # pulsate red
     else:        
-        COLORS_LED = [(0, 0, ledConfig["brightness"]), (0, ledConfig["brightness"], 0), (ledConfig["brightness"], ledConfig["brightness"], 0), (ledConfig["brightness"], 0, 0)]
-        rgb_control.set_const_color(value_to_color(value=measurement["wattValue"],colors=COLORS_LED,value_max=ledConfig["max"]))
+        COLORS_LED = [(0, 0, meas["brightness"]), (0, meas["brightness"], 0), (meas["brightness"], meas["brightness"], 0), (meas["brightness"], 0, 0)]
+        rgb_control.set_const_color(value_to_color(value=meas["wattValue"],colors=COLORS_LED,value_max=meas["max"]))
         if (wattValueNonMaxed == 0):
             rgb_control.start_pulse(blue=True)
     
