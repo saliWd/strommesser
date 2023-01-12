@@ -135,6 +135,32 @@ def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting i
     display.text(text, x, y, scale=1.1)
     display.text(text, x+1, y, scale=1.1)
 
+def sepStrToArr(separatedString:str, isMeasurement:bool):
+    valueArray = separatedString.split("|") # Format: $valid|$newestConsumption|Y|m|d|H|i|s
+    
+    if isMeasurement:
+        retVal = dict([
+            ('valid', 0),
+            ('wattValue', 999),
+            ('hour', 99)
+        ])
+        if (len(valueArray) > 5 ):
+            retVal["valid"] = int(valueArray[0])
+            retVal["wattValue"] = int(valueArray[1])
+            retVal["hour"] = int(valueArray[5])
+    else:
+        # I'm assuming some things: min is >= 0, min is smaller than max, max is reasonable (e.g. < 100'000), brightness is between 1 and 255
+        retVal = dict([
+            ('min', 0),
+            ('max', 405),
+            ('brightness', 80)
+        ])
+        if (len(valueArray) > 2 ):
+            retVal["min"] = int(valueArray[0])
+            retVal["max"] = int(valueArray[1])
+            retVal["brightness"] = int(valueArray[2])
+    return retVal
+
 rgb_control = RgbControl()
 rgb_control.start_pulse(blue=False) # signal startup
 
@@ -153,57 +179,39 @@ while True:
     wattValueString = send_message_get_response(DBGCFG=DBGCFG, message=message, getValue=True) # does not send anything when in simulation
     configString = send_message_get_response(DBGCFG=DBGCFG, message=message, getValue=False) # does not send anything when in simulation
 
-    validValue = wattValueString.split("|") # Format: $valid|$newestConsumption|Y|m|d|H|i|s
-    configValue = configString.split("|")
-
-    if (len(validValue) < 2 ):
-        valid = 0
-        wattValue = 999
-        hour = 99
-    else:
-        valid = int(validValue[0])
-        wattValue = int(validValue[1])
-        hour = int(validValue[5])
-
+    measurement = sepStrToArr(separatedString=wattValueString, isMeasurement=True)
+    ledConfig = sepStrToArr(separatedString=configString, isMeasurement=False)
+    
     # at two o'clock in the morning (or when receiving invalid data) I start a timer to reset 80mins later
-    if (hour == 2) or (valid == 0):
+    if (measurement["hour"] == 2) or (measurement["valid"] == 0):
         if second_core_idle: # start it only once
             _thread.start_new_thread(SecondCoreTask, ())
             second_core_idle = False
             debug_print(DBGCFG, "did start the second core")
 
-    # I'm assuming some things: min is >= 0, min is smaller than max, max is reasonable (e.g. < 100'000), brightness is between 1 and 255
-    if (len(configValue) < 3 ):
-        led_value_min = 0
-        led_value_max = 405
-        led_brightness = 80
-    else:
-        led_value_min = int(configValue[0])
-        led_value_max = int(configValue[1])
-        led_brightness = int(configValue[2])
 
     # normalize the value. Is between 0 and (max-min)
-    wattValueNonMaxed = wattValue
-    led_value_max = led_value_max - led_value_min
-    wattValue = wattValue - led_value_min
-    wattValue = min(wattValue, led_value_max)
-    wattValue = max(wattValue, 0)
+    wattValueNonMaxed = measurement["wattValue"]
+    ledConfig["max"] = ledConfig["max"] - ledConfig["min"]
+    measurement["wattValue"] = measurement["wattValue"] - ledConfig["min"]
+    measurement["wattValue"] = min(measurement["wattValue"], ledConfig["max"])
+    measurement["wattValue"] = max(measurement["wattValue"], 0)
 
-    debug_print(DBGCFG, "normalized watt value: "+str(wattValue)+", min/max/bright: "+str(led_value_min)+"/"+str(led_value_max)+"/"+str(led_brightness))
+    debug_print(DBGCFG, "normalized watt value: "+str(measurement["wattValue"])+", min/max/bright: "+str(ledConfig["min"])+"/"+str(ledConfig["max"])+"/"+str(ledConfig["brightness"]))
 
     # fills the screen with black
     display.set_pen(BLACK)
     display.clear()
 
-    wattValues.append(wattValue)
+    wattValues.append(measurement["wattValue"])
     if len(wattValues) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
         wattValues.pop(0)
 
     i = 0
     for t in wattValues:        
-        VALUE_COLOUR = display.create_pen(*value_to_color(value=t,disp=True,value_max=led_value_max))
+        VALUE_COLOUR = display.create_pen(*value_to_color(value=t,disp=True,value_max=ledConfig["max"]))
         display.set_pen(VALUE_COLOUR)
-        display.rectangle(i, int(HEIGHT - (float(t) / float(led_value_max / HEIGHT))), BAR_WIDTH, HEIGHT)
+        display.rectangle(i, int(HEIGHT - (float(t) / float(ledConfig["max"] / HEIGHT))), BAR_WIDTH, HEIGHT)
         i += BAR_WIDTH
 
     display.set_pen(WHITE)
@@ -219,10 +227,10 @@ while True:
     display.update()
 
     # lets also set the LED to match
-    if (valid == 0):
+    if (measurement["valid"] == 0):
         rgb_control.start_pulse(blue=False) # pulsate red
     else:
-        rgb_control.set_const_color(value_to_color(value=wattValue,disp=False,value_max=led_value_max))
+        rgb_control.set_const_color(value_to_color(value=measurement["wattValue"],disp=False,value_max=ledConfig["max"]))
         if (wattValueNonMaxed == 0):
             rgb_control.start_pulse(blue=True)
     
