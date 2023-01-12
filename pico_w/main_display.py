@@ -20,18 +20,15 @@ def SecondCoreTask(): # reboots after about ~1h
             from machine import reset # type: ignore
             reset() # NB: connection to whatever device is getting lost; complicates debugging
 
-def send_message_get_response(DBGCFG:dict, message:dict, getValue:bool):
-    # getValue == false means I'm getting the configuration
-    if (DBGCFG["wlan_sim"]):
-        if getValue:
-            return("1|57|2023|01|27|18|22|09") # valid|57W|someDateTime
-        else:
-            return("30|500|100") # min|max|brightness
-    
-    if getValue:
+def send_message_get_response(DBGCFG:dict, message:dict, isMeasurement:bool):    
+    if isMeasurement:
         URL = "https://strommesser.ch/verbrauch/getRaw_v2.php?TX=pico&TXVER=2"
+        SIM_STR = "1|57|2023|01|27|18|22|09"
     else:
         URL = "https://strommesser.ch/verbrauch/getConfigDisp_v1.php?TX=pico&TXVER=2"
+        SIM_STR = "30|500|100"
+    if (DBGCFG["wlan_sim"]):        
+        return(sepStrToArr(separatedString=SIM_STR, isMeasurement=isMeasurement))            
 
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     urlenc = urlencode(message)
@@ -39,7 +36,7 @@ def send_message_get_response(DBGCFG:dict, message:dict, getValue:bool):
     debug_print(DBGCFG, response.text)
     returnText = response.text
     response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
-    return(returnText)
+    return(sepStrToArr(separatedString=returnText, isMeasurement=isMeasurement))
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
 LOOP_WAIT_TIME = 80
@@ -136,8 +133,7 @@ def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting i
     display.text(text, x+1, y, scale=1.1)
 
 def sepStrToArr(separatedString:str, isMeasurement:bool):
-    valueArray = separatedString.split("|") # Format: $valid|$newestConsumption|Y|m|d|H|i|s
-    
+    valueArray = separatedString.split("|") # Format: $valid|$newestConsumption|Y|m|d|H|i|s    
     if isMeasurement:
         retVal = dict([
             ('valid', 0),
@@ -176,11 +172,8 @@ while True:
         ])
         
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
-    wattValueString = send_message_get_response(DBGCFG=DBGCFG, message=message, getValue=True) # does not send anything when in simulation
-    configString = send_message_get_response(DBGCFG=DBGCFG, message=message, getValue=False) # does not send anything when in simulation
-
-    measurement = sepStrToArr(separatedString=wattValueString, isMeasurement=True)
-    ledConfig = sepStrToArr(separatedString=configString, isMeasurement=False)
+    measurement = send_message_get_response(DBGCFG=DBGCFG, message=message, isMeasurement=True) # does not send anything when in simulation
+    ledConfig = send_message_get_response(DBGCFG=DBGCFG, message=message, isMeasurement=False) # does not send anything when in simulation   
     
     # at two o'clock in the morning (or when receiving invalid data) I start a timer to reset 80mins later
     if (measurement["hour"] == 2) or (measurement["valid"] == 0):
@@ -188,7 +181,6 @@ while True:
             _thread.start_new_thread(SecondCoreTask, ())
             second_core_idle = False
             debug_print(DBGCFG, "did start the second core")
-
 
     # normalize the value. Is between 0 and (max-min)
     wattValueNonMaxed = measurement["wattValue"]
