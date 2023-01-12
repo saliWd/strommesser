@@ -4,17 +4,27 @@ from time import sleep
 from machine import Timer # type: ignore
 from pimoroni import RGBLED  # type: ignore
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
+import _thread
 
 # my own files
 import my_config
 from my_functions import debug_print, debug_sleep, wlan_connect, urlencode, get_randNum_hash
 
+def SecondCoreTask(): # reboots after about ~1h
+    reset_counter = 40 # do a regular reboot (stability increase work around)
+    while True:
+        sleep(120) # seconds
+        if reset_counter > 0:
+            reset_counter -= 1
+        else:
+            from machine import reset # type: ignore
+            reset() # NB: connection to whatever device is getting lost; complicates debugging
 
 def send_message_get_response(DBGCFG:dict, message:dict):
     if (DBGCFG["wlan_sim"]):
-        return("1|57") # valid|57W
+        return("1|57|2023|01|27|18|22|09") # valid|57W|someDateTime
     
-    URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
+    URL = "https://strommesser.ch/verbrauch/getRaw_v2.php?TX=pico&TXVER=2"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     urlenc = urlencode(message)
     response = urequests.post(URL, data=urlenc, headers=HEADERS)
@@ -24,7 +34,7 @@ def send_message_get_response(DBGCFG:dict, message:dict):
     return(returnText)
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
-LOOP_WAIT_TIME = 60
+LOOP_WAIT_TIME = 80
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True) # activate it. NB: disabling does not work correctly
 sleep(1)
@@ -121,6 +131,8 @@ def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting i
 rgb_control = RgbControl()
 rgb_control.start_pulse(blue=False) # signal startup
 
+second_core_idle = True
+
 while True:
     randNum_hash = get_randNum_hash(device_config)
     
@@ -133,18 +145,28 @@ while True:
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
     wattValueString = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
 
-    validValue = wattValueString.split("|")
-    if (len(validValue) != 2 ):
+    validValue = wattValueString.split("|") # Format: $valid|$newestConsumption|Y|m|d|H|i|s
+    if (len(validValue) < 2 ):
         valid = 0
         wattValue = 999
+        hour = 99
     else:
         valid = int(validValue[0])
         wattValue = int(validValue[1])
+        hour = int(validValue[5])
     
     # normalize the value
     wattValueNonMaxed = wattValue
     wattValue = min(wattValue, VALUE_MAX)
     wattValue = max(wattValue, 0)
+
+    # at two o'clock in the morning (or when receiving invalid data) I start a timer to reset 80mins later
+    if (hour == 2) or (valid == 0):
+        if second_core_idle: # start it only once
+            _thread.start_new_thread(SecondCoreTask, ())
+            second_core_idle = False
+            debug_print(DBGCFG, "did start the second core")
+
 
     debug_print(DBGCFG, "watt value: "+str(wattValue))
 
