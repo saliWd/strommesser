@@ -84,7 +84,7 @@ function validUseridInPost ($dbConn): int {
     return 0; // invalid userid
   }
   $row = $result->fetch_assoc();
-  return $row['id'];
+  return (int)$row['id'];
 }
 
 function checkHash ($dbConn, string $device): bool { // TODO: deprecated
