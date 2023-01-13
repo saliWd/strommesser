@@ -56,7 +56,7 @@ def send_message_and_wait_post(DBGCFG:dict, message:dict, wait_time:int, led_onb
     # 0 is doing GET-communication, 1 uses post to transmit an identifier, values as blob
     # 2 uses authentification with a hash when sending
     if(not DBGCFG["wlan_sim"]): # not sending anything in simulation
-        URL = "https://strommesser.ch/verbrauch/rx_v3.php?TX=pico&TXVER=2"
+        URL = "https://strommesser.ch/verbrauch/rx.php?TX=pico&TXVER=2"
         HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
 
         urlenc = urlencode(message)

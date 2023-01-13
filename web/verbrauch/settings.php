@@ -21,11 +21,11 @@ if ($doSafe === 0) { // entry point of this site
       <table width="100%" style="line-height:4.6;">
         <tr>
           <td width="50%" align="left">Maximalwert Farbskala:</td>
-          <td width="50%" align="center"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="'.$LIMIT_LED_MAX_VALUE.'" step="10" value="'.$row['ledMaxValue'].'" class="range" oninput="this.nextElementSibling.value=this.value"/> <output>'.$row['ledMaxValue'].'</output>W</td>
+          <td width="50%" align="center"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="'.$LIMIT_LED_MAX_VALUE.'" step="20" value="'.$row['ledMaxValue'].'" class="range" oninput="this.nextElementSibling.value=this.value"/> <output>'.$row['ledMaxValue'].'</output>W</td>
         </tr>
         <tr>
           <td width="50%" align="left">LED Helligkeit:</td>
-          <td width="50%" align="center"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="'.$LIMIT_LED_BRIGHTNESS.'" step="2" value="'.$row['ledBrightness'].'" class="range" oninput="this.nextElementSibling.value=this.value"/> <output>'.$row['ledBrightness'].'</output></td>
+          <td width="50%" align="center"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="'.$LIMIT_LED_BRIGHTNESS.'" step="5" value="'.$row['ledBrightness'].'" class="range" oninput="this.nextElementSibling.value=this.value"/> <output>'.$row['ledBrightness'].'</output></td>
         </tr>
         <tr>
           <td colspan="2" align="center"><input id="settingsFormSubmit" class="mt-8 input-text" name="settingsFormSubmit" type="submit" value="speichern"></td>
@@ -53,7 +53,7 @@ if ($doSafe === 0) { // entry point of this site
   $result = $dbConn->query('UPDATE `user` SET `ledMaxValue` = "'.$ledMaxValue.'", `ledBrightness` = "'.$ledBrightness.'" WHERE `id` = "'.$userid.'";');
 
   echo 'gespeichert<br>';
-  echo '<script>setTimeout(() => { window.location.href = \'settings.php\'; }, 1500);</script>';
+  echo '<script>setTimeout(() => { window.location.href = \'settings.php\'; }, 2000);</script>';
 } else { // should never happen
   echo '<p>...something went wrong (undefined do-variable)...</p>';
 }
