@@ -9,18 +9,20 @@ SET time_zone = "+00:00";
 
 
 CREATE TABLE `user` (
-  `id` int(11) NOT NULL,
-  `device` varchar(8) NOT NULL,
+  `id` int(10) UNSIGNED NOT NULL,
+  `description` varchar(63) NOT NULL,
   `post_key` varchar(32) NOT NULL,
   `email` varchar(127) NOT NULL,
   `lastLogin` timestamp NOT NULL DEFAULT current_timestamp(),
   `pwHash` char(255) NOT NULL,
-  `randCookie` char(64) NOT NULL
+  `randCookie` char(64) NOT NULL,
+  `ledMaxValue` smallint(5) UNSIGNED NOT NULL DEFAULT 405,
+  `ledBrightness` tinyint(3) UNSIGNED NOT NULL DEFAULT 80
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `verbrauch` (
-  `id` bigint(20) NOT NULL,
-  `device` varchar(8) DEFAULT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `userid` int(10) UNSIGNED NOT NULL,
   `consumption` decimal(10,3) NOT NULL,
   `consDiff` decimal(10,3) NOT NULL,
   `aveConsDiff` double NOT NULL,
@@ -39,10 +41,10 @@ ALTER TABLE `verbrauch`
 
 
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `verbrauch`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
