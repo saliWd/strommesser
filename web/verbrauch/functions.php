@@ -77,7 +77,17 @@ function validDevice ($dbConn, string $postIndicator): array {
   return array(FALSE, ''); // valid/deviceString
 }
 
-function checkHash ($dbConn, string $device): bool {
+function validUseridInPost ($dbConn): int {        
+  $unsafeUserid = safeIntFromExt('POST', 'userid', 11); // maximum length of 11
+  $result = $dbConn->query('SELECT `id` FROM `user` WHERE `id` = '.$unsafeUserid.' LIMIT 1;');
+  if ($result->num_rows !== 1) {
+    return 0; // invalid userid
+  }
+  $row = $result->fetch_assoc();
+  return $row['id'];
+}
+
+function checkHash ($dbConn, string $device): bool { // TODO: deprecated
   $unsafeRandNum = safeIntFromExt('POST', 'randNum', 8); // range 1 to 10'000 (0 excluded)
   $unsafePostHash = safeHexFromExt('POST', 'hash', 64); 
   if ($unsafeRandNum === 0 or $unsafePostHash === '') {
@@ -97,6 +107,47 @@ function checkHash ($dbConn, string $device): bool {
       return FALSE;
   }
 }
+
+function checkHashUserid ($dbConn, int $userid): bool {
+  $unsafeRandNum = safeIntFromExt('POST', 'randNum', 8); // range 1 to 10'000 (0 excluded)
+  $unsafePostHash = safeHexFromExt('POST', 'hash', 64); 
+  if ($unsafeRandNum === 0 or $unsafePostHash === '') {
+      return FALSE;
+  }
+  $result = $dbConn->query('SELECT `post_key` FROM `user` WHERE `id` = "'.$userid.'" LIMIT 1');
+  if ($result->num_rows !== 1) {
+      return FALSE;
+  }
+  $row = $result->fetch_assoc();
+  // now do a hash over randNum and the post_key. if that one matches the transmitted hash, we are ok.
+  $unsafeRandNum = (string)$unsafeRandNum; // convert the int to a string
+  $rxSideHash = hash('sha256',$unsafeRandNum.$row['post_key']);
+  if ($rxSideHash === $unsafePostHash) {
+      return TRUE;
+  } else {
+      return FALSE;
+  }
+}
+
+// function used to check post and get variables 
+function checkInputs($dbConn): int {
+  if (! verifyGetParams()) { // now I can look the post variables        
+    printRawErrorAndDie('Error', 'invalid params');
+    return 0;
+  }
+  $userid = validUseridInPost($dbConn);
+  if (! $userid) {
+    printRawErrorAndDie('Error', 'userid not supported');
+    return 0;
+  }
+  if (! checkHashUserid($dbConn, $userid)) {
+    printRawErrorAndDie('Error', 'access key not ok');
+    return 0;
+  }
+  return $userid;
+}
+
+
 
 function printNavMenu (string $siteSafe): void {  
   $wpHome = '<li><a href="../">Home</a></li>'; // I don't display this menu on the wp site
@@ -255,6 +306,7 @@ function safeStrFromExt (string $source, string $varName, int $length): string {
    }
 }
 
+// TODO: deprecated
 function doDbThinning($dbConn, string $device, bool $talkative, int $timeRangeMins):void {
   // 24h-old: thin with a rate of 1 entry per 15 minutes (about a 2/15 rate)
   // 72h-old: thin with a rate of 1 entry per 4 hours (about a 2/240 rate), resulting in 6 entries per day  
@@ -315,5 +367,67 @@ function doDbThinning($dbConn, string $device, bool $talkative, int $timeRangeMi
   $sql = 'DELETE FROM `verbrauch` WHERE '.$sqlWhereDeviceThin.' AND `zeit` < "'.$zeitToThinString.'";';
   $result = $dbConn->query($sql);
   echo $dbConn->affected_rows.' entries have been deleted';
-}      
+}
+
+function doDbThinningUserid($dbConn, int $userid, bool $talkative, int $timeRangeMins):void {
+  // 24h-old: thin with a rate of 1 entry per 15 minutes (about a 2/15 rate)
+  // 72h-old: thin with a rate of 1 entry per 4 hours (about a 2/240 rate), resulting in 6 entries per day  
+  if (($timeRangeMins !== 15) and ($timeRangeMins !== 240)) { // $timeRangeMins is either 15 or 240
+    return;
+  }
+
+  $sqlWhereUseridThin = '`userid` = "'.$userid.'" AND `thin` < "15"';
+  if ($timeRangeMins === 240) {
+    $sqlWhereUseridThin = '`userid` = "'.$userid.'" AND `thin` < "240"';
+  }
+  $sql = 'SELECT `zeit` FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' ORDER BY `id` ASC LIMIT 1;';
+  $result = $dbConn->query($sql);
+  $row = $result->fetch_assoc();
+  // get the time, add 15 minutes  
+  $zeitToThin = date_create($row['zeit']);
+  $zeitToThin->modify('+ '.$timeRangeMins.' minutes');
+  $zeitToThinString = $zeitToThin->format('Y-m-d H:i:s');
+  
+  $zeitThinStart = date_create("now");
+  if ($timeRangeMins === 15) {
+    $zeitThinStart->modify('- 24 hours');
+  } else {
+    $zeitThinStart->modify('- 72 hours');
+  }
+  
+  if ($zeitToThin >= $zeitThinStart) {  // if this time is more then 24h old, proceed. Otherwise stop
+    if($talkative) { echo 'keine Einträge, die genügend alt sind'; }
+    return;
+  }
+  // get the last one where thinning was not yet applied
+  $sql = 'SELECT `id` FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitToThinString.'" ORDER BY `id` ASC LIMIT 240;';
+  $result = $dbConn->query($sql);
+  if ($result->num_rows < 7) { // otherwise I can't really compact stuff
+    // I have an issue when there are gaps in the entries. I then have less than 7 entries per 15 minutes
+    $zeitThinStartWithMargin = $zeitThinStart;
+    $zeitThinStartWithMargin->modify('- 2 hours');
+    if ($zeitToThin < $zeitThinStartWithMargin) {
+      // proceed normally
+      if($talkative) { echo '...prozessiere '.$result->num_rows.' Einträge (weniger als 7 aber schon alt) seit '.$zeitToThinString; }
+    } else {
+      if($talkative) { echo 'nur '.$result->num_rows.' Einträge (weniger als 7) seit '.$zeitToThinString; }
+      return;
+    }
+  }
+  $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
+  $idToUpdate = $row['id'];
+  
+  $sql = 'SELECT SUM(`aveConsDiff`) as `sumAveConsDiff`, SUM(`aveZeitDiff`) as `sumAveZeitDiff` FROM `verbrauch`';
+  $sql = $sql. ' WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitToThinString.'";';
+  $result = $dbConn->query($sql);
+  $row = $result->fetch_assoc(); 
+
+  // now do the update and then delete the others. Number 15 means: a ratio of about one data item per 15min was implemented 
+  $sql = 'UPDATE `verbrauch` SET `aveConsDiff` = "'.$row['sumAveConsDiff'].'", `aveZeitDiff` = "'.$row['sumAveZeitDiff'].'", `thin` = "'.$timeRangeMins.'" WHERE `id` = "'.$idToUpdate.'";';
+  $result = $dbConn->query($sql);
+  
+  $sql = 'DELETE FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitToThinString.'";';
+  $result = $dbConn->query($sql);
+  echo $dbConn->affected_rows.' entries have been deleted';
+}
  
