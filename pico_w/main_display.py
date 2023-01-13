@@ -21,7 +21,7 @@ def SecondCoreTask(): # reboots after about ~1h
             reset() # NB: connection to whatever device is getting lost; complicates debugging
 
 def send_message_get_response(DBGCFG:dict, message:dict):    
-    URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
+    URL = "https://strommesser.ch/verbrauch/getRaw_v2.php?TX=pico&TXVER=2"
     SIM_STR = "1|57|2023|01|27|18|22|09|30|500|100"
     if (DBGCFG["wlan_sim"]):        
         return(sepStrToArr(separatedString=SIM_STR))            
@@ -150,7 +150,7 @@ while True:
     randNum_hash = get_randNum_hash(device_config)
     
     message = dict([
-        ('device', device_config['device_name']),
+        ('userid', device_config['userid']),
         ('randNum', randNum_hash['randNum']),
         ('hash', randNum_hash['hash'])
         ])
