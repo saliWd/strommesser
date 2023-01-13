@@ -29,7 +29,7 @@ def uart_ir_e350(DBGCFG:dict, uart_ir):
         uart_ir.read() # first clear everything. This should return None. Timeout set to 6s
         print('Warning: UART buffer was not empty at first read')
     uart_ir.write('\x2F\x3F\x21\x0D\x0A') # in characters: '/?!\r\n'
-    sleep(1) # need to make sure it has been sent but not wait more than 2 secs. TODO: maybe use uart_ir.flush()
+    sleep(1) # need to make sure it has been sent but not wait more than 2 secs
     uart_str_id = uart_ir.read() # should be b'/LGZ4ZMF100AC.M26\r\n' (this part is not being transmitted)
     uart_ir.write('\x06\x30\x30\x30\x0D\x0A') # in characters: ACK000\r\n
     sleep(2) 

@@ -21,8 +21,8 @@ def SecondCoreTask(): # reboots after about ~1h
             reset() # NB: connection to whatever device is getting lost; complicates debugging
 
 def send_message_get_response(DBGCFG:dict, message:dict):    
-    URL = "https://strommesser.ch/verbrauch/getRaw_v2.php?TX=pico&TXVER=2"
-    SIM_STR = "1|57|2023|01|27|18|22|09|30|500|100"
+    URL = "https://strommesser.ch/verbrauch/getRaw_v3.php?TX=pico&TXVER=2"
+    SIM_STR = "1|57|2023|01|27|18|22|09|500|100"
     if (DBGCFG["wlan_sim"]):        
         return(sepStrToArr(separatedString=SIM_STR))            
 
@@ -128,17 +128,15 @@ def sepStrToArr(separatedString:str):
             ('valid', 0),
             ('wattValue', 999),
             ('hour', 99),
-            ('min', 0),
             ('max', 405),
             ('brightness', 80)
     ])
-    if (len(valueArray) > 10 ):
+    if (len(valueArray) > 9 ):
             retVal["valid"] = int(valueArray[0])
             retVal["wattValue"] = int(valueArray[1])
             retVal["hour"] = int(valueArray[5])
-            retVal["min"] = int(valueArray[8])
-            retVal["max"] = int(valueArray[9])
-            retVal["brightness"] = int(valueArray[10])            
+            retVal["max"] = int(valueArray[8])
+            retVal["brightness"] = int(valueArray[9])            
     return retVal
 
 rgb_control = RgbControl()
@@ -165,14 +163,12 @@ while True:
             second_core_idle = False
             debug_print(DBGCFG, "did start the second core")
 
-    # normalize the value. Is between 0 and (max-min)
-    wattValueNonMaxed = meas["wattValue"]
-    meas["max"] = meas["max"] - meas["min"]
-    meas["wattValue"] = meas["wattValue"] - meas["min"]
+    # normalize the value. Is between 0 and max
+    wattValueNonMaxed = meas["wattValue"]    
     meas["wattValue"] = min(meas["wattValue"], meas["max"])
     meas["wattValue"] = max(meas["wattValue"], 0)
 
-    debug_print(DBGCFG, "normalized watt value: "+str(meas["wattValue"])+", min/max/bright: "+str(meas["min"])+"/"+str(meas["max"])+"/"+str(meas["brightness"]))
+    debug_print(DBGCFG, "normalized watt value: "+str(meas["wattValue"])+", max/bright: "+str(meas["max"])+"/"+str(meas["brightness"]))
 
     # fills the screen with black
     display.set_pen(BLACK)

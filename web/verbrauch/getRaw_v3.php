@@ -23,12 +23,12 @@
         $valid = 0;
     }
 
-    $result = $dbConn->query('SELECT `ledMinValue`,`ledMaxValue`,`ledBrightness` FROM `user` WHERE `id` = "'.$userid.'" LIMIT 1;');
+    $result = $dbConn->query('SELECT `ledMaxValue`,`ledBrightness` FROM `user` WHERE `id` = "'.$userid.'" LIMIT 1;');
     if ($result->num_rows !== 1) {
         printRawErrorAndDie('Error', 'no config data');
     } 
     $row = $result->fetch_assoc();
     // not doing consistency checks (min < max and stuff) because this is done at edit/insert of the values
     
-    echo $valid.'|'.$newestConsumption.date_format($zeitNewest,"|Y|m|d|H|i|s|").$row['ledMinValue'].'|'.$row['ledMaxValue'].'|'.$row['ledBrightness'];
+    echo $valid.'|'.$newestConsumption.date_format($zeitNewest,"|Y|m|d|H|i|s|").$row['ledMaxValue'].'|'.$row['ledBrightness'];
 ?>

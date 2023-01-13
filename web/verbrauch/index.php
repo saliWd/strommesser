@@ -47,7 +47,7 @@ if ($totalCount > 0) {// this may be 0. Can't
   $rowOldest = $result->fetch_assoc();
   $result->data_seek(0); // go back to the first row
 
-  $rowNewest = $result->fetch_assoc(); // TODO: could maybe remove this now (combine freshest and newest)
+  $rowNewest = $result->fetch_assoc();
   $queryCount = $result->num_rows; // this may be < graph-limit ( = display at least the newest) or >= graph-limit ( = all good)
 
   if ($rowNewest['aveZeitDiff'] > 0) { // divide by 0 exception
@@ -81,7 +81,7 @@ if ($totalCount > 0) {// this may be 0. Can't
     $val_y0_consumption = '[ '.substr($val_y0_consumption, 0, -2).' ]';
     $val_y1_watt = '[ '.substr($val_y1_watt, 0, -2).' ]';
     
-    // TODO: add some text about the absolute value (of kWh)
+    // maybe: add some text about the absolute value (of kWh)
     echo '
     <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
     <script>
@@ -139,7 +139,7 @@ $checkedText = '';
 if($enableReload) {
   $checkedText = ' checked';
 }
-// TODO: depending on the number of entries, some ranges cannot be selected
+
 $submitTexts = array (
   '1' => array('1','1 h','class="btn"'),
   '6' => array('6','6 h','class="btn"'),
