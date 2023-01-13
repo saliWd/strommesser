@@ -19,11 +19,11 @@ if ($doSafe === 0) { // entry point of this site
       <table width="100%" style="line-height:4.6;">
         <tr>
           <td width="50%" align="left">Maximalwert Farbskala:</td>
-          <td width="50%" align="center"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="2000" value="'.$row['ledMaxValue'].'" class="range" /></td>
+          <td width="50%" align="center"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="2000" value="'.$row['ledMaxValue'].'" class="range" oninput="this.nextElementSibling.value=this.value"/> <output>'.$row['ledMaxValue'].'</output></td>
         </tr>
         <tr>
           <td width="50%" align="left">LED Helligkeit:</td>
-          <td width="50%" align="center"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="255" value="'.$row['ledBrightness'].'" class="range" /></td>
+          <td width="50%" align="center"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="255" value="'.$row['ledBrightness'].'" class="range" oninput="this.nextElementSibling.value=this.value"/> <output>'.$row['ledBrightness'].'</output></td>
         </tr>
         <tr>
           <td colspan="2" align="center"><input id="settingsFormSubmit" class="mt-8 input-text" name="settingsFormSubmit" type="submit" value="speichern"></td>
