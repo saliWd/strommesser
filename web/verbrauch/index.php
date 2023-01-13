@@ -5,14 +5,14 @@ $dbConn = initialize();
 // returns the time range to be displayed as int. Possible values are: 1 (for last 1 hour), 6, 24, 25. 25 means: all data
 function getTimeRange():int {
   $returnVal = 6;  // default time range
-  $unsafeInt = safeIntFromExt('GET', 'range', 2);
+  $unsafeInt = safeIntFromExt(source:'GET',varName:'range',length:2);
   if (($unsafeInt === 1) or ($unsafeInt === 6) or ($unsafeInt === 24) or ($unsafeInt === 25)) {
     $returnVal = $unsafeInt; 
   }
   return $returnVal;
 }
 
-$reload = safeIntFromExt('GET', 'reload', 1);
+$reload = safeIntFromExt(source:'GET',varName:'reload',length:1);
 $timeSelected = getTimeRange();
 $enableReload = ($reload === 1);
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
