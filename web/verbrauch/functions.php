@@ -306,8 +306,11 @@ function safeStrFromExt (string $source, string $varName, int $length): string {
    }
 }
 
-// TODO: deprecated
-function doDbThinning($dbConn, string $device, bool $talkative, int $timeRangeMins):void {
+function limitInt (int $input, int $lower, int $upper): int {
+  return min(max($input,$lower),$upper);  
+}
+
+function doDbThinning($dbConn, string $device, bool $talkative, int $timeRangeMins):void { // TODO: deprecated
   // 24h-old: thin with a rate of 1 entry per 15 minutes (about a 2/15 rate)
   // 72h-old: thin with a rate of 1 entry per 4 hours (about a 2/240 rate), resulting in 6 entries per day  
   if (($timeRangeMins !== 15) and ($timeRangeMins !== 240)) { // $timeRangeMins is either 15 or 240
