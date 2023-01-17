@@ -67,7 +67,7 @@ def send_message_and_wait_post(DBGCFG:dict, message:dict, wait_time:int, led_onb
     led_onboard.toggle() # signal success
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
-LOOP_WAIT_TIME = 90
+LOOP_WAIT_TIME = 100 # results in about 2mins between measurements
 
 # pins
 led_onboard = Pin("LED", Pin.OUT)
@@ -105,6 +105,5 @@ while True:
         ])
     debug_print(DBGCFG=DBGCFG, text=str(message))
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=led_onboard, meas=True) # try to connect to the WLAN. Hangs there if no connection can be made
-    wait_time = LOOP_WAIT_TIME + randint(1, 20) # to get some variance on the measurement data
-    send_message_and_wait_post(DBGCFG=DBGCFG, message=message, wait_time=wait_time, led_onboard=led_onboard) # does not send anything when in simulation 
+    send_message_and_wait_post(DBGCFG=DBGCFG, message=message, wait_time=LOOP_WAIT_TIME, led_onboard=led_onboard) # does not send anything when in simulation 
 # end while
