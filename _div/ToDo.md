@@ -4,7 +4,8 @@
    1. fill with more content
 2. StromMesser/verbrauch
    1. average numbers: per day, per week, per month (additional page/graph)
-   1. settings.php: add explaining images
+   1. get all the pages behind the login mask into seo
+   1. settings.php
    1. getRaw.php
    1. index.php
    1. login.php
@@ -16,4 +17,4 @@
 4. div
 
 
-Next:  1.1 / 2.2 / 
+Next:  1.1 / 2.2 /
