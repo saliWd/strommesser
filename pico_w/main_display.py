@@ -139,6 +139,12 @@ def sepStrToArr(separatedString:str):
             retVal["brightness"] = int(valueArray[9])            
     return retVal
 
+def getBrightness(meas:list):
+    brightness = meas["brightness"]
+    if (meas["hour"] > 21) or (meas["hour"] < 6):
+        brightness = round(0.5 * meas["brightness"]) # darker from 22:00 to 05:59
+    return brightness
+
 rgb_control = RgbControl()
 rgb_control.start_pulse(blue=False) # signal startup
 
@@ -200,8 +206,9 @@ while True:
     # lets also set the LED to match
     if (meas["valid"] == 0):
         rgb_control.start_pulse(blue=False) # pulsate red
-    else:        
-        COLORS_LED = [(0, 0, meas["brightness"]), (0, meas["brightness"], 0), (meas["brightness"], meas["brightness"], 0), (meas["brightness"], 0, 0)]
+    else:
+        brightness = getBrightness(meas=meas)
+        COLORS_LED = [(0, 0, brightness), (0, brightness, 0), (brightness, brightness, 0), (brightness, 0, 0)]
         rgb_control.set_const_color(value_to_color(value=meas["wattValue"],colors=COLORS_LED,value_max=meas["max"]))
         if (wattValueNonMaxed == 0):
             rgb_control.start_pulse(blue=True)
