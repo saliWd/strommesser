@@ -96,43 +96,11 @@ function newUserLoginAndLinks (object $dbConn, int $newUserid, string $pw) : boo
 } 
 */
 
-function printLoginForm(bool $demoAccount):void {
-  if ($demoAccount) {
-    $emailPreFilled = 'messer@strommesser.ch';
-    $pwPreFilled = 'messerPW';
-    $cookieChecked = '';      
-  } else {
-    $emailPreFilled = '';
-    $pwPreFilled = '';
-    $cookieChecked = ' checked';
-  }
-  echo '
-  <form action="login.php?do=1" method="post" id="loginForm">
-  <table width="100%" style="line-height:4.6;">
-  <tr>
-    <td width="50%" align="right">Email:</td>
-    <td width="50%" align="left"><input class="input-text" name="email" type="email" maxlength="127" value="'.$emailPreFilled.'" required></td>
-  </tr>
-  <tr>
-    <td width="50%" align="right">Passwort:</td>
-    <td width="50%" align="left"><input class="input-text" name="password" type="password" maxlength="63" value="'.$pwPreFilled.'" required></td>
-  </tr>
-  <tr>
-    <td width="50%" align="right"><input class="w-10" type="checkbox" name="setCookie" value="1"'.$cookieChecked.'></td>
-    <td width="50%" align="left" class="text-sm">auf diesem Gerät speichern</td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center"><input id="loginFormSubmit" class="mt-8 input-text" name="create" type="submit" value="log in"></td>
-  </tr>
-  </table>
-  </form>';
-}
-
 $doSafe = safeIntFromExt('GET', 'do', 1); // this is an integer (range 1 to 9) or non-existing
 // do = 0: entry point
 // do = 1: process login form
 // do = 2: logout
-// do = 3: print login form with demo account (do not check cookies)
+// do = 3: process login form with demo account info
 
 if ($doSafe === 0) {
   // check cookie
@@ -144,7 +112,26 @@ if ($doSafe === 0) {
   } // no cookie present and no userid. print the login form
 
   printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', logInOut:'Log in');
-  printLoginForm(demoAccount:FALSE);
+  echo '
+  <form action="login.php?do=1" method="post" id="loginForm">
+    <table width="100%" style="line-height:4.6;">
+      <tr>
+        <td width="50%" align="right">Email:</td>
+        <td width="50%" align="left"><input class="input-text" name="email" type="email" maxlength="127" value="" required></td>
+      </tr>
+      <tr>
+        <td width="50%" align="right">Passwort:</td>
+        <td width="50%" align="left"><input class="input-text" name="password" type="password" maxlength="63" value="" required></td>
+      </tr>
+      <tr>
+        <td width="50%" align="right"><input class="w-10" type="checkbox" name="setCookie" value="1" checked></td>
+        <td width="50%" align="left" class="text-sm">auf diesem Gerät speichern</td>
+      </tr>
+      <tr>
+        <td colspan="2" align="center"><input id="loginFormSubmit" class="mt-8 input-text" name="create" type="submit" value="log in"></td>
+      </tr>
+    </table>
+  </form>';  
 } elseif ($doSafe === 1) {
   processLoginData(
     dbConn:$dbConn,
@@ -156,14 +143,13 @@ if ($doSafe === 0) {
   sessionAndCookieDelete();
   printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', logInOut:'Log out');
   echo '<p>log out ok, zurück zur <a href="../wp/index.php">Startseite</a></p>';
-} elseif ($doSafe === 3) {
-  printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', logInOut:'Log in');
-  printLoginForm(demoAccount:TRUE);
-  echo '
-  <script>
-    document.getElementById(\'loginForm\').submit();
-  </script>
-';
+} elseif ($doSafe === 3) {  
+  processLoginData(
+    dbConn:$dbConn,
+    emailUnsafe:filter_var('messer@strommesser.ch', FILTER_SANITIZE_EMAIL), // demo account
+    passwordUnsafe:filter_var('messerPW', FILTER_SANITIZE_STRING), // demo account
+    setCookieSafe:safeIntFromExt('POST', 'setCookie', 1)
+  ); // this redirects on success
 } else {
   printErrorAndDie('Error','unsupported do on login.php');
 }
