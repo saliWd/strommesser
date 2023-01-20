@@ -114,24 +114,17 @@ if ($doSafe === 0) {
   printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', logInOut:'Log in');
   echo '
   <form action="login.php?do=1" method="post" id="loginForm">
-    <table width="100%" style="line-height:4.6;">
-      <tr>
-        <td width="50%" align="right">Email:</td>
-        <td width="50%" align="left"><input class="input-text" name="email" type="email" maxlength="127" value="" required></td>
-      </tr>
-      <tr>
-        <td width="50%" align="right">Passwort:</td>
-        <td width="50%" align="left"><input class="input-text" name="password" type="password" maxlength="63" value="" required></td>
-      </tr>
-      <tr>
-        <td width="50%" align="right"><input class="w-10" type="checkbox" name="setCookie" value="1" checked></td>
-        <td width="50%" align="left" class="text-sm">auf diesem Gerät speichern</td>
-      </tr>
-      <tr>
-        <td colspan="2" align="center"><input id="loginFormSubmit" class="mt-8 input-text" name="create" type="submit" value="log in"></td>
-      </tr>
-    </table>
-  </form>';  
+    <div class="grid grid-cols-2 gap-4 justify-items-start mt-8">
+      <div class="justify-self-end">Email:</div>
+      <div><input class="input-text" name="email" type="email" maxlength="127" value="" required></div>
+      <div class="justify-self-end">Passwort:</div>
+      <div><input class="input-text" name="password" type="password" maxlength="63" value="" required></div>
+      <div class="justify-self-end"><input class="w-10" type="checkbox" name="setCookie" value="1" checked></div>
+      <div class="text-sm">auf diesem Gerät speichern</div>
+      <div class="justify-self-center col-span-2"><input id="loginFormSubmit" class="mt-8 input-text" name="create" type="submit" value="log in"></div>      
+    </div>
+  </form>
+  ';  
 } elseif ($doSafe === 1) {
   processLoginData(
     dbConn:$dbConn,
