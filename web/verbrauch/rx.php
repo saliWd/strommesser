@@ -64,27 +64,14 @@
         $consDiff = $row_now['consumption'] - $row_before['consumption']; // 0 or positive                        
         $zeitDiff = date_diff(date_create($row_before['zeit']), date_create($row_now['zeit']));
         $zeitSecs = ($zeitDiff->d * 24 * 3600) + ($zeitDiff->h*3600) + ($zeitDiff->i * 60) + ($zeitDiff->s);
-        if ($zeitSecs < 9000) { // doesn't make sense otherwise, too long between measurements
-            $result = $dbConn->query('UPDATE `verbrauch` SET `consDiff` = "'.$consDiff.'", `zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
-            // let sql calculate the moving average over 5 entries and then store that in the table
-            $sql = 'SELECT `id`, ';
-            $sql = $sql.'avg(`consDiff`) OVER(ORDER BY `zeit` DESC ROWS BETWEEN 5 PRECEDING AND CURRENT ROW ) as `movAveConsDiff`, ';
-            $sql = $sql.'avg(`zeitDiff`) OVER(ORDER BY `zeit` DESC ROWS BETWEEN 5 PRECEDING AND CURRENT ROW ) as `movAveZeitDiff` ';
-            $sql = $sql.'from `verbrauch` WHERE `userid` = "'.$userid.'" ';
-            $sql = $sql.'ORDER BY `zeit` DESC LIMIT 3;';
-            $result = $dbConn->query($sql); // gets me at least one result
-            // update the last 3 ones (moving average for the newest does not differ)
-            while ($row = $result->fetch_assoc()) {  
-                $dbConn->query('UPDATE `verbrauch` SET `aveConsDiff` = "'.$row['movAveConsDiff'].'", `aveZeitDiff` = "'.$row['movAveZeitDiff'].'" WHERE `id` = "'.$row['id'].'";');
-            }
-            echo 'update ok';
-            
-            // dbThinnings: do not need to run every time but it doesn't hurt either
-            doDbThinningUserid($dbConn, $userid, FALSE, 15);
-            doDbThinningUserid($dbConn, $userid, FALSE, 240);
-        } else {
-            echo 'previous data too old'; // not an error
-        } 
+        
+        $result = $dbConn->query('UPDATE `verbrauch` SET `consDiff` = "'.$consDiff.'", `zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
+        
+        $result = $dbConn->query('UPDATE `verbrauch` SET `aveConsDiff` = "'.$consDiff.'", `aveZeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
+        // dbThinnings: do not need to run every time but it doesn't hurt either
+        doDbThinningUserid($dbConn, $userid, FALSE, 15);
+        doDbThinningUserid($dbConn, $userid, FALSE, 240);
+         
     } else {
         echo 'no previous data'; // not an error
     }

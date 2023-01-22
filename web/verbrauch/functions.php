@@ -335,13 +335,13 @@ function doDbThinningUserid($dbConn, int $userid, bool $talkative, int $timeRang
   $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
   $idToUpdate = $row['id'];
   
-  $sql = 'SELECT SUM(`aveConsDiff`) as `sumAveConsDiff`, SUM(`aveZeitDiff`) as `sumAveZeitDiff` FROM `verbrauch`';
+  $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
   $sql = $sql. ' WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitToThinString.'";';
   $result = $dbConn->query($sql);
   $row = $result->fetch_assoc(); 
 
   // now do the update and then delete the others. Number 15 means: a ratio of about one data item per 15min was implemented 
-  $sql = 'UPDATE `verbrauch` SET `aveConsDiff` = "'.$row['sumAveConsDiff'].'", `aveZeitDiff` = "'.$row['sumAveZeitDiff'].'", `thin` = "'.$timeRangeMins.'" WHERE `id` = "'.$idToUpdate.'";';
+  $sql = 'UPDATE `verbrauch` SET `consDiff` = "'.$row['sumConsDiff'].'", `zeitDiff` = "'.$row['sumZeitDiff'].'", `thin` = "'.$timeRangeMins.'" WHERE `id` = "'.$idToUpdate.'";';
   $result = $dbConn->query($sql);
   
   $sql = 'DELETE FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitToThinString.'";';

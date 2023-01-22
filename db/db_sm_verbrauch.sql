@@ -25,10 +25,8 @@ CREATE TABLE `verbrauch` (
   `userid` int(10) UNSIGNED NOT NULL,
   `consumption` decimal(10,3) NOT NULL,
   `consDiff` decimal(10,3) NOT NULL,
-  `aveConsDiff` double NOT NULL,
   `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
   `zeitDiff` int(11) NOT NULL,
-  `aveZeitDiff` double NOT NULL,
   `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

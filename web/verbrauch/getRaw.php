@@ -11,8 +11,8 @@
         printRawErrorAndDie('Error', 'no meas data');
     } 
     $row = $result->fetch_assoc();
-    if ($row['aveZeitDiff'] > 0) { // divide by 0 exception
-        $newestConsumption = round($row['aveConsDiff']*3600*1000 / $row['aveZeitDiff']); // kWh compared to seconds
+    if ($row['zeitDiff'] > 0) { // divide by 0 exception
+        $newestConsumption = round($row['consDiff']*3600*1000 / $row['zeitDiff']); // kWh compared to seconds
     } else { $newestConsumption = 0.0; }
     $zeitNewest = date_create($row['zeit']);
     $zeitNow = date_create("now");

@@ -38,7 +38,7 @@ if ($totalCount > 0) {// this may be 0. Can't
   $QUERY_LIMIT = 10000; // have some upper limit, both for js and db-performance
   $GRAPH_LIMIT = 3; // does not make sense to display a graph otherwise
 
-  $sql = 'SELECT `consumption`, `zeit`, `aveConsDiff`, `aveZeitDiff` ';
+  $sql = 'SELECT `consumption`, `zeit`, `consDiff`, `zeitDiff` ';
   $sql .= 'from `verbrauch` WHERE `userid` = "'.$userid.'" AND `zeit` > "'.$zeitOldestString.'" ';
   $sql .= 'ORDER BY `zeit` DESC LIMIT '.$QUERY_LIMIT.';';    
 
@@ -50,8 +50,8 @@ if ($totalCount > 0) {// this may be 0. Can't
   $rowNewest = $result->fetch_assoc();
   $queryCount = $result->num_rows; // this may be < graph-limit ( = display at least the newest) or >= graph-limit ( = all good)
 
-  if ($rowNewest['aveZeitDiff'] > 0) { // divide by 0 exception
-      $newestConsumption = round($rowNewest['aveConsDiff']*3600*1000 / $rowNewest['aveZeitDiff']); // kWh compared to seconds
+  if ($rowNewest['zeitDiff'] > 0) { // divide by 0 exception
+      $newestConsumption = round($rowNewest['consDiff']*3600*1000 / $rowNewest['zeitDiff']); // kWh compared to seconds
   } else { $newestConsumption = 0.0; }
   
   $zeitString = 'um '.$zeitNewest->format('Y-m-d H:i:s');
@@ -67,8 +67,8 @@ if ($totalCount > 0) {// this may be 0. Can't
     
     while ($row = $result->fetch_assoc()) { // did already fetch the newest one. At least 2 remaining  
       $consumption = $row['consumption'] - $rowOldest['consumption']; // to get a relative value (and not some huge numbers)
-      if ($row['aveZeitDiff'] > 0) { // divide by 0 exception
-        $watt = max(round($row['aveConsDiff']*3600*1000 / $row['aveZeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
+      if ($row['zeitDiff'] > 0) { // divide by 0 exception
+        $watt = max(round($row['consDiff']*3600*1000 / $row['zeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
       } else { $watt = 0; }
       
       // revert the ordering
