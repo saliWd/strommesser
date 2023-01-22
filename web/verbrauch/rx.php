@@ -67,7 +67,6 @@
         
         $result = $dbConn->query('UPDATE `verbrauch` SET `consDiff` = "'.$consDiff.'", `zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
         
-        $result = $dbConn->query('UPDATE `verbrauch` SET `aveConsDiff` = "'.$consDiff.'", `aveZeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
         // dbThinnings: do not need to run every time but it doesn't hurt either
         doDbThinningUserid($dbConn, $userid, FALSE, 15);
         doDbThinningUserid($dbConn, $userid, FALSE, 240);
