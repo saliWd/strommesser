@@ -2,7 +2,6 @@ import network # type: ignore (this is a pylance ignore warning directive)
 import urequests # type: ignore
 from time import sleep
 from machine import Pin, UART # type: ignore
-from random import randint
 import _thread
 
 def SecondCoreTask(): # reboots every ~8h
