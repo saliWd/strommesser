@@ -1,10 +1,9 @@
 # StromMesser TODOs
 
 1. StromMesser wordpress
-   1. fill with more content: demo account data (copy) on wp site
+   1. fill with more content: demo account data (static) on wp site: how about links? Some postprocessing?
 2. StromMesser/verbrauch
-   1. average numbers: per day, per week, per month (additional page or below graph)
-   1. get all the pages behind the login mask into seo
+   1. average numbers: per day, per week, per month (additional page or below graph)  
    1. settings.php
    1. getRaw.php
    1. index.php
@@ -19,4 +18,4 @@
 4. div
 
 
-Next:  1.1 / 2.2 /
+Next:  1.1 / 2.1 /
