@@ -25,7 +25,7 @@ $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
 printBeginOfPage(enableReload:$enableReload, timerange:'&range='.$timeSelected, site:'index.php');
-if ($totalCount > 0) {// this may be 0. Can't 
+if ($totalCount > 0) {// this may be 0
   $zeitNewest = date_create($rowFreshest['zeit']);    
   if ($timeSelected < 25) {
     $zeitOldest = date_create($rowFreshest['zeit']);
