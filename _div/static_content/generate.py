@@ -11,7 +11,8 @@ def replace_content(dict_replace, target):
 
 dict_replace = {
   'settings.php': 'settings.php.static.html',
-  'index.php': 'index.php.static.html'
+  'index.php': 'index.php.static.html',
+  '<body>':'<body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>'
 }
 
 file_names = ('index.php.static','settings.php.static')
