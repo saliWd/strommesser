@@ -1,0 +1,73 @@
+<!DOCTYPE html><html><head><meta charset="utf-8" /><title>StromMesser Verbrauch</title>
+  <meta name="description" content="zeigt deinen Energieverbrauch" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="strommesser.css" type="text/css" />
+  <script src="script/chart.min.js"></script>
+  <script src="script/moment.min.mine.js"></script>
+  <script src="script/chartjs-adapter-moment.mine.js"></script>
+  </head><body>
+  <nav style="width:400px">
+    <div id="menuToggle">
+      <input type="checkbox">
+      <span></span>
+      <span></span>
+      <span></span>
+      <ul id="menu">
+        <li>&nbsp;</li>
+        <li><a href="../">Home</a></li>
+        <li class="differentColor">Verbrauch</li>
+        <li><a href="settings.php">Einstellungen</a></li>
+        <li>&nbsp;</li>
+        <li><a href="login.php?do=2">Log out</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container mx-auto px-4 py-2 lg text-center">
+  <h1 class="text-2xl m-2">Verbrauch</h1><hr>Verbrauch: <b>2707W</b> heute um 20:32:13<hr>
+    <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
+    <script>
+    const ctx = document.getElementById("myChart");
+    const labels = [ new Date("2023-01-25 19:33:27"), new Date("2023-01-25 19:35:30"), new Date("2023-01-25 19:37:31"), new Date("2023-01-25 19:39:32"), new Date("2023-01-25 19:41:33"), new Date("2023-01-25 19:43:34"), new Date("2023-01-25 19:45:37"), new Date("2023-01-25 19:47:45"), new Date("2023-01-25 19:49:45"), new Date("2023-01-25 19:51:48"), new Date("2023-01-25 19:53:48"), new Date("2023-01-25 19:55:49"), new Date("2023-01-25 19:57:49"), new Date("2023-01-25 19:59:51"), new Date("2023-01-25 20:01:51"), new Date("2023-01-25 20:03:52"), new Date("2023-01-25 20:05:56"), new Date("2023-01-25 20:07:57"), new Date("2023-01-25 20:10:01"), new Date("2023-01-25 20:12:01"), new Date("2023-01-25 20:14:02"), new Date("2023-01-25 20:16:04"), new Date("2023-01-25 20:18:05"), new Date("2023-01-25 20:20:06"), new Date("2023-01-25 20:22:07"), new Date("2023-01-25 20:24:09"), new Date("2023-01-25 20:26:10"), new Date("2023-01-25 20:28:10"), new Date("2023-01-25 20:30:12") ];
+    const data = {
+      labels: labels,
+      datasets: [{
+        label: "Verbrauch [W]",
+        data: [ 268, 293, 238, 238, 1369, 2767, 2751, 2700, 3060, 1288, 180, 208, 180, 177, 150, 149, 145, 149, 145, 150, 149, 148, 149, 149, 149, 177, 149, 1230, 2656 ],
+        yAxisID: "yleft",
+        backgroundColor: "rgb(25, 99, 132)",
+        showLine: false
+      },
+      {
+        label: "Verbrauch total [kWh]",
+        data: [ 0, 0.010000000002037, 0.018000000003667, 0.025999999998021, 0.072000000000116, 0.16500000000087, 0.2589999999982, 0.3550000000032, 0.45700000000215, 0.50100000000384, 0.50699999999779, 0.51400000000285, 0.52000000000407, 0.52599999999802, 0.53100000000268, 0.53600000000006, 0.54099999999744, 0.5460000000021, 0.55099999999948, 0.55600000000413, 0.56100000000151, 0.56599999999889, 0.57100000000355, 0.57600000000093, 0.58099999999831, 0.58699999999953, 0.59200000000419, 0.63300000000163, 0.72299999999814 ],
+        yAxisID: "yright",
+        backgroundColor: "rgba(255, 99, 132, 0.4)",
+        showLine: false
+      }
+    ],
+    };
+    const config = {
+      type: "line",
+      data: data,
+      options: {
+        scales: {
+          x: { type: "time", 
+            time: { unit: "minute" }
+              },
+          yleft: { type: "logarithmic", position: "left", ticks: {color: "rgb(25, 99, 132)"} },
+          yright: { type: "linear",  position: "right", ticks: {color: "rgba(255, 99, 132, 0.8)"}, grid: {drawOnChartArea: false} }
+        }
+      }
+    };
+    const myChart = new Chart( document.getElementById("myChart"), config );
+    </script>
+<script>
+function setValAndSubmit(valueString){
+    document.getElementById('hiddentext').value=valueString;
+    document.getElementById('timerangeform').submit();
+}
+</script>
+<form id="timerangeform" action="index.php" method="get">
+<input type="checkbox" id="reload" name="reload" value="1" onChange="setValAndSubmit('1')" > reload&nbsp;<button type="button" onclick="setValAndSubmit('1')" class="btn-diff">1 h</button><button type="button" onclick="setValAndSubmit('6')" class="btn">6 h</button><button type="button" onclick="setValAndSubmit('24')" class="btn">24 h</button><button type="button" onclick="setValAndSubmit('25')" class="btn">alles</button><input type="text" id="hiddentext" name="range" value="invalidRange" hidden class="w-min">
+</form>
+<hr>Insgesamt 903 Einträge</div></body></html>
