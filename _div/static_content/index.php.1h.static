@@ -61,7 +61,7 @@
     };
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>
-<a href="index.php?range=1&reload=1"><input id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="index.php?range=1&reload=1">&nbsp;reload&nbsp;</a></label>
+<a href="index.php?range=1&reload=1"><input id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="index.php?range=1&reload=1">reload </a></label>
   <a href="index.php?range=1" class="btn-diff">1 h</a>
   <a href="index.php?range=6" class="btn">6 h</a>
   <a href="index.php?range=24" class="btn">24 h</a>
