@@ -136,8 +136,12 @@ if ($totalCount > 0) {// this may be 0
 }
 
 $checkedText = '';
+$reloadLink = '';
+$reloadLinkChange = '?range='.$timeSelected.'&reload=1';
 if($enableReload) {
   $checkedText = ' checked';
+  $reloadLink = '&reload=1';
+  $reloadLinkChange = '?range='.$timeSelected;
 }
 
 $submitTexts = array (
@@ -147,21 +151,11 @@ $submitTexts = array (
   '25' => array('25','alles','class="btn"')
 );
 $submitTexts[$timeSelected][2]  = 'class="btn-diff"'; // highlight the selected one
-echo '
-<script>
-function setValAndSubmit(valueString){
-    document.getElementById(\'hiddentext\').value=valueString;
-    document.getElementById(\'timerangeform\').submit();
-}
-</script>';
-echo '
-<form id="timerangeform" action="index.php" method="get">
-<input type="checkbox" id="reload" name="reload" value="1" onChange="setValAndSubmit(\''.$timeSelected.'\')" '.$checkedText.'> reload&nbsp;';
+echo '<a href="index.php'.$reloadLinkChange.'"><input'.$checkedText.' id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="index.php'.$reloadLinkChange.'">reload&nbsp;</a></label>';
 foreach ($submitTexts as $submitText) {
-  echo '<button type="button" onclick="setValAndSubmit(\''.$submitText[0].'\')" '.$submitText[2].'>'.$submitText[1].'</button>';
+  echo '<a href="index.php?range='.$submitText[0].$reloadLink.'" '.$submitText[2].'>'.$submitText[1].'</a>';
 }
-echo '<input type="text" id="hiddentext" name="range" value="invalidRange" hidden class="w-min">
-</form>
+echo '<br /><br />
 <hr>Insgesamt '.$totalCount.' Einträge';
 
 ?>
