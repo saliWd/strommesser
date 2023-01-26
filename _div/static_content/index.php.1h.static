@@ -23,23 +23,23 @@
     </div>
   </nav>
   <div class="container mx-auto px-4 py-2 lg text-center">
-  <h1 class="text-2xl m-2">Verbrauch</h1><hr>Verbrauch: <b>2707W</b> heute um 20:32:13<hr>
+  <h1 class="text-2xl m-2">Verbrauch</h1><hr>Verbrauch: <b>234W</b> heute um 10:26:47<hr>
     <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
-    const labels = [ new Date("2023-01-25 19:33:27"), new Date("2023-01-25 19:35:30"), new Date("2023-01-25 19:37:31"), new Date("2023-01-25 19:39:32"), new Date("2023-01-25 19:41:33"), new Date("2023-01-25 19:43:34"), new Date("2023-01-25 19:45:37"), new Date("2023-01-25 19:47:45"), new Date("2023-01-25 19:49:45"), new Date("2023-01-25 19:51:48"), new Date("2023-01-25 19:53:48"), new Date("2023-01-25 19:55:49"), new Date("2023-01-25 19:57:49"), new Date("2023-01-25 19:59:51"), new Date("2023-01-25 20:01:51"), new Date("2023-01-25 20:03:52"), new Date("2023-01-25 20:05:56"), new Date("2023-01-25 20:07:57"), new Date("2023-01-25 20:10:01"), new Date("2023-01-25 20:12:01"), new Date("2023-01-25 20:14:02"), new Date("2023-01-25 20:16:04"), new Date("2023-01-25 20:18:05"), new Date("2023-01-25 20:20:06"), new Date("2023-01-25 20:22:07"), new Date("2023-01-25 20:24:09"), new Date("2023-01-25 20:26:10"), new Date("2023-01-25 20:28:10"), new Date("2023-01-25 20:30:12") ];
+    const labels = [ new Date("2023-01-26 09:28:06"), new Date("2023-01-26 09:30:07"), new Date("2023-01-26 09:32:07"), new Date("2023-01-26 09:34:08"), new Date("2023-01-26 09:36:09"), new Date("2023-01-26 09:38:12"), new Date("2023-01-26 09:40:13"), new Date("2023-01-26 09:42:13"), new Date("2023-01-26 09:44:14"), new Date("2023-01-26 09:46:16"), new Date("2023-01-26 09:48:19"), new Date("2023-01-26 09:50:20"), new Date("2023-01-26 09:52:24"), new Date("2023-01-26 09:54:24"), new Date("2023-01-26 09:56:25"), new Date("2023-01-26 09:58:25"), new Date("2023-01-26 10:00:27"), new Date("2023-01-26 10:02:27"), new Date("2023-01-26 10:04:28"), new Date("2023-01-26 10:06:29"), new Date("2023-01-26 10:08:30"), new Date("2023-01-26 10:10:32"), new Date("2023-01-26 10:12:36"), new Date("2023-01-26 10:14:37"), new Date("2023-01-26 10:16:41"), new Date("2023-01-26 10:18:42"), new Date("2023-01-26 10:20:42"), new Date("2023-01-26 10:22:44"), new Date("2023-01-26 10:24:44") ];
     const data = {
       labels: labels,
       datasets: [{
         label: "Verbrauch [W]",
-        data: [ 268, 293, 238, 238, 1369, 2767, 2751, 2700, 3060, 1288, 180, 208, 180, 177, 150, 149, 145, 149, 145, 150, 149, 148, 149, 149, 149, 177, 149, 1230, 2656 ],
+        data: [ 1434, 179, 180, 149, 179, 176, 179, 150, 149, 148, 644, 2648, 2613, 2730, 2737, 2760, 679, 120, 149, 149, 119, 148, 116, 149, 116, 208, 210, 236, 210 ],
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
         showLine: false
       },
       {
         label: "Verbrauch total [kWh]",
-        data: [ 0, 0.010000000002037, 0.018000000003667, 0.025999999998021, 0.072000000000116, 0.16500000000087, 0.2589999999982, 0.3550000000032, 0.45700000000215, 0.50100000000384, 0.50699999999779, 0.51400000000285, 0.52000000000407, 0.52599999999802, 0.53100000000268, 0.53600000000006, 0.54099999999744, 0.5460000000021, 0.55099999999948, 0.55600000000413, 0.56100000000151, 0.56599999999889, 0.57100000000355, 0.57600000000093, 0.58099999999831, 0.58699999999953, 0.59200000000419, 0.63300000000163, 0.72299999999814 ],
+        data: [ 0, 0.0060000000012224, 0.011999999995169, 0.016999999999825, 0.023000000001048, 0.028999999994994, 0.034999999996217, 0.040000000000873, 0.044999999998254, 0.049999999995634, 0.072000000000116, 0.16100000000006, 0.25099999999657, 0.34199999999691, 0.43400000000111, 0.52599999999802, 0.54899999999907, 0.55299999999988, 0.55799999999726, 0.56299999999464, 0.56699999999546, 0.57200000000012, 0.57600000000093, 0.58099999999831, 0.58499999999913, 0.59199999999691, 0.5989999999947, 0.60699999999633, 0.6140000000014 ],
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
@@ -61,13 +61,9 @@
     };
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>
-<script>
-function setValAndSubmit(valueString){
-    document.getElementById('hiddentext').value=valueString;
-    document.getElementById('timerangeform').submit();
-}
-</script>
-<form id="timerangeform" action="index.php" method="get">
-<input type="checkbox" id="reload" name="reload" value="1" onChange="setValAndSubmit('1')" > reload&nbsp;<button type="button" onclick="setValAndSubmit('1')" class="btn-diff">1 h</button><button type="button" onclick="setValAndSubmit('6')" class="btn">6 h</button><button type="button" onclick="setValAndSubmit('24')" class="btn">24 h</button><button type="button" onclick="setValAndSubmit('25')" class="btn">alles</button><input type="text" id="hiddentext" name="range" value="invalidRange" hidden class="w-min">
-</form>
-<hr>Insgesamt 903 Einträge</div></body></html>
+<a href="index.php?range=1&reload=1"><input id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="index.php?range=1&reload=1">&nbsp;reload&nbsp;</a></label>
+  <a href="index.php?range=1" class="btn-diff">1 h</a>
+  <a href="index.php?range=6" class="btn">6 h</a>
+  <a href="index.php?range=24" class="btn">24 h</a>
+  <a href="index.php?range=25" class="btn">alles</a><br /><br />
+<hr>Insgesamt 909 Einträge</div></body></html>

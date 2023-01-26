@@ -151,9 +151,11 @@ $submitTexts = array (
   '25' => array('25','alles','class="btn"')
 );
 $submitTexts[$timeSelected][2]  = 'class="btn-diff"'; // highlight the selected one
-echo '<a href="index.php'.$reloadLinkChange.'"><input'.$checkedText.' id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="index.php'.$reloadLinkChange.'">reload&nbsp;</a></label>';
+echo '
+<a href="index.php'.$reloadLinkChange.'"><input'.$checkedText.' id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="index.php'.$reloadLinkChange.'">&nbsp;reload&nbsp;</a></label>';
 foreach ($submitTexts as $submitText) {
-  echo '<a href="index.php?range='.$submitText[0].$reloadLink.'" '.$submitText[2].'>'.$submitText[1].'</a>';
+  echo '
+  <a href="index.php?range='.$submitText[0].$reloadLink.'" '.$submitText[2].'>'.$submitText[1].'</a>';
 }
 echo '<br /><br />
 <hr>Insgesamt '.$totalCount.' Einträge';

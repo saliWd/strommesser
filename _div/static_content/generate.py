@@ -11,9 +11,13 @@ def replace_content(dict_replace, target):
 
 dict_replace = {
   'settings.php': 'settings.php.static.html',
-  'index.php': 'index.php.static.html',
-  '<body>':'<body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>',
-  "document.getElementById\('timerangeform'\).submit\(\);":'window.location.href="index.php."+valueString+"h.static.html";' # "document.getElementById('timerangeform').submit();":"blabliblud" # 'window.location.href="index.php."+valueString+"h.static.html";'
+  'index.php"': 'index.php.static.html"',
+  'index.php\?range=1' : 'index.php.1h.static.html',
+  'index.php\?range=6' : 'index.php.6h.static.html',
+  'index.php\?range=24' : 'index.php.24h.static.html',
+  'index.php\?range=25' : 'index.php.25h.static.html',
+  '&reload=1' : '',
+  '<body>':'<body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>'
 }
 
 file_names = ('index.php.static','index.php.1h.static','index.php.6h.static','index.php.24h.static','index.php.25h.static','settings.php.static')
@@ -28,5 +32,10 @@ for file_name in file_names:
     new_file_open = open(new_file, 'w')
 
     new_content = replace_content(dict_replace, file_read)
+    
+
+
+
+
     new_file_open.write(new_content)
     new_file_open.close()
