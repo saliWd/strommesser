@@ -1,7 +1,7 @@
 # StromMesser TODOs
 
 1. StromMesser wordpress
-   1. fill with more content: demo account data (static) on wp site: how about links? Some postprocessing?
+   1. fill with more content: explanation?
 2. StromMesser/verbrauch
    1. average numbers: per day, per week, per month (additional page or below graph)  
    1. settings.php
@@ -10,7 +10,7 @@
    1. login.php
    1. rx.php
 3. pico devices
-   1. stability: So far so good, no hanging since 10.01.23. (one issue because of )
+   1. stability: So far so good, no hanging since 10.01.23. (one issue because of USB power supply issue)
       * check with WLAN disconnection
       * does not (always) recover from issue on server side. Need more stable reset mechanism
    1. disp
@@ -18,4 +18,4 @@
 4. div
 
 
-Next:  1.1 / 2.1 /
+Next:  2.1 /

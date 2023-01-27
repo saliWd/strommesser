@@ -40,18 +40,20 @@
         return $return_array;
     }
 
-    function doDbThinning_v2($dbConn, int $userid):void {
-      // doing the thinning in 2 steps
-      // - everything older than 24hours thin to 1 meas per hour: thin = 60 (mins)
-      // not yet implemented: - everything older than 72hours thin to 4 meas per day: thin = 360 (mins)
-
-      // do so in a way the remaining data point after thinning is the first in his period, meaning the first datapoint of a day has always a timestamp of 00:00 or 00:01...
-     
-      $sqlNoThin = '`userid` = "'.$userid.'" AND `thin` = "0"';
-      
+    function doReduction($dbConn, int $userid, bool $smlTimeScale):void {
+      if ($smlTimeScale) {
+        $sqlNoThin = '`userid` = "'.$userid.'" AND `thin` = "0"';
+        $interval = 24+1;
+        $formatString = 'Y-m-d H:00:00';
+        $thinUpdate = '1';
+      } else {
+        $sqlNoThin = '`userid` = "'.$userid.'" AND `thin` = "1"';
+        $interval = 72+24;
+        $formatString = 'Y-m-d 00:00:00';
+        $thinUpdate = '24';
+      }
       // search the newest one where thinnig has not yet been applied (and is older than 25h)
-      $sql = 'SELECT `zeit` FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` > DATE_SUB(NOW(), INTERVAL 25 HOUR) ORDER BY `id` ASC LIMIT 1;';
-      // echo $sql.'<br />';
+      $sql = 'SELECT `zeit` FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` > DATE_SUB(NOW(), INTERVAL '.$interval.' HOUR) ORDER BY `id` ASC LIMIT 1;';
       $result = $dbConn->query($sql);
       if ($result->num_rows < 1) { // if there is no entry older than 25h, there is nothing to do. NB: there is a difference between NOW and last-insert-time
         return;
@@ -60,8 +62,8 @@
 
       // compact all from the last hour before this entry
       $zeit = date_create($row['zeit']); // e.g. 18:43      
-      $zeitHourAlignedString = $zeit->format('Y-m-d H:00:00'); // start of the last hour, e.g. 18:00
-      
+      $zeitHourAlignedString = $zeit->format($formatString); // start of the last hour, e.g. 18:00
+
       // get the last one where thinning was not yet applied      
       $result = $dbConn->query('SELECT `id` FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'" ORDER BY `id` ASC LIMIT 1;');
       $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
@@ -69,85 +71,27 @@
            
       $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
       $sql = $sql. ' WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'";';
-      // echo $sql.'<br />';
       $result = $dbConn->query($sql);
       $row = $result->fetch_assoc();
     
       // now do the update and then delete the others
-      $sql = 'UPDATE `verbrauch` SET `consDiff` = "'.$row['sumConsDiff'].'", `zeitDiff` = "'.$row['sumZeitDiff'].'", `thin` = "60" WHERE `id` = "'.$idToUpdate.'";';
+      $sql = 'UPDATE `verbrauch` SET `consDiff` = "'.$row['sumConsDiff'].'", `zeitDiff` = "'.$row['sumZeitDiff'].'", `thin` = "'.$thinUpdate.'" WHERE `id` = "'.$idToUpdate.'";';
       $result = $dbConn->query($sql);
-      // echo $sql.'<br />';
       
       $sql = 'DELETE FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'";';
       $result = $dbConn->query($sql);
-      // echo $dbConn->affected_rows.' entries have been deleted';
-      // echo $sql.'<br />';
     }
 
-/*
-    function doDbThinning($dbConn, int $userid, int $timeRangeMins):void {
-        // 24h-old: thin with a rate of 1 entry per 15 minutes (about a 2/15 rate)
-        // 72h-old: thin with a rate of 1 entry per 4 hours (about a 2/240 rate), resulting in 6 entries per day  
-        // $timeRangeMins is either 15 or 240
-        
-        $sqlWhereUseridThin = '`userid` = "'.$userid.'" AND `thin` < "15"';
-        if ($timeRangeMins === 240) {
-          $sqlWhereUseridThin = '`userid` = "'.$userid.'" AND `thin` < "240"';
-        }
-        $sql = 'SELECT `zeit` FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' ORDER BY `id` ASC LIMIT 1;';
-        $result = $dbConn->query($sql);
-        $row = $result->fetch_assoc();
-        // get the time, add 15 or 240 minutes  
-        $zeitToThin = date_create($row['zeit']);
-        $zeitToThin->modify('+ '.$timeRangeMins.' minutes');
-        $zeitToThinString = $zeitToThin->format('Y-m-d H:i:s');
-        
-        $zeitThinStart = date_create("now");
-        if ($timeRangeMins === 15) {
-          $zeitThinStart->modify('- 24 hours');
-        } else {
-          $zeitThinStart->modify('- 72 hours');
-        }
-        
-        if ($zeitToThin >= $zeitThinStart) {  // if this time is more then 24h/72h old, proceed. Otherwise stop          
-          return;
-        }
-        // get the last one where thinning was not yet applied
-        $sql = 'SELECT `id` FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitToThinString.'" ORDER BY `id` ASC LIMIT 240;';
-        $result = $dbConn->query($sql);
-        if ($result->num_rows < 7) { // otherwise I can't really compact stuff
-          // I have an issue when there are gaps in the entries. I then have less than 7 entries per 15 minutes
-          $zeitThinStartWithMargin = $zeitThinStart;
-          $zeitThinStartWithMargin->modify('- 2 hours');
-          if ($zeitToThin >= $zeitThinStartWithMargin) { // otherwise proceed normally
-            return;
-          }
-        }
-        $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
-        $idToUpdate = $row['id'];
-        
-        $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-        $sql = $sql. ' WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitToThinString.'";';
-        $result = $dbConn->query($sql);
-        $row = $result->fetch_assoc(); 
-      
-        // now do the update and then delete the others. Number 15 means: a ratio of about one data item per 15min was implemented 
-        $sql = 'UPDATE `verbrauch` SET `consDiff` = "'.$row['sumConsDiff'].'", `zeitDiff` = "'.$row['sumZeitDiff'].'", `thin` = "'.$timeRangeMins.'" WHERE `id` = "'.$idToUpdate.'";';
-        $result = $dbConn->query($sql);
-        
-        $sql = 'DELETE FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitToThinString.'";';
-        $result = $dbConn->query($sql);
-        echo $dbConn->affected_rows.' entries have been deleted';
-      }
-    
-    // temporary. TODO: remove again
-    $do = safeIntFromExt('GET', 'do', 2);
-    if ($do === 99) {
-      doDbThinning_v2(dbConn:$dbConn, userid:1);
-      die();
+    function doDbThinning($dbConn, int $userid):void {
+      // doing the thinning in 2 steps
+      // - everything older than 24hours thin to 1 meas per hour: thin = 1 (hour)
+      // - everything older than 72hours thin to 1 meas per day: thin = 24 (hour)
+
+      // do so in a way the remaining data point after thinning is the first in his period, meaning the first datapoint of a day has always a timestamp of 00:00 or 00:01...
+      doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:TRUE);
+      doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:FALSE);
     }
-    // end of temporary
-*/
+
     $userid = checkInputs($dbConn);
 
     $sqlSafe_ir_answer = sqlSafeStrFromPost($dbConn, 'ir_answer', 511); // safe to insert into sql (not to output on html)   
@@ -175,10 +119,8 @@
         
         $result = $dbConn->query('UPDATE `verbrauch` SET `consDiff` = "'.$consDiff.'", `zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
         
-        // dbThinnings: do not need to run every time but it doesn't hurt either
-        // doDbThinning(dbConn:$dbConn, userid:$userid, timeRangeMins:15);
-        // doDbThinning(dbConn:$dbConn, userid:$userid, timeRangeMins:240);
-        doDbThinning_v2(dbConn:$dbConn, userid:$userid);
+        // dbThinnings: do not need to run every time but it doesn't hurt either        
+        doDbThinning(dbConn:$dbConn, userid:$userid);
          
     } else {
         echo 'no previous data'; // not an error
