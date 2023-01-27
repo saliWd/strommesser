@@ -23,7 +23,7 @@ dict_replace = {
 file_names = ('index.php.1h.static','index.php.6h.static','index.php.24h.static','index.php.25h.static','settings.php.static')
 
 for file_name in file_names:
-    file = abspath(join(dirname(__file__), file_name))
+    file = abspath(join(dirname(__file__), 'staticHtml/'+file_name))
     file_open = open(file, 'r')
     file_read = file_open.read()
     file_open.close()
