@@ -1,0 +1,3 @@
+- install a python (3.x) environment
+- get selenium (pip install selenium)
+- execute run.py

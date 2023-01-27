@@ -131,7 +131,7 @@ function printNavMenu (string $siteSafe): void {
   $home   = ($siteSafe === 'index.php') ? '<li class="differentColor">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
   $links  = ($siteSafe === 'settings.php') ? '<li class="differentColor">Einstellungen</li>' : '<li><a href="settings.php">Einstellungen</a></li>';  
   // login site not available as list item, will be redirected to login site from various pages
-  $logout = '<li><a href="login.php?do=2">Log out</a></li>'; 
+  $logout = '<li><a href="login.php?do=2" id="navLogoutLink">Log out</a></li>'; 
   
   echo '
   <nav style="width:400px">
