@@ -16,7 +16,7 @@ dict_replace = {
   'index.php\?range=6' : 'index.php.6h.static.html',
   'index.php\?range=24' : 'index.php.24h.static.html',
   'index.php\?range=25' : 'index.php.25h.static.html',
-  '&reload=1' : '',
+  '&amp;reload=1' : '',
   '<body>':'<body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>'
 }
 
