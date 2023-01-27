@@ -36,8 +36,8 @@ def getStatic(driver, testNum):
     sourceCode = driver.page_source
 
     new_file = abspath(join(dirname(__file__), 'staticHtml/index.php.'+range+'.static'))
-    new_file_open = open(new_file, 'w')
-    new_file_open.write(sourceCode)
+    new_file_open = open(new_file, 'wb')
+    new_file_open.write(sourceCode.encode('utf8'))
     new_file_open.close()
 
   return True
