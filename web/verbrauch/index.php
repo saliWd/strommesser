@@ -129,10 +129,10 @@ if ($totalCount > 0) {// this may be 0
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>';
   } else {
-    echo ' - weniger als '.$GRAPH_LIMIT.' Einträge - ';
+    echo '<br /><br /> - weniger als '.$GRAPH_LIMIT.' Einträge - <br /><br /><br />';
   }    
 } else {
-  echo ' - noch keine Einträge - ';
+  echo '<br /><br /> - noch keine Einträge - <br /><br /><br />';
 }
 
 $checkedText = '';
