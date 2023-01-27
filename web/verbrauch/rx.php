@@ -47,48 +47,44 @@
 
       // do so in a way the remaining data point after thinning is the first in his period, meaning the first datapoint of a day has always a timestamp of 00:00 or 00:01...
      
-      $sqlWhereUseridThin = '`userid` = "'.$userid.'" AND `thin` = "0"';
+      $sqlNoThin = '`userid` = "'.$userid.'" AND `thin` = "0"';
       
-      // search the newest one where thinnig has not yet been applied
-      // TODO: could add the 24h clause already here?
-      $result = $dbConn->query('SELECT `zeit` FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' ORDER BY `id` DESC LIMIT 1;');
-      $row_newest = $result->fetch_assoc();
-      $result = $dbConn->query('SELECT `zeit` FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' ORDER BY `id` ASC LIMIT 1;');
-      $row_oldest = $result->fetch_assoc();
-
-      // if the date diff between those two is not more than 25h, there is nothing to do
-      $zeitNewestMinus25h = date_create($row_newest['zeit']);
-      $zeitNewestMinus25h->modify('- 25 hours');
-      $zeitOldest = date_create($row_oldest['zeit']);
-      if ($zeitOldest >= $zeitNewestMinus25h) {
+      // search the newest one where thinnig has not yet been applied (and is older than 25h)
+      $sql = 'SELECT `zeit` FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` > DATE_SUB(NOW(), INTERVAL 25 HOUR) ORDER BY `id` ASC LIMIT 1;';
+      // echo $sql.'<br />';
+      $result = $dbConn->query($sql);
+      if ($result->num_rows < 1) { // if there is no entry older than 25h, there is nothing to do. NB: there is a difference between NOW and last-insert-time
         return;
       }
+      $row = $result->fetch_assoc();
 
       // compact all from the last hour before this entry
-      $zeitNewestMinus1h = date_create($row_newest['zeit']); // e.g. 18:43
-      $zeitNewestMinus1h->modify('- 60 minutes'); // e.g. 17:43
-      $zeitNewestMinus1hString = $zeitNewestMinus1h->format('Y-m-d H:00:00'); // start of the last hour, e.g. 17:00
+      $zeit = date_create($row['zeit']); // e.g. 18:43      
+      $zeitHourAlignedString = $zeit->format('Y-m-d H:00:00'); // start of the last hour, e.g. 18:00
       
       // get the last one where thinning was not yet applied      
-      $result = $dbConn->query('SELECT `id` FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitNewestMinus1hString.'" ORDER BY `id` ASC LIMIT 1;');
+      $result = $dbConn->query('SELECT `id` FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'" ORDER BY `id` ASC LIMIT 1;');
       $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
       $idToUpdate = $row['id'];
            
       $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-      $sql = $sql. ' WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitNewestMinus1hString.'";';
+      $sql = $sql. ' WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'";';
+      // echo $sql.'<br />';
       $result = $dbConn->query($sql);
       $row = $result->fetch_assoc();
     
       // now do the update and then delete the others
       $sql = 'UPDATE `verbrauch` SET `consDiff` = "'.$row['sumConsDiff'].'", `zeitDiff` = "'.$row['sumZeitDiff'].'", `thin` = "60" WHERE `id` = "'.$idToUpdate.'";';
       $result = $dbConn->query($sql);
+      // echo $sql.'<br />';
       
-      $sql = 'DELETE FROM `verbrauch` WHERE '.$sqlWhereUseridThin.' AND `zeit` < "'.$zeitNewestMinus1hString.'";';
+      $sql = 'DELETE FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'";';
       $result = $dbConn->query($sql);
-      echo $dbConn->affected_rows.' entries have been deleted';
+      // echo $dbConn->affected_rows.' entries have been deleted';
+      // echo $sql.'<br />';
     }
 
-
+/*
     function doDbThinning($dbConn, int $userid, int $timeRangeMins):void {
         // 24h-old: thin with a rate of 1 entry per 15 minutes (about a 2/15 rate)
         // 72h-old: thin with a rate of 1 entry per 4 hours (about a 2/240 rate), resulting in 6 entries per day  
@@ -144,6 +140,14 @@
         echo $dbConn->affected_rows.' entries have been deleted';
       }
     
+    // temporary. TODO: remove again
+    $do = safeIntFromExt('GET', 'do', 2);
+    if ($do === 99) {
+      doDbThinning_v2(dbConn:$dbConn, userid:1);
+      die();
+    }
+    // end of temporary
+*/
     $userid = checkInputs($dbConn);
 
     $sqlSafe_ir_answer = sqlSafeStrFromPost($dbConn, 'ir_answer', 511); // safe to insert into sql (not to output on html)   
@@ -172,8 +176,9 @@
         $result = $dbConn->query('UPDATE `verbrauch` SET `consDiff` = "'.$consDiff.'", `zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
         
         // dbThinnings: do not need to run every time but it doesn't hurt either
-        doDbThinning(dbConn:$dbConn, userid:$userid, timeRangeMins:15);
-        doDbThinning(dbConn:$dbConn, userid:$userid, timeRangeMins:240);
+        // doDbThinning(dbConn:$dbConn, userid:$userid, timeRangeMins:15);
+        // doDbThinning(dbConn:$dbConn, userid:$userid, timeRangeMins:240);
+        doDbThinning_v2(dbConn:$dbConn, userid:$userid);
          
     } else {
         echo 'no previous data'; // not an error
