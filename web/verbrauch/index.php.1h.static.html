@@ -1,7 +1,7 @@
-<!DOCTYPE html><html><head><meta charset="utf-8" /><title>StromMesser Verbrauch</title>
-  <meta name="description" content="zeigt deinen Energieverbrauch" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="strommesser.css" type="text/css" />
+<html><head><meta charset="utf-8"><title>StromMesser Verbrauch</title>
+  <meta name="description" content="zeigt deinen Energieverbrauch">  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="strommesser.css" type="text/css">
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>
@@ -18,28 +18,28 @@
         <li class="differentColor">Verbrauch</li>
         <li><a href="settings.php.static.html">Einstellungen</a></li>
         <li>&nbsp;</li>
-        <li><a href="login.php?do=2">Log out</a></li>
+        <li><a href="login.php?do=2" id="navLogoutLink">Log out</a></li>
       </ul>
     </div>
   </nav>
   <div class="container mx-auto px-4 py-2 lg text-center">
-  <h1 class="text-2xl m-2">Verbrauch</h1><hr>Verbrauch: <b>234W</b> heute um 10:26:47<hr>
-    <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
+  <h1 class="text-2xl m-2">Verbrauch</h1><hr>Verbrauch: <b>149W</b> heute um 14:59:53<hr>
+    <canvas id="myChart" class="mb-2" style="display: block; box-sizing: border-box; height: 228px; width: 456px;" width="456" height="228"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
-    const labels = [ new Date("2023-01-26 09:28:06"), new Date("2023-01-26 09:30:07"), new Date("2023-01-26 09:32:07"), new Date("2023-01-26 09:34:08"), new Date("2023-01-26 09:36:09"), new Date("2023-01-26 09:38:12"), new Date("2023-01-26 09:40:13"), new Date("2023-01-26 09:42:13"), new Date("2023-01-26 09:44:14"), new Date("2023-01-26 09:46:16"), new Date("2023-01-26 09:48:19"), new Date("2023-01-26 09:50:20"), new Date("2023-01-26 09:52:24"), new Date("2023-01-26 09:54:24"), new Date("2023-01-26 09:56:25"), new Date("2023-01-26 09:58:25"), new Date("2023-01-26 10:00:27"), new Date("2023-01-26 10:02:27"), new Date("2023-01-26 10:04:28"), new Date("2023-01-26 10:06:29"), new Date("2023-01-26 10:08:30"), new Date("2023-01-26 10:10:32"), new Date("2023-01-26 10:12:36"), new Date("2023-01-26 10:14:37"), new Date("2023-01-26 10:16:41"), new Date("2023-01-26 10:18:42"), new Date("2023-01-26 10:20:42"), new Date("2023-01-26 10:22:44"), new Date("2023-01-26 10:24:44") ];
+    const labels = [ new Date("2023-01-27 14:01:12"), new Date("2023-01-27 14:03:13"), new Date("2023-01-27 14:05:14"), new Date("2023-01-27 14:07:17"), new Date("2023-01-27 14:09:18"), new Date("2023-01-27 14:11:18"), new Date("2023-01-27 14:13:20"), new Date("2023-01-27 14:15:21"), new Date("2023-01-27 14:17:22"), new Date("2023-01-27 14:19:23"), new Date("2023-01-27 14:21:27"), new Date("2023-01-27 14:23:28"), new Date("2023-01-27 14:25:28"), new Date("2023-01-27 14:27:29"), new Date("2023-01-27 14:29:32"), new Date("2023-01-27 14:31:32"), new Date("2023-01-27 14:33:34"), new Date("2023-01-27 14:35:36"), new Date("2023-01-27 14:37:37"), new Date("2023-01-27 14:39:38"), new Date("2023-01-27 14:41:40"), new Date("2023-01-27 14:43:42"), new Date("2023-01-27 14:45:43"), new Date("2023-01-27 14:47:44"), new Date("2023-01-27 14:49:45"), new Date("2023-01-27 14:51:48"), new Date("2023-01-27 14:53:48"), new Date("2023-01-27 14:55:50"), new Date("2023-01-27 14:57:52") ];
     const data = {
       labels: labels,
       datasets: [{
         label: "Verbrauch [W]",
-        data: [ 1434, 179, 180, 149, 179, 176, 179, 150, 149, 148, 644, 2648, 2613, 2730, 2737, 2760, 679, 120, 149, 149, 119, 148, 116, 149, 116, 208, 210, 236, 210 ],
+        data: [ 595, 2767, 2737, 2780, 2856, 1740, 236, 179, 179, 179, 174, 179, 150, 179, 176, 180, 148, 148, 119, 149, 974, 2656, 2767, 2707, 2767, 1229, 150, 148, 118 ],
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
         showLine: false
       },
       {
         label: "Verbrauch total [kWh]",
-        data: [ 0, 0.0060000000012224, 0.011999999995169, 0.016999999999825, 0.023000000001048, 0.028999999994994, 0.034999999996217, 0.040000000000873, 0.044999999998254, 0.049999999995634, 0.072000000000116, 0.16100000000006, 0.25099999999657, 0.34199999999691, 0.43400000000111, 0.52599999999802, 0.54899999999907, 0.55299999999988, 0.55799999999726, 0.56299999999464, 0.56699999999546, 0.57200000000012, 0.57600000000093, 0.58099999999831, 0.58499999999913, 0.59199999999691, 0.5989999999947, 0.60699999999633, 0.6140000000014 ],
+        data: [ 0, 0.093000000000757, 0.18499999999767, 0.27999999999884, 0.37599999999657, 0.43400000000111, 0.44200000000274, 0.44799999999668, 0.4539999999979, 0.45999999999913, 0.46600000000035, 0.47200000000157, 0.47699999999895, 0.48300000000017, 0.4890000000014, 0.49500000000262, 0.5, 0.50499999999738, 0.5089999999982, 0.51400000000285, 0.54699999999866, 0.63700000000244, 0.7300000000032, 0.82100000000355, 0.91399999999703, 0.95599999999831, 0.96100000000297, 0.96600000000035, 0.97000000000116 ],
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
@@ -61,9 +61,6 @@
     };
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>
-<a href="index.php.1h.static.html"><input id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="index.php.1h.static.html">reload </a></label>
-  <a href="index.php.1h.static.html" class="btn-diff">1 h</a>
-  <a href="index.php.6h.static.html" class="btn">6 h</a>
-  <a href="index.php.24h.static.html" class="btn">24 h</a>
-  <a href="index.php.25h.static.html" class="btn">alles</a><br /><br />
-<hr>Insgesamt 909 Eintr√§ge</div></body></html>
+<a href="index.php.1h.static.html&amp;reload=1"><input id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="index.php.1h.static.html&amp;reload=1">reload </a></label><a id="range_1h_link" href="index.php.1h.static.html" class="btn-diff">1 h</a><a id="range_6h_link" href="index.php.6h.static.html" class="btn">6 h</a><a id="range_24h_link" href="index.php.24h.static.html" class="btn">24 h</a><a id="range_25h_link" href="index.php.25h.static.html" class="btn">alles</a><br><br>
+<hr>Insgesamt 142 Eintr‰ge</div>
+</body></html>

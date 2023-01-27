@@ -9,7 +9,7 @@ def printUsage(ALL_TESTS):
   print("Usage: run.py [testName]")
   print("run.py: runs all the available tests")
   print("run.py testName: runs a single test")
-  print("  available tests are: ", end="")
+  print("\n -> available tests are: ", end="")
   for test in ALL_TESTS:
     print(test + " ", end="")
   print(" ")  # just a new line
@@ -18,13 +18,15 @@ def printUsage(ALL_TESTS):
 
 def callSingleTest(driver, testNum, ALL_TESTS, testsToRun):
   from loginLogout import doLoginLogout
-  from index import doTimescales
+  from index import doTimescales, getStatic
   
   if ALL_TESTS[testNum] in testsToRun:       
     if testNum == 0:
       result = doLoginLogout(driver, testNum)
     if testNum == 1:
-      result = doTimescales(driver, testNum)    
+      result = doTimescales(driver, testNum)
+    if testNum == 2:
+      result = getStatic(driver, testNum)    
     else:
       result = False
     # end if-elif
@@ -35,7 +37,7 @@ def callSingleTest(driver, testNum, ALL_TESTS, testsToRun):
 # end def
 
 
-ALL_TESTS = ['loginLogout', 'differentTimescales']
+ALL_TESTS = ['loginLogout', 'differentTimescales', 'getStatic']
 
 
 # input processing
