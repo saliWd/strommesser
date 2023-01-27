@@ -32,10 +32,6 @@ for file_name in file_names:
     new_file_open = open(new_file, 'w')
 
     new_content = replace_content(dict_replace, file_read)
-    
-
-
-
 
     new_file_open.write(new_content)
     new_file_open.close()
