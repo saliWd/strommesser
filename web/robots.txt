@@ -1,0 +1,9 @@
+User-Agent: *
+Allow: /wp-content/uploads/
+Disallow: /wp-admin/
+Disallow: /readme.html
+Disallow: /blogs/
+Disallow: /tmp/
+ 
+Sitemap: https://strommesser.ch/sitemap.xml
+Sitemap: https://strommesser.ch/wp-sitemap.xml
