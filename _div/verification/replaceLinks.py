@@ -10,21 +10,23 @@ def replace_content(dict_replace, target):
   return target
 
 dict_replace = {
-  'login.php"': 'login.php.static.html"',
-  'login.php\?do=2' : 'login.php.static.html',
-  'settings.php': 'settings.php.static.html',
-  'index.php"': 'index.php.6h.static.html"',
-  'index.php\?range=1' : 'index.php.1h.static.html',
-  'index.php\?range=6' : 'index.php.6h.static.html',
-  'index.php\?range=24' : 'index.php.24h.static.html',
-  'index.php\?range=25' : 'index.php.25h.static.html',
+  'login.php"': 'static.login.html"',
+  'login.php\?do=2' : 'static.login.html',
+  'settings.php': 'static.settings.html',
+  'index.php"': 'static.index.6h.html"',
+  'index.php\?range=1' : 'static.index.1h.html',
+  'index.php\?range=6' : 'static.index.6h.html',
+  'index.php\?range=24' : 'static.index.24h.html',
+  'index.php\?range=25' : 'static.index.25h.html',
   '&amp;reload=1' : '',
   '<body>':'<body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>'
 }
 
-file_names = ('index.php.1h.static','index.php.6h.static','index.php.24h.static','index.php.25h.static',
-'settings.php.static',
-'login.php.static')
+file_names = ('static.index.1h','static.index.6h','static.index.24h','static.index.25h',
+'static.settings',
+'static.login')
+
+fileCounter = 0
 
 for file_name in file_names:
     file = abspath(join(dirname(__file__), 'staticHtml/'+file_name))
@@ -39,3 +41,6 @@ for file_name in file_names:
 
     new_file_open.write(new_content)
     new_file_open.close()
+    fileCounter = fileCounter + 1
+
+print("generated "+str(fileCounter)+" files in ../../web/verbrauch/ directory.")    
