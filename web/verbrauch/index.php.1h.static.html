@@ -18,28 +18,28 @@
         <li class="differentColor">Verbrauch</li>
         <li><a href="settings.php.static.html">Einstellungen</a></li>
         <li>&nbsp;</li>
-        <li><a href="login.php?do=2" id="navLogoutLink">Log out</a></li>
+        <li><a href="login.php.static.html" id="navLogoutLink">Log out</a></li>
       </ul>
     </div>
   </nav>
   <div class="container mx-auto px-4 py-2 lg text-center">
-  <h1 class="text-2xl m-2">Verbrauch</h1><hr>Verbrauch: <b>2767W</b> heute um 16:16:57<hr>
+  <h1 class="text-2xl m-2">Verbrauch</h1><hr>Verbrauch: <b>2744W</b> heute um 11:41:16<hr>
     <canvas id="myChart" class="mb-2" style="display: block; box-sizing: border-box; height: 228px; width: 456px;" width="456" height="228"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
-    const labels = [ new Date("2023-01-30 15:18:08"), new Date("2023-01-30 15:20:11"), new Date("2023-01-30 15:22:11"), new Date("2023-01-30 15:24:12"), new Date("2023-01-30 15:26:15"), new Date("2023-01-30 15:28:15"), new Date("2023-01-30 15:30:16"), new Date("2023-01-30 15:32:17"), new Date("2023-01-30 15:34:19"), new Date("2023-01-30 15:36:21"), new Date("2023-01-30 15:38:21"), new Date("2023-01-30 15:40:22"), new Date("2023-01-30 15:42:24"), new Date("2023-01-30 15:44:25"), new Date("2023-01-30 15:46:26"), new Date("2023-01-30 15:48:29"), new Date("2023-01-30 15:50:29"), new Date("2023-01-30 15:52:30"), new Date("2023-01-30 15:54:31"), new Date("2023-01-30 15:56:34"), new Date("2023-01-30 15:58:36"), new Date("2023-01-30 16:00:36"), new Date("2023-01-30 16:02:37"), new Date("2023-01-30 16:04:39"), new Date("2023-01-30 16:06:50"), new Date("2023-01-30 16:08:51"), new Date("2023-01-30 16:10:54"), new Date("2023-01-30 16:12:55"), new Date("2023-01-30 16:14:56") ];
+    const labels = [ new Date("2023-02-02 10:42:36"), new Date("2023-02-02 10:44:37"), new Date("2023-02-02 10:46:38"), new Date("2023-02-02 10:48:42"), new Date("2023-02-02 10:50:43"), new Date("2023-02-02 10:52:43"), new Date("2023-02-02 10:54:44"), new Date("2023-02-02 10:56:47"), new Date("2023-02-02 10:58:47"), new Date("2023-02-02 11:00:48"), new Date("2023-02-02 11:02:51"), new Date("2023-02-02 11:04:52"), new Date("2023-02-02 11:06:53"), new Date("2023-02-02 11:08:54"), new Date("2023-02-02 11:10:57"), new Date("2023-02-02 11:12:57"), new Date("2023-02-02 11:14:58"), new Date("2023-02-02 11:16:59"), new Date("2023-02-02 11:19:01"), new Date("2023-02-02 11:21:02"), new Date("2023-02-02 11:23:03"), new Date("2023-02-02 11:25:06"), new Date("2023-02-02 11:27:06"), new Date("2023-02-02 11:29:07"), new Date("2023-02-02 11:31:08"), new Date("2023-02-02 11:33:12"), new Date("2023-02-02 11:35:13"), new Date("2023-02-02 11:37:13"), new Date("2023-02-02 11:39:14") ];
     const data = {
       labels: labels,
       datasets: [{
         label: "Verbrauch [W]",
-        data: [ 2945, 2956, 3120, 2916, 439, 390, 268, 179, 207, 177, 180, 179, 177, 208, 179, 205, 180, 179, 179, 205, 177, 180, 149, 118, 137, 179, 1902, 2707, 2737 ],
+        data: [ 208, 208, 208, 203, 208, 120, 119, 88, 120, 119, 117, 119, 89, 119, 117, 120, 119, 119, 118, 119, 119, 117, 120, 149, 149, 377, 2678, 2700, 2707 ],
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
         showLine: false
       },
       {
         label: "Verbrauch total [kWh]",
-        data: [ 0, 0.10099999999511, 0.20500000000175, 0.30299999999988, 0.3179999999993, 0.33099999999831, 0.33999999999651, 0.34599999999773, 0.35299999999552, 0.35899999999674, 0.36499999999796, 0.37099999999919, 0.37700000000041, 0.3839999999982, 0.38999999999942, 0.39699999999721, 0.40299999999843, 0.40899999999965, 0.41500000000087, 0.42199999999866, 0.42799999999988, 0.43400000000111, 0.43899999999849, 0.4429999999993, 0.44799999999668, 0.4539999999979, 0.51900000000023, 0.61000000000058, 0.7019999999975 ],
+        data: [ 0, 0.0069999999977881, 0.013999999995576, 0.020999999993364, 0.027999999998428, 0.031999999999243, 0.036000000000058, 0.038999999997031, 0.042999999997846, 0.046999999998661, 0.050999999999476, 0.055000000000291, 0.057999999997264, 0.061999999998079, 0.065999999998894, 0.069999999999709, 0.074000000000524, 0.077999999994063, 0.081999999994878, 0.085999999995693, 0.089999999996508, 0.093999999997322, 0.097999999998137, 0.10299999999552, 0.10800000000017, 0.12099999999919, 0.21099999999569, 0.30099999999948, 0.39199999999983 ],
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
@@ -62,5 +62,5 @@
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>
 <a href="index.php.1h.static.html"><input id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="index.php.1h.static.html">reload </a></label><a id="range_1h_link" href="index.php.1h.static.html" class="btn-diff">1 h</a><a id="range_6h_link" href="index.php.6h.static.html" class="btn">6 h</a><a id="range_24h_link" href="index.php.24h.static.html" class="btn">24 h</a><a id="range_25h_link" href="index.php.25h.static.html" class="btn">alles</a><br><br>
-<hr>Insgesamt 802 Einträge</div>
+<hr>Insgesamt 846 Einträge</div>
 </body></html>

@@ -33,17 +33,12 @@
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://strommesser.ch/verbrauch/index.php</loc>
-  <lastmod>2023-01-30T15:21:13+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
   <loc>https://strommesser.ch/verbrauch/settings.php.static.html</loc>
   <lastmod>2023-01-30T15:20:34+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://strommesser.ch/verbrauch/login.php?do=2</loc>
+  <loc>https://strommesser.ch/verbrauch/login.php.static.html</loc>
   <lastmod>2023-01-30T15:21:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
@@ -60,11 +55,6 @@
 <url>
   <loc>https://strommesser.ch/verbrauch/index.php.25h.static.html</loc>
   <lastmod>2023-01-30T15:20:34+00:00</lastmod>
-  <priority>0.64</priority>
-</url>
-<url>
-  <loc>https://strommesser.ch/verbrauch/login.php</loc>
-  <lastmod>2023-01-30T15:21:13+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 

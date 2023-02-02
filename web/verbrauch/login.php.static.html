@@ -1,0 +1,37 @@
+<html><head><meta charset="utf-8"><title>StromMesser Log in</title>
+  <meta name="description" content="zeigt deinen Energieverbrauch">  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="strommesser.css" type="text/css">
+  
+  </head><body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
+  <nav style="width:400px">
+    <div id="menuToggle">
+      <input type="checkbox">
+      <span></span>
+      <span></span>
+      <span></span>
+      <ul id="menu">
+        <li>&nbsp;</li>
+        <li><a href="../">Home</a></li>
+        <li><a href="index.php.6h.static.html">Verbrauch</a></li>
+        <li><a href="settings.php.static.html">Einstellungen</a></li>
+        <li>&nbsp;</li>
+        <li><a href="login.php.static.html" id="navLogoutLink">Log out</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container mx-auto px-4 py-2 lg text-center">
+  <h1 class="text-2xl m-2">Log in</h1>
+  <form action="login.php?do=1" method="post" id="loginForm">
+    <div class="grid grid-cols-2 gap-4 justify-items-start mt-8">
+      <div class="justify-self-end">Email:</div>
+      <div><input class="input-text" name="email" type="email" maxlength="127" value="" required=""></div>
+      <div class="justify-self-end">Passwort:</div>
+      <div><input class="input-text" name="password" type="password" maxlength="63" value="" required=""></div>
+      <div class="justify-self-end"><input class="w-10" type="checkbox" name="setCookie" value="1" checked=""></div>
+      <div class="text-sm">auf diesem Gerät speichern</div>
+      <div class="justify-self-center col-span-2"><input id="loginFormSubmit" class="mt-8 input-text" name="create" type="submit" value="log in"></div>      
+    </div>
+  </form>
+  </div>
+</body></html>

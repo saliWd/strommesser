@@ -1,9 +1,10 @@
 # StromMesser TODOs
 
 1. StromMesser wordpress
-   1. fill with more content: explanation?
+   1. fill with more content: explanation?   
 2. StromMesser/verbrauch
-   1. average numbers: per day, per week, per month (additional page or below graph)  
+   1. statistik: per day, per week, per month (additional page or below graph)  
+   1. replace login with static version
    1. settings.php
    1. getRaw.php
    1. index.php
@@ -18,4 +19,4 @@
 4. div
 
 
-Next:  2.1 /
+Next:  2.1 / 

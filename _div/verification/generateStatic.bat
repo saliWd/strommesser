@@ -1,2 +1,2 @@
 python run.py getStatic
-python generateStaticHtml.py
+python replaceLinks.py

@@ -18,27 +18,3 @@ def doTimescales(driver, testNum):
   # end if
   return True
 # end def
-
-def getStatic(driver, testNum):
-  from functions import checkSiteTitleAndPrint, doLoginCorrect
- 
-  modDescription = [(str(testNum)+".1"), "getStatic_6h"] 
-
-  doLoginCorrect(driver, modDescription)
-  # now on index site
-  ranges = ('1h','6h','24h','25h')
- 
-  from os.path import abspath, join, dirname
-  for range in ranges:
-    menuLink = driver.find_element(By.ID, 'range_'+range+'_link')
-    menuLink.click()
-    time.sleep(2)
-    sourceCode = driver.page_source
-
-    new_file = abspath(join(dirname(__file__), 'staticHtml/index.php.'+range+'.static'))
-    new_file_open = open(new_file, 'wb')
-    new_file_open.write(sourceCode.encode('utf8'))
-    new_file_open.close()
-
-  return True
-# end def

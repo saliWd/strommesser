@@ -1,40 +1,40 @@
-<!DOCTYPE html><html><head><meta charset="utf-8" /><title>StromMesser Einstellungen</title>
-    <meta name="description" content="zeigt deinen Energieverbrauch" />  
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="strommesser.css" type="text/css" />
-    
-    </head><body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
-    <nav style="width:400px">
-      <div id="menuToggle">
-        <input type="checkbox">
-        <span></span>
-        <span></span>
-        <span></span>
-        <ul id="menu">
-          <li>&nbsp;</li>
-          <li><a href="../">Home</a></li>
-          <li><a href="index.php.6h.static.html">Verbrauch</a></li>
-          <li class="differentColor">Einstellungen</li>
-          <li>&nbsp;</li>
-          <li><a href="login.php?do=2">Log out</a></li>
-        </ul>
-      </div>
-    </nav>
-    <div class="container mx-auto px-4 py-2 lg text-center">
-    <h1 class="text-2xl m-2">Einstellungen</h1>
-      <img class="w-48 mx-auto" src="img/display.jpg" alt="Anzeige Stromverbrauch. Mit einem kleinen, stromsparenden Bildschirm und gut sichtbarer LED" />
-      <p>&nbsp;</p>
-      <form id="settingsValues" action="settings.php.static.html?do=2" method="post">
-        <p class="text-left"><b>Maximalwert Farbskala:</b><br />
-        LED und Minibildschirm zeigen den aktuellen Verbrauch mit einer Farbskala von blau über grün nach gelb und schlussendlich rot.<br />
-        0 Watt entspricht der Farbe blau, der Maximalwert (und alles darüber) wird rot angezeigt.</p>          
-        <p class="mx-auto"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="2000" step="20" value="400" class="range" oninput="this.nextElementSibling.value=this.value"/> <output>400</output>W</p>
-        <hr />
-        <p class="text-left"><b>LED Helligkeit:</b><br />
-        Die Helligkeit der farbigen LED. Von 0 (ausgeschaltet) bis 255.<br />
-        In der Nacht (22 Uhr bis 6 Uhr) leuchtet sie übrigens 50% dunkler.</p>
-        <p class="mx-auto"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="255" step="5" value="80" class="range" oninput="this.nextElementSibling.value=this.value"/> <output>80</output></p>
-        <p class="mx-auto"><input id="settingsFormSubmit" class="mt-8 input-text mx-auto" name="settingsFormSubmit" type="submit" value="speichern"></p>
-        <p>&nbsp;</p>
-      </form></div></body></html>
+<html><head><meta charset="utf-8"><title>StromMesser Einstellungen</title>
+  <meta name="description" content="zeigt deinen Energieverbrauch">  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="strommesser.css" type="text/css">
   
+  </head><body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
+  <nav style="width:400px">
+    <div id="menuToggle">
+      <input type="checkbox">
+      <span></span>
+      <span></span>
+      <span></span>
+      <ul id="menu">
+        <li>&nbsp;</li>
+        <li><a href="../">Home</a></li>
+        <li><a href="index.php.6h.static.html">Verbrauch</a></li>
+        <li class="differentColor">Einstellungen</li>
+        <li>&nbsp;</li>
+        <li><a href="login.php.static.html" id="navLogoutLink">Log out</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container mx-auto px-4 py-2 lg text-center">
+  <h1 class="text-2xl m-2">Einstellungen</h1>
+    <img class="w-48 mx-auto" src="img/display.jpg" alt="Anzeige Stromverbrauch. Mit einem kleinen, stromsparenden Bildschirm und gut sichtbarer LED">
+    <p>&nbsp;</p>
+    <form id="settingsValues" action="settings.php.static.html?do=2" method="post">
+      <p class="text-left"><b>Maximalwert Farbskala:</b><br>
+      LED und Minibildschirm zeigen den aktuellen Verbrauch mit einer Farbskala von blau über grün nach gelb und schlussendlich rot.<br>
+      0 Watt entspricht der Farbe blau, der Maximalwert (und alles darüber) wird rot angezeigt.</p>          
+      <p class="mx-auto"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="2000" step="20" value="400" class="range" oninput="this.nextElementSibling.value=this.value"> <output>400</output>W</p>
+      <hr>
+      <p class="text-left"><b>LED Helligkeit:</b><br>
+      Die Helligkeit der farbigen LED. Von 0 (ausgeschaltet) bis 255.<br>
+      In der Nacht (22 Uhr bis 6 Uhr) leuchtet sie übrigens 50% dunkler.</p>
+      <p class="mx-auto"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="255" step="5" value="80" class="range" oninput="this.nextElementSibling.value=this.value"> <output>80</output></p>
+      <p class="mx-auto"><input id="settingsFormSubmit" class="mt-8 input-text mx-auto" name="settingsFormSubmit" type="submit" value="speichern"></p>
+      <p>&nbsp;</p>
+    </form></div>
+</body></html>
