@@ -157,7 +157,11 @@ function printBeginOfPage(bool $enableReload, string $timerange, string $site, s
   if (! in_array($site, $VALID_SITES)) {
     return;
   }
-  echo '<!DOCTYPE html><html><head><meta charset="utf-8" />';
+  echo '<!DOCTYPE html>
+  <html>
+  <head>
+  <meta charset="utf-8" />
+  ';
   
   $title = '';
   $scripts = '';
@@ -165,27 +169,37 @@ function printBeginOfPage(bool $enableReload, string $timerange, string $site, s
     $title = 'Verbrauch';
     $scripts = '<script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
-  <script src="script/chartjs-adapter-moment.mine.js"></script>';
+  <script src="script/chartjs-adapter-moment.mine.js"></script>
+  ';
   } elseif ($site === "settings.php") {
     $title = 'Einstellungen';    
   } elseif ($site === 'login.php') {
     $title = $logInOut;
+  } elseif ($site === 'statistic.php') {
+    $title = 'Statistik zum Energieverbrauch';
+    $scripts = '<script src="script/chart.min.js"></script>
+  <script src="script/moment.min.mine.js"></script>
+  <script src="script/chartjs-adapter-moment.mine.js"></script>
+  ';
   }
-  echo '<title>StromMesser '.$title.'</title>';
-  echo '
-  <meta name="description" content="zeigt deinen Energieverbrauch" />  
+  echo '<title>StromMesser '.$title.'</title>
+  ';
+  echo '<meta name="description" content="zeigt deinen Energieverbrauch" />  
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="strommesser.css" type="text/css" />
   '.$scripts;  
   if ($enableReload) {
-    echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1'.$timerange.'">';
+    echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1'.$timerange.'">
+    ';
   }
-  echo '
-  </head><body>';
+  echo '</head>
+  <body>
+  ';
   printNavMenu($site);
   echo '
   <div class="container mx-auto px-4 py-2 lg text-center">
-  <h1 class="text-2xl m-2">'.$title.'</h1>';
+  <h1 class="text-2xl m-2">'.$title.'</h1>
+  ';
   return;
 }
 

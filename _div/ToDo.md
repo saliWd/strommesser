@@ -3,13 +3,13 @@
 1. StromMesser wordpress
    1. fill with more content: explanation?   
 2. StromMesser/verbrauch
-   1. statistik: per day, per week, per month (additional page or below graph)  
-   1. replace login with static version
+   1. statistik: per day, per week, per month (additional page or below graph)     
    1. settings.php
    1. getRaw.php
    1. index.php
    1. login.php
    1. rx.php
+   1. static pages: fix the encoding stuff: <!DOCTYPE html>, closing slash < />, etc...
 3. pico devices
    1. stability: So far so good, no hanging since 10.01.23. (one issue because of USB power supply issue)
       * check with WLAN disconnection
