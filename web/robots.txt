@@ -4,6 +4,10 @@ Disallow: /wp-admin/
 Disallow: /readme.html
 Disallow: /blogs/
 Disallow: /tmp/
+Disallow: /verbrauch/index.php
+Disallow: /verbrauch/login.php
+Disallow: /verbrauch/settings.php
+Disallow: /verbrauch/statistik.php
 
  
 Sitemap: https://strommesser.ch/sitemap.xml
