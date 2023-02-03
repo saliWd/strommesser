@@ -37,9 +37,6 @@ $dailyStrings = array( // maybe: could this be done more nicely?
 // for some entries, this sql will return the sum of only one line (thin = 24), for others 24 and for the newest ones it returns the sum of lots of entries 
 $val_y = '';
 
-$minWatt = 10000;
-$maxWatt = 0;
-
 for ($i = 0; $i < 7; $i++) {
   $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
   $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` > "'.$dailyStrings[$i].'" AND `zeit` < "'.$dailyStrings[$i+1].'";';
@@ -49,15 +46,11 @@ for ($i = 0; $i < 7; $i++) {
   
   if ($row['sumZeitDiff'] > 0) { // divide by 0 exception
     $watt = max(round($row['sumConsDiff']*3600*1000 / $row['sumZeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
-    $minWatt = min($minWatt, $watt);
-    $maxWatt = max($maxWatt, $watt);
   } else { 
     $watt = ' '; 
   }      
   $val_y .= $watt.', ';
 }
-$minWatt = max(0, $minWatt - 100); // make sure it's not negative
-$maxWatt = $maxWatt + 100;
 
 
 $lastOrThis = ($weeksPast === 0) ? 'diese' : 'letzte';
@@ -65,7 +58,7 @@ $lastWkLnk = ($weeksPast === 0) ? '?weeksPast=1">letzte' : '">diese'; // TODO: c
 
 echo '<hr>
 <div class="grid grid-cols-2 justify-items-start">
-  <div class="justify-self-center">Tagesverbrauch '.$lastOrThis.' Woche</div>
+  <div class="text-xl">Tagesverbrauch '.$lastOrThis.' Woche</div>
   <div class="justify-self-end"><a class="underline" href="statistic.php'.$lastWkLnk.' Woche</a></div>
 </div>
 <hr>';
@@ -106,13 +99,7 @@ const data = {
 const config = {
   type: "bar",
   data: data,
-  options: {
-    scales: {
-      y: {
-        min: '.$minWatt.',
-        max: '.$maxWatt.'
-      }
-    },
+  options: {    
     plugins : {
       legend: {
         display: false
