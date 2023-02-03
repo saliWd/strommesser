@@ -127,7 +127,6 @@ function checkInputs($dbConn): int {
 }
 
 function printNavMenu (string $siteSafe): void {  
-  $wpHome = '<li><a href="../">Home</a></li>'; // I don't display this menu on the wp site
   $home   = ($siteSafe === 'index.php') ? '<li class="differentColor">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
   $statistic  = ($siteSafe === 'statistic.php') ? '<li class="differentColor">Statistik</li>' : '<li><a href="statistic.php">Statistik</a></li>';
   $settings  = ($siteSafe === 'settings.php') ? '<li class="differentColor">Einstellungen</li>' : '<li><a href="settings.php">Einstellungen</a></li>';
@@ -143,7 +142,7 @@ function printNavMenu (string $siteSafe): void {
       <span></span>
       <ul id="menu">
         <li>&nbsp;</li>
-        '.$wpHome.'
+        <li><a href="../">Home</a></li>
         '.$home.'
         '.$statistic.'
         '.$settings.'

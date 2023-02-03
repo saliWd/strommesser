@@ -15,7 +15,10 @@ $dbConn = initialize();
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 printBeginOfPage(enableReload:FALSE, timerange:'', site:'statistic.php');
 
-$minusWeekArr = array(1,1,1,1,1,1,1,1); // 0 to 7
+$weeksPast = safeIntFromExt(source:'GET', varName:'weeksPast', length:2); // 
+$mWeeks = $weeksPast + 1; // for the current week, I need to search for the last Monday (not this Monday). So one week back
+
+$minusWeekArr = array($mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks); // 0 to 7
 $weekday = (int)(date_create()->format('N')); // N: 1 (for Monday) through 7 (for Sunday)
 for ($i = $weekday - 1; $i < 8; $i++) { // i = 0 .. 7
   $minusWeekArr[$i] = $minusWeekArr[$i] - 1; // one week less
@@ -33,6 +36,10 @@ $dailyStrings = array( // maybe: could this be done more nicely?
 
 // for some entries, this sql will return the sum of only one line (thin = 24), for others 24 and for the newest ones it returns the sum of lots of entries 
 $val_y = '';
+
+$minWatt = 10000;
+$maxWatt = 0;
+
 for ($i = 0; $i < 7; $i++) {
   $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
   $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` > "'.$dailyStrings[$i].'" AND `zeit` < "'.$dailyStrings[$i+1].'";';
@@ -42,14 +49,26 @@ for ($i = 0; $i < 7; $i++) {
   
   if ($row['sumZeitDiff'] > 0) { // divide by 0 exception
     $watt = max(round($row['sumConsDiff']*3600*1000 / $row['sumZeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
+    $minWatt = min($minWatt, $watt);
+    $maxWatt = max($maxWatt, $watt);
   } else { 
-    $watt = 0; 
+    $watt = ' '; 
   }      
   $val_y .= $watt.', ';
-
 }
+$minWatt = max(0, $minWatt - 100); // make sure it's not negative
+$maxWatt = $maxWatt + 100;
 
-echo '<hr>Tagesverbrauch diese Woche<hr>';
+
+$lastOrThis = ($weeksPast === 0) ? 'diese' : 'letzte';
+$lastWkLnk = ($weeksPast === 0) ? '?weeksPast=1">letzte' : '">diese'; // TODO: clickable triangels to scroll through the weeks
+
+echo '<hr>
+<div class="grid grid-cols-2 justify-items-start">
+  <div class="justify-self-center">Tagesverbrauch '.$lastOrThis.' Woche</div>
+  <div class="justify-self-end"><a class="underline" href="statistic.php'.$lastWkLnk.' Woche</a></div>
+</div>
+<hr>';
 
 // remove the last two caracters (a comma-space) and add the brackets before and after
 $val_y = '[ '.substr($val_y, 0, -2).' ]';
@@ -90,7 +109,8 @@ const config = {
   options: {
     scales: {
       y: {
-        type: "logarithmic"
+        min: '.$minWatt.',
+        max: '.$maxWatt.'
       }
     },
     plugins : {
