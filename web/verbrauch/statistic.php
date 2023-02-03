@@ -15,30 +15,36 @@ $dbConn = initialize();
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 printBeginOfPage(enableReload:FALSE, timerange:'', site:'statistic.php');
 
-// this week: only have the daily consumption up to 3 days ago. Need to calculate the last days here (not yet in data base)
-
-// find the monday in this week
-$monday = date_create("last Monday 00:00");
-$mondayString = $monday->format('Y-m-d 00:00:00');
-
-$sqlUser = ' from `verbrauch` WHERE `userid` = "'.$userid.'" ';
-
-$sql = 'SELECT `consDiff`, `zeitDiff`'.$sqlUser.'AND `zeit` >= "'.$mondayString.'" AND `thin` = "24" ';
-$sql .= 'ORDER BY `id` LIMIT 7;';    // TODO: add the non-daily data as well
-
-$result = $dbConn->query($sql);
-echo '<hr>Tagesverbrauch diese Woche<hr>';
-
+$dailyStrings = array( // maybe: could this be done more nicely?
+  date_create("last Monday 00:00")->format('Y-m-d 00:00:00'),
+  date_create("last Tuesday 00:00")->format('Y-m-d 00:00:00'),
+  date_create("last Wednesday 00:00")->format('Y-m-d 00:00:00'),
+  date_create("last Thursday 00:00")->format('Y-m-d 00:00:00'),
+  date_create("last Friday 00:00")->format('Y-m-d 00:00:00'),  // this is wrong when today is Friday... Kind of logical
+  date_create("last Saturday 00:00")->format('Y-m-d 00:00:00'),
+  date_create("last Sunday 00:00")->format('Y-m-d 00:00:00'),
+  date_create("this Monday 00:00")->format('Y-m-d 00:00:00') // have a additional one
+);
+// for some entries, this sql will return the sum of only one line (thin = 24), for others 24 and for the newest ones it returns the sum of lots of entries 
 $val_y = '';
-    
-while ($row = $result->fetch_assoc()) {
-  if ($row['zeitDiff'] > 0) { // divide by 0 exception
-    $watt = max(round($row['consDiff']*3600*1000 / $row['zeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
+for ($i = 0; $i < 7; $i++) {
+  $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+  $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` > "'.$dailyStrings[$i].'" AND `zeit` < "'.$dailyStrings[$i+1].'";';
+  echo $sql."<br />";
+  $result = $dbConn->query($sql); // returns only one row
+  $row = $result->fetch_assoc();
+  
+  if ($row['sumZeitDiff'] > 0) { // divide by 0 exception
+    $watt = max(round($row['sumConsDiff']*3600*1000 / $row['sumZeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
   } else { 
     $watt = 0; 
   }      
   $val_y .= $watt.', ';
-} // while 
+
+}
+
+echo '<hr>Tagesverbrauch diese Woche<hr>';
+
 // remove the last two caracters (a comma-space) and add the brackets before and after
 $val_y = '[ '.substr($val_y, 0, -2).' ]';
 
