@@ -18,14 +18,14 @@ printBeginOfPage(enableReload:FALSE, timerange:'', site:'statistic.php');
 $minusWeekArr = array(1,1,1,1,1,1,1,1); // 0 to 7
 $weekday = (int)(date_create()->format('N')); // N: 1 (for Monday) through 7 (for Sunday)
 for ($i = $weekday - 1; $i < 8; $i++) { // i = 0 .. 7
-  $minusWeekArr[$i] = 0;
+  $minusWeekArr[$i] = $minusWeekArr[$i] - 1; // one week less
 }
 $dailyStrings = array( // maybe: could this be done more nicely?
   date_create('-'.$minusWeekArr[0].' week Monday 00:00')->format('Y-m-d 00:00:00'),
   date_create('-'.$minusWeekArr[1].' week Tuesday 00:00')->format('Y-m-d 00:00:00'),
   date_create('-'.$minusWeekArr[2].' week Wednesday 00:00')->format('Y-m-d 00:00:00'),
-  date_create('-'.$minusWeekArr[3].' week Thursday 00:00')->format('Y-m-d 00:00:00'),
-  date_create('-'.$minusWeekArr[4].' week Friday 00:00')->format('Y-m-d 00:00:00'),
+  date_create('-'.$minusWeekArr[3].' week Thursday 00:00')->format('Y-m-d 00:00:00'), // last week (if today is Friday)
+  date_create('-'.$minusWeekArr[4].' week Friday 00:00')->format('Y-m-d 00:00:00'), // this week (if today is Friday)
   date_create('-'.$minusWeekArr[5].' week Saturday 00:00')->format('Y-m-d 00:00:00'),
   date_create('-'.$minusWeekArr[6].' week Sunday 00:00')->format('Y-m-d 00:00:00'),
   date_create('-'.$minusWeekArr[7].' week Monday 00:00')->format('Y-m-d 00:00:00') // have a additional one
