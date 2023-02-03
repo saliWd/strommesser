@@ -23,8 +23,8 @@ $mondayString = $monday->format('Y-m-d 00:00:00');
 
 $sqlUser = ' from `verbrauch` WHERE `userid` = "'.$userid.'" ';
 
-$sql = 'SELECT `consDiff`, `zeitDiff`'.$sqlUser.'AND `zeit` >= "'.$mondayString.'" ';
-$sql .= 'ORDER BY `zeit` LIMIT 7;';    // TODO: contains non-daily data as well
+$sql = 'SELECT `consDiff`, `zeitDiff`'.$sqlUser.'AND `zeit` >= "'.$mondayString.'" AND `thin` = "24" ';
+$sql .= 'ORDER BY `id` LIMIT 7;';    // TODO: add the non-daily data as well
 
 $result = $dbConn->query($sql);
 echo '<hr>Tagesverbrauch diese Woche<hr>';

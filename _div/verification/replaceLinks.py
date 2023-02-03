@@ -13,6 +13,7 @@ dict_replace = {
   'login.php"': 'static.login.html"',
   'login.php\?do=2' : 'static.login.html',
   'settings.php': 'static.settings.html',
+  'statistic.php': 'static.statistic.html',
   'index.php"': 'static.index.6h.html"',
   'index.php\?range=1' : 'static.index.1h.html',
   'index.php\?range=6' : 'static.index.6h.html',
@@ -24,6 +25,7 @@ dict_replace = {
 
 file_names = ('static.index.1h','static.index.6h','static.index.24h','static.index.25h',
 'static.settings',
+'static.statistic',
 'static.login')
 
 fileCounter = 0

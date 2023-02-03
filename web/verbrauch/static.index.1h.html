@@ -1,11 +1,15 @@
-<html><head><meta charset="utf-8"><title>StromMesser Verbrauch</title>
+<html><head>
+  <meta charset="utf-8">
+  <title>StromMesser Verbrauch</title>
   <meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="strommesser.css" type="text/css">
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>
-  </head><body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
+  </head>
+  <body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
+  
   <nav style="width:400px">
     <div id="menuToggle">
       <input type="checkbox">
@@ -16,6 +20,7 @@
         <li>&nbsp;</li>
         <li><a href="../">Home</a></li>
         <li class="differentColor">Verbrauch</li>
+        <li><a href="static.statistic.html">Statistik</a></li>
         <li><a href="static.settings.html">Einstellungen</a></li>
         <li>&nbsp;</li>
         <li><a href="static.login.html" id="navLogoutLink">Log out</a></li>
@@ -23,23 +28,24 @@
     </div>
   </nav>
   <div class="container mx-auto px-4 py-2 lg text-center">
-  <h1 class="text-2xl m-2">Verbrauch</h1><hr>Verbrauch: <b>180W</b> heute um 15:25:55<hr>
+  <h1 class="text-2xl m-2">Verbrauch</h1>
+  <hr>Verbrauch: <b>119W</b> heute um 10:05:49<hr>
     <canvas id="myChart" class="mb-2" style="display: block; box-sizing: border-box; height: 228px; width: 456px;" width="456" height="228"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
-    const labels = [ new Date("2023-02-02 14:27:16"), new Date("2023-02-02 14:29:17"), new Date("2023-02-02 14:31:20"), new Date("2023-02-02 14:33:20"), new Date("2023-02-02 14:35:21"), new Date("2023-02-02 14:37:23"), new Date("2023-02-02 14:39:24"), new Date("2023-02-02 14:41:25"), new Date("2023-02-02 14:43:26"), new Date("2023-02-02 14:45:28"), new Date("2023-02-02 14:47:30"), new Date("2023-02-02 14:49:31"), new Date("2023-02-02 14:51:32"), new Date("2023-02-02 14:53:34"), new Date("2023-02-02 14:55:34"), new Date("2023-02-02 14:57:36"), new Date("2023-02-02 14:59:38"), new Date("2023-02-02 15:01:39"), new Date("2023-02-02 15:03:40"), new Date("2023-02-02 15:05:41"), new Date("2023-02-02 15:07:45"), new Date("2023-02-02 15:09:47"), new Date("2023-02-02 15:11:47"), new Date("2023-02-02 15:13:48"), new Date("2023-02-02 15:15:50"), new Date("2023-02-02 15:17:51"), new Date("2023-02-02 15:19:52"), new Date("2023-02-02 15:21:54"), new Date("2023-02-02 15:23:55") ];
+    const labels = [ new Date("2023-02-03 09:07:05"), new Date("2023-02-03 09:09:06"), new Date("2023-02-03 09:11:08"), new Date("2023-02-03 09:13:08"), new Date("2023-02-03 09:15:10"), new Date("2023-02-03 09:17:12"), new Date("2023-02-03 09:19:13"), new Date("2023-02-03 09:21:14"), new Date("2023-02-03 09:23:16"), new Date("2023-02-03 09:25:19"), new Date("2023-02-03 09:27:20"), new Date("2023-02-03 09:29:21"), new Date("2023-02-03 09:31:25"), new Date("2023-02-03 09:33:28"), new Date("2023-02-03 09:35:28"), new Date("2023-02-03 09:37:29"), new Date("2023-02-03 09:39:32"), new Date("2023-02-03 09:41:33"), new Date("2023-02-03 09:43:34"), new Date("2023-02-03 09:45:35"), new Date("2023-02-03 09:47:39"), new Date("2023-02-03 09:49:39"), new Date("2023-02-03 09:51:40"), new Date("2023-02-03 09:53:41"), new Date("2023-02-03 09:55:43"), new Date("2023-02-03 09:57:44"), new Date("2023-02-03 09:59:45"), new Date("2023-02-03 10:01:47"), new Date("2023-02-03 10:03:48") ];
     const data = {
       labels: labels,
       datasets: [{
         label: "Verbrauch [W]",
-        data: [ 180, 208, 146, 1890, 2380, 2361, 2410, 2350, 1160, 1770, 2656, 2707, 2737, 2774, 750, 148, 177, 179, 179, 149, 145, 177, 180, 208, 177, 179, 208, 177, 208 ],
+        data: [ 238, 179, 118, 120, 118, 148, 149, 149, 148, 176, 149, 208, 174, 146, 120, 89, 59, 119, 2559, 2588, 2555, 2760, 1815, 119, 89, 119, 119, 118, 149 ],
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
         showLine: false
       },
       {
         label: "Verbrauch total [kWh]",
-        data: [ 0, 0.0069999999977881, 0.011999999995169, 0.07499999999709, 0.15499999999884, 0.23500000000058, 0.31599999999889, 0.3949999999968, 0.43400000000111, 0.49399999999878, 0.58399999999529, 0.67499999999563, 0.76699999999983, 0.86099999999715, 0.8859999999986, 0.89099999999598, 0.89699999999721, 0.90299999999843, 0.90899999999965, 0.91399999999703, 0.91900000000169, 0.92499999999563, 0.93099999999686, 0.93800000000192, 0.94399999999587, 0.94999999999709, 0.95700000000215, 0.9629999999961, 0.97000000000116 ],
+        data: [ 0, 0.0060000000012224, 0.010000000002037, 0.013999999995576, 0.017999999996391, 0.023000000001048, 0.027999999998428, 0.032999999995809, 0.038000000000466, 0.044000000001688, 0.048999999999069, 0.055999999996857, 0.061999999998079, 0.067000000002736, 0.070999999996275, 0.074000000000524, 0.076000000000931, 0.080000000001746, 0.16599999999744, 0.25299999999697, 0.34100000000035, 0.43299999999726, 0.49399999999878, 0.49799999999959, 0.50099999999657, 0.50499999999738, 0.5089999999982, 0.51299999999901, 0.51799999999639 ],
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
@@ -62,5 +68,5 @@
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>
 <a href="static.index.1h.html"><input id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="static.index.1h.html">reload </a></label><a id="range_1h_link" href="static.index.1h.html" class="btn-diff">1 h</a><a id="range_6h_link" href="static.index.6h.html" class="btn">6 h</a><a id="range_24h_link" href="static.index.24h.html" class="btn">24 h</a><a id="range_25h_link" href="static.index.25h.html" class="btn">alles</a><br><br>
-<hr>Insgesamt 842 Einträge</div>
+<hr>Insgesamt 828 Einträge</div>
 </body></html>

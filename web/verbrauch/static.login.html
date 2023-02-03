@@ -1,9 +1,12 @@
-<html><head><meta charset="utf-8"><title>StromMesser Log in</title>
+<html><head>
+  <meta charset="utf-8">
+  <title>StromMesser Log in</title>
   <meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="strommesser.css" type="text/css">
+  </head>
+  <body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
   
-  </head><body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
   <nav style="width:400px">
     <div id="menuToggle">
       <input type="checkbox">
@@ -14,6 +17,7 @@
         <li>&nbsp;</li>
         <li><a href="../">Home</a></li>
         <li><a href="static.index.6h.html">Verbrauch</a></li>
+        <li><a href="static.statistic.html">Statistik</a></li>
         <li><a href="static.settings.html">Einstellungen</a></li>
         <li>&nbsp;</li>
         <li><a href="static.login.html" id="navLogoutLink">Log out</a></li>
@@ -22,6 +26,7 @@
   </nav>
   <div class="container mx-auto px-4 py-2 lg text-center">
   <h1 class="text-2xl m-2">Log in</h1>
+  
   <form action="login.php?do=1" method="post" id="loginForm">
     <div class="grid grid-cols-2 gap-4 justify-items-start mt-8">
       <div class="justify-self-end">Email:</div>
