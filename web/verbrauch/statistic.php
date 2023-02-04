@@ -56,12 +56,7 @@ for ($i = 0; $i < 7; $i++) {
 $lastOrThis = ($weeksPast === 0) ? 'diese' : 'letzte';
 $lastWkLnk = ($weeksPast === 0) ? '?weeksPast=1">letzte' : '">diese'; // TODO: clickable triangels to scroll through the weeks
 
-echo '<hr>
-<div class="grid grid-cols-2 justify-items-start">
-  <div class="text-xl">Tagesverbrauch '.$lastOrThis.' Woche</div>
-  <div class="justify-self-end"><a class="underline" href="statistic.php'.$lastWkLnk.' Woche</a></div>
-</div>
-<hr>';
+echo '<div class="mt-4">Tagesverbrauch '.$lastOrThis.' Woche</div>';
 
 // remove the last two caracters (a comma-space) and add the brackets before and after
 $val_y = '[ '.substr($val_y, 0, -2).' ]';
@@ -108,7 +103,9 @@ const config = {
   },
 };
 const myChart = new Chart( document.getElementById("myChart"), config );
-</script>';
+</script>
+<a class="underline" href="statistic.php'.$lastWkLnk.' Woche</a><hr>
+';
 
 ?>
 </div></body></html>
