@@ -1,6 +1,6 @@
 <html><head>
   <meta charset="utf-8">
-  <title>StromMesser Statistik zum Energieverbrauch</title>
+  <title>StromMesser Statistiken</title>
   <meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="strommesser.css" type="text/css">
@@ -28,53 +28,47 @@
     </div>
   </nav>
   <div class="container mx-auto px-4 py-2 lg text-center">
-  <h1 class="text-2xl m-2">Statistik zum Energieverbrauch</h1>
-  <hr>
-<div class="grid grid-cols-2 justify-items-start">
-  <div class="text-xl">Tagesverbrauch diese Woche</div>
-  <div class="justify-self-end"><a class="underline" href="static.statistic.html">letzte Woche</a></div>
+  <h1 class="text-2xl m-2">Statistiken</h1>
+  <div class="mt-4">Tagesverbrauch diese Woche</div>
+
+  <canvas id="weeklyBar" class="mb-2" style="display: block; box-sizing: border-box; height: 228px; width: 456px;" width="456" height="228"></canvas>
+  <script>
+  const ctxweeklyBar = document.getElementById("weeklyBar");
+  const labelsweeklyBar = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
+  const dataweeklyBar = {
+    labels: labelsweeklyBar,
+    datasets: [{
+      data: [ 1016, 874, 739, 925, 876, 872, 1265 ],
+      backgroundColor: [      
+        "rgba(255, 99, 132, 0.2)",
+        "rgba(255, 159, 64, 0.2)",
+        "rgba(255, 205, 86, 0.2)",
+        "rgba(75, 192, 192, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
+        "rgba(153, 102, 255, 0.2)",
+        "rgba(201, 203, 207, 0.2)"
+      ],
+      borderColor: [
+        "rgb(255, 99, 132)",
+        "rgb(255, 159, 64)",
+        "rgb(255, 205, 86)",
+        "rgb(75, 192, 192)",
+        "rgb(54, 162, 235)",
+        "rgb(153, 102, 255)",
+        "rgb(201, 203, 207)"
+      ],
+      borderWidth: 1
+    }]
+  };
+  const configweeklyBar = {
+    type: "bar",
+    data: dataweeklyBar,
+    options: { plugins : { legend: { display: false } } },
+  };
+  const weeklyBar = new Chart( document.getElementById("weeklyBar"), configweeklyBar );
+  </script>
+  <div class="text-sm">Durchschnittlicher Tagesverbrauch in Watt (ein Wert von 1000 Watt entspricht einem Tagesverbrauch von 24 kWh)</div>
+  
+<a class="underline" href="static.statistic.html">letzte Woche</a><hr>
 </div>
-<hr>
-<canvas id="myChart" class="mb-2" style="display: block; box-sizing: border-box; height: 228px; width: 456px;" width="456" height="228"></canvas>
-<script>
-const ctx = document.getElementById("myChart");
-const labels = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
-const data = {
-  labels: labels,
-  datasets: [{
-    data: [ 1016, 874, 739, 925, 705,  ,   ],
-    backgroundColor: [      
-      "rgba(255, 99, 132, 0.2)",
-      "rgba(255, 159, 64, 0.2)",
-      "rgba(255, 205, 86, 0.2)",
-      "rgba(75, 192, 192, 0.2)",
-      "rgba(54, 162, 235, 0.2)",
-      "rgba(153, 102, 255, 0.2)",
-      "rgba(201, 203, 207, 0.2)"
-    ],
-    borderColor: [
-      "rgb(255, 99, 132)",
-      "rgb(255, 159, 64)",
-      "rgb(255, 205, 86)",
-      "rgb(75, 192, 192)",
-      "rgb(54, 162, 235)",
-      "rgb(153, 102, 255)",
-      "rgb(201, 203, 207)"
-    ],
-    borderWidth: 1
-  }]
-};
-const config = {
-  type: "bar",
-  data: data,
-  options: {    
-    plugins : {
-      legend: {
-        display: false
-      }
-    }
-  },
-};
-const myChart = new Chart( document.getElementById("myChart"), config );
-</script></div>
 </body></html>

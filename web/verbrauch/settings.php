@@ -10,7 +10,7 @@ $doSafe = safeIntFromExt('GET', 'do', 2); // this is an integer (range 1 to 99) 
 // do = 0: entry point
 // do = 1: delete all entries in DB
 // do = 2: process setting changes
-printBeginOfPage(enableReload:FALSE, timerange:'', site:'settings.php');
+printBeginOfPage(enableReload:FALSE, timerange:'', site:'settings.php', title:'Einstellungen');
 if ($doSafe === 0) { // entry point of this site
     $result = $dbConn->query('SELECT `ledMaxValue`,`ledBrightness` FROM `user` WHERE `id` = "'.$userid.'" LIMIT 1;');
     $row = $result->fetch_assoc();

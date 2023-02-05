@@ -195,10 +195,10 @@ function printWeeklyGraph (string $val_y, string $chartId):void {
   echo '
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
-  const ctx = document.getElementById("'.$chartId.'");
-  const labels = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
-  const data = {
-    labels: labels,
+  const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
+  const labels'.$chartId.' = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
+  const data'.$chartId.' = {
+    labels: labels'.$chartId.',
     datasets: [{
       data: '.$val_y.',
       backgroundColor: [      
@@ -222,18 +222,18 @@ function printWeeklyGraph (string $val_y, string $chartId):void {
       borderWidth: 1
     }]
   };
-  const config = {
+  const config'.$chartId.' = {
     type: "bar",
-    data: data,
+    data: data'.$chartId.',
     options: { plugins : { legend: { display: false } } },
   };
-  const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config );
+  const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
   </script>
+  <div class="text-sm">Durchschnittlicher Tagesverbrauch in Watt (ein Wert von 1000 Watt entspricht einem Tagesverbrauch von 24 kWh)</div>
   ';
-
 }
 
-function printBeginOfPage(bool $enableReload, string $timerange, string $site, string $logInOut = ''):void {
+function printBeginOfPage(bool $enableReload, string $timerange, string $site, string $title):void {
   require_once('constants.php');
   if (! in_array($site, $VALID_SITES)) {
     return;
@@ -243,26 +243,14 @@ function printBeginOfPage(bool $enableReload, string $timerange, string $site, s
   <head>
   <meta charset="utf-8" />
   ';
-  
-  $title = '';
   $scripts = '';
-  if ($site === "index.php") {
-    $title = 'Verbrauch';
+  if (($site === "index.php") or ($site === 'statistic.php')) {
     $scripts = '<script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>
   ';
-  } elseif ($site === "settings.php") {
-    $title = 'Einstellungen';    
-  } elseif ($site === 'login.php') {
-    $title = $logInOut;
-  } elseif ($site === 'statistic.php') {
-    $title = 'Statistik zum Energieverbrauch';
-    $scripts = '<script src="script/chart.min.js"></script>
-  <script src="script/moment.min.mine.js"></script>
-  <script src="script/chartjs-adapter-moment.mine.js"></script>
-  ';
-  }
+  } 
+  
   echo '<title>StromMesser '.$title.'</title>
   ';
   echo '<meta name="description" content="zeigt deinen Energieverbrauch" />  

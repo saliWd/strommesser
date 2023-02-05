@@ -14,7 +14,7 @@ $dbConn = initialize();
 
 // returns the time range to be displayed as int. Possible values are: 1 (for last 1 hour), 6, 24, 25. 25 means: all data
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
-printBeginOfPage(enableReload:FALSE, timerange:'', site:'statistic.php');
+printBeginOfPage(enableReload:FALSE, timerange:'', site:'statistic.php', title:'Statistiken');
 
 $weeksPast = safeIntFromExt(source:'GET', varName:'weeksPast', length:2); // 
 $lastOrThis = ($weeksPast === 0) ? 'diese' : 'letzte';

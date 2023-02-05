@@ -29,23 +29,23 @@
   </nav>
   <div class="container mx-auto px-4 py-2 lg text-center">
   <h1 class="text-2xl m-2">Verbrauch</h1>
-  <hr>Verbrauch: <b>149W</b> heute um 15:56:07<hr>
+  <hr>Verbrauch: <b>833W</b> heute um 17:19:11<hr>
     <canvas id="myChart" class="mb-2" style="display: block; box-sizing: border-box; height: 228px; width: 456px;" width="456" height="228"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
-    const labels = [ new Date("2023-02-03 14:57:29"), new Date("2023-02-03 14:59:31"), new Date("2023-02-03 15:01:32"), new Date("2023-02-03 15:03:33"), new Date("2023-02-03 15:05:36"), new Date("2023-02-03 15:07:36"), new Date("2023-02-03 15:09:37"), new Date("2023-02-03 15:11:39"), new Date("2023-02-03 15:13:42"), new Date("2023-02-03 15:15:43"), new Date("2023-02-03 15:17:43"), new Date("2023-02-03 15:19:44"), new Date("2023-02-03 15:21:47"), new Date("2023-02-03 15:23:47"), new Date("2023-02-03 15:25:48"), new Date("2023-02-03 15:27:51"), new Date("2023-02-03 15:29:51"), new Date("2023-02-03 15:31:52"), new Date("2023-02-03 15:33:53"), new Date("2023-02-03 15:35:56"), new Date("2023-02-03 15:37:57"), new Date("2023-02-03 15:39:58"), new Date("2023-02-03 15:41:58"), new Date("2023-02-03 15:44:01"), new Date("2023-02-03 15:46:01"), new Date("2023-02-03 15:48:03"), new Date("2023-02-03 15:50:05"), new Date("2023-02-03 15:52:05"), new Date("2023-02-03 15:54:06") ];
+    const labels = [ new Date("2023-02-05 16:20:27"), new Date("2023-02-05 16:22:28"), new Date("2023-02-05 16:24:30"), new Date("2023-02-05 16:26:31"), new Date("2023-02-05 16:28:32"), new Date("2023-02-05 16:30:34"), new Date("2023-02-05 16:32:38"), new Date("2023-02-05 16:34:39"), new Date("2023-02-05 16:36:39"), new Date("2023-02-05 16:38:40"), new Date("2023-02-05 16:40:42"), new Date("2023-02-05 16:42:43"), new Date("2023-02-05 16:44:44"), new Date("2023-02-05 16:46:47"), new Date("2023-02-05 16:48:48"), new Date("2023-02-05 16:50:48"), new Date("2023-02-05 16:52:50"), new Date("2023-02-05 16:54:53"), new Date("2023-02-05 16:56:54"), new Date("2023-02-05 16:58:54"), new Date("2023-02-05 17:00:55"), new Date("2023-02-05 17:02:57"), new Date("2023-02-05 17:04:58"), new Date("2023-02-05 17:06:59"), new Date("2023-02-05 17:09:05"), new Date("2023-02-05 17:11:05"), new Date("2023-02-05 17:13:06"), new Date("2023-02-05 17:15:07"), new Date("2023-02-05 17:17:10") ];
     const data = {
       labels: labels,
       datasets: [{
         label: "Verbrauch [W]",
-        data: [ 2648, 2685, 2767, 2023, 117, 150, 119, 118, 176, 268, 180, 417, 585, 150, 179, 146, 180, 149, 179, 176, 149, 149, 150, 117, 150, 148, 148, 150, 179 ],
+        data: [ 2975, 2975, 3275, 2707, 1101, 443, 377, 655, 1020, 5415, 9030, 7795, 803, 1141, 952, 360, 325, 790, 1101, 990, 387, 413, 982, 1131, 800, 540, 565, 1131, 1141 ],
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
         showLine: false
       },
       {
         label: "Verbrauch total [kWh]",
-        data: [ 0, 0.091000000000349, 0.18400000000111, 0.25200000000041, 0.25600000000122, 0.2609999999986, 0.26499999999942, 0.26900000000023, 0.27500000000146, 0.28399999999965, 0.29000000000087, 0.30400000000373, 0.32400000000052, 0.32900000000518, 0.33499999999913, 0.34000000000378, 0.34600000000501, 0.35100000000239, 0.35700000000361, 0.36300000000483, 0.36800000000221, 0.37299999999959, 0.37800000000425, 0.38200000000506, 0.38700000000244, 0.39199999999983, 0.39700000000448, 0.40200000000186, 0.40800000000309 ],
+        data: [ 0, 0.099999999998545, 0.21100000000297, 0.30200000000332, 0.33899999999994, 0.35399999999936, 0.36699999999837, 0.38900000000285, 0.4230000000025, 0.6050000000032, 0.91100000000006, 1.1730000000025, 1.2000000000044, 1.2390000000014, 1.2710000000006, 1.2830000000031, 1.2940000000017, 1.3210000000036, 1.3580000000002, 1.3910000000033, 1.4040000000023, 1.4179999999978, 1.4510000000009, 1.4890000000014, 1.5169999999998, 1.5350000000035, 1.5540000000037, 1.5920000000042, 1.6310000000012 ],
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
@@ -68,5 +68,84 @@
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>
 <a href="static.index.1h.html"><input id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="static.index.1h.html">reload </a></label><a id="range_1h_link" href="static.index.1h.html" class="btn-diff">1 h</a><a id="range_6h_link" href="static.index.6h.html" class="btn">6 h</a><a id="range_24h_link" href="static.index.24h.html" class="btn">24 h</a><a id="range_25h_link" href="static.index.25h.html" class="btn">alles</a><br><br>
-<hr>Insgesamt 858 Einträge</div>
+<hr>Insgesamt 844 Einträge<br><br>
+<div class="mt-4 text-xl">Tagesverbrauch <b>diese</b> Woche</div>
+
+  <canvas id="weeklyBarThisWeek" class="mb-2" style="display: block; box-sizing: border-box; height: 219px; width: 439px;" width="439" height="219"></canvas>
+  <script>
+  const ctxweeklyBarThisWeek = document.getElementById("weeklyBarThisWeek");
+  const labelsweeklyBarThisWeek = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
+  const dataweeklyBarThisWeek = {
+    labels: labelsweeklyBarThisWeek,
+    datasets: [{
+      data: [ 1016, 874, 739, 925, 876, 872, 1265 ],
+      backgroundColor: [      
+        "rgba(255, 99, 132, 0.2)",
+        "rgba(255, 159, 64, 0.2)",
+        "rgba(255, 205, 86, 0.2)",
+        "rgba(75, 192, 192, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
+        "rgba(153, 102, 255, 0.2)",
+        "rgba(201, 203, 207, 0.2)"
+      ],
+      borderColor: [
+        "rgb(255, 99, 132)",
+        "rgb(255, 159, 64)",
+        "rgb(255, 205, 86)",
+        "rgb(75, 192, 192)",
+        "rgb(54, 162, 235)",
+        "rgb(153, 102, 255)",
+        "rgb(201, 203, 207)"
+      ],
+      borderWidth: 1
+    }]
+  };
+  const configweeklyBarThisWeek = {
+    type: "bar",
+    data: dataweeklyBarThisWeek,
+    options: { plugins : { legend: { display: false } } },
+  };
+  const weeklyBarThisWeek = new Chart( document.getElementById("weeklyBarThisWeek"), configweeklyBarThisWeek );
+  </script>
+  <div class="text-sm">Durchschnittlicher Tagesverbrauch in Watt (ein Wert von 1000 Watt entspricht einem Tagesverbrauch von 24 kWh)</div>
+  <br><br><div class="mt-4 text-xl">Tagesverbrauch <b>letzte</b> Woche</div>
+
+  <canvas id="weeklyBarLastWeek" class="mb-2" style="display: block; box-sizing: border-box; height: 219px; width: 439px;" width="439" height="219"></canvas>
+  <script>
+  const ctxweeklyBarLastWeek = document.getElementById("weeklyBarLastWeek");
+  const labelsweeklyBarLastWeek = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
+  const dataweeklyBarLastWeek = {
+    labels: labelsweeklyBarLastWeek,
+    datasets: [{
+      data: [  ,  ,  ,  , 1140, 1030, 1232 ],
+      backgroundColor: [      
+        "rgba(255, 99, 132, 0.2)",
+        "rgba(255, 159, 64, 0.2)",
+        "rgba(255, 205, 86, 0.2)",
+        "rgba(75, 192, 192, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
+        "rgba(153, 102, 255, 0.2)",
+        "rgba(201, 203, 207, 0.2)"
+      ],
+      borderColor: [
+        "rgb(255, 99, 132)",
+        "rgb(255, 159, 64)",
+        "rgb(255, 205, 86)",
+        "rgb(75, 192, 192)",
+        "rgb(54, 162, 235)",
+        "rgb(153, 102, 255)",
+        "rgb(201, 203, 207)"
+      ],
+      borderWidth: 1
+    }]
+  };
+  const configweeklyBarLastWeek = {
+    type: "bar",
+    data: dataweeklyBarLastWeek,
+    options: { plugins : { legend: { display: false } } },
+  };
+  const weeklyBarLastWeek = new Chart( document.getElementById("weeklyBarLastWeek"), configweeklyBarLastWeek );
+  </script>
+  <div class="text-sm">Durchschnittlicher Tagesverbrauch in Watt (ein Wert von 1000 Watt entspricht einem Tagesverbrauch von 24 kWh)</div>
+  </div>
 </body></html>

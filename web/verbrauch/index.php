@@ -24,7 +24,7 @@ $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
-printBeginOfPage(enableReload:$enableReload, timerange:'&range='.$timeSelected, site:'index.php');
+printBeginOfPage(enableReload:$enableReload, timerange:'&range='.$timeSelected, site:'index.php', title:'Verbrauch');
 if ($totalCount > 0) {// this may be 0
   $zeitNewest = date_create($rowFreshest['zeit']);    
   if ($timeSelected < 25) {
@@ -157,7 +157,19 @@ foreach ($submitTexts as $submitText) {
   echo '<a id="range_'.$submitText[0].'h_link" href="index.php?range='.$submitText[0].$reloadLink.'" '.$submitText[2].'>'.$submitText[1].'</a>';
 }
 echo '<br /><br />
-<hr>Insgesamt '.$totalCount.' Einträge';
+<hr>Insgesamt '.$totalCount.' Einträge<br /><br />
+';
+
+echo '<div class="mt-4 text-xl">Tagesverbrauch <b>diese</b> Woche</div>
+';
+$val_y = getDailyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
+printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarThisWeek');
+
+echo '<br /><br /><div class="mt-4 text-xl">Tagesverbrauch <b>letzte</b> Woche</div>
+';
+$val_y = getDailyValues(dbConn:$dbConn, weeksPast:1, userid:$userid);
+printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarLastWeek');
+
 
 ?>
 </div></body></html>
