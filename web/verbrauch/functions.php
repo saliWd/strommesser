@@ -268,7 +268,6 @@ function printBeginOfPage(bool $enableReload, string $timerange, string $site, s
   echo '<meta name="description" content="zeigt deinen Energieverbrauch" />  
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="strommesser.css" type="text/css" />
-  <link rel="stylesheet" href="flowbite.min.css" type="text/css" />
   '.$scripts;  
   if ($enableReload) {
     echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1'.$timerange.'">
