@@ -7,6 +7,7 @@
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>
+  <script src="script/flowbite.min.js"></script>
   </head>
   <body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
   
@@ -29,23 +30,23 @@
   </nav>
   <div class="container mx-auto px-4 py-2 lg text-center">
   <h1 class="text-2xl m-2">Verbrauch</h1>
-  <hr>Verbrauch: <b>833W</b> heute um 17:19:11<hr>
+  <hr>Verbrauch: <b>176W</b> heute um 16:54:10<hr>
     <canvas id="myChart" class="mb-2" style="display: block; box-sizing: border-box; height: 228px; width: 456px;" width="456" height="228"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
-    const labels = [ new Date("2023-02-05 16:20:27"), new Date("2023-02-05 16:22:28"), new Date("2023-02-05 16:24:30"), new Date("2023-02-05 16:26:31"), new Date("2023-02-05 16:28:32"), new Date("2023-02-05 16:30:34"), new Date("2023-02-05 16:32:38"), new Date("2023-02-05 16:34:39"), new Date("2023-02-05 16:36:39"), new Date("2023-02-05 16:38:40"), new Date("2023-02-05 16:40:42"), new Date("2023-02-05 16:42:43"), new Date("2023-02-05 16:44:44"), new Date("2023-02-05 16:46:47"), new Date("2023-02-05 16:48:48"), new Date("2023-02-05 16:50:48"), new Date("2023-02-05 16:52:50"), new Date("2023-02-05 16:54:53"), new Date("2023-02-05 16:56:54"), new Date("2023-02-05 16:58:54"), new Date("2023-02-05 17:00:55"), new Date("2023-02-05 17:02:57"), new Date("2023-02-05 17:04:58"), new Date("2023-02-05 17:06:59"), new Date("2023-02-05 17:09:05"), new Date("2023-02-05 17:11:05"), new Date("2023-02-05 17:13:06"), new Date("2023-02-05 17:15:07"), new Date("2023-02-05 17:17:10") ];
+    const labels = [ new Date("2023-02-07 15:55:26"), new Date("2023-02-07 15:57:27"), new Date("2023-02-07 15:59:28"), new Date("2023-02-07 16:01:34"), new Date("2023-02-07 16:03:36"), new Date("2023-02-07 16:05:36"), new Date("2023-02-07 16:07:37"), new Date("2023-02-07 16:09:40"), new Date("2023-02-07 16:11:40"), new Date("2023-02-07 16:13:41"), new Date("2023-02-07 16:15:44"), new Date("2023-02-07 16:17:45"), new Date("2023-02-07 16:19:46"), new Date("2023-02-07 16:21:47"), new Date("2023-02-07 16:23:50"), new Date("2023-02-07 16:25:50"), new Date("2023-02-07 16:27:51"), new Date("2023-02-07 16:29:52"), new Date("2023-02-07 16:31:54"), new Date("2023-02-07 16:33:55"), new Date("2023-02-07 16:35:56"), new Date("2023-02-07 16:37:58"), new Date("2023-02-07 16:39:59"), new Date("2023-02-07 16:42:00"), new Date("2023-02-07 16:44:01"), new Date("2023-02-07 16:46:05"), new Date("2023-02-07 16:48:06"), new Date("2023-02-07 16:50:06"), new Date("2023-02-07 16:52:07") ];
     const data = {
       labels: labels,
       datasets: [{
         label: "Verbrauch [W]",
-        data: [ 2975, 2975, 3275, 2707, 1101, 443, 377, 655, 1020, 5415, 9030, 7795, 803, 1141, 952, 360, 325, 790, 1101, 990, 387, 413, 982, 1131, 800, 540, 565, 1131, 1141 ],
+        data: [ 10, 10, 10, 10, 10, 10, 119, 117, 120, 149, 117, 149, 119, 119, 117, 150, 119, 119, 148, 2469, 2648, 2626, 2737, 2202, 119, 145, 149, 180, 149 ],
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
         showLine: false
       },
       {
         label: "Verbrauch total [kWh]",
-        data: [ 0, 0.099999999998545, 0.21100000000297, 0.30200000000332, 0.33899999999994, 0.35399999999936, 0.36699999999837, 0.38900000000285, 0.4230000000025, 0.6050000000032, 0.91100000000006, 1.1730000000025, 1.2000000000044, 1.2390000000014, 1.2710000000006, 1.2830000000031, 1.2940000000017, 1.3210000000036, 1.3580000000002, 1.3910000000033, 1.4040000000023, 1.4179999999978, 1.4510000000009, 1.4890000000014, 1.5169999999998, 1.5350000000035, 1.5540000000037, 1.5920000000042, 1.6310000000012 ],
+        data: [ 0, 0, 0, 0, 0, 0, 0.0040000000008149, 0.0080000000016298, 0.012000000002445, 0.016999999999825, 0.02100000000064, 0.025999999998021, 0.029999999998836, 0.033999999999651, 0.038000000000466, 0.042999999997846, 0.046999999998661, 0.050999999999476, 0.055999999996857, 0.13899999999558, 0.22799999999552, 0.31699999999546, 0.40899999999965, 0.48300000000017, 0.48700000000099, 0.49199999999837, 0.49699999999575, 0.50299999999697, 0.50800000000163 ],
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
@@ -68,7 +69,7 @@
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>
 <a href="static.index.1h.html"><input id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="static.index.1h.html">reload </a></label><a id="range_1h_link" href="static.index.1h.html" class="btn-diff">1 h</a><a id="range_6h_link" href="static.index.6h.html" class="btn">6 h</a><a id="range_24h_link" href="static.index.24h.html" class="btn">24 h</a><a id="range_25h_link" href="static.index.25h.html" class="btn">alles</a><br><br>
-<hr>Insgesamt 844 Einträge<br><br>
+<hr>Insgesamt 734 Einträge<br><br>
 <div class="mt-4 text-xl">Tagesverbrauch <b>diese</b> Woche</div>
 
   <canvas id="weeklyBarThisWeek" class="mb-2" style="display: block; box-sizing: border-box; height: 219px; width: 439px;" width="439" height="219"></canvas>
@@ -78,7 +79,7 @@
   const dataweeklyBarThisWeek = {
     labels: labelsweeklyBarThisWeek,
     datasets: [{
-      data: [ 1016, 874, 739, 925, 876, 872, 1265 ],
+      data: [ 829, 785,  ,  ,  ,  ,   ],
       backgroundColor: [      
         "rgba(255, 99, 132, 0.2)",
         "rgba(255, 159, 64, 0.2)",
@@ -107,7 +108,18 @@
   };
   const weeklyBarThisWeek = new Chart( document.getElementById("weeklyBarThisWeek"), configweeklyBarThisWeek );
   </script>
-  <div class="text-sm">Durchschnittlicher Tagesverbrauch in Watt (ein Wert von 1000 Watt entspricht einem Tagesverbrauch von 24 kWh)</div>
+
+  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-descriptionweeklyBarThisWeek" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Show information</span></button></p>
+  <div data-popover="" id="popover-descriptionweeklyBarThisWeek" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(101px, 106px);" data-popper-reference-hidden="" data-popper-placement="top-start">
+      <div class="p-3 space-y-2">
+          <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
+          <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
+          <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+          <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+          <a href="static.statistic.html" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
+      </div>
+      <div data-popper-arrow="" style="position: absolute; left: 0px; transform: translate(7px);"></div>
+  </div>
   <br><br><div class="mt-4 text-xl">Tagesverbrauch <b>letzte</b> Woche</div>
 
   <canvas id="weeklyBarLastWeek" class="mb-2" style="display: block; box-sizing: border-box; height: 219px; width: 439px;" width="439" height="219"></canvas>
@@ -117,7 +129,7 @@
   const dataweeklyBarLastWeek = {
     labels: labelsweeklyBarLastWeek,
     datasets: [{
-      data: [  ,  ,  ,  , 1140, 1030, 1232 ],
+      data: [ 1016, 874, 739, 925, 876, 872, 962 ],
       backgroundColor: [      
         "rgba(255, 99, 132, 0.2)",
         "rgba(255, 159, 64, 0.2)",
@@ -146,6 +158,18 @@
   };
   const weeklyBarLastWeek = new Chart( document.getElementById("weeklyBarLastWeek"), configweeklyBarLastWeek );
   </script>
-  <div class="text-sm">Durchschnittlicher Tagesverbrauch in Watt (ein Wert von 1000 Watt entspricht einem Tagesverbrauch von 24 kWh)</div>
+
+  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-descriptionweeklyBarLastWeek" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Show information</span></button></p>
+  <div data-popover="" id="popover-descriptionweeklyBarLastWeek" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(101px, 445px);" data-popper-reference-hidden="" data-popper-escaped="" data-popper-placement="top-start">
+      <div class="p-3 space-y-2">
+          <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
+          <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
+          <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+          <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+          <a href="static.statistic.html" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
+      </div>
+      <div data-popper-arrow="" style="position: absolute; left: 0px; transform: translate(7px);"></div>
   </div>
+  <br><br><br>
+</div>
 </body></html>
