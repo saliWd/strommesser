@@ -56,7 +56,7 @@ function printErrorAndDie (string $heading, string $text): void {
     <title>Error page</title>
     <meta name="description" content="a generic error page" />  
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="css/verbrauch.css" type="text/css" />';    
+    <link rel="stylesheet" href="strommesser.css" type="text/css" />';
   echo '</head><body><div class="row twelve columns textBox"><h4>'.$heading.'</h4><p>'.$text.'</p></div></body></html>';
   die();
 }
@@ -229,12 +229,17 @@ function printWeeklyGraph (string $val_y, string $chartId):void {
   };
   const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
   </script>
-  <div class="group">
-    <div class="grid grid-cols-2 gap-4 w-20 items-center">
-      <div class="w-10"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
-      <div class="underline">Info</div>
-    </div>
-    <div class="hidden group-hover:block text-sm">Durchschnittlicher Tagesverbrauch in Watt (ein Wert von 1000 Watt entspricht einem Tagesverbrauch von 24 kWh)</div>
+
+  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Show information</span></button></p>
+  <div data-popover id="popover-description'.$chartId.'" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
+      <div class="p-3 space-y-2">
+          <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
+          <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
+          <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+          <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+          <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
+      </div>
+      <div data-popper-arrow></div>
   </div>
   ';
 }
@@ -254,6 +259,7 @@ function printBeginOfPage(bool $enableReload, string $timerange, string $site, s
     $scripts = '<script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>
+  <script src="script/flowbite.min.js"></script>
   ';
   } 
   
@@ -262,6 +268,7 @@ function printBeginOfPage(bool $enableReload, string $timerange, string $site, s
   echo '<meta name="description" content="zeigt deinen Energieverbrauch" />  
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="strommesser.css" type="text/css" />
+  <link rel="stylesheet" href="flowbite.min.css" type="text/css" />
   '.$scripts;  
   if ($enableReload) {
     echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1'.$timerange.'">

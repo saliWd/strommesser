@@ -11,8 +11,7 @@ module.exports = {
           300: '#9ae6b4',
           700: '#2f855a',          
         },        
-      },
-      display: ["group-hover"],
+      }
     },
   },
   plugins: [],
