@@ -229,7 +229,13 @@ function printWeeklyGraph (string $val_y, string $chartId):void {
   };
   const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
   </script>
-  <div class="text-sm">Durchschnittlicher Tagesverbrauch in Watt (ein Wert von 1000 Watt entspricht einem Tagesverbrauch von 24 kWh)</div>
+  <div class="group">
+    <div class="grid grid-cols-2 gap-4 w-20 items-center">
+      <div class="w-10"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+      <div class="underline">Info</div>
+    </div>
+    <div class="hidden group-hover:block text-sm">Durchschnittlicher Tagesverbrauch in Watt (ein Wert von 1000 Watt entspricht einem Tagesverbrauch von 24 kWh)</div>
+  </div>
   ';
 }
 

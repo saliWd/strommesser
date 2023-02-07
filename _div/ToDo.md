@@ -3,7 +3,7 @@
 1. StromMesser wordpress
    1. fill with more content: explanation?   
 2. StromMesser/verbrauch
-   1. statistik: per day, per week, per month (additional page or below graph)     
+   1. statistik: per week, per month (additional page and below graph)     
    1. settings.php
    1. getRaw.php
    1. index.php

@@ -172,4 +172,5 @@ printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarLastWeek');
 
 
 ?>
+<br /><br /><br />
 </div></body></html>
