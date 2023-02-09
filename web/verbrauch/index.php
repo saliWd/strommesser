@@ -157,8 +157,33 @@ foreach ($submitTexts as $submitText) {
   echo '<a id="range_'.$submitText[0].'h_link" href="index.php?range='.$submitText[0].$reloadLink.'" '.$submitText[2].'>'.$submitText[1].'</a>';
 }
 echo '<br><br>
-<hr>Insgesamt '.$totalCount.' Einträge
-';
+<hr>
+<div class="flex items-center">
+  <div class="text-sm font-light text-gray-500">
+    Info / Details:
+    <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button">
+    <svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+    </svg><span class="sr-only">Show information</span></button>  
+  </div>
+  <div class="flex-auto ml-6 text-right">Insgesamt '.$totalCount.' Einträge</div>
+</div>
+<div data-popover id="popover-descriptionIndex" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
+    <div class="p-3 space-y-2">
+        <h3 class="font-semibold text-gray-900">Verbrauch in Watt (blau)</h3>
+        <p>Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 0.001 kWh, d.h. 1 Wh = 3600 W über einen Zeitraum von ca. zwei Minuten = 120 Sekunden. Für die einzelne Wattmessung entspricht das einer Auflösung von ca. 30 W. Dies wird in blau auf der linken Skala logarithmisch aufgetragen.</p>
+        <p>Werte von 0 W werden dabei als 10 W dargestellt (0 ist auf der Log-Skala schwierig)</p>
+        <h3 class="font-semibold text-gray-900">Verbrauch Total (rot)</h3>
+        <p>Der Totalverbrauch (in 0.001 kWh-Auflösung) wird rot und auf der rechten Skala aufgetragen. Diese Skala beginnt immer bei 0 kWh.</p>
+        <h3 class="font-semibold text-gray-900">Zeitliche Auflösung (x-Achse)</h3>
+        <p>Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 72 Stunden), bzw. mit einem Punkt pro Tag (älter). </p>
+        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
+    </div>
+    <div data-popper-arrow></div>
+</div>
+<br>';
 
 $val_y = getDailyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
 printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarThisWeek', title:'diese');
