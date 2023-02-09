@@ -17,9 +17,10 @@ def writeFile(fileName, fileContent):
 
 def getPage(driver, page, testNum, subTest):
   from functions import printOkOrNot
-  driver.get('https://strommesser.ch/verbrauch/'+page+'.php')
-  # time.sleep(1)
-  writeFile(fileName='staticHtml/static.'+page, fileContent=driver.page_source)    
+  driver.get('view-source:https://strommesser.ch/verbrauch/'+page+'.php')
+  pageSource=driver.find_element(By.TAG_NAME, 'html').text
+  writeFile(fileName='staticHtml/static.'+page, fileContent=pageSource)
+
   modDescription = [(str(testNum)+"."+str(subTest)), 'getStatic_'+page] 
   printOkOrNot(ok=True, testNum=modDescription[0], text=modDescription[1])
   return subTest + 1
@@ -29,22 +30,22 @@ def getStatic(driver, testNum):
   from functions import doLoginCorrect, printOkOrNot
   subTest = 1
   
-  driver.get("https://strommesser.ch/verbrauch/login.php")
-  # time.sleep(1)
-  writeFile(fileName='staticHtml/static.login', fileContent=driver.page_source)    
+  driver.get("view-source:https://strommesser.ch/verbrauch/login.php")
+  pageSource=driver.find_element(By.TAG_NAME, 'html').text
+  writeFile(fileName='staticHtml/static.login', fileContent=pageSource)    
   modDescription = [(str(testNum)+"."+str(subTest)), "getStatic_login"] 
   
   doLoginCorrect(driver, modDescription) # after this, I'm on index.php site
   subTest = subTest + 1
 
-  ranges = ('1h','6h','24h','25h')
+  ranges = ('1','6','24','25')
   
   for range in ranges:
-    menuLink = driver.find_element(By.ID, 'range_'+range+'_link')
-    menuLink.click()
-    # time.sleep(1)
-    writeFile(fileName='staticHtml/static.index.'+range, fileContent=driver.page_source)    
+    url = '?range='+range
+    driver.get("view-source:https://strommesser.ch/verbrauch/index.php"+url)
+    pageSource=driver.find_element(By.TAG_NAME, 'html').text
 
+    writeFile(fileName='staticHtml/static.index.'+range+'h', fileContent=pageSource)
     modDescription = [(str(testNum)+"."+str(subTest)), "getStatic_range_"+range] 
     printOkOrNot(ok=True, testNum=modDescription[0], text=modDescription[1])
 
@@ -53,7 +54,6 @@ def getStatic(driver, testNum):
 
   subTest = getPage(driver, 'settings', testNum, subTest)
   subTest = getPage(driver, 'statistic', testNum, subTest)
-
 
   return True
 # end def

@@ -1,9 +1,11 @@
-<html><head>
-  <meta charset="utf-8">
+<!DOCTYPE html>
+  <html>
+  <head>
+  <meta charset="utf-8" />
   <title>StromMesser Statistiken</title>
-  <meta name="description" content="zeigt deinen Energieverbrauch">  
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="strommesser.css" type="text/css">
+  <meta name="description" content="zeigt deinen Energieverbrauch" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="strommesser.css" type="text/css" />
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>
@@ -32,14 +34,14 @@
   <h1 class="text-2xl m-2">Statistiken</h1>
   <div class="mt-4">Tagesverbrauch diese Woche</div>
 
-  <canvas id="weeklyBar" class="mb-2" style="display: block; box-sizing: border-box; height: 228px; width: 456px;" width="456" height="228"></canvas>
+  <canvas id="weeklyBar" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctxweeklyBar = document.getElementById("weeklyBar");
   const labelsweeklyBar = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
   const dataweeklyBar = {
     labels: labelsweeklyBar,
     datasets: [{
-      data: [ 829, 785,  ,  ,  ,  ,   ],
+      data: [ 829, 884, 968, 1335,  ,  ,   ],
       backgroundColor: [      
         "rgba(255, 99, 132, 0.2)",
         "rgba(255, 159, 64, 0.2)",
@@ -70,7 +72,7 @@
   </script>
 
   <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-descriptionweeklyBar" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Show information</span></button></p>
-  <div data-popover="" id="popover-descriptionweeklyBar" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(101px, -293px);" data-popper-placement="top-start">
+  <div data-popover id="popover-descriptionweeklyBar" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
       <div class="p-3 space-y-2">
           <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
           <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
@@ -78,9 +80,8 @@
           <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
           <a href="static.statistic.html" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
       </div>
-      <div data-popper-arrow="" style="position: absolute; left: 0px; transform: translate(7px);"></div>
+      <div data-popper-arrow></div>
   </div>
   
 <a class="underline" href="static.statistic.html">letzte Woche</a><hr>
-</div>
-</body></html>
+</div></body></html>
