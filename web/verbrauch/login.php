@@ -135,7 +135,7 @@ if ($doSafe === 0) {
 } elseif ($doSafe === 2) {
   sessionAndCookieDelete();
   printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', title:'Log out');
-  echo '<p>log out ok, zurück zur <a href="../wp/index.php">Startseite</a></p>';
+  echo '<p>log out ok, zurück zur <a href="../index.php" class="underline">Startseite</a></p>';
 } elseif ($doSafe === 3) {  
   processLoginData(
     dbConn:$dbConn,

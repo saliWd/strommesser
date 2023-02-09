@@ -52,11 +52,11 @@ function error (int $errorMsgNum): bool {
 function printErrorAndDie (string $heading, string $text): void {
   echo '
   <!DOCTYPE html><html><head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
     <title>Error page</title>
-    <meta name="description" content="a generic error page" />  
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="strommesser.css" type="text/css" />';
+    <meta name="description" content="a generic error page">  
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="strommesser.css" type="text/css">';
   echo '</head><body><div class="row twelve columns textBox"><h4>'.$heading.'</h4><p>'.$text.'</p></div></body></html>';
   die();
 }
@@ -191,8 +191,9 @@ function getDailyValues($dbConn, int $weeksPast, int $userid):string {
   return $val_y;
 }
 
-function printWeeklyGraph (string $val_y, string $chartId):void {
+function printWeeklyGraph (string $val_y, string $chartId, string $title):void {
   echo '
+  <div class="mt-4 text-xl">Tagesverbrauch <b>'.$title.'</b> Woche</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
@@ -252,7 +253,7 @@ function printBeginOfPage(bool $enableReload, string $timerange, string $site, s
   echo '<!DOCTYPE html>
   <html>
   <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   ';
   $scripts = '';
   if (($site === "index.php") or ($site === 'statistic.php')) {
@@ -265,9 +266,9 @@ function printBeginOfPage(bool $enableReload, string $timerange, string $site, s
   
   echo '<title>StromMesser '.$title.'</title>
   ';
-  echo '<meta name="description" content="zeigt deinen Energieverbrauch" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="strommesser.css" type="text/css" />
+  echo '<meta name="description" content="zeigt deinen Energieverbrauch">  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="strommesser.css" type="text/css">
   '.$scripts;  
   if ($enableReload) {
     echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1'.$timerange.'">

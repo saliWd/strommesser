@@ -20,13 +20,11 @@ $weeksPast = safeIntFromExt(source:'GET', varName:'weeksPast', length:2); //
 $lastOrThis = ($weeksPast === 0) ? 'diese' : 'letzte';
 $lastWkLnk = ($weeksPast === 0) ? '?weeksPast=1">letzte' : '">diese'; // TODO: clickable triangles to scroll through the weeks
 
-echo '<div class="mt-4">Tagesverbrauch '.$lastOrThis.' Woche</div>
-';
 $val_y = getDailyValues(dbConn:$dbConn, weeksPast:$weeksPast, userid:$userid);
-printWeeklyGraph (val_y:$val_y, chartId:'weeklyBar');
+printWeeklyGraph (val_y:$val_y, chartId:'weeklyBar', title:$lastOrThis);
 echo '
 <a class="underline" href="statistic.php'.$lastWkLnk.' Woche</a><hr>
 ';
 
 ?>
-</div></body></html>
+<br><br></div></body></html>

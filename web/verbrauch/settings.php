@@ -16,18 +16,18 @@ if ($doSafe === 0) { // entry point of this site
     $row = $result->fetch_assoc();
 
     echo '
-    <img class="w-48 mx-auto" src="img/display.jpg" alt="Anzeige Stromverbrauch. Mit einem kleinen, stromsparenden Bildschirm und gut sichtbarer LED" />
+    <img class="w-48 mx-auto" src="img/display.jpg" alt="Anzeige Stromverbrauch. Mit einem kleinen, stromsparenden Bildschirm und gut sichtbarer LED">
     <p>&nbsp;</p>
     <form id="settingsValues" action="settings.php?do=2" method="post">
-      <p class="text-left"><b>Maximalwert Farbskala:</b><br />
-      LED und Minibildschirm zeigen den aktuellen Verbrauch mit einer Farbskala von blau über grün nach gelb und schlussendlich rot.<br />
+      <p class="text-left"><b>Maximalwert Farbskala:</b><br>
+      LED und Minibildschirm zeigen den aktuellen Verbrauch mit einer Farbskala von blau über grün nach gelb und schlussendlich rot.<br>
       0 Watt entspricht der Farbe blau, der Maximalwert (und alles darüber) wird rot angezeigt.</p>          
-      <p class="mx-auto"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="'.$LIMIT_LED_MAX_VALUE.'" step="20" value="'.$row['ledMaxValue'].'" class="range" oninput="this.nextElementSibling.value=this.value"/> <output>'.$row['ledMaxValue'].'</output>W</p>
-      <hr />
-      <p class="text-left"><b>LED Helligkeit:</b><br />
-      Die Helligkeit der farbigen LED. Von 0 (ausgeschaltet) bis 255.<br />
+      <p class="mx-auto"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="'.$LIMIT_LED_MAX_VALUE.'" step="20" value="'.$row['ledMaxValue'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledMaxValue'].'</output>W</p>
+      <hr>
+      <p class="text-left"><b>LED Helligkeit:</b><br>
+      Die Helligkeit der farbigen LED. Von 0 (ausgeschaltet) bis 255.<br>
       In der Nacht (22 Uhr bis 6 Uhr) leuchtet sie übrigens 50% dunkler.</p>
-      <p class="mx-auto"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="'.$LIMIT_LED_BRIGHTNESS.'" step="5" value="'.$row['ledBrightness'].'" class="range" oninput="this.nextElementSibling.value=this.value"/> <output>'.$row['ledBrightness'].'</output></p>
+      <p class="mx-auto"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="'.$LIMIT_LED_BRIGHTNESS.'" step="5" value="'.$row['ledBrightness'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledBrightness'].'</output></p>
       <p class="mx-auto"><input id="settingsFormSubmit" class="mt-8 input-text mx-auto" name="settingsFormSubmit" type="submit" value="speichern"></p>
       <p>&nbsp;</p>
     </form>';

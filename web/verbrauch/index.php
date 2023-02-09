@@ -129,10 +129,10 @@ if ($totalCount > 0) {// this may be 0
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>';
   } else {
-    echo '<br /><br /> - weniger als '.$GRAPH_LIMIT.' Einträge - <br /><br /><br />';
+    echo '<br><br> - weniger als '.$GRAPH_LIMIT.' Einträge - <br><br><br>';
   }    
 } else {
-  echo '<br /><br /> - noch keine Einträge - <br /><br /><br />';
+  echo '<br><br> - noch keine Einträge - <br><br><br>';
 }
 
 $checkedText = '';
@@ -156,21 +156,20 @@ echo '
 foreach ($submitTexts as $submitText) {
   echo '<a id="range_'.$submitText[0].'h_link" href="index.php?range='.$submitText[0].$reloadLink.'" '.$submitText[2].'>'.$submitText[1].'</a>';
 }
-echo '<br /><br />
-<hr>Insgesamt '.$totalCount.' Einträge<br /><br />
+echo '<br><br>
+<hr>Insgesamt '.$totalCount.' Einträge
 ';
 
-echo '<div class="mt-4 text-xl">Tagesverbrauch <b>diese</b> Woche</div>
-';
 $val_y = getDailyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
-printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarThisWeek');
-
-echo '<br /><br /><div class="mt-4 text-xl">Tagesverbrauch <b>letzte</b> Woche</div>
+printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarThisWeek', title:'diese');
+echo '<br>
+<br>
 ';
+
 $val_y = getDailyValues(dbConn:$dbConn, weeksPast:1, userid:$userid);
-printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarLastWeek');
+printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarLastWeek', title:'letzte');
 
 
 ?>
-<br /><br /><br />
+<br><br>
 </div></body></html>

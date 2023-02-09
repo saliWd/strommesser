@@ -1,11 +1,11 @@
 <!DOCTYPE html>
   <html>
   <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>StromMesser Statistiken</title>
-  <meta name="description" content="zeigt deinen Energieverbrauch" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="strommesser.css" type="text/css" />
+  <meta name="description" content="zeigt deinen Energieverbrauch">  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="strommesser.css" type="text/css">
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>
@@ -32,8 +32,8 @@
   </nav>
   <div class="container mx-auto px-4 py-2 lg text-center">
   <h1 class="text-2xl m-2">Statistiken</h1>
-  <div class="mt-4">Tagesverbrauch diese Woche</div>
-
+  
+  <div class="mt-4 text-xl">Tagesverbrauch <b>diese</b> Woche</div>
   <canvas id="weeklyBar" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctxweeklyBar = document.getElementById("weeklyBar");
@@ -41,7 +41,7 @@
   const dataweeklyBar = {
     labels: labelsweeklyBar,
     datasets: [{
-      data: [ 829, 884, 968, 1335,  ,  ,   ],
+      data: [ 829, 884, 968, 1267,  ,  ,   ],
       backgroundColor: [      
         "rgba(255, 99, 132, 0.2)",
         "rgba(255, 159, 64, 0.2)",
@@ -84,4 +84,4 @@
   </div>
   
 <a class="underline" href="static.statistic.html">letzte Woche</a><hr>
-</div></body></html>
+<br><br></div></body></html>
