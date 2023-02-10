@@ -16,15 +16,12 @@ $dbConn = initialize();
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 printBeginOfPage(enableReload:FALSE, timerange:'', site:'statistic.php', title:'Statistiken');
 
-$weeksPast = safeIntFromExt(source:'GET', varName:'weeksPast', length:2); // 
-$lastOrThis = ($weeksPast === 0) ? 'diese' : 'letzte';
-$lastWkLnk = ($weeksPast === 0) ? '?weeksPast=1">letzte' : '">diese'; // TODO: clickable triangles to scroll through the weeks
+echo ''; // TODO: print links to the anchors
+$val_y = getDailyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
+printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarThisWeek', title:'diese');
 
-$val_y = getDailyValues(dbConn:$dbConn, weeksPast:$weeksPast, userid:$userid);
-printWeeklyGraph (val_y:$val_y, chartId:'weeklyBar', title:$lastOrThis);
-echo '
-<a class="underline" href="statistic.php'.$lastWkLnk.' Woche</a><hr>
-';
+$val_y = getDailyValues(dbConn:$dbConn, weeksPast:1, userid:$userid);
+printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarLastWeek', title:'letzte');
 
 ?>
-<br><br></div></body></html>
+</div></body></html>

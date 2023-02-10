@@ -156,8 +156,11 @@ function printNavMenu (string $siteSafe): void {
 function getDailyValues($dbConn, int $weeksPast, int $userid):string {
   $mWeeks = $weeksPast + 1; // for the current week, I need to search for the last Monday (not this Monday). So one week back
 
-  $minusWeekArr = array($mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks-1); // 0 to 7. Last one is Monday one week later
+  $minusWeekArr = array($mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks); // 0 to 7
   $weekday = (int)(date_create()->format('N')); // N: 1 (for Monday) through 7 (for Sunday)
+  if ($weekday === 7) {
+    $minusWeekArr[7] = $minusWeekArr[7] - 1; // Last one is Monday one week later if we are on Sunday
+  }
   for ($i = $weekday - 1; $i < 8; $i++) { // i = 0 .. 7
     $minusWeekArr[$i] = $minusWeekArr[$i] - 1; // one week less
   }
@@ -177,6 +180,7 @@ function getDailyValues($dbConn, int $weeksPast, int $userid):string {
     // for some entries, this sql will return the sum of only one line (thin = 24), for others 24 and for the newest ones it returns the sum of lots of entries 
     $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
     $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dailyStrings[$i].'" AND `zeit` < "'.$dailyStrings[$i+1].'";';
+    // echo $sql.'<br>';
     $result = $dbConn->query($sql); // returns only one row
     $row = $result->fetch_assoc();
     
@@ -242,6 +246,8 @@ function printWeeklyGraph (string $val_y, string $chartId, string $title):void {
       </div>
       <div data-popper-arrow></div>
   </div>
+  <br>
+  <br>
   ';
 }
 

@@ -172,11 +172,10 @@ echo '<br><br>
     <div class="p-3 space-y-2">
         <h3 class="font-semibold text-gray-900">Verbrauch in Watt (blau)</h3>
         <p>Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 0.001 kWh, d.h. 1 Wh = 3600 W über einen Zeitraum von ca. zwei Minuten = 120 Sekunden. Für die einzelne Wattmessung entspricht das einer Auflösung von ca. 30 W. Dies wird in blau auf der linken Skala logarithmisch aufgetragen.</p>
-        <p>Werte von 0 W werden dabei als 10 W dargestellt (0 ist auf der Log-Skala schwierig)</p>
         <h3 class="font-semibold text-gray-900">Verbrauch Total (rot)</h3>
-        <p>Der Totalverbrauch (in 0.001 kWh-Auflösung) wird rot und auf der rechten Skala aufgetragen. Diese Skala beginnt immer bei 0 kWh.</p>
+        <p>Der Totalverbrauch (in Wh-Auflösung) wird rot und auf der rechten Skala aufgetragen. Diese Skala beginnt immer bei 0 kWh.</p>
         <h3 class="font-semibold text-gray-900">Zeitliche Auflösung (x-Achse)</h3>
-        <p>Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 72 Stunden), bzw. mit einem Punkt pro Tag (älter). </p>
+        <p>Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 72 Stunden), bzw. mit einem Punkt pro Tag (älter).</p>
         <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
         <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
         <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
@@ -187,13 +186,6 @@ echo '<br><br>
 
 $val_y = getDailyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
 printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarThisWeek', title:'diese');
-echo '<br>
-<br>
-';
-
-$val_y = getDailyValues(dbConn:$dbConn, weeksPast:1, userid:$userid);
-printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarLastWeek', title:'letzte');
-
 
 ?>
 <br><br>

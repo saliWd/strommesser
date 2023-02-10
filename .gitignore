@@ -3,6 +3,7 @@ pico_w/my_config_austr10.py
 _div/tailwindcss/package-lock.json
 _div/tailwindcss/package.json
 _div/tailwindcss/node_modules/*
+_div/tailwindcss/script/*
 web/verbrauch/tmp.html
 _div/verification/geckodriver.log
 _div/verification/__pycache__/*
