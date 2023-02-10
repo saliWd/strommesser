@@ -17,10 +17,10 @@ $userid = getUserid(); // this will get a valid return because if not, the initi
 printBeginOfPage(enableReload:FALSE, timerange:'', site:'statistic.php', title:'Statistiken');
 
 echo ''; // TODO: print links to the anchors
-$val_y = getDailyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
+$val_y = getWeeklyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
 printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarThisWeek', title:'diese');
 
-$val_y = getDailyValues(dbConn:$dbConn, weeksPast:1, userid:$userid);
+$val_y = getWeeklyValues(dbConn:$dbConn, weeksPast:1, userid:$userid);
 printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarLastWeek', title:'letzte');
 
 ?>

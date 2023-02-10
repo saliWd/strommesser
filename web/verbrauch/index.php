@@ -184,7 +184,7 @@ echo '<br><br>
 </div>
 <br>';
 
-$val_y = getDailyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
+$val_y = getWeeklyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
 printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarThisWeek', title:'diese');
 
 ?>
