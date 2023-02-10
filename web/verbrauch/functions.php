@@ -182,7 +182,7 @@ function getMonthlyValues($dbConn, int $userid):array {
 
 function printMonthlyGraph (string $val_x, string $val_y, string $chartId):void {
   echo '
-  <div class="mt-4 text-xl">Tagesverbrauch diesen Monat</div>
+  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch diesen Monat</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
@@ -257,8 +257,9 @@ function getWeeklyValues($dbConn, int $weeksPast, int $userid):string {
 }
 
 function printWeeklyGraph (string $val_y, string $chartId, string $title):void {
+  $colors = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
   echo '
-  <div class="mt-4 text-xl">Tagesverbrauch <b>'.$title.'</b> Woche</div>
+  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch <b>'.$title.'</b> Woche</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
@@ -267,24 +268,18 @@ function printWeeklyGraph (string $val_y, string $chartId, string $title):void {
     labels: labels'.$chartId.',
     datasets: [{
       data: '.$val_y.',
-      backgroundColor: [      
-        "rgba(255, 99, 132, 0.2)",
-        "rgba(255, 159, 64, 0.2)",
-        "rgba(255, 205, 86, 0.2)",
-        "rgba(75, 192, 192, 0.2)",
-        "rgba(54, 162, 235, 0.2)",
-        "rgba(153, 102, 255, 0.2)",
-        "rgba(201, 203, 207, 0.2)"
-      ],
-      borderColor: [
-        "rgb(255, 99, 132)",
-        "rgb(255, 159, 64)",
-        "rgb(255, 205, 86)",
-        "rgb(75, 192, 192)",
-        "rgb(54, 162, 235)",
-        "rgb(153, 102, 255)",
-        "rgb(201, 203, 207)"
-      ],
+      backgroundColor: [';
+      for($i = 0; $i < 7; $i++) {
+        echo '"rgba('.$colors[$i].', 0.2)"';
+        if($i != 6) { echo ",\n"; }
+      }
+      echo '    ],
+      borderColor: [';
+      for($i = 0; $i < 7; $i++) {
+        echo '"rgba('.$colors[$i].')"';
+        if($i != 6) { echo ",\n"; }
+      }
+      echo '],
       borderWidth: 1
     }]
   };
