@@ -153,6 +153,10 @@ function printNavMenu (string $siteSafe): void {
   </nav>';
 }
 
+function printMonthly($dbConn, int $userid):void {  
+  printMonthlyGraph (values:getMonthlyValues(dbConn:$dbConn, userid:$userid), chartId:'MonthlyNow');
+}
+
 function getMonthlyValues($dbConn, int $userid):array {
   $yearMonthStr = (date_create()->format('Y-m-'));
   $lastDay = (int)date_create('last day of this month 00:00')->format('d');
@@ -177,20 +181,35 @@ function getMonthlyValues($dbConn, int $userid):array {
   }
   $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
   $val_x = substr($val_x, 0, -2).' ]';
-  return [$val_x, $val_y];
+  return [$val_x, $val_y, $lastDay];
 }
 
-function printMonthlyGraph (string $val_x, string $val_y, string $chartId):void {
+function printMonthlyGraph (array $values, string $chartId):void {
+  $colors = ['255,159,64','255,205,86','75,192,192','153,102,255','201,203,207'];
+  $len = $values[2];
   echo '
   <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch diesen Monat</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
-  const labels'.$chartId.' = '.$val_x.';
+  const labels'.$chartId.' = '.$values[0].';
   const data'.$chartId.' = {
     labels: labels'.$chartId.',
     datasets: [{
-      data: '.$val_y.',      
+      data: '.$values[1].',
+      backgroundColor: [';
+      for($i = 0; $i < $len; $i++) {
+        echo '"rgba('.$colors[($i % 5)].', 0.2)"';
+        if($i != ($len-1)) { echo ",\n"; }
+      }
+      echo '    ],
+      borderColor: [';
+      for($i = 0; $i < $len; $i++) {
+        echo '"rgba('.$colors[($i % 5)].')"';
+        if($i != ($len - 1)) { echo ",\n"; }
+      }
+      echo '],
+      borderWidth: 1
     }]
   };
   const config'.$chartId.' = {

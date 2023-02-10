@@ -27,8 +27,6 @@ printWeeklyGraph (val_y:$val_y, chartId:'WeeklyNow', title:'diese');
 $val_y = getWeeklyValues(dbConn:$dbConn, weeksPast:1, userid:$userid);
 printWeeklyGraph (val_y:$val_y, chartId:'WeeklyLast', title:'letzte');
 
-[$val_x, $val_y] = getMonthlyValues(dbConn:$dbConn, userid:$userid);
-printMonthlyGraph (val_x:$val_x, val_y:$val_y, chartId:'MonthlyNow');
-
+printMonthly(dbConn:$dbConn, userid:$userid);
 ?>
 </div></body></html>
