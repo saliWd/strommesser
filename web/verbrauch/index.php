@@ -187,6 +187,10 @@ echo '<br><br>
 $val_y = getWeeklyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
 printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarThisWeek', title:'diese');
 
+[$val_x, $val_y] = getMonthlyValues(dbConn:$dbConn, userid:$userid);
+printMonthlyGraph (val_x:$val_x, val_y:$val_y, chartId:'monthlyBarThisWeek');
+
+
 ?>
 <br><br>
 </div></body></html>

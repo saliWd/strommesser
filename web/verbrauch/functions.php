@@ -180,36 +180,17 @@ function getMonthlyValues($dbConn, int $userid):array {
   return [$val_x, $val_y];
 }
 
-function printMonthlyGraph (string $val_y, string $chartId):void {
+function printMonthlyGraph (string $val_x, string $val_y, string $chartId):void {
   echo '
   <div class="mt-4 text-xl">Tagesverbrauch diesen Monat</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
-  const labels'.$chartId.' = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
+  const labels'.$chartId.' = '.$val_x.';
   const data'.$chartId.' = {
     labels: labels'.$chartId.',
     datasets: [{
-      data: '.$val_y.',
-      backgroundColor: [      
-        "rgba(255, 99, 132, 0.2)",
-        "rgba(255, 159, 64, 0.2)",
-        "rgba(255, 205, 86, 0.2)",
-        "rgba(75, 192, 192, 0.2)",
-        "rgba(54, 162, 235, 0.2)",
-        "rgba(153, 102, 255, 0.2)",
-        "rgba(201, 203, 207, 0.2)"
-      ],
-      borderColor: [
-        "rgb(255, 99, 132)",
-        "rgb(255, 159, 64)",
-        "rgb(255, 205, 86)",
-        "rgb(75, 192, 192)",
-        "rgb(54, 162, 235)",
-        "rgb(153, 102, 255)",
-        "rgb(201, 203, 207)"
-      ],
-      borderWidth: 1
+      data: '.$val_y.',      
     }]
   };
   const config'.$chartId.' = {
@@ -223,7 +204,7 @@ function printMonthlyGraph (string $val_y, string $chartId):void {
   <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Show information</span></button></p>
   <div data-popover id="popover-description'.$chartId.'" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
       <div class="p-3 space-y-2">
-          <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
+          <h3 class="font-semibold text-gray-900">Tagesverbrauch pro Monat</h3>
           <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
           <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
           <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
@@ -231,7 +212,7 @@ function printMonthlyGraph (string $val_y, string $chartId):void {
       </div>
       <div data-popper-arrow></div>
   </div>
-  <br>
+  <hr>
   <br>
   ';
 }
@@ -326,7 +307,7 @@ function printWeeklyGraph (string $val_y, string $chartId, string $title):void {
       </div>
       <div data-popper-arrow></div>
   </div>
-  <br>
+  <hr>
   <br>
   ';
 }

@@ -23,5 +23,8 @@ printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarThisWeek', title:'diese');
 $val_y = getWeeklyValues(dbConn:$dbConn, weeksPast:1, userid:$userid);
 printWeeklyGraph (val_y:$val_y, chartId:'weeklyBarLastWeek', title:'letzte');
 
+[$val_x, $val_y] = getMonthlyValues(dbConn:$dbConn, userid:$userid);
+printMonthlyGraph (val_x:$val_x, val_y:$val_y, chartId:'monthlyBarThisWeek');
+
 ?>
 </div></body></html>
