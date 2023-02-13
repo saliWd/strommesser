@@ -278,7 +278,7 @@ function getWeeklyValues($dbConn, int $weeksPast, int $userid):string {
 function printWeeklyGraph (string $val_y, string $chartId, string $title):void {
   $colors = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
   echo '
-  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch <b>'.$title.'</b> Woche</div>
+  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch '.$title.' Woche</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
