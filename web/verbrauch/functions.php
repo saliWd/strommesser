@@ -154,13 +154,13 @@ function printNavMenu (string $siteSafe): void {
 }
 
 function printMonthly($dbConn, int $userid):void {  
-  printBarGraph(values:getMonthlyValues(dbConn:$dbConn, userid:$userid), chartId:'MonthlyNow', title:'diesen Monat');
+  printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, isMonth:TRUE, weeksPast:0), chartId:'MonthlyNow', title:'diesen Monat');
 }
 
 function printWeekly($dbConn, int $userid, bool $twoWeeks):void {
-  printBarGraph(values:getWeeklyValues(dbConn:$dbConn, weeksPast:0, userid:$userid), chartId:'WeeklyNow', title:'diese Woche');
+  printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, isMonth:FALSE, weeksPast:0), chartId:'WeeklyNow', title:'diese Woche');
   if($twoWeeks) {
-    printBarGraph(values:getWeeklyValues(dbConn:$dbConn, weeksPast:1, userid:$userid), chartId:'WeeklyLast', title:'letzte Woche');  
+    printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, isMonth:FALSE, weeksPast:1), chartId:'WeeklyLast', title:'letzte Woche');  
   }  
 }
 
@@ -235,16 +235,40 @@ function printBarGraph (array $values, string $chartId, string $title):void {
   ';
 }
 
-function getMonthlyValues($dbConn, int $userid):array {
-  $yearMonthStr = (date_create()->format('Y-m-'));
-  $lastDay = (int)date_create('last day of this month 00:00')->format('d');
-  
+function getValues($dbConn, int $userid, bool $isMonth, int $weeksPast):array {
   $val_y = '[ ';
   $val_x = '[ ';
-  for ($i = 1; $i <= $lastDay; $i++) { // 1 to 28 (for February)
+  $dailyStrings = array();
+
+  if($isMonth) {
+    $yearMonthStr = (date_create()->format('Y-m-'));    
+    $lastDay = (int)date_create('last day of this month 00:00')->format('d');
+
+    for ($i = 1; $i <= $lastDay; $i++) { // 1 to 28 (for February)
+      array_push($dailyStrings, $yearMonthStr.$i); // NB: array index is 0..27
+    }
+  } else {
+    $lastDay = 7;
+    
+    $minusWeekArr = array($weeksPast,$weeksPast,$weeksPast,$weeksPast,$weeksPast,$weeksPast,$weeksPast); // 0 to 6
+    $weekday = (int)(date_create()->format('N')); // N: 1 (for Monday) through 7 (for Sunday)
+    for ($i = 0; $i < $weekday - 1; $i++) { // i = 0 .. 6
+      $minusWeekArr[$i] = $minusWeekArr[$i] + 1; // for the current week, I need to search for the last Monday (not this Monday). So one week back
+    }
+    // maybe: could be written more nicely?
+    array_push($dailyStrings, date_create('-'.$minusWeekArr[0].' week Monday 00:00')->format('Y-m-d '));
+    array_push($dailyStrings, date_create('-'.$minusWeekArr[1].' week Tuesday 00:00')->format('Y-m-d '));
+    array_push($dailyStrings, date_create('-'.$minusWeekArr[2].' week Wednesday 00:00')->format('Y-m-d '));
+    array_push($dailyStrings, date_create('-'.$minusWeekArr[3].' week Thursday 00:00')->format('Y-m-d ')); // last week (if today is Friday)
+    array_push($dailyStrings, date_create('-'.$minusWeekArr[4].' week Friday 00:00')->format('Y-m-d ')); // this week (if today is Friday)
+    array_push($dailyStrings, date_create('-'.$minusWeekArr[5].' week Saturday 00:00')->format('Y-m-d '));
+    array_push($dailyStrings, date_create('-'.$minusWeekArr[6].' week Sunday 00:00')->format('Y-m-d '));  
+  }
+  
+  for ($i = 0; $i < $lastDay; $i++) {
     // for some entries, this sql will return the sum of only one line (thin = 24), for others 24 and for the newest ones it returns the sum of lots of entries 
     $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-    $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$yearMonthStr.$i.' 00:00:00" AND `zeit` < "'.$yearMonthStr.$i.' 23:59:59";';
+    $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dailyStrings[$i].' 00:00:00" AND `zeit` <= "'.$dailyStrings[$i].' 23:59:59";';
     // echo $sql.'<br>';
     $result = $dbConn->query($sql); // returns only one row
     $row = $result->fetch_assoc();
@@ -255,50 +279,15 @@ function getMonthlyValues($dbConn, int $userid):array {
       $watt = ' ';
     }
     $val_y .= $watt.', ';
-    $val_x .= $i.', ';
+    $val_x .= ($i+1).', '; // only valid for month
   }
   $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
-  $val_x = substr($val_x, 0, -2).' ]';
+  if ($isMonth) {
+    $val_x = substr($val_x, 0, -2).' ]';
+  } else {
+    $val_x = '[ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ]'; 
+  }  
   return [$val_x, $val_y, $lastDay];
-}
-
-function getWeeklyValues($dbConn, int $weeksPast, int $userid):array {
-  $mWeeks = $weeksPast + 1; // for the current week, I need to search for the last Monday (not this Monday). So one week back
-
-  $minusWeekArr = array($mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks); // 0 to 6
-  $weekday = (int)(date_create()->format('N')); // N: 1 (for Monday) through 7 (for Sunday)
-  for ($i = $weekday - 1; $i < 7; $i++) { // i = 0 .. 6
-    $minusWeekArr[$i] = $minusWeekArr[$i] - 1; // one week less
-  }
-  $dailyStrings = array( // maybe: could this be done more nicely?
-    date_create('-'.$minusWeekArr[0].' week Monday 00:00')->format('Y-m-d '),
-    date_create('-'.$minusWeekArr[1].' week Tuesday 00:00')->format('Y-m-d '),
-    date_create('-'.$minusWeekArr[2].' week Wednesday 00:00')->format('Y-m-d '),
-    date_create('-'.$minusWeekArr[3].' week Thursday 00:00')->format('Y-m-d '), // last week (if today is Friday)
-    date_create('-'.$minusWeekArr[4].' week Friday 00:00')->format('Y-m-d '), // this week (if today is Friday)
-    date_create('-'.$minusWeekArr[5].' week Saturday 00:00')->format('Y-m-d '),
-    date_create('-'.$minusWeekArr[6].' week Sunday 00:00')->format('Y-m-d ')
-  );
-
-  $val_y = '[ ';
-  for ($i = 0; $i < 7; $i++) {
-    // for some entries, this sql will return the sum of only one line (thin = 24), for others 24 and for the newest ones it returns the sum of lots of entries 
-    $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-    $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dailyStrings[$i].'00:00:00" AND `zeit` <= "'.$dailyStrings[$i].'23:59:59";';
-    // echo $sql.'<br>';
-    $result = $dbConn->query($sql); // returns only one row
-    $row = $result->fetch_assoc();
-    
-    if ($row['sumZeitDiff'] > 0) { // divide by 0 exception
-      $watt = max(round($row['sumConsDiff']*3600*1000 / $row['sumZeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
-    } else {
-      $watt = ' ';
-    }
-    $val_y .= $watt.', ';
-  }
-  $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
-  $val_x = '[ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ]'; 
-  return [$val_x, $val_y, 7];
 }
 
 function printBeginOfPage(bool $enableReload, string $timerange, string $site, string $title):void {
