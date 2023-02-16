@@ -61,14 +61,15 @@ if ($totalCount > 0) {// this may be 0
   
   $zeitString = 'um '.$zeitNewest->format('Y-m-d H:i:s');
   if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
-    $zeitString = 'heute um '.$zeitNewest->format('H:i:s');
+    $zeitString = '('.$zeitNewest->format('H:i').')';
   }
   echo '<hr>
-  <div class="flex items-center">
-    <div>Verbrauch: <b>'.$newestConsumption.'W</b> '.$zeitString.'.</div>
-    <div class="flex-auto ml-6 text-right">Ø-Verbrauch: <b>'.$aveConsumption.'W</b></div>
+  <div class="flex">
+    <div class="flex-auto text-left">Verbrauch: <b>'.$newestConsumption.'W</b> '.$zeitString.'.</div>
+    <div class="flex-auto text-right">Ø-Verbrauch: <b>'.$aveConsumption.'W</b></div>
   </div>
-  <hr>';
+  <hr>
+  ';
 
   if ($queryCount >= $GRAPH_LIMIT) {
     $axis_x = ''; // rightmost value comes first. Remove something again after the while loop
