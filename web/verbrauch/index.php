@@ -53,18 +53,29 @@ if ($totalCount > 0) {// this may be 0
   if ($rowNewest['zeitDiff'] > 0) { // divide by 0 exception
       $newestConsumption = round($rowNewest['consDiff']*3600*1000 / $rowNewest['zeitDiff']); // kWh compared to seconds
   } else { $newestConsumption = 0.0; }
+
+  $zeitDiff = strtotime($rowNewest['zeit']) - strtotime($rowOldest['zeit']); // difference in seconds
+  if ($zeitDiff > 0) { // divide by 0 exception
+    $aveConsumption = round(($rowNewest['consumption'] - $rowOldest['consumption'])*3600*1000 / $zeitDiff); // kWh compared to seconds
+  } else { $aveConsumption = 0.0; }
   
   $zeitString = 'um '.$zeitNewest->format('Y-m-d H:i:s');
   if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
     $zeitString = 'heute um '.$zeitNewest->format('H:i:s');
   }
-  echo '<hr>Verbrauch: <b>'.$newestConsumption.'W</b> '.$zeitString.'<hr>';
+  echo '<hr>
+  <div class="flex items-center">
+    <div>Verbrauch: <b>'.$newestConsumption.'W</b> '.$zeitString.'.</div>
+    <div class="flex-auto ml-6 text-right">Ø-Verbrauch: <b>'.$aveConsumption.'W</b></div>
+  </div>
+  <hr>';
 
   if ($queryCount >= $GRAPH_LIMIT) {
     $axis_x = ''; // rightmost value comes first. Remove something again after the while loop
     $val_y0_consumption = '';
     $val_y1_watt = '';
     
+    $lastConsumption = 0;
     while ($row = $result->fetch_assoc()) { // did already fetch the newest one. At least 2 remaining  
       $consumption = $row['consumption'] - $rowOldest['consumption']; // to get a relative value (and not some huge numbers)
       if ($row['zeitDiff'] > 0) { // divide by 0 exception
@@ -74,8 +85,8 @@ if ($totalCount > 0) {// this may be 0
       // revert the ordering
       $axis_x = 'new Date("'.$row['zeit'].'"), '.$axis_x; // new Date("2020-03-01 12:00:12")
       $val_y0_consumption = $consumption.', '.$val_y0_consumption;
-      $val_y1_watt = $watt.', '.$val_y1_watt;
-    } // while 
+      $val_y1_watt = $watt.', '.$val_y1_watt;      
+    } // while
     // remove the last two caracters (a comma-space) and add the brackets before and after
     $axis_x = '[ '.substr($axis_x, 0, -2).' ]';
     $val_y0_consumption = '[ '.substr($val_y0_consumption, 0, -2).' ]';
