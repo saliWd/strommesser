@@ -21,11 +21,8 @@ echo '
   <a href="#anchorWeeklyLast" class="flex-auto underline">Letzte Woche</a>
   <a href="#anchorMonthlyNow" class="flex-auto underline">Diesen Monat</a>
 </div><br><br>';
-$val_y = getWeeklyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
-printWeeklyGraph (val_y:$val_y, chartId:'WeeklyNow', title:'diese');
 
-$val_y = getWeeklyValues(dbConn:$dbConn, weeksPast:1, userid:$userid);
-printWeeklyGraph (val_y:$val_y, chartId:'WeeklyLast', title:'letzte');
+printWeekly(dbConn:$dbConn, userid:$userid, twoWeeks:TRUE);
 
 printMonthly(dbConn:$dbConn, userid:$userid);
 ?>

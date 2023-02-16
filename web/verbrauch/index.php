@@ -193,8 +193,7 @@ echo '<br><br>
 </div>
 <br>';
 
-$val_y = getWeeklyValues(dbConn:$dbConn, weeksPast:0, userid:$userid);
-printWeeklyGraph (val_y:$val_y, chartId:'WeeklyNow', title:'diese');
+printWeekly(dbConn:$dbConn, userid:$userid, twoWeeks:FALSE);
 
 printMonthly(dbConn:$dbConn, userid:$userid);
 ?>

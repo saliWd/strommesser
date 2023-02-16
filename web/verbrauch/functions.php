@@ -157,6 +157,14 @@ function printMonthly($dbConn, int $userid):void {
   printMonthlyGraph (values:getMonthlyValues(dbConn:$dbConn, userid:$userid), chartId:'MonthlyNow');
 }
 
+function printWeekly($dbConn, int $userid, bool $twoWeeks):void {
+  printWeeklyGraph(values:getWeeklyValues(dbConn:$dbConn, weeksPast:0, userid:$userid), chartId:'WeeklyNow', title:'diese');
+  if($twoWeeks) {
+    printWeeklyGraph(values:getWeeklyValues(dbConn:$dbConn, weeksPast:1, userid:$userid), chartId:'WeeklyLast', title:'letzte');  
+  }  
+}
+
+
 function printColors(int $limit):void {
   $COLORS = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
   echo "\n      backgroundColor: [\n";
@@ -227,17 +235,17 @@ function printMonthlyGraph (array $values, string $chartId):void {
   <br>
   ';
 }
-function printWeeklyGraph (string $val_y, string $chartId, string $title):void {  
+function printWeeklyGraph (array $values, string $chartId, string $title):void {  
   echo '
   <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch '.$title.' Woche</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
-  const labels'.$chartId.' = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
+  const labels'.$chartId.' = '.$values[0].';
   const data'.$chartId.' = {
     labels: labels'.$chartId.',
     datasets: [{
-      data: '.$val_y.',';
+      data: '.$values[1].',';
       printColors(limit:7);
       echo '
       borderWidth: 1
@@ -292,7 +300,7 @@ function getMonthlyValues($dbConn, int $userid):array {
   return [$val_x, $val_y, $lastDay];
 }
 
-function getWeeklyValues($dbConn, int $weeksPast, int $userid):string {
+function getWeeklyValues($dbConn, int $weeksPast, int $userid):array {
   $mWeeks = $weeksPast + 1; // for the current week, I need to search for the last Monday (not this Monday). So one week back
 
   $minusWeekArr = array($mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks,$mWeeks); // 0 to 6
@@ -327,7 +335,8 @@ function getWeeklyValues($dbConn, int $weeksPast, int $userid):string {
     $val_y .= $watt.', ';
   }
   $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
-  return $val_y;
+  $val_x = '[ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ]'; 
+  return [$val_x, $val_y];
 }
 
 function printBeginOfPage(bool $enableReload, string $timerange, string $site, string $title):void {
