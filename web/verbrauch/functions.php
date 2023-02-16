@@ -154,16 +154,15 @@ function printNavMenu (string $siteSafe): void {
 }
 
 function printMonthly($dbConn, int $userid):void {  
-  printMonthlyGraph (values:getMonthlyValues(dbConn:$dbConn, userid:$userid), chartId:'MonthlyNow');
+  printBarGraph(values:getMonthlyValues(dbConn:$dbConn, userid:$userid), chartId:'MonthlyNow', title:'diesen Monat');
 }
 
 function printWeekly($dbConn, int $userid, bool $twoWeeks):void {
-  printWeeklyGraph(values:getWeeklyValues(dbConn:$dbConn, weeksPast:0, userid:$userid), chartId:'WeeklyNow', title:'diese');
+  printBarGraph(values:getWeeklyValues(dbConn:$dbConn, weeksPast:0, userid:$userid), chartId:'WeeklyNow', title:'diese Woche');
   if($twoWeeks) {
-    printWeeklyGraph(values:getWeeklyValues(dbConn:$dbConn, weeksPast:1, userid:$userid), chartId:'WeeklyLast', title:'letzte');  
+    printBarGraph(values:getWeeklyValues(dbConn:$dbConn, weeksPast:1, userid:$userid), chartId:'WeeklyLast', title:'letzte Woche');  
   }  
 }
-
 
 function printColors(int $limit):void {
   $COLORS = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
@@ -198,9 +197,9 @@ function printPopOverLnk(string $chartId):void {
 ';
 }
 
-function printMonthlyGraph (array $values, string $chartId):void {    
+function printBarGraph (array $values, string $chartId, string $title):void {  
   echo '
-  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch diesen Monat</div>
+  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch '.$title.'</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
@@ -210,43 +209,6 @@ function printMonthlyGraph (array $values, string $chartId):void {
     datasets: [{
       data: '.$values[1].',';
       printColors(limit:$values[2]);
-      echo '
-      borderWidth: 1
-    }]
-  };
-  const config'.$chartId.' = {
-    type: "bar",
-    data: data'.$chartId.',
-    options: { plugins : { legend: { display: false } } },
-  };
-  const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
-  </script>';
-  printPopOverLnk(chartId:$chartId);
-  echo '
-        <h3 class="font-semibold text-gray-900">Tagesverbrauch pro Monat</h3>
-        <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
-        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(questionMark:FALSE).'</a>
-      </div>
-    <div data-popper-arrow></div>
-  </div>
-  <hr>
-  <br>
-  ';
-}
-function printWeeklyGraph (array $values, string $chartId, string $title):void {  
-  echo '
-  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch '.$title.' Woche</div>
-  <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
-  <script>
-  const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
-  const labels'.$chartId.' = '.$values[0].';
-  const data'.$chartId.' = {
-    labels: labels'.$chartId.',
-    datasets: [{
-      data: '.$values[1].',';
-      printColors(limit:7);
       echo '
       borderWidth: 1
     }]
@@ -336,7 +298,7 @@ function getWeeklyValues($dbConn, int $weeksPast, int $userid):array {
   }
   $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
   $val_x = '[ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ]'; 
-  return [$val_x, $val_y];
+  return [$val_x, $val_y, 7];
 }
 
 function printBeginOfPage(bool $enableReload, string $timerange, string $site, string $title):void {
