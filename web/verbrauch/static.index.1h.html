@@ -34,27 +34,27 @@
   <h1 class="text-2xl m-2">Verbrauch</h1>
   <hr>
   <div class="flex">
-    <div class="flex-auto text-left">Verbrauch: <b>0W</b> (12:34).</div>
-    <div class="flex-auto text-right">Ø-Verbrauch: <b>227W</b></div>
+    <div class="flex-auto text-left">Verbrauch: <b>0W</b> (13:11).</div>
+    <div class="flex-auto text-right">Ø-Verbrauch: <b>0W</b></div>
   </div>
   <hr>
   
     <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
-    const labels = [ new Date("2023-02-16 11:36:07"), new Date("2023-02-16 11:38:10"), new Date("2023-02-16 11:40:10"), new Date("2023-02-16 11:42:11"), new Date("2023-02-16 11:44:14"), new Date("2023-02-16 11:46:14"), new Date("2023-02-16 11:48:15"), new Date("2023-02-16 11:50:16"), new Date("2023-02-16 11:52:20"), new Date("2023-02-16 11:54:21"), new Date("2023-02-16 11:56:21"), new Date("2023-02-16 11:58:23"), new Date("2023-02-16 12:00:24"), new Date("2023-02-16 12:02:25"), new Date("2023-02-16 12:04:26"), new Date("2023-02-16 12:06:29"), new Date("2023-02-16 12:08:29"), new Date("2023-02-16 12:10:30"), new Date("2023-02-16 12:12:31"), new Date("2023-02-16 12:14:34"), new Date("2023-02-16 12:16:35"), new Date("2023-02-16 12:18:35"), new Date("2023-02-16 12:20:36"), new Date("2023-02-16 12:22:39"), new Date("2023-02-16 12:24:39"), new Date("2023-02-16 12:26:40"), new Date("2023-02-16 12:28:43"), new Date("2023-02-16 12:30:43"), new Date("2023-02-16 12:32:44") ];
+    const labels = [ new Date("2023-02-16 12:12:31"), new Date("2023-02-16 12:14:34"), new Date("2023-02-16 12:16:35"), new Date("2023-02-16 12:18:35"), new Date("2023-02-16 12:20:36"), new Date("2023-02-16 12:22:39"), new Date("2023-02-16 12:24:39"), new Date("2023-02-16 12:26:40"), new Date("2023-02-16 12:28:43"), new Date("2023-02-16 12:30:43"), new Date("2023-02-16 12:32:44"), new Date("2023-02-16 12:34:45"), new Date("2023-02-16 12:36:48"), new Date("2023-02-16 12:38:49"), new Date("2023-02-16 12:40:50"), new Date("2023-02-16 12:42:51"), new Date("2023-02-16 12:44:53"), new Date("2023-02-16 12:46:53"), new Date("2023-02-16 12:48:55"), new Date("2023-02-16 12:50:57"), new Date("2023-02-16 12:52:58"), new Date("2023-02-16 12:54:59"), new Date("2023-02-16 12:57:00"), new Date("2023-02-16 12:59:03"), new Date("2023-02-16 13:01:05"), new Date("2023-02-16 13:03:05"), new Date("2023-02-16 13:05:06"), new Date("2023-02-16 13:07:09"), new Date("2023-02-16 13:09:09") ];
     const data = {
       labels: labels,
       datasets: [{
         label: "Verbrauch [W]",
-        data: [ 10, 10, 450, 476, 644, 690, 684, 714, 813, 714, 510, 236, 268, 327, 60, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ],
+        data: [ 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ],
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
         showLine: false
       },
       {
         label: "Verbrauch total [kWh]",
-        data: [ 0, 0, 0.014999999999418, 0.031000000002678, 0.052999999999884, 0.076000000000931, 0.099000000001979, 0.12299999999959, 0.1510000000053, 0.17500000000291, 0.19200000000274, 0.20000000000437, 0.20900000000256, 0.22000000000116, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157, 0.22200000000157 ],
+        data: [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
@@ -81,12 +81,9 @@
 <div class="flex items-center">
   <div class="text-sm font-light text-gray-500">
     Info / Details:
-    <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button">
-    <svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
-    </svg><span class="sr-only">Show information</span></button>  
+    <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Info</span></button>
   </div>
-  <div class="flex-auto ml-6 text-right">Insgesamt 857 Einträge</div>
+  <div class="flex-auto text-right">Insgesamt 846 Einträge</div>
 </div>
 <div data-popover id="popover-descriptionIndex" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
     <div class="p-3 space-y-2">
@@ -111,7 +108,7 @@
   const dataWeeklyNow = {
     labels: labelsWeeklyNow,
     datasets: [{
-      data: [ 680, 848, 927, 941,  ,  ,   ],
+      data: [ 680, 848, 927, 898,  ,  ,   ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",
@@ -138,17 +135,19 @@
   };
   const WeeklyNow = new Chart( document.getElementById("WeeklyNow"), configWeeklyNow );
   </script>
-
-  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-descriptionWeeklyNow" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Info</span></button></p>
+  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:
+    <button data-popover-target="popover-descriptionWeeklyNow" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Info</span></button>
+  </p>
   <div data-popover id="popover-descriptionWeeklyNow" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
-      <div class="p-3 space-y-2">
-          <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
-          <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
-          <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-          <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-          <a href="static.statistic.html" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
+    <div class="p-3 space-y-2">
+
+        <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
+        <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
+        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+        <a href="static.statistic.html" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
       </div>
-      <div data-popper-arrow></div>
+    <div data-popper-arrow></div>
   </div>
   <hr>
   <br>
@@ -161,7 +160,7 @@
   const dataMonthlyNow = {
     labels: labelsMonthlyNow,
     datasets: [{
-      data: [ 739, 925, 876, 872, 1219, 829, 884, 968, 1147, 968, 993, 1030, 680, 848, 927, 941,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
+      data: [ 739, 925, 876, 872, 1219, 829, 884, 968, 1147, 968, 993, 1030, 680, 848, 927, 898,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",
@@ -230,17 +229,19 @@
   };
   const MonthlyNow = new Chart( document.getElementById("MonthlyNow"), configMonthlyNow );
   </script>
-
-  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-descriptionMonthlyNow" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Show information</span></button></p>
+  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:
+    <button data-popover-target="popover-descriptionMonthlyNow" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Info</span></button>
+  </p>
   <div data-popover id="popover-descriptionMonthlyNow" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
-      <div class="p-3 space-y-2">
-          <h3 class="font-semibold text-gray-900">Tagesverbrauch pro Monat</h3>
-          <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
-          <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-          <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-          <a href="static.statistic.html" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
+    <div class="p-3 space-y-2">
+
+        <h3 class="font-semibold text-gray-900">Tagesverbrauch pro Monat</h3>
+        <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
+        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+        <a href="static.statistic.html" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
       </div>
-      <div data-popper-arrow></div>
+    <div data-popper-arrow></div>
   </div>
   <hr>
   <br>

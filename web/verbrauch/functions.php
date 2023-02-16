@@ -172,6 +172,24 @@ function printColors(int $limit):void {
   echo '],';
 }
 
+function getSvg(bool $questionMark) {
+  if ($questionMark) { // a "?" sign in a circle
+    return '<svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>';
+  } else { // a ">" sign (but nicely drawn)
+    return '<svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>';
+  }
+}
+
+function printPopOverLnk(string $chartId):void {    
+  echo '
+  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:
+    <button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button">'.getSvg(questionMark:TRUE).'<span class="sr-only">Info</span></button>
+  </p>
+  <div data-popover id="popover-description'.$chartId.'" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
+    <div class="p-3 space-y-2">
+';
+}
+
 function printMonthlyGraph (array $values, string $chartId):void {    
   echo '
   <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch diesen Monat</div>
@@ -194,18 +212,16 @@ function printMonthlyGraph (array $values, string $chartId):void {
     options: { plugins : { legend: { display: false } } },
   };
   const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
-  </script>
-
-  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Show information</span></button></p>
-  <div data-popover id="popover-description'.$chartId.'" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
-      <div class="p-3 space-y-2">
-          <h3 class="font-semibold text-gray-900">Tagesverbrauch pro Monat</h3>
-          <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
-          <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-          <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-          <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
+  </script>';
+  printPopOverLnk(chartId:$chartId);
+  echo '
+        <h3 class="font-semibold text-gray-900">Tagesverbrauch pro Monat</h3>
+        <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
+        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(questionMark:FALSE).'</a>
       </div>
-      <div data-popper-arrow></div>
+    <div data-popper-arrow></div>
   </div>
   <hr>
   <br>
@@ -233,18 +249,16 @@ function printWeeklyGraph (string $val_y, string $chartId, string $title):void {
     options: { plugins : { legend: { display: false } } },
   };
   const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
-  </script>
-
-  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Info</span></button></p>
-  <div data-popover id="popover-description'.$chartId.'" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
-      <div class="p-3 space-y-2">
-          <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
-          <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
-          <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-          <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-          <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
+  </script>';
+  printPopOverLnk(chartId:$chartId);
+  echo '
+        <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
+        <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
+        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(questionMark:FALSE).'</a>
       </div>
-      <div data-popper-arrow></div>
+    <div data-popper-arrow></div>
   </div>
   <hr>
   <br>
