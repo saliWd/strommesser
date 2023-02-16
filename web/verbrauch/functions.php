@@ -157,36 +157,22 @@ function printMonthly($dbConn, int $userid):void {
   printMonthlyGraph (values:getMonthlyValues(dbConn:$dbConn, userid:$userid), chartId:'MonthlyNow');
 }
 
-function getMonthlyValues($dbConn, int $userid):array {
-  $yearMonthStr = (date_create()->format('Y-m-'));
-  $lastDay = (int)date_create('last day of this month 00:00')->format('d');
-  
-  $val_y = '[ ';
-  $val_x = '[ ';
-  for ($i = 1; $i <= $lastDay; $i++) { // 1 to 28 (for February)
-    // for some entries, this sql will return the sum of only one line (thin = 24), for others 24 and for the newest ones it returns the sum of lots of entries 
-    $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-    $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$yearMonthStr.$i.' 00:00:00" AND `zeit` < "'.$yearMonthStr.$i.' 23:59:59";';
-    // echo $sql.'<br>';
-    $result = $dbConn->query($sql); // returns only one row
-    $row = $result->fetch_assoc();
-    
-    if ($row['sumZeitDiff'] > 0) { // divide by 0 exception
-      $watt = max(round($row['sumConsDiff']*3600*1000 / $row['sumZeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
-    } else {
-      $watt = ' ';
-    }
-    $val_y .= $watt.', ';
-    $val_x .= $i.', ';
+function printColors(int $limit):void {
+  $COLORS = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
+  echo "\n      backgroundColor: [\n";
+  for($i = 0; $i < $limit; $i++) {
+    echo '      "rgba('.$COLORS[$i % 7].', 0.2)"';
+    if($i != ($limit-1)) { echo ",\n"; }
   }
-  $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
-  $val_x = substr($val_x, 0, -2).' ]';
-  return [$val_x, $val_y, $lastDay];
+  echo "],\n      borderColor: [\n";
+  for($i = 0; $i < $limit; $i++) {
+    echo '      "rgb('.$COLORS[$i % 7].')"';
+    if($i != ($limit-1)) { echo ",\n"; }
+  }
+  echo '],';
 }
 
-function printMonthlyGraph (array $values, string $chartId):void {
-  $colors = ['255,159,64','255,205,86','75,192,192','153,102,255','201,203,207'];
-  $len = $values[2];
+function printMonthlyGraph (array $values, string $chartId):void {    
   echo '
   <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch diesen Monat</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
@@ -196,19 +182,9 @@ function printMonthlyGraph (array $values, string $chartId):void {
   const data'.$chartId.' = {
     labels: labels'.$chartId.',
     datasets: [{
-      data: '.$values[1].',
-      backgroundColor: [';
-      for($i = 0; $i < $len; $i++) {
-        echo '"rgba('.$colors[($i % 5)].', 0.2)"';
-        if($i != ($len-1)) { echo ",\n"; }
-      }
-      echo '    ],
-      borderColor: [';
-      for($i = 0; $i < $len; $i++) {
-        echo '"rgba('.$colors[($i % 5)].')"';
-        if($i != ($len - 1)) { echo ",\n"; }
-      }
-      echo '],
+      data: '.$values[1].',';
+      printColors(limit:$values[2]);
+      echo '
       borderWidth: 1
     }]
   };
@@ -235,7 +211,72 @@ function printMonthlyGraph (array $values, string $chartId):void {
   <br>
   ';
 }
+function printWeeklyGraph (string $val_y, string $chartId, string $title):void {  
+  echo '
+  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch '.$title.' Woche</div>
+  <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
+  <script>
+  const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
+  const labels'.$chartId.' = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
+  const data'.$chartId.' = {
+    labels: labels'.$chartId.',
+    datasets: [{
+      data: '.$val_y.',';
+      printColors(limit:7);
+      echo '
+      borderWidth: 1
+    }]
+  };
+  const config'.$chartId.' = {
+    type: "bar",
+    data: data'.$chartId.',
+    options: { plugins : { legend: { display: false } } },
+  };
+  const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
+  </script>
 
+  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Info</span></button></p>
+  <div data-popover id="popover-description'.$chartId.'" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
+      <div class="p-3 space-y-2">
+          <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
+          <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
+          <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+          <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+          <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
+      </div>
+      <div data-popper-arrow></div>
+  </div>
+  <hr>
+  <br>
+  ';
+}
+
+function getMonthlyValues($dbConn, int $userid):array {
+  $yearMonthStr = (date_create()->format('Y-m-'));
+  $lastDay = (int)date_create('last day of this month 00:00')->format('d');
+  
+  $val_y = '[ ';
+  $val_x = '[ ';
+  for ($i = 1; $i <= $lastDay; $i++) { // 1 to 28 (for February)
+    // for some entries, this sql will return the sum of only one line (thin = 24), for others 24 and for the newest ones it returns the sum of lots of entries 
+    $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+    $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$yearMonthStr.$i.' 00:00:00" AND `zeit` < "'.$yearMonthStr.$i.' 23:59:59";';
+    // echo $sql.'<br>';
+    $result = $dbConn->query($sql); // returns only one row
+    $row = $result->fetch_assoc();
+    
+    if ($row['sumZeitDiff'] > 0) { // divide by 0 exception
+      $watt = max(round($row['sumConsDiff']*3600*1000 / $row['sumZeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
+    } else {
+      $watt = ' ';
+    }
+    $val_y .= $watt.', ';
+    $val_x .= $i.', ';
+  }
+  $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
+  $val_x = substr($val_x, 0, -2).' ]';
+  return [$val_x, $val_y, $lastDay];
+}
 
 function getWeeklyValues($dbConn, int $weeksPast, int $userid):string {
   $mWeeks = $weeksPast + 1; // for the current week, I need to search for the last Monday (not this Monday). So one week back
@@ -273,57 +314,6 @@ function getWeeklyValues($dbConn, int $weeksPast, int $userid):string {
   }
   $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
   return $val_y;
-}
-
-function printWeeklyGraph (string $val_y, string $chartId, string $title):void {
-  $colors = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
-  echo '
-  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch '.$title.' Woche</div>
-  <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
-  <script>
-  const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
-  const labels'.$chartId.' = [ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ];
-  const data'.$chartId.' = {
-    labels: labels'.$chartId.',
-    datasets: [{
-      data: '.$val_y.',
-      backgroundColor: [';
-      for($i = 0; $i < 7; $i++) {
-        echo '"rgba('.$colors[$i].', 0.2)"';
-        if($i != 6) { echo ",\n"; }
-      }
-      echo '    ],
-      borderColor: [';
-      for($i = 0; $i < 7; $i++) {
-        echo '"rgba('.$colors[$i].')"';
-        if($i != 6) { echo ",\n"; }
-      }
-      echo '],
-      borderWidth: 1
-    }]
-  };
-  const config'.$chartId.' = {
-    type: "bar",
-    data: data'.$chartId.',
-    options: { plugins : { legend: { display: false } } },
-  };
-  const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
-  </script>
-
-  <p class="flex items-center text-sm font-light text-gray-500">Info / Details:<button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Info</span></button></p>
-  <div data-popover id="popover-description'.$chartId.'" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
-      <div class="p-3 space-y-2">
-          <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
-          <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
-          <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-          <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-          <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik <svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg></a>
-      </div>
-      <div data-popper-arrow></div>
-  </div>
-  <hr>
-  <br>
-  ';
 }
 
 function printBeginOfPage(bool $enableReload, string $timerange, string $site, string $title):void {
