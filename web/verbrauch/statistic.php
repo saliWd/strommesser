@@ -13,7 +13,7 @@ $dbConn = initialize();
 
 // returns the time range to be displayed as int. Possible values are: 1 (for last 1 hour), 6, 24, 25. 25 means: all data
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
-printBeginOfPage(enableReload:FALSE, timerange:'', site:'statistic.php', title:'Statistiken');
+printBeginOfPage(site:'statistic.php', title:'Statistiken');
 
 echo '
 <div class="flex items-center">
@@ -22,7 +22,7 @@ echo '
   <a href="#anchorMonthlyNow" class="flex-auto underline">Diesen Monat</a>
 </div><br><br>';
 
-printWeekly(dbConn:$dbConn, userid:$userid, twoWeeks:TRUE);
+printWeekly(dbConn:$dbConn, userid:$userid, isTwoWeeks:TRUE);
 
 printMonthly(dbConn:$dbConn, userid:$userid);
 ?>

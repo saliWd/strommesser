@@ -24,7 +24,7 @@ $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
-printBeginOfPage(enableReload:$enableReload, timerange:'&range='.$timeSelected, site:'index.php', title:'Verbrauch');
+printBeginOfPage(site:'index.php', title:'Verbrauch', isReloadEnabled:$enableReload, timerange:'&range='.$timeSelected, );
 if ($totalCount > 0) {// this may be 0
   $zeitNewest = date_create($rowFreshest['zeit']);    
   if ($timeSelected < 25) {
@@ -173,7 +173,7 @@ echo '<br><br>
 <div class="flex items-center">
   <div class="text-sm font-light text-gray-500">
     Info / Details:
-    <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button">'.getSvg(questionMark:TRUE).'<span class="sr-only">Info</span></button>
+    <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button">'.getSvg(isQuestionMark:TRUE).'<span class="sr-only">Info</span></button>
   </div>
   <div class="flex-auto text-right">Insgesamt '.$totalCount.' Einträge</div>
 </div>
@@ -187,13 +187,13 @@ echo '<br><br>
         <p>Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 72 Stunden), bzw. mit einem Punkt pro Tag (älter).</p>
         <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
         <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(questionMark:FALSE).'</a>
+        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(isQuestionMark:FALSE).'</a>
     </div>
     <div data-popper-arrow></div>
 </div>
 <br>';
 
-printWeekly(dbConn:$dbConn, userid:$userid, twoWeeks:FALSE);
+printWeekly(dbConn:$dbConn, userid:$userid, isTwoWeeks:FALSE);
 
 printMonthly(dbConn:$dbConn, userid:$userid);
 ?>

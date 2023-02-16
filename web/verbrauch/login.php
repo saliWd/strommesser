@@ -111,7 +111,7 @@ if ($doSafe === 0) {
     die(); // will not be executed
   } // no cookie present and no userid. print the login form
 
-  printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', title:'Log in');
+  printBeginOfPage(site:'login.php', title:'Log in');
   echo '
   <form action="login.php?do=1" method="post" id="loginForm">
     <div class="grid grid-cols-2 gap-4 justify-items-start mt-8">
@@ -134,7 +134,7 @@ if ($doSafe === 0) {
   ); // this redirects on success
 } elseif ($doSafe === 2) {
   sessionAndCookieDelete();
-  printBeginOfPage(enableReload:FALSE, timerange:'', site:'login.php', title:'Log out');
+  printBeginOfPage(site:'login.php', title:'Log out');
   echo '<p>log out ok, zurück zur <a href="../index.php" class="underline">Startseite</a></p>';
 } elseif ($doSafe === 3) {  
   processLoginData(
