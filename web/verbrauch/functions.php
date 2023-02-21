@@ -77,7 +77,7 @@ function printRawErrorAndDie (string $heading, string $text): void {
   die();
 }  
 
-function validDevice ($dbConn, string $postIndicator): array {        
+function validDevice (object $dbConn, string $postIndicator): array {        
   $unsafeDevice = safeStrFromExt('POST', $postIndicator, 8); // maximum length of 8
   $result = $dbConn->query('SELECT `device` FROM `user` WHERE 1 ORDER BY `id`;');
   while ($row = $result->fetch_assoc()) {
@@ -88,7 +88,7 @@ function validDevice ($dbConn, string $postIndicator): array {
   return array(FALSE, ''); // valid/deviceString
 }
 
-function validUseridInPost ($dbConn): int {        
+function validUseridInPost (object $dbConn): int {        
   $unsafeUserid = safeIntFromExt('POST', 'userid', 11); // maximum length of 11
   $result = $dbConn->query('SELECT `id` FROM `user` WHERE `id` = '.$unsafeUserid.' LIMIT 1;');
   if ($result->num_rows !== 1) {
@@ -98,7 +98,7 @@ function validUseridInPost ($dbConn): int {
   return (int)$row['id'];
 }
 
-function checkHashUserid ($dbConn, int $userid): bool {
+function checkHashUserid (object $dbConn, int $userid): bool {
   $unsafeRandNum = safeIntFromExt('POST', 'randNum', 8); // range 1 to 10'000 (0 excluded)
   $unsafePostHash = safeHexFromExt('POST', 'hash', 64); 
   if ($unsafeRandNum === 0 or $unsafePostHash === '') {
@@ -120,17 +120,17 @@ function checkHashUserid ($dbConn, int $userid): bool {
 }
 
 // function used to check post and get variables 
-function checkInputs($dbConn): int {
+function checkInputs(object $dbConn): int {
   if (! verifyGetParams()) { // now I can look the post variables        
     printRawErrorAndDie('Error', 'invalid params');
     return 0;
   }
-  $userid = validUseridInPost($dbConn);
+  $userid = validUseridInPost(dbConn:$dbConn);
   if (! $userid) {
     printRawErrorAndDie('Error', 'userid not supported');
     return 0;
   }
-  if (! checkHashUserid($dbConn, $userid)) {
+  if (! checkHashUserid(dbConn:$dbConn, userid:$userid)) {
     printRawErrorAndDie('Error', 'access key not ok');
     return 0;
   }
@@ -179,7 +179,7 @@ function printColors(int $limit):void {
   echo '],';
 }
 
-function getSvg(bool $isQuestionMark) {
+function getSvg(bool $isQuestionMark):string {
   if ($isQuestionMark) { // a "?" sign in a circle
     return '<svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>';
   } else { // a ">" sign (but nicely drawn)
@@ -238,9 +238,9 @@ function printBarGraph (array $values, string $chartId, string $title, bool $isI
   ';
 }
 
-function getWattSum($dbConn, int $userid, string $dayA, string $dayB) {
+function getWattSum(object $dbConn, int $userid, string $dayA, string $dayB) { // returns either a number or a string
   $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-  $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
+  $sql .= ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
   //echo $sql."\n<br>";
   $result = $dbConn->query($sql); // returns only one row
   $row = $result->fetch_assoc();
@@ -251,7 +251,7 @@ function getWattSum($dbConn, int $userid, string $dayA, string $dayB) {
   return ' '; // not really nice, returning a string
 }
 
-function getValues($dbConn, int $userid, EnumTimerange $timerange, int $goBack = 0):array {
+function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $goBack = 0):array {
   $val_y = '[ ';
   $val_x = '[ ';
   $now = date_create();
@@ -261,7 +261,7 @@ function getValues($dbConn, int $userid, EnumTimerange $timerange, int $goBack =
   $day = (int)$now->format('d'); // current day
   $numOfEntries = 0;
 
-  if($timerange === EnumTimerange::Year) {
+  if ($timerange === EnumTimerange::Year) { // generates one value per week
     $monNames = array('Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'); // need german naming, not using format('M')
     $year = $year - $goBack;
     $startDay = date_create($year.'-01-01');
@@ -280,7 +280,7 @@ function getValues($dbConn, int $userid, EnumTimerange $timerange, int $goBack =
       
       $startDay->modify('+1 days'); // Monday again
     }
-  } elseif($timerange === EnumTimerange::Month) {
+  } elseif ($timerange === EnumTimerange::Month) { // maybe to do: could switch to date->modify method
     $month = $month - $goBack; // NB: goBack must not be greater than 12
     if ($month < 1) {
       $year--;
@@ -355,7 +355,7 @@ function printBeginOfPage(string $site, string $title, bool $isReloadEnabled=FAL
 }
 
 // checks the params retrieved over get and returns TRUE if they are ok
-function verifyGetParams (): bool {  
+function verifyGetParams():bool {  
   if (safeStrFromExt('GET','TX', 4) !== 'pico') {                
       return FALSE;
   }
@@ -366,7 +366,7 @@ function verifyGetParams (): bool {
 }
 
 // sql sanitation and length limitation
-function sqlSafeStrFromPost ($dbConn, string $varName, int $length): string {
+function sqlSafeStrFromPost(object $dbConn, string $varName, int $length):string {
   if (isset($_POST[$varName])) {
      return mysqli_real_escape_string($dbConn, (substr($_POST[$varName], 0, $length))); // length-limited variable           
   } else {
@@ -375,7 +375,7 @@ function sqlSafeStrFromPost ($dbConn, string $varName, int $length): string {
 }
 
 // returns a 'safe' integer. Return value is 0 if the checks did not work out
-function makeSafeInt ($unsafe, int $length): int {  
+function makeSafeInt($unsafe, int $length):int {  
   $unsafe = filter_var(substr($unsafe, 0, $length), FILTER_SANITIZE_NUMBER_INT); // sanitize a length-limited variable
   if (filter_var($unsafe, FILTER_VALIDATE_INT)) { 
     return (int)$unsafe;
@@ -385,12 +385,12 @@ function makeSafeInt ($unsafe, int $length): int {
 }
 
 // returns a 'safe' string. Not that much to do though for a string
-function makeSafeStr ($unsafe, int $length): string {
+function makeSafeStr($unsafe, int $length):string {
   return (htmlentities(substr($unsafe, 0, $length))); // length-limited variable, HTML encoded
 }
 
 // returns a 'safe' character-as-hex value
-function makeSafeHex ($unsafe, int $length): string {  
+function makeSafeHex($unsafe, int $length):string {  
   $unsafe = substr($unsafe, 0, $length); // length-limited variable  
   if (ctype_xdigit($unsafe)) {
     return (string)$unsafe;
@@ -400,7 +400,7 @@ function makeSafeHex ($unsafe, int $length): string {
 }
 
 // checks whether a get/post/cookie variable exists and makes it safe if it does. If not, returns 0
-function safeIntFromExt (string $source, string $varName, int $length): int {
+function safeIntFromExt(string $source, string $varName, int $length):int {
   if (($source === 'GET') and (isset($_GET[$varName]))) {
     return makeSafeInt($_GET[$varName], $length);    
   } elseif (($source === 'POST') and (isset($_POST[$varName]))) {
@@ -412,7 +412,7 @@ function safeIntFromExt (string $source, string $varName, int $length): int {
   }
 }
 
-function safeHexFromExt (string $source, string $varName, int $length): string {
+function safeHexFromExt(string $source, string $varName, int $length):string {
   if (($source === 'GET') and (isset($_GET[$varName]))) {
      return makeSafeHex($_GET[$varName], $length);
    } elseif (($source === 'POST') and (isset($_POST[$varName]))) {
@@ -424,7 +424,7 @@ function safeHexFromExt (string $source, string $varName, int $length): string {
    }
 }
 
-function safeStrFromExt (string $source, string $varName, int $length): string {
+function safeStrFromExt(string $source, string $varName, int $length):string {
   if (($source === 'GET') and (isset($_GET[$varName]))) {
      return makeSafeStr($_GET[$varName], $length);
    } elseif (($source === 'POST') and (isset($_POST[$varName]))) {
@@ -436,7 +436,7 @@ function safeStrFromExt (string $source, string $varName, int $length): string {
    }
 }
 
-function limitInt (int $input, int $lower, int $upper): int {
+function limitInt(int $input, int $lower, int $upper):int {
   return min(max($input,$lower),$upper);  
 }
 

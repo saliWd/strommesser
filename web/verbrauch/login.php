@@ -82,6 +82,63 @@ function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid=0, s
 } // function
 
 /*
+function updateUser (object $dbConn, int $userid, bool $forgotPw): bool {  
+  if (!(isNotTestUser($dbConn, $userid))) {
+    return false;
+  }
+  if (!($result = $dbConn->query('SELECT * FROM `user` WHERE `id` = "'.$userid.'"'))) {
+    return error($dbConn, 104404);
+  }
+  
+  $row = $result->fetch_assoc(); // guaranteed to get only one row      
+  $passwordUnsafe = safeStrFromExt('POST','password', 63);
+  if (!(($forgotPw) or (password_verify($passwordUnsafe, $row['pwHash'])))) {        
+    return error($dbConn, 104403);
+  }
+    
+  $passwordUnsafe = filter_var(safeStrFromExt('POST','passwordNew', 63), FILTER_SANITIZE_STRING);
+  if (strlen($passwordUnsafe) <= 3) {
+    return error($dbConn, 104400);
+  }
+  $pwHash = password_hash($passwordUnsafe, PASSWORD_DEFAULT);
+  
+  // TODO: quiet ugly statements...
+  $emailOk = false;
+  if (!$forgotPw) {
+    $emailUnsafe = filter_var(safeStrFromExt('POST','email', 127), FILTER_SANITIZE_EMAIL);
+    // newEmail must not exist in the db (exclude current user itself)
+    if (filter_var($emailUnsafe, FILTER_VALIDATE_EMAIL)) { // have a valid email 
+      // check whether email already exists
+      $emailSqlSafe = mysqli_real_escape_string($dbConn, $emailUnsafe);
+      if (strcasecmp($emailSqlSafe, $row['email'])  != 0) { // 0 means they are equal
+        if ($result = $dbConn->query('SELECT `verified` FROM `user` WHERE `email` LIKE "'.$emailSqlSafe.'" LIMIT 1')) {
+          if ($result->num_rows == 0) {
+            $emailOk = true; 
+          }
+        }
+      } else { $emailOk = true; }; // no need to check again if the email did not change
+    }
+  }
+    
+  if ($emailOk) {
+    if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'", `email` = "'.$emailSqlSafe.'" WHERE `id` = "'.$userid.'"'))) {
+      return error($dbConn, 104401);
+    }
+    return true;
+  } else { 
+    if (!$forgotPw) { 
+      return error($dbConn, 104405);
+    }
+    if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$userid.'"'))) {
+      return error($dbConn, 104402);      
+    }
+    return true;
+  } // emailOK-else  
+}
+
+
+
+
 function newUserLoginAndLinks (object $dbConn, int $newUserid, string $pw) : bool {       
   // password_hash("messerPW", PASSWORD_DEFAULT) returns '$2y$10$zd4qDdeg59iqGV7GrviV9eLw.B9OD/JVTIul8rr1IPp9oWJd4AZAy';
   $pwHash = password_hash($pw, PASSWORD_DEFAULT); // $pw is potentially unsafe. Shouldn't be an issue as I store the hash
@@ -100,7 +157,10 @@ $doSafe = safeIntFromExt('GET', 'do', 1); // this is an integer (range 1 to 9) o
 // do = 0: entry point
 // do = 1: process login form
 // do = 2: logout
-// do = 3: process login form with demo account info
+// do = 3: present changePW form
+// do = 4: execute the changePW
+// do = 5: present the forgotPW form
+// do = 6: execute the forgotPW
 
 if ($doSafe === 0) {
   // check cookie
@@ -121,7 +181,9 @@ if ($doSafe === 0) {
       <div><input class="input-text" name="password" type="password" maxlength="63" value="" required></div>
       <div class="justify-self-end"><input class="w-10" type="checkbox" name="setCookie" value="1" checked></div>
       <div class="text-sm">auf diesem Gerät speichern</div>
-      <div class="justify-self-center col-span-2"><input id="loginFormSubmit" class="mt-8 input-text" name="create" type="submit" value="log in"></div>      
+      <div class="justify-self-center col-span-2"><input id="loginFormSubmit" class="mt-8 input-text" name="submit" type="submit" value="log in"></div>      
+      <div class="mt-16 justify-self-center"><a href="login.php?do=3" class="btn">Passwort ändern</a></div>
+      <div class="mt-16 justify-self-center"><a href="login.php?do=5" class="btn">Passwort vergessen</a></div>
     </div>
   </form>
   ';  
@@ -136,13 +198,30 @@ if ($doSafe === 0) {
   sessionAndCookieDelete();
   printBeginOfPage(site:'login.php', title:'Log out');
   echo '<p>log out ok, zurück zur <a href="../index.php" class="underline">Startseite</a></p>';
-} elseif ($doSafe === 3) {  
-  processLoginData(
-    dbConn:$dbConn,
-    emailUnsafe:filter_var('messer@strommesser.ch', FILTER_SANITIZE_EMAIL), // demo account
-    passwordUnsafe:filter_var('messerPW', FILTER_SANITIZE_STRING), // demo account
-    setCookieSafe:safeIntFromExt('POST', 'setCookie', 1)
-  ); // this redirects on success
+} elseif ($doSafe === 3) {    
+  printBeginOfPage(site:'login.php', title:'Passwort ändern');
+  echo '
+  <form action="login.php?do=4" method="post" id="loginForm">
+    <div class="grid grid-cols-2 gap-4 justify-items-start mt-8">
+      <div class="justify-self-end">Email:</div>
+      <div><input class="input-text" name="email" type="email" maxlength="127" value="" required></div>
+      <div class="justify-self-end">altes Passwort:</div>
+      <div><input class="input-text" name="password" type="password" maxlength="63" value="" required></div>
+      <div class="justify-self-end">neues Passwort:</div>
+      <div><input class="input-text" name="passwordNew" type="password" maxlength="63" value="" required></div>
+      <div class="justify-self-center col-span-2"><input id="loginFormSubmit" class="mt-8 input-text" name="submit" type="submit" value="Passwort ändern"></div>      
+    </div>
+  </form>
+  ';  
+} elseif ($doSafe === 4) {
+  printBeginOfPage(site:'login.php', title:'TODO: Passwort wurde geändert');
+  echo '<p>Funktion noch nicht implementiert...zurück zur <a href="login.php" class="underline">Loginseite</a></p>';
+} elseif ($doSafe === 5) {
+  printBeginOfPage(site:'login.php', title:'TODO: Passwort vergessen');
+  echo '<p>Funktion noch nicht implementiert...zurück zur <a href="login.php" class="underline">Loginseite</a></p>';
+} elseif ($doSafe === 6) {
+  printBeginOfPage(site:'login.php', title:'TODO: Link zum Zurücksetzen des Passworts verschickt');
+  echo '<p>Funktion noch nicht implementiert...zurück zur <a href="login.php" class="underline">Loginseite</a></p>';
 } else {
   printErrorAndDie('Error','unsupported do on login.php');
 }
