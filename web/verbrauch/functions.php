@@ -232,7 +232,7 @@ function printBarGraph (array $values, string $chartId, string $title, bool $isI
     <div data-popper-arrow></div>
   </div>';
   }
-    echo '
+  echo '
   <hr>
   <br>
   ';

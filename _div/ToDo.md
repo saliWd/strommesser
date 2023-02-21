@@ -3,7 +3,9 @@
 1. StromMesser wordpress
    1. fill with more content: explanation?   
 2. StromMesser/verbrauch
-   1. statistic.php: scrollable: per week, per month. Per year
+   1. statistic.php: 
+      * scrollable: per week, per month, per year
+      * design / explanations
    1. settings.php
    1. getRaw.php
    1. index.php

@@ -3,15 +3,14 @@ require_once('functions.php');
 $dbConn = initialize();
 
 
-// shows several graphs: 
-// - consumption in this week (starting monday), consumption last week
-// - consumption in this month (starting 1st of)
-// TODO: - consumption per week (starting 1st week of year, always Monday to Sunday)
+// shows several bar graphs:
+// - daily consumption this week (starting monday), consumption last week
+// - daily consumption this month (starting 1st of), consumption last month
+// - weekly consumption this year
 // TODO: always: scrollable (select this month or go back to last month etc.)
 // always: displaying the data as I have it. If only two days this month, I display those...
 // bar graph for few items
 
-// returns the time range to be displayed as int. Possible values are: 1 (for last 1 hour), 6, 24, 25. 25 means: all data
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 printBeginOfPage(site:'statistic.php', title:'Statistiken');
 
@@ -26,7 +25,7 @@ echo '
 </div><br><br>';
 
 printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:0), chartId:'WeeklyNow', title:'diese Woche');
-printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:1), chartId:'WeeklyLast', title:'letzte Woche');  
+printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:1), chartId:'WeeklyLast', title:'letzte Woche');
 
 printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:0), chartId:'MonthlyNow', title:'diesen Monat');
 printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:1), chartId:'MonthlyLast', title:'letzten Monat');
