@@ -197,7 +197,7 @@ function printPopOverLnk(string $chartId):void {
 ';
 }
 
-function printBarGraph (array $values, string $chartId, string $title):void {  
+function printBarGraph (array $values, string $chartId, string $title, bool $isIndexPage=FALSE):void {  
   echo '
   <div class="mt-4 text-xl" id="anchor'.$chartId.'">Durchschnittsverbrauch '.$title.'</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
@@ -220,16 +220,19 @@ function printBarGraph (array $values, string $chartId, string $title):void {
   };
   const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
   </script>';
-  printPopOverLnk(chartId:$chartId);
-  echo '
+  if ($isIndexPage) {
+    printPopOverLnk(chartId:$chartId);
+    echo '
         <h3 class="font-semibold text-gray-900">Durchschnittsverbrauch</h3>
-        <p>Durchschnittsverbrauch in Watt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
+        <p>Durchschnittsverbrauch in Watt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh</p>
         <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
         <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
         <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(isQuestionMark:FALSE).'</a>
       </div>
     <div data-popper-arrow></div>
-  </div>
+  </div>';
+  }
+    echo '
   <hr>
   <br>
   ';
@@ -258,19 +261,24 @@ function getValues($dbConn, int $userid, EnumTimerange $timerange, int $goBack =
   $day = (int)$now->format('d'); // current day
   $numOfEntries = 0;
 
-  if($timerange === EnumTimerange::Year) { // TODO: works. But it should be really per Week (Mo-So)
+  if($timerange === EnumTimerange::Year) {
     $monNames = array('Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'); // need german naming, not using format('M')
     $year = $year - $goBack;
-    for ($month = 1; $month <= 12; $month++) {
-      $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
-      for ($day = 1; $day <= $lastDay; $day = $day + 7) { // 1 to 28 (for February)
-        // 1..7, 8..14, 15..21, 22..28, (29..31). Gets me either 4 or 5 bars per month but not starting on Monday. Last one is 'shorter'
-        $dayStrA = $year.'-'.$month.'-'.$day;        
-        $dayStrB = $year.'-'.$month.'-'.min($day + 6, $lastDay);
-        $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStrA, dayB:$dayStrB).', ';
-        $val_x .= '"'.$monNames[$month-1].'", ';
-        $numOfEntries++;
-      }
+    $startDay = date_create($year.'-01-01');
+    $weekday = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday)
+    if ($weekday > 0) {
+      $startDay->modify('+'.(7-$weekday).' days'); // that gets me first Monday in the year
+    }
+    for ($week = 1; $week <= 52; $week++) { // 364 days (one or two days are left over)
+      $dayStrA = $startDay->format('Y-m-d');
+      $month = (int)$startDay->format('m'); // plot the month of the Monday
+      $startDay->modify('+6 days'); // Sunday
+      $dayStrB = $startDay->format('Y-m-d');
+      $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStrA, dayB:$dayStrB).', ';
+      $val_x .= '"'.$monNames[$month-1].'", ';
+      $numOfEntries++;
+      
+      $startDay->modify('+1 days'); // Monday again
     }
   } elseif($timerange === EnumTimerange::Month) {
     $month = $month - $goBack; // NB: goBack must not be greater than 12
@@ -297,7 +305,7 @@ function getValues($dbConn, int $userid, EnumTimerange $timerange, int $goBack =
       $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr).', ';
       $startDay->modify('+1 days');
     }
-    $val_x .= '"Mo", "Di", "Mi", "Do", "Fr", "Sa", "So", ';    
+    $val_x .= '"Mo", "Di", "Mi", "Do", "Fr", "Sa", "So", ';
   }
   
   $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after

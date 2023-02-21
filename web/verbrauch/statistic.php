@@ -15,11 +15,14 @@ $dbConn = initialize();
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 printBeginOfPage(site:'statistic.php', title:'Statistiken');
 
+// TODO: this is ugly on desktop layout (okayish on mobile)
 echo '
-<div class="flex items-center">
+<div class="grid grid-cols-2 gap-4 mt-8">
   <a href="#anchorWeeklyNow" class="flex-auto underline">Diese Woche</a>
   <a href="#anchorWeeklyLast" class="flex-auto underline">Letzte Woche</a>
   <a href="#anchorMonthlyNow" class="flex-auto underline">Diesen Monat</a>
+  <a href="#anchorMonthlyLast" class="flex-auto underline">Letzten Monat</a>
+  <a href="#anchorYearlyLast" class="flex-auto underline">Dieses Jahr</a>
 </div><br><br>';
 
 printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:0), chartId:'WeeklyNow', title:'diese Woche');
