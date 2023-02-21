@@ -193,9 +193,9 @@ echo '<br><br>
 </div>
 <br>';
 
-printWeekly(dbConn:$dbConn, userid:$userid, isTwoWeeks:FALSE);
+printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:0), chartId:'WeeklyNow', title:'diese Woche');
+printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:0), chartId:'MonthlyNow', title:'diesen Monat');
 
-printMonthly(dbConn:$dbConn, userid:$userid);
 ?>
 <br><br>
 </div></body></html>

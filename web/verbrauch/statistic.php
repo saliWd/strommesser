@@ -22,8 +22,12 @@ echo '
   <a href="#anchorMonthlyNow" class="flex-auto underline">Diesen Monat</a>
 </div><br><br>';
 
-printWeekly(dbConn:$dbConn, userid:$userid, isTwoWeeks:TRUE);
+printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:0), chartId:'WeeklyNow', title:'diese Woche');
+printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:1), chartId:'WeeklyLast', title:'letzte Woche');  
 
-printMonthly(dbConn:$dbConn, userid:$userid);
+printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:0), chartId:'MonthlyNow', title:'diesen Monat');
+printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:1), chartId:'MonthlyLast', title:'letzten Monat');
+
+printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Year, goBack:0), chartId:'YearlyNow', title:'dieses Jahr');
 ?>
 </div></body></html>

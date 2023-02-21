@@ -164,17 +164,6 @@ function printNavMenu (string $siteSafe): void {
   </nav>';
 }
 
-function printMonthly($dbConn, int $userid):void {    
-  printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month), chartId:'MonthlyNow', title:'diesen Monat');
-}
-
-function printWeekly($dbConn, int $userid, bool $isTwoWeeks):void {
-  printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:0), chartId:'WeeklyNow', title:'diese Woche');
-  if($isTwoWeeks) {
-    printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:1), chartId:'WeeklyLast', title:'letzte Woche');  
-  }  
-}
-
 function printColors(int $limit):void {
   $COLORS = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
   echo "\n      backgroundColor: [\n";
@@ -210,7 +199,7 @@ function printPopOverLnk(string $chartId):void {
 
 function printBarGraph (array $values, string $chartId, string $title):void {  
   echo '
-  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Tagesverbrauch '.$title.'</div>
+  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Durchschnittsverbrauch '.$title.'</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
@@ -233,8 +222,8 @@ function printBarGraph (array $values, string $chartId, string $title):void {
   </script>';
   printPopOverLnk(chartId:$chartId);
   echo '
-        <h3 class="font-semibold text-gray-900">Tagesverbrauch</h3>
-        <p>Durchschnittsverbrauch in Watt pro Tag. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
+        <h3 class="font-semibold text-gray-900">Durchschnittsverbrauch</h3>
+        <p>Durchschnittsverbrauch in Watt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh. Gemessen wird von 00:00 Uhr bis 23:59 Uhr, bzw. am aktuellen Tag `bis jetzt`</p>
         <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
         <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
         <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(isQuestionMark:FALSE).'</a>
@@ -246,9 +235,9 @@ function printBarGraph (array $values, string $chartId, string $title):void {
   ';
 }
 
-function getWattOfDay($dbConn, int $userid, string $dayString) {
+function getWattSum($dbConn, int $userid, string $dayA, string $dayB) {
   $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-  $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayString.' 00:00:00" AND `zeit` <= "'.$dayString.' 23:59:59";';
+  $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
   //echo $sql."\n<br>";
   $result = $dbConn->query($sql); // returns only one row
   $row = $result->fetch_assoc();
@@ -262,22 +251,27 @@ function getWattOfDay($dbConn, int $userid, string $dayString) {
 function getValues($dbConn, int $userid, EnumTimerange $timerange, int $goBack = 0):array {
   $val_y = '[ ';
   $val_x = '[ ';
+  $now = date_create();
 
-  $year = (int)date_create()->format('Y'); // current year
-  $month = (int)date_create()->format('m'); // current month
-  $day = (int)date_create()->format('d'); // current day
+  $year = (int)$now->format('Y'); // current year
+  $month = (int)$now->format('m'); // current month
+  $day = (int)$now->format('d'); // current day
   $numOfEntries = 0;
 
-  if($timerange === EnumTimerange::Year) {       
+  if($timerange === EnumTimerange::Year) { // TODO: works. But it should be really per Week (Mo-So)
+    $monNames = array('Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'); // need german naming, not using format('M')
     $year = $year - $goBack;
-    for ($mon = 1; $mon <= 12; $mon++) {
+    for ($month = 1; $month <= 12; $month++) {
       $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
-      for ($day = 1; $day <= $lastDay; $day++) { // 1 to 28 (for February)
-        $val_y .= getWattOfDay(dbConn:$dbConn, userid:$userid, dayString:$year.'-'.$mon.'-'.$day).', ';
-        $val_x .= $day.', ';
+      for ($day = 1; $day <= $lastDay; $day = $day + 7) { // 1 to 28 (for February)
+        // 1..7, 8..14, 15..21, 22..28, (29..31). Gets me either 4 or 5 bars per month but not starting on Monday. Last one is 'shorter'
+        $dayStrA = $year.'-'.$month.'-'.$day;        
+        $dayStrB = $year.'-'.$month.'-'.min($day + 6, $lastDay);
+        $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStrA, dayB:$dayStrB).', ';
+        $val_x .= '"'.$monNames[$month-1].'", ';
         $numOfEntries++;
       }
-    }    
+    }
   } elseif($timerange === EnumTimerange::Month) {
     $month = $month - $goBack; // NB: goBack must not be greater than 12
     if ($month < 1) {
@@ -286,19 +280,21 @@ function getValues($dbConn, int $userid, EnumTimerange $timerange, int $goBack =
     }
     $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
     for ($day = 1; $day <= $lastDay; $day++) { // 1 to 28 (for February)
-      $val_y .= getWattOfDay(dbConn:$dbConn, userid:$userid, dayString:$year.'-'.$month.'-'.$day).', ';
+      $dayStr = $year.'-'.$month.'-'.$day;
+      $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr).', ';
       $val_x .= $day.', ';
       $numOfEntries++;
     }
   } elseif ($timerange === EnumTimerange::Week) {
     $numOfEntries = 7;
-    $startDay = date_create($year.'-'.$month.'-'.$day);    
+    $startDay = $now;
     $startDay->modify('-'.$goBack.' weeks');
     $weekday = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday)
     $startDay->modify('-'.$weekday.' days'); // that gets me Monday in this week
     
     for ($day = 1; $day <= $numOfEntries; $day++) {
-      $val_y .= getWattOfDay(dbConn:$dbConn, userid:$userid, dayString:$startDay->format('Y-m-d')).', ';
+      $dayStr = $startDay->format('Y-m-d');
+      $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr).', ';
       $startDay->modify('+1 days');
     }
     $val_x .= '"Mo", "Di", "Mi", "Do", "Fr", "Sa", "So", ';    
