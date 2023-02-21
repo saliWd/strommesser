@@ -3,11 +3,11 @@
 1. StromMesser wordpress
    1. fill with more content: explanation?   
 2. StromMesser/verbrauch
-   1. statistic.php: scrollable: per week, per month (plus maybe per year?)
+   1. statistic.php: scrollable: per week, per month. Per year
    1. settings.php
    1. getRaw.php
    1. index.php
-   1. login.php
+   1. login.php. PW change.
    1. rx.php
 3. pico devices
    1. stability: So far so good, no hanging since 10.01.23. (one issue because of USB power supply issue)
@@ -18,7 +18,7 @@
 4. div
 
 
-Next:  1.1 / 2.1 / 
+Next:  2.1 / 2.5
 
 
 [lnkCase]: https://www.thingiverse.com/thing:4767008

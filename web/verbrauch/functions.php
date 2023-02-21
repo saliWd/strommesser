@@ -1,6 +1,18 @@
 <?php declare(strict_types=1);
 // This file is included in other sites
 
+// --------------------------
+// class definitions
+enum EnumTimerange
+{
+  case Week;
+  case Month;
+  case Year;
+}
+
+// --------------------------
+// function definitions
+
 // this function is called on every (user related) page on the very start  
 // it does the session start and opens connection to the data base. Returns the dbConn variable or a boolean
 function initialize () {
@@ -152,14 +164,14 @@ function printNavMenu (string $siteSafe): void {
   </nav>';
 }
 
-function printMonthly($dbConn, int $userid):void {  
-  printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, isMonth:TRUE, weeksPast:0), chartId:'MonthlyNow', title:'diesen Monat');
+function printMonthly($dbConn, int $userid):void {    
+  printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month), chartId:'MonthlyNow', title:'diesen Monat');
 }
 
 function printWeekly($dbConn, int $userid, bool $isTwoWeeks):void {
-  printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, isMonth:FALSE, weeksPast:0), chartId:'WeeklyNow', title:'diese Woche');
+  printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:0), chartId:'WeeklyNow', title:'diese Woche');
   if($isTwoWeeks) {
-    printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, isMonth:FALSE, weeksPast:1), chartId:'WeeklyLast', title:'letzte Woche');  
+    printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:1), chartId:'WeeklyLast', title:'letzte Woche');  
   }  
 }
 
@@ -234,59 +246,67 @@ function printBarGraph (array $values, string $chartId, string $title):void {
   ';
 }
 
-function getValues($dbConn, int $userid, bool $isMonth, int $weeksPast):array {
+function getWattOfDay($dbConn, int $userid, string $dayString) {
+  $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+  $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayString.' 00:00:00" AND `zeit` <= "'.$dayString.' 23:59:59";';
+  //echo $sql."\n<br>";
+  $result = $dbConn->query($sql); // returns only one row
+  $row = $result->fetch_assoc();
+    
+  if ($row['sumZeitDiff'] > 0) { // divide by 0 exception
+    return round($row['sumConsDiff']*3600*1000 / $row['sumZeitDiff']);
+  } 
+  return ' '; // not really nice, returning a string
+}
+
+function getValues($dbConn, int $userid, EnumTimerange $timerange, int $goBack = 0):array {
   $val_y = '[ ';
   $val_x = '[ ';
-  $dailyStrings = array();
 
-  if($isMonth) {
-    $yearMonthStr = (date_create()->format('Y-m-'));    
-    $lastDay = (int)date_create('last day of this month 00:00')->format('d');
+  $year = (int)date_create()->format('Y'); // current year
+  $month = (int)date_create()->format('m'); // current month
+  $day = (int)date_create()->format('d'); // current day
+  $numOfEntries = 0;
 
-    for ($i = 1; $i <= $lastDay; $i++) { // 1 to 28 (for February)
-      array_push($dailyStrings, $yearMonthStr.$i); // NB: array index is 0..27
+  if($timerange === EnumTimerange::Year) {       
+    $year = $year - $goBack;
+    for ($mon = 1; $mon <= 12; $mon++) {
+      $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
+      for ($day = 1; $day <= $lastDay; $day++) { // 1 to 28 (for February)
+        $val_y .= getWattOfDay(dbConn:$dbConn, userid:$userid, dayString:$year.'-'.$mon.'-'.$day).', ';
+        $val_x .= $day.', ';
+        $numOfEntries++;
+      }
+    }    
+  } elseif($timerange === EnumTimerange::Month) {
+    $month = $month - $goBack; // NB: goBack must not be greater than 12
+    if ($month < 1) {
+      $year--;
+      $month += 12;
     }
-  } else {
-    $lastDay = 7;
+    $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
+    for ($day = 1; $day <= $lastDay; $day++) { // 1 to 28 (for February)
+      $val_y .= getWattOfDay(dbConn:$dbConn, userid:$userid, dayString:$year.'-'.$month.'-'.$day).', ';
+      $val_x .= $day.', ';
+      $numOfEntries++;
+    }
+  } elseif ($timerange === EnumTimerange::Week) {
+    $numOfEntries = 7;
+    $startDay = date_create($year.'-'.$month.'-'.$day);    
+    $startDay->modify('-'.$goBack.' weeks');
+    $weekday = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday)
+    $startDay->modify('-'.$weekday.' days'); // that gets me Monday in this week
     
-    $minusWeekArr = array($weeksPast,$weeksPast,$weeksPast,$weeksPast,$weeksPast,$weeksPast,$weeksPast); // 0 to 6
-    $weekday = (int)(date_create()->format('N')); // N: 1 (for Monday) through 7 (for Sunday)
-    for ($i = 0; $i < $weekday - 1; $i++) { // i = 0 .. 6
-      $minusWeekArr[$i] = $minusWeekArr[$i] + 1; // for the current week, I need to search for the last Monday (not this Monday). So one week back
+    for ($day = 1; $day <= $numOfEntries; $day++) {
+      $val_y .= getWattOfDay(dbConn:$dbConn, userid:$userid, dayString:$startDay->format('Y-m-d')).', ';
+      $startDay->modify('+1 days');
     }
-    // maybe: could be written more nicely?
-    array_push($dailyStrings, date_create('-'.$minusWeekArr[0].' week Monday 00:00')->format('Y-m-d '));
-    array_push($dailyStrings, date_create('-'.$minusWeekArr[1].' week Tuesday 00:00')->format('Y-m-d '));
-    array_push($dailyStrings, date_create('-'.$minusWeekArr[2].' week Wednesday 00:00')->format('Y-m-d '));
-    array_push($dailyStrings, date_create('-'.$minusWeekArr[3].' week Thursday 00:00')->format('Y-m-d ')); // last week (if today is Friday)
-    array_push($dailyStrings, date_create('-'.$minusWeekArr[4].' week Friday 00:00')->format('Y-m-d ')); // this week (if today is Friday)
-    array_push($dailyStrings, date_create('-'.$minusWeekArr[5].' week Saturday 00:00')->format('Y-m-d '));
-    array_push($dailyStrings, date_create('-'.$minusWeekArr[6].' week Sunday 00:00')->format('Y-m-d '));  
+    $val_x .= '"Mo", "Di", "Mi", "Do", "Fr", "Sa", "So", ';    
   }
   
-  for ($i = 0; $i < $lastDay; $i++) {
-    // for some entries, this sql will return the sum of only one line (thin = 24), for others 24 and for the newest ones it returns the sum of lots of entries 
-    $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-    $sql = $sql. ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dailyStrings[$i].' 00:00:00" AND `zeit` <= "'.$dailyStrings[$i].' 23:59:59";';
-    // echo $sql.'<br>';
-    $result = $dbConn->query($sql); // returns only one row
-    $row = $result->fetch_assoc();
-    
-    if ($row['sumZeitDiff'] > 0) { // divide by 0 exception
-      $watt = max(round($row['sumConsDiff']*3600*1000 / $row['sumZeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
-    } else {
-      $watt = ' ';
-    }
-    $val_y .= $watt.', ';
-    $val_x .= ($i+1).', '; // only valid for month
-  }
   $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
-  if ($isMonth) {
-    $val_x = substr($val_x, 0, -2).' ]';
-  } else {
-    $val_x = '[ "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" ]'; 
-  }  
-  return [$val_x, $val_y, $lastDay];
+  $val_x = substr($val_x, 0, -2).' ]';
+  return [$val_x, $val_y, $numOfEntries];
 }
 
 // prints header with css/js and body, container-div and h1 title
