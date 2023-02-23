@@ -21,13 +21,15 @@ function mail2userid (object $dbConn, string $emailUnsafe) : int {
   return (int)$row[0];            
 }  
 
-function processLoginData(object $dbConn, string $emailUnsafe, string $passwordUnsafe, int $setCookieSafe): bool {
+function processLoginData(object $dbConn, string $emailUnsafe, string $passwordUnsafe, int $setCookieSafe, bool $doRedirect=TRUE): bool {
   if (!(filter_var($emailUnsafe, FILTER_VALIDATE_EMAIL))) { // have a valid email
-      printErrorAndDie('Error','Email ungültig');      
+      printErrorAndDie('Error','Email ungültig');
+      return FALSE;
   }
+
   $userid = mail2userid(dbConn:$dbConn, emailUnsafe:$emailUnsafe);
   if (!($userid > 0) ) { // email found in db
-    printErrorAndDie('Error','Falsches Passwort oder Email... Nochmals versuchen? <a href="login.php">zurück zur Login-Seite</a>');
+    printErrorAndDie('Error','Falsches Passwort oder Email... Nochmals versuchen? <a href="login.php" class="underline">zurück zur Login-Seite</a>');
     return FALSE; 
   } 
 
@@ -45,7 +47,9 @@ function processLoginData(object $dbConn, string $emailUnsafe, string $passwordU
     $row = $result->fetch_row();
     setcookie('randCookie', $row[0], $expire, '/verbrauch/', 'strommesser.ch', TRUE, TRUE);
   } // setCookie is selected
-  redirectRelative('index.php');
+  if ($doRedirect) {
+    redirectRelative('index.php');
+  }
   return TRUE;
 }
 
@@ -214,8 +218,34 @@ if ($doSafe === 0) {
   </form>
   ';  
 } elseif ($doSafe === 4) {
-  printBeginOfPage(site:'login.php', title:'TODO: Passwort wurde geändert');
-  echo '<p>Funktion noch nicht implementiert...zurück zur <a href="login.php" class="underline">Loginseite</a></p>';
+  $emailUnsafe = filter_var(safeStrFromExt('POST', 'email', 127), FILTER_SANITIZE_EMAIL);
+  $isOldPwOk = processLoginData(
+    dbConn:$dbConn,
+    emailUnsafe:$emailUnsafe,
+    passwordUnsafe:filter_var(safeStrFromExt('POST', 'password', 63), FILTER_SANITIZE_STRING), // generic string, max length 63
+    setCookieSafe:0,
+    doRedirect:FALSE
+  );
+  if ($isOldPwOk) {
+    // check whether criterias are met (min-length = 4 characters)
+    $newPw = filter_var(safeStrFromExt('POST', 'passwordNew', 63), FILTER_SANITIZE_STRING);
+    if (strlen($newPw) < 4) {
+      printErrorAndDie('Error','Neues Passwort muss mindestens 4 Zeichen lang sein... Nochmals versuchen? <a href="login.php" class="underline">zurück zur Login-Seite</a>');
+    }
+    $userid = mail2userid(dbConn:$dbConn, emailUnsafe:$emailUnsafe);
+    if (!($userid > 0) ) { // email found in db
+      printErrorAndDie('Error','Falsches Passwort oder Email... Nochmals versuchen? <a href="login.php" class="underline">zurück zur Login-Seite</a>');
+      return FALSE; 
+    } 
+
+
+    $pwHash = password_hash($newPw, PASSWORD_DEFAULT);
+    if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$userid.'"'))) {
+      return error($dbConn, 104402);      
+    }
+  }
+  printBeginOfPage(site:'login.php', title:'Passwort wurde geändert');
+  echo '<p>Dein Passwort wurde erfolgreich geändert. Du kannst dich nun damit auf der <a href="login.php" class="underline">Loginseite</a> einloggen</p>';
 } elseif ($doSafe === 5) {
   printBeginOfPage(site:'login.php', title:'TODO: Passwort vergessen');
   echo '<p>Funktion noch nicht implementiert...zurück zur <a href="login.php" class="underline">Loginseite</a></p>';
