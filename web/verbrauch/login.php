@@ -85,6 +85,54 @@ function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid=0, s
   return TRUE;
 } // function
 
+function printLoginForm (string $reason, int $formDo, string $submitText): void {
+  echo '
+  <form action="login.php?do='.$formDo.'" method="post" id="loginForm">
+    <div class="flex flex-row mt-8">
+      <div class="basis-1/3 self-center">Email:</div>
+      <div class="basis-2/3 inline-block align-middle"><input class="input-text" name="email" type="email" maxlength="127" value="" required></div>
+    </div>';
+    if ($reason === 'change' or $reason === 'login') {
+      echo '    
+    <div class="flex flex-row mt-2">
+      <div class="basis-1/3 self-center">Passwort:</div>
+      <div class="basis-2/3"><input class="input-text" name="password" type="password" maxlength="63" value="" required></div>
+    </div>'; 
+    }
+    if ($reason === 'change') {
+      echo '
+    <div class="flex flex-row mt-2">
+      <div class="basis-1/3 self-center">neues Passwort:</div>
+      <div class="basis-2/3"><input class="input-text" name="passwordNew" type="password" maxlength="63" value="" required></div>
+    </div>';
+    } 
+    if ($reason === 'login') { 
+      echo '
+    <div class="flex flex-row justify-center mt-2">
+      <div><input class="w-10" type="checkbox" name="setCookie" value="1" checked> <span class="text-sm">auf diesem Gerät speichern</span></div>
+    </div>';
+    }
+    echo '
+    <div class="flex flex-row justify-center mt-2">
+      <div><input id="loginFormSubmit" class="mt-8 input-text basis-full" name="submit" type="submit" value="'.$submitText.'"></div>
+    </div>
+  </form>
+  <hr class="my-8">';
+  if ($reason != 'change') {
+    echo '
+  <div class="flex flex-row justify-center">
+    <div><a href="login.php?do=3" class="input-text basis-full">Passwort ändern</a></div>
+  </div>';
+  }
+  if ($reason != 'forgot') {
+    echo '
+  <div class="flex flex-row justify-center mt-4">
+    <div><a href="login.php?do=5" class="input-text basis-full">Passwort vergessen</a></div>
+  </div>
+  ';
+  }
+}
+
 $doSafe = safeIntFromExt('GET', 'do', 1); // this is an integer (range 1 to 9) or non-existing
 // do = 0: entry point
 // do = 1: process login form
@@ -104,32 +152,7 @@ if ($doSafe === 0) {
   } // no cookie present and no userid. print the login form
 
   printBeginOfPage(site:'login.php', title:'Log in');
-
-  echo '
-  <form action="login.php?do=1" method="post" id="loginForm">
-    <div class="flex flex-row mt-8">
-      <div class="basis-1/3 self-center">Email:</div>
-      <div class="basis-2/3 inline-block align-middle"><input class="input-text" name="email" type="email" maxlength="127" value="" required></div>
-    </div>
-    <div class="flex flex-row mt-2">
-      <div class="basis-1/3 self-center">Passwort:</div>
-      <div class="basis-2/3"><input class="input-text" name="password" type="password" maxlength="63" value="" required></div>
-    </div>
-    <div class="flex flex-row justify-center mt-2">
-      <div><input class="w-10" type="checkbox" name="setCookie" value="1" checked> <span class="text-sm">auf diesem Gerät speichern</span></div>
-    </div>
-    <div class="flex flex-row justify-center mt-2">
-      <div><input id="loginFormSubmit" class="mt-8 input-text basis-full" name="submit" type="submit" value="log in"></div>
-    </div>
-  </form>
-  <hr class="my-8">
-  <div class="flex flex-row justify-center">
-    <div><a href="login.php?do=3" class="input-text basis-full">Passwort ändern</a></div>
-  </div>
-  <div class="flex flex-row justify-center mt-4">
-    <div><a href="login.php?do=5" class="input-text basis-full">Passwort vergessen</a></div>
-  </div>
-  ';  
+  printLoginForm(reason:'login', formDo:1, submitText:'Log in');
 } elseif ($doSafe === 1) {
   processLoginData(
     dbConn:$dbConn,
@@ -143,19 +166,7 @@ if ($doSafe === 0) {
   echo '<p>log out ok, zurück zur <a href="../index.php" class="underline">Startseite</a></p>';
 } elseif ($doSafe === 3) {    
   printBeginOfPage(site:'login.php', title:'Passwort ändern');
-  echo '
-  <form action="login.php?do=4" method="post" id="loginForm">
-    <div class="grid grid-cols-2 gap-4 justify-items-start mt-8">
-      <div class="justify-self-end">Email:</div>
-      <div><input class="input-text" name="email" type="email" maxlength="127" value="" required></div>
-      <div class="justify-self-end">altes Passwort:</div>
-      <div><input class="input-text" name="password" type="password" maxlength="63" value="" required></div>
-      <div class="justify-self-end">neues Passwort:</div>
-      <div><input class="input-text" name="passwordNew" type="password" maxlength="63" value="" required></div>
-      <div class="justify-self-center col-span-2"><input id="loginFormSubmit" class="mt-8 input-text" name="submit" type="submit" value="Passwort ändern"></div>      
-    </div>
-  </form>
-  ';  
+  printLoginForm (reason:'change', formDo:4, submitText:'Neues Passwort speichern');
 } elseif ($doSafe === 4) {
   $emailUnsafe = filter_var(safeStrFromExt('POST', 'email', 127), FILTER_SANITIZE_EMAIL);
   $isOldPwOk = processLoginData(
@@ -186,15 +197,7 @@ if ($doSafe === 0) {
   echo '<p>Dein Passwort wurde erfolgreich geändert. Du kannst dich nun damit auf der <a href="login.php" class="underline">Loginseite</a> einloggen</p>';
 } elseif ($doSafe === 5) {
   printBeginOfPage(site:'login.php', title:'Passwort vergessen');
-  echo '
-  <form action="login.php?do=6" method="post" id="loginForm">
-    <div class="grid grid-cols-2 gap-4 justify-items-start mt-8">
-      <div class="justify-self-end">Email:</div>
-      <div><input class="input-text" name="email" type="email" maxlength="127" value="" required></div>
-      <div class="justify-self-center col-span-2"><input id="loginFormSubmit" class="mt-8 input-text" name="submit" type="submit" value="Passwort zurücksetzen"></div>      
-    </div>
-  </form>
-  ';
+  printLoginForm (reason:'forgot', formDo:6, submitText:'Passwort zurücksetzen');  
 } elseif ($doSafe === 6) {
   printBeginOfPage(site:'login.php', title:'TODO: Link zum Zurücksetzen des Passworts verschickt');
   echo '<p>Funktion noch nicht implementiert...zurück zur <a href="login.php" class="underline">Loginseite</a></p>';
