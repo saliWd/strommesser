@@ -26,7 +26,7 @@
         <li><a href="static.statistic.html">Statistik</a></li>
         <li><a href="static.settings.html">Einstellungen</a></li>
         <li>&nbsp;</li>
-        <li><a href="static.login.html" id="navLogoutLink">Log out</a></li>
+        <li><a href="login.php?do=2" id="navLogoutLink">Log out</a></li>
       </ul>
     </div>
   </nav>
@@ -34,27 +34,27 @@
   <h1 class="text-2xl m-2">Verbrauch</h1>
   <hr>
   <div class="flex">
-    <div class="flex-auto text-left">Verbrauch: <b>87W</b> (11:27).</div>
-    <div class="flex-auto text-right">Ø-Verbrauch: <b>19W</b></div>
+    <div class="flex-auto text-left">Verbrauch: <b>29W</b> (16:16).</div>
+    <div class="flex-auto text-right">Ø-Verbrauch: <b>50W</b></div>
   </div>
   <hr>
   
     <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
-    const labels = [ new Date("2023-02-23 10:28:26"), new Date("2023-02-23 10:30:27"), new Date("2023-02-23 10:32:28"), new Date("2023-02-23 10:34:31"), new Date("2023-02-23 10:36:31"), new Date("2023-02-23 10:38:32"), new Date("2023-02-23 10:40:33"), new Date("2023-02-23 10:42:37"), new Date("2023-02-23 10:44:39"), new Date("2023-02-23 10:46:39"), new Date("2023-02-23 10:48:40"), new Date("2023-02-23 10:50:43"), new Date("2023-02-23 10:52:44"), new Date("2023-02-23 10:54:45"), new Date("2023-02-23 10:56:47"), new Date("2023-02-23 10:58:48"), new Date("2023-02-23 11:00:49"), new Date("2023-02-23 11:02:51"), new Date("2023-02-23 11:04:54"), new Date("2023-02-23 11:06:55"), new Date("2023-02-23 11:08:56"), new Date("2023-02-23 11:10:57"), new Date("2023-02-23 11:12:59"), new Date("2023-02-23 11:15:00"), new Date("2023-02-23 11:17:01"), new Date("2023-02-23 11:19:03"), new Date("2023-02-23 11:21:04"), new Date("2023-02-23 11:23:06"), new Date("2023-02-23 11:25:07") ];
+    const labels = [ new Date("2023-02-23 15:18:05"), new Date("2023-02-23 15:20:05"), new Date("2023-02-23 15:22:07"), new Date("2023-02-23 15:24:09"), new Date("2023-02-23 15:26:10"), new Date("2023-02-23 15:28:11"), new Date("2023-02-23 15:30:12"), new Date("2023-02-23 15:32:15"), new Date("2023-02-23 15:34:16"), new Date("2023-02-23 15:36:16"), new Date("2023-02-23 15:38:18"), new Date("2023-02-23 15:40:20"), new Date("2023-02-23 15:42:21"), new Date("2023-02-23 15:44:22"), new Date("2023-02-23 15:46:25"), new Date("2023-02-23 15:48:26"), new Date("2023-02-23 15:50:27"), new Date("2023-02-23 15:52:27"), new Date("2023-02-23 15:54:31"), new Date("2023-02-23 15:56:32"), new Date("2023-02-23 15:58:32"), new Date("2023-02-23 16:00:33"), new Date("2023-02-23 16:02:36"), new Date("2023-02-23 16:04:36"), new Date("2023-02-23 16:06:38"), new Date("2023-02-23 16:08:40"), new Date("2023-02-23 16:10:40"), new Date("2023-02-23 16:12:41"), new Date("2023-02-23 16:14:43") ];
     const data = {
       labels: labels,
       datasets: [{
         label: "Verbrauch [W]",
-        data: [ 60, 30, 60, 59, 30, 10, 10, 10, 10, 30, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 89, 10, 10, 10, 60, 89, 10, 30, 10 ],
+        data: [ 59, 120, 148, 118, 119, 89, 89, 59, 60, 60, 118, 89, 119, 89, 117, 30, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ],
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
         showLine: false
       },
       {
         label: "Verbrauch total [kWh]",
-        data: [ 0, 0.0010000000038417, 0.0030000000042492, 0.0050000000046566, 0.0060000000012224, 0.0060000000012224, 0.0060000000012224, 0.0060000000012224, 0.0060000000012224, 0.0070000000050641, 0.0070000000050641, 0.0070000000050641, 0.0070000000050641, 0.0070000000050641, 0.0070000000050641, 0.0070000000050641, 0.0070000000050641, 0.0070000000050641, 0.0070000000050641, 0.0070000000050641, 0.010000000002037, 0.010000000002037, 0.010000000002037, 0.010000000002037, 0.012000000002445, 0.014999999999418, 0.014999999999418, 0.01600000000326, 0.01600000000326 ],
+        data: [ 0, 0.0040000000008149, 0.0089999999981956, 0.01299999999901, 0.016999999999825, 0.019999999996799, 0.023000000001048, 0.025000000001455, 0.027000000001863, 0.02900000000227, 0.033000000003085, 0.036000000000058, 0.040000000000873, 0.042999999997846, 0.046999999998661, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503, 0.048000000002503 ],
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
@@ -83,7 +83,7 @@
     Info / Details:
     <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Info</span></button>
   </div>
-  <div class="flex-auto text-right">Insgesamt 859 Einträge</div>
+  <div class="flex-auto text-right">Insgesamt 858 Einträge</div>
 </div>
 <div data-popover id="popover-descriptionIndex" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
     <div class="p-3 space-y-2">
@@ -108,7 +108,7 @@
   const dataWeeklyNow = {
     labels: labelsWeeklyNow,
     datasets: [{
-      data: [ 537, 604, 561, 422,  ,  ,   ],
+      data: [ 537, 604, 561, 315,  ,  ,   ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",
@@ -160,7 +160,7 @@
   const dataMonthlyNow = {
     labels: labelsMonthlyNow,
     datasets: [{
-      data: [ 739, 925, 876, 872, 1219, 829, 884, 968, 1147, 968, 993, 1030, 680, 848, 927, 744, 433, 651, 722, 537, 604, 561, 422,  ,  ,  ,  ,   ],
+      data: [ 739, 925, 876, 872, 1219, 829, 884, 968, 1147, 968, 993, 1030, 680, 848, 927, 744, 433, 651, 722, 537, 604, 561, 315,  ,  ,  ,  ,   ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",

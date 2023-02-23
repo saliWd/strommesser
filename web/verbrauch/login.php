@@ -5,7 +5,7 @@ $dbConn = get_dbConn(); // do not use initialize here
 
 function sessionAndCookieDelete (): void {
   $_SESSION['userid'] = 0; // the most important one, make sure it's really 0
-  setcookie('userIdCookie', '0', (time() - 42000), '/verbrauch/', 'strommesser.ch', TRUE, TRUE); // some big enough value in the past to make sure things like summer time changes do not affect it  
+  setcookie('userIdCookie', '0', (time() - 42000), '/verbrauch/', 'strommesser.ch', TRUE, TRUE); // some big enough value in the past to make sure things like summer time changes do not affect it
 }
 
 // returns the userid which matches to the email given. Returns 0 if something went wrong
@@ -55,7 +55,7 @@ function processLoginData(object $dbConn, string $emailUnsafe, string $passwordU
 
 // function to do the login. Several options are available to log in
 function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid=0, string $passwordUnsafe='', string $randCookieInput='') : bool {
-  $_SESSION['userid'] = 0; // clear it just to make sure    
+  $_SESSION['userid'] = 0; // clear it just to make sure
   
   if (!($result = $dbConn->query('SELECT `pwHash`, `randCookie` FROM `user` WHERE `id` = "'.$userid.'"'))) {
     return error(112004);
@@ -64,7 +64,7 @@ function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid=0, s
     return error(112003);
   }
 
-  $row = $result->fetch_assoc();        
+  $row = $result->fetch_assoc();
   $pwHash = $row['pwHash'];
   $randCookie = $row['randCookie'];
   
@@ -85,78 +85,6 @@ function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid=0, s
   return TRUE;
 } // function
 
-/*
-function updateUser (object $dbConn, int $userid, bool $forgotPw): bool {  
-  if (!(isNotTestUser($dbConn, $userid))) {
-    return false;
-  }
-  if (!($result = $dbConn->query('SELECT * FROM `user` WHERE `id` = "'.$userid.'"'))) {
-    return error($dbConn, 104404);
-  }
-  
-  $row = $result->fetch_assoc(); // guaranteed to get only one row      
-  $passwordUnsafe = safeStrFromExt('POST','password', 63);
-  if (!(($forgotPw) or (password_verify($passwordUnsafe, $row['pwHash'])))) {        
-    return error($dbConn, 104403);
-  }
-    
-  $passwordUnsafe = filter_var(safeStrFromExt('POST','passwordNew', 63), FILTER_SANITIZE_STRING);
-  if (strlen($passwordUnsafe) <= 3) {
-    return error($dbConn, 104400);
-  }
-  $pwHash = password_hash($passwordUnsafe, PASSWORD_DEFAULT);
-  
-  // TODO: quiet ugly statements...
-  $emailOk = false;
-  if (!$forgotPw) {
-    $emailUnsafe = filter_var(safeStrFromExt('POST','email', 127), FILTER_SANITIZE_EMAIL);
-    // newEmail must not exist in the db (exclude current user itself)
-    if (filter_var($emailUnsafe, FILTER_VALIDATE_EMAIL)) { // have a valid email 
-      // check whether email already exists
-      $emailSqlSafe = mysqli_real_escape_string($dbConn, $emailUnsafe);
-      if (strcasecmp($emailSqlSafe, $row['email'])  != 0) { // 0 means they are equal
-        if ($result = $dbConn->query('SELECT `verified` FROM `user` WHERE `email` LIKE "'.$emailSqlSafe.'" LIMIT 1')) {
-          if ($result->num_rows == 0) {
-            $emailOk = true; 
-          }
-        }
-      } else { $emailOk = true; }; // no need to check again if the email did not change
-    }
-  }
-    
-  if ($emailOk) {
-    if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'", `email` = "'.$emailSqlSafe.'" WHERE `id` = "'.$userid.'"'))) {
-      return error($dbConn, 104401);
-    }
-    return true;
-  } else { 
-    if (!$forgotPw) { 
-      return error($dbConn, 104405);
-    }
-    if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$userid.'"'))) {
-      return error($dbConn, 104402);      
-    }
-    return true;
-  } // emailOK-else  
-}
-
-
-
-
-function newUserLoginAndLinks (object $dbConn, int $newUserid, string $pw) : bool {       
-  // password_hash("messerPW", PASSWORD_DEFAULT) returns '$2y$10$zd4qDdeg59iqGV7GrviV9eLw.B9OD/JVTIul8rr1IPp9oWJd4AZAy';
-  $pwHash = password_hash($pw, PASSWORD_DEFAULT); // $pw is potentially unsafe. Shouldn't be an issue as I store the hash
-  
-  // NB: set a cookie for some random big number. Not the password itself and not the pwHash!
-  // NB: will use this number on every cookie for this user, to login on several devices. One cannot guess other users random number                  
-  $hexStr64 = bin2hex(random_bytes(32)); // some random value, used for cookie     
-  if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'", `randCookie` = "'.$hexStr64.'" WHERE `id` = "'.$newUserid.'"'))) { 
-    return FALSE;
-  }
-  return TRUE;
-} 
-*/
-
 $doSafe = safeIntFromExt('GET', 'do', 1); // this is an integer (range 1 to 9) or non-existing
 // do = 0: entry point
 // do = 1: process login form
@@ -164,7 +92,7 @@ $doSafe = safeIntFromExt('GET', 'do', 1); // this is an integer (range 1 to 9) o
 // do = 3: present changePW form
 // do = 4: execute the changePW
 // do = 5: present the forgotPW form
-// do = 6: execute the forgotPW
+// do = 6: TODO: execute the forgotPW
 
 if ($doSafe === 0) {
   // check cookie
@@ -176,20 +104,31 @@ if ($doSafe === 0) {
   } // no cookie present and no userid. print the login form
 
   printBeginOfPage(site:'login.php', title:'Log in');
+
   echo '
   <form action="login.php?do=1" method="post" id="loginForm">
-    <div class="grid grid-cols-2 gap-4 justify-items-start mt-8">
-      <div class="justify-self-end">Email:</div>
-      <div><input class="input-text" name="email" type="email" maxlength="127" value="" required></div>
-      <div class="justify-self-end">Passwort:</div>
-      <div><input class="input-text" name="password" type="password" maxlength="63" value="" required></div>
-      <div class="justify-self-end"><input class="w-10" type="checkbox" name="setCookie" value="1" checked></div>
-      <div class="text-sm">auf diesem Gerät speichern</div>
-      <div class="justify-self-center col-span-2"><input id="loginFormSubmit" class="mt-8 input-text" name="submit" type="submit" value="log in"></div>      
-      <div class="mt-16 justify-self-center"><a href="login.php?do=3" class="input-text">Passwort ändern</a></div>
-      <div class="mt-16 justify-self-center"><a href="login.php?do=5" class="input-text">Passwort vergessen</a></div>
+    <div class="flex flex-row mt-8">
+      <div class="basis-1/3 self-center">Email:</div>
+      <div class="basis-2/3 inline-block align-middle"><input class="input-text" name="email" type="email" maxlength="127" value="" required></div>
+    </div>
+    <div class="flex flex-row mt-2">
+      <div class="basis-1/3 self-center">Passwort:</div>
+      <div class="basis-2/3"><input class="input-text" name="password" type="password" maxlength="63" value="" required></div>
+    </div>
+    <div class="flex flex-row justify-center mt-2">
+      <div><input class="w-10" type="checkbox" name="setCookie" value="1" checked> <span class="text-sm">auf diesem Gerät speichern</span></div>
+    </div>
+    <div class="flex flex-row justify-center mt-2">
+      <div><input id="loginFormSubmit" class="mt-8 input-text basis-full" name="submit" type="submit" value="log in"></div>
     </div>
   </form>
+  <hr class="my-8">
+  <div class="flex flex-row justify-center">
+    <div><a href="login.php?do=3" class="input-text basis-full">Passwort ändern</a></div>
+  </div>
+  <div class="flex flex-row justify-center mt-4">
+    <div><a href="login.php?do=5" class="input-text basis-full">Passwort vergessen</a></div>
+  </div>
   ';  
 } elseif ($doSafe === 1) {
   processLoginData(
@@ -238,7 +177,6 @@ if ($doSafe === 0) {
       return FALSE; 
     } 
 
-
     $pwHash = password_hash($newPw, PASSWORD_DEFAULT);
     if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$userid.'"'))) {
       return error($dbConn, 104402);      
@@ -247,8 +185,16 @@ if ($doSafe === 0) {
   printBeginOfPage(site:'login.php', title:'Passwort wurde geändert');
   echo '<p>Dein Passwort wurde erfolgreich geändert. Du kannst dich nun damit auf der <a href="login.php" class="underline">Loginseite</a> einloggen</p>';
 } elseif ($doSafe === 5) {
-  printBeginOfPage(site:'login.php', title:'TODO: Passwort vergessen');
-  echo '<p>Funktion noch nicht implementiert...zurück zur <a href="login.php" class="underline">Loginseite</a></p>';
+  printBeginOfPage(site:'login.php', title:'Passwort vergessen');
+  echo '
+  <form action="login.php?do=6" method="post" id="loginForm">
+    <div class="grid grid-cols-2 gap-4 justify-items-start mt-8">
+      <div class="justify-self-end">Email:</div>
+      <div><input class="input-text" name="email" type="email" maxlength="127" value="" required></div>
+      <div class="justify-self-center col-span-2"><input id="loginFormSubmit" class="mt-8 input-text" name="submit" type="submit" value="Passwort zurücksetzen"></div>      
+    </div>
+  </form>
+  ';
 } elseif ($doSafe === 6) {
   printBeginOfPage(site:'login.php', title:'TODO: Link zum Zurücksetzen des Passworts verschickt');
   echo '<p>Funktion noch nicht implementiert...zurück zur <a href="login.php" class="underline">Loginseite</a></p>';
