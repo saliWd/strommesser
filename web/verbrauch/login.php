@@ -182,8 +182,8 @@ if ($doSafe === 0) {
       <div class="justify-self-end"><input class="w-10" type="checkbox" name="setCookie" value="1" checked></div>
       <div class="text-sm">auf diesem Gerät speichern</div>
       <div class="justify-self-center col-span-2"><input id="loginFormSubmit" class="mt-8 input-text" name="submit" type="submit" value="log in"></div>      
-      <div class="mt-16 justify-self-center"><a href="login.php?do=3" class="btn">Passwort ändern</a></div>
-      <div class="mt-16 justify-self-center"><a href="login.php?do=5" class="btn">Passwort vergessen</a></div>
+      <div class="mt-16 justify-self-center"><a href="login.php?do=3" class="input-text">Passwort ändern</a></div>
+      <div class="mt-16 justify-self-center"><a href="login.php?do=5" class="input-text">Passwort vergessen</a></div>
     </div>
   </form>
   ';  

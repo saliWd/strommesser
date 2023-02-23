@@ -8,7 +8,7 @@ $LIMIT_LED_BRIGHTNESS = 255;
 
 $doSafe = safeIntFromExt('GET', 'do', 2); // this is an integer (range 1 to 99) or non-existing
 // do = 0: entry point
-// do = 1: delete all entries in DB
+// do = 1: (previously: delete all entries in DB)
 // do = 2: process setting changes
 printBeginOfPage(site:'settings.php', title:'Einstellungen');
 if ($doSafe === 0) { // entry point of this site
@@ -21,7 +21,7 @@ if ($doSafe === 0) { // entry point of this site
     <form id="settingsValues" action="settings.php?do=2" method="post">
       <p class="text-left"><b>Maximalwert Farbskala:</b><br>
       LED und Minibildschirm zeigen den aktuellen Verbrauch mit einer Farbskala von blau über grün nach gelb und schlussendlich rot.<br>
-      0 Watt entspricht der Farbe blau, der Maximalwert (und alles darüber) wird rot angezeigt.</p>          
+      0 Watt entspricht der Farbe blau, der Maximalwert (und alles darüber) wird rot angezeigt.</p>
       <p class="mx-auto"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="'.$LIMIT_LED_MAX_VALUE.'" step="20" value="'.$row['ledMaxValue'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledMaxValue'].'</output>W</p>
       <hr>
       <p class="text-left"><b>LED Helligkeit:</b><br>
@@ -29,8 +29,9 @@ if ($doSafe === 0) { // entry point of this site
       In der Nacht (22 Uhr bis 6 Uhr) leuchtet sie übrigens 50% dunkler.</p>
       <p class="mx-auto"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="'.$LIMIT_LED_BRIGHTNESS.'" step="5" value="'.$row['ledBrightness'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledBrightness'].'</output></p>
       <p class="mx-auto"><input id="settingsFormSubmit" class="mt-8 input-text mx-auto" name="settingsFormSubmit" type="submit" value="speichern"></p>
-      <p>&nbsp;</p>
-    </form>';
+    </form>
+    <hr class="mt-8">
+    <p class="mt-8"><a href="login.php?do=3" class="input-text">Passwort ändern</a></p>';
 
     // echo '<p>&nbsp;</p><p>&nbsp;</p><p><div class="btn mt-8 input-text"><a href="settings.php?do=1">alle Einträge löschen</a></div></p>';        
 } elseif ($doSafe === 1) { // delete all entries
