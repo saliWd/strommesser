@@ -1,17 +1,18 @@
 # StromMesser TODOs
 
 1. StromMesser wordpress
-   1. fill with more content: explanation?   
+   1. fill with more content: explanation?
+   1. link to login 
 2. StromMesser/verbrauch
    1. statistic.php: 
       * scrollable: per week, per month, per year
       * design / explanations
-   1. settings.php: design
+   1. settings.php: design (distinguish between pico-disp and rest). Change email.
    1. getRaw.php
    1. index.php
-   1. login.php: PW change / design (distinguish between pico-disp and rest)
+   1. login.php: PW forgotten
    1. rx.php
-   1. general: in-page navigation concept
+   1. general: in-page navigation concept -> statistic-menu
 3. pico devices
    1. stability: So far so good, no hanging since 10.01.23. (one issue because of USB power supply issue)
       * check with WLAN disconnection
