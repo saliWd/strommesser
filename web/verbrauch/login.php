@@ -123,6 +123,7 @@ function processPwRecLink(object $dbConn, int $useridGetSafe, string $verSqlSafe
     <div class="basis-1/3 self-center">neues Passwort:</div>
     <div class="basis-2/3"><input class="input-text" name="passwordNew" type="password" maxlength="63" value="" required></div>
   </div>
+  <input name="userid" type="hidden" value="'.$useridGetSafe.'"><input name="ver" type="hidden" value="'.$verGet.'">
   <div class="flex flex-row justify-center mt-2">
     <div><input id="loginFormSubmit" class="mt-8 input-text basis-full" name="submit" type="submit" value="neues Passwort speichern"></div>
   </div>
@@ -134,16 +135,16 @@ function processPwRecLink(object $dbConn, int $useridGetSafe, string $verSqlSafe
 // checks whether there is (at least) one entry in the data base and it's not yet expired
 function checkPwForgot(object $dbConn, int $useridGetSafe, $verSqlSafe) : bool {
   if (!($result = $dbConn->query('SELECT `validUntil` FROM `pwForgot` WHERE `userid` = "'.$useridGetSafe.'" AND `hexval` = "'.$verSqlSafe.'" ORDER BY `id` DESC'))) {
-    return false;
+    return error(111005);
   }
   // there might be more than one because user might have pressed the send email button several times
   if ($result->num_rows == 0) { 
-    return false; 
+    return error(111006);
   }
   $row = $result->fetch_row(); // interested only in the last one, so no for loop
   $validUntil = $row[0];
   if (time() > (strtotime($validUntil))) { 
-    return false; 
+    return error(111007);
   }
   
   return true;
@@ -158,7 +159,7 @@ function processNewPw(object $dbConn, int $useridPostSafe, string $verPost): boo
     return error(104400);
   }
   $pwHash = password_hash($passwordUnsafe, PASSWORD_DEFAULT); 
-  if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$userid.'"'))) {
+  if (!($dbConn->query('UPDATE `kunden` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$useridPostSafe.'"'))) {
     return error($dbConn, 104402);
   }
   if (!($dbConn->query('DELETE FROM `pwForgot` WHERE `userid` = "'.$useridPostSafe.'"'))) {

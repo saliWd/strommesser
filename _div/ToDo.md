@@ -10,11 +10,11 @@
    1. settings.php: design (distinguish between pico-disp and rest). Change email.
    1. getRaw.php
    1. index.php
-   1. login.php: PW forgotten
+   1. login.php
    1. rx.php
    1. general: in-page navigation concept -> statistic-menu. go-up link at bottom of page
 3. pico devices
-   1. stability: So far so good, no hanging since 10.01.23. (one issue because of USB power supply issue)
+   1. stability: good since 10.01.23
       * check with WLAN disconnection
       * does not (always) recover from issue on server side. Need more stable reset mechanism
    1. disp
@@ -22,7 +22,7 @@
 4. div
 
 
-Next:  2.5 / 2.1 
+Next:  2.1 
 
 
 [lnkCase]: https://www.thingiverse.com/thing:4767008
