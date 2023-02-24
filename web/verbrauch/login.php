@@ -290,11 +290,12 @@ if ($doSafe === 0) {
     dbConn:$dbConn, 
     emailUnsafe:filter_var(safeStrFromExt('POST', 'email', 127), FILTER_SANITIZE_EMAIL));
 } elseif ($doSafe === 7) {
+  $verGet = safeHexFromExt('GET', 'ver', 64);
   processPwRecLink(
     dbConn:$dbConn, 
     useridGetSafe:safeIntFromExt('GET', 'userid', 11), 
     verSqlSafe:mysqli_real_escape_string($dbConn, $verGet), 
-    verGet:safeHexFromExt('GET', 'ver', 64));
+    verGet:$verGet);
 } elseif ($doSafe === 8) {  
   processNewPw(
     dbConn:$dbConn, 
