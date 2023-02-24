@@ -39,11 +39,11 @@ echo '
   </div>
 </nav>
 <br><br>
-<div class="text-left">
-  <h3 class="font-semibold text-gray-900">Tageswerte pro Woche</h3>
-  <p>Für jeden Wochentag ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh</p>
-  <p>Gemessen wird von 00:00 bis 23:59 bzw. am aktuellen Tag von 00:00 bis `jetzt`.</p>
-  <p>Mit den Navigationspfeilen kannst du zwischen den Wochen blättern (TODO: noch in Arbeit)</p>
+<div class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+  <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Tageswerte pro Woche</h3>
+  <p class="font-normal text-gray-700">Für jeden Wochentag ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh.</p>
+  <p class="font-normal text-gray-700">Gemessen wird von 00:00 bis 23:59 bzw. am aktuellen Tag von 00:00 bis `jetzt`.</p>
+  <p class="font-normal text-gray-700">Mit den Navigationspfeilen kannst du zwischen den Wochen blättern (TODO: noch in Arbeit)</p>
 </div>
 ';
 printBarGraph(
@@ -60,22 +60,22 @@ printBarGraph(
 );
 
 echo '
-<div class="text-left mt-4">
-  <h3 class="font-semibold text-gray-900">Tageswerte pro Monat</h3>
-  <p>Für jeden Tag ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh</p>
-  <p>Gemessen wird von 00:00 bis 23:59 bzw. am aktuellen Tag von 00:00 bis `jetzt`.</p>
-  <p>Mit den Navigationspfeilen kannst du zwischen den Monaten blättern (TODO: noch in Arbeit)</p>
+<div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+  <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Tageswerte pro Monat</h3>
+  <p class="font-normal text-gray-700">Für jeden Tag ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh.</p>
+  <p class="font-normal text-gray-700">Gemessen wird von 00:00 bis 23:59 bzw. am aktuellen Tag von 00:00 bis `jetzt`.</p>
+  <p class="font-normal text-gray-700">Mit den Navigationspfeilen kannst du zwischen den Monaten blättern (TODO: noch in Arbeit)</p>
 </div>
 ';
 printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:0), chartId:'MonthlyNow', title:'diesen Monat');
 printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:1), chartId:'MonthlyLast', title:'letzten Monat');
 
 echo '
-<div class="text-left mt-4">
-  <h3 class="font-semibold text-gray-900">Wochenwerte übers Jahr</h3>
-  <p>Für jeden Woche ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Wochenverbrauch von 7*24 kWh</p>
-  <p>Gemessen wird von Montag 00:00 bis Sonntag 23:59 bzw. in der aktuellen Woche von Montag 00:00 bis `jetzt`.</p>
-</div>  
+<div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+  <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Wochenwerte übers Jahr</h3>
+  <p class="font-normal text-gray-700">Für jede Woche ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Wochenverbrauch von 7*24 kWh.</p>
+  <p class="font-normal text-gray-700">Gemessen wird von Montag 00:00 bis Sonntag 23:59 bzw. in der aktuellen Woche von Montag 00:00 bis `jetzt`.</p>
+</div>
 ';
 printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Year, goBack:0), chartId:'YearlyNow', title:'dieses Jahr');
 ?>
