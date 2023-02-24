@@ -10,7 +10,7 @@ function sessionAndCookieDelete (): void {
 
 // returns the userid which matches to the email given. Returns 0 if something went wrong
 function mail2userid (object $dbConn, string $emailUnsafe) : int {    
-  if (!($result = $dbConn->query('SELECT `id` FROM `user` WHERE `email` = "'.mysqli_real_escape_string($dbConn, $emailUnsafe).'";'))) {
+  if (!($result = $dbConn->query('SELECT `id` FROM `kunden` WHERE `email` = "'.mysqli_real_escape_string($dbConn, $emailUnsafe).'";'))) {
     return 0;
   }
   if (!($result->num_rows == 1)) {
@@ -23,13 +23,13 @@ function mail2userid (object $dbConn, string $emailUnsafe) : int {
 
 function processLoginData(object $dbConn, string $emailUnsafe, string $passwordUnsafe, int $setCookieSafe, bool $doRedirect=TRUE): bool {
   if (!(filter_var($emailUnsafe, FILTER_VALIDATE_EMAIL))) { // have a valid email
-      printErrorAndDie('Error','Email ungültig');
+      printPageAndDie('Error','Email ungültig');
       return FALSE;
   }
 
   $userid = mail2userid(dbConn:$dbConn, emailUnsafe:$emailUnsafe);
   if (!($userid > 0) ) { // email found in db
-    printErrorAndDie('Error','Falsches Passwort oder Email... Nochmals versuchen? <a href="login.php" class="underline">zurück zur Login-Seite</a>');
+    printPageAndDie('Error','Falsches Passwort oder Email... Nochmals versuchen? <a href="login.php" class="underline">zurück zur Login-Seite</a>');
     return FALSE; 
   } 
 
@@ -41,7 +41,7 @@ function processLoginData(object $dbConn, string $emailUnsafe, string $passwordU
     setcookie('userIdCookie', (string)$userid, $expire, '/verbrauch/', 'strommesser.ch', TRUE, TRUE);
 
     // this is just a random number which has been set at user creation. To make sure one cannot read out others data by changing its cookie
-    if (!($result = $dbConn->query('SELECT `randCookie` FROM `user` WHERE `id` = "'.$userid.'"' ))) {
+    if (!($result = $dbConn->query('SELECT `randCookie` FROM `kunden` WHERE `id` = "'.$userid.'"' ))) {
       return error(110400); 
     }
     $row = $result->fetch_row();
@@ -57,7 +57,7 @@ function processLoginData(object $dbConn, string $emailUnsafe, string $passwordU
 function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid=0, string $passwordUnsafe='', string $randCookieInput='') : bool {
   $_SESSION['userid'] = 0; // clear it just to make sure
   
-  if (!($result = $dbConn->query('SELECT `pwHash`, `randCookie` FROM `user` WHERE `id` = "'.$userid.'"'))) {
+  if (!($result = $dbConn->query('SELECT `pwHash`, `randCookie` FROM `kunden` WHERE `id` = "'.$userid.'"'))) {
     return error(112004);
   }
   if (!($result->num_rows === 1)) {
@@ -70,7 +70,7 @@ function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid=0, s
   
   if ($authMethodPw) { // with a pw
     if (!(password_verify($passwordUnsafe, $pwHash))) {
-      printErrorAndDie('Error','falsches Passwort');
+      printPageAndDie('Error','falsches Passwort');
       return FALSE;
     } 
   } else { // with a Cookie
@@ -78,12 +78,70 @@ function verifyCredentials (object $dbConn, bool $authMethodPw, int $userid=0, s
       return error(112001);
     }
   }    
-  if (!($dbConn->query('UPDATE `user` SET `lastLogin` = CURRENT_TIMESTAMP WHERE `id` = "'.$userid.'"'))) {
+  if (!($dbConn->query('UPDATE `kunden` SET `lastLogin` = CURRENT_TIMESTAMP WHERE `id` = "'.$userid.'"'))) {
     return error(112005);
   }
   $_SESSION['userid'] = $userid;
   return TRUE;
 } // function
+
+function processPwForgot(object $dbConn, string $emailUnsafe): bool {
+  $pwForgotUserid = mail2userid(dbConn:$dbConn, emailUnsafe:$emailUnsafe); // email exists    
+  if (!($pwForgotUserid > 0)) { // pwForgot-db stores a completely unrelated hexval which is valid for 1 hour. DB-layout: id / userid / hexval / validUntil
+    return error(110802); 
+  }  
+  $hexStr64 = bin2hex(random_bytes(32)); // this is stored in the database
+  $validUntil = date('Y-m-d H:i:s', time() + 3600);      
+  if (!($dbConn->query('INSERT INTO `pwForgot` (`userid`, `hexval`, `validUntil`) VALUES ("'.$pwForgotUserid.'", "'.$hexStr64.'", "'.$validUntil.'")'))) {
+    return error(110801); 
+  }
+  $emailBody = "Sali,\n\nDein Passwortwiederherstellungs-Link (gültig für eine Stunde):\nhttps://strommesser.ch/verbrauch/login.php?do=7&userid=".$pwForgotUserid."&ver=".$hexStr64."\n";
+  $emailBody = $emailBody."\n\nMerci und Gruess,\nDaniel von StromMesser\n\n--\nKontakt: messer@strommesser.ch\n";
+  if (!(mail($emailUnsafe, 'Passwortwiederherstellung auf strommesser.ch', $emailBody))) {
+    return error(110800);
+  }          
+  printPageAndDie(heading:'Email verschickt', text:'Das Email zur Passwortwiederherstellung wurde verschickt (an '.htmlentities($emailUnsafe).').<br>Die Wiederherstellung ist nun für eine Stunde aktiv...<br><br><a href="../index.php">zur Startseite</a>');
+  return true;
+}
+
+function processPwRecLink(object $dbConn, int $useridGetSafe, string $verSqlSafe, string $verGet): bool {
+  if (!(checkPwForgot(dbConn:$dbConn, useridGetSafe:$useridGetSafe, verSqlSafe:$verSqlSafe))) {
+    printPageAndDie('Error', 'Recovery link expired');
+    return error(110900);
+  }
+  printBeginOfPage(site:'login.php', title:'Neues Passwort setzen');
+  // maybe could integrate it into printLoginForm
+  echo '
+<form action="login.php?do=8" method="post" id="loginForm">
+  <div class="flex flex-row mt-2">
+    <div class="basis-1/3 self-center">neues Passwort:</div>
+    <div class="basis-2/3"><input class="input-text" name="passwordNew" type="password" maxlength="63" value="" required></div>
+  </div>
+  <div class="flex flex-row justify-center mt-2">
+    <div><input id="loginFormSubmit" class="mt-8 input-text basis-full" name="submit" type="submit" value="neues Passwort speichern"></div>
+  </div>
+</form>
+<hr class="my-8">';
+  return true;
+}
+
+// checks whether there is (at least) one entry in the data base and it's not yet expired
+function checkPwForgot(object $dbConn, int $useridGetSafe, $verSqlSafe) : bool {
+  if (!($result = $dbConn->query('SELECT `validUntil` FROM `pwForgot` WHERE `userid` = "'.$useridGetSafe.'" AND `hexval` = "'.$verSqlSafe.'" ORDER BY `id` DESC'))) {
+    return false;
+  }
+  // there might be more than one because user might have pressed the send email button several times
+  if ($result->num_rows == 0) { 
+    return false; 
+  }
+  $row = $result->fetch_row(); // interested only in the last one, so no for loop
+  $validUntil = $row[0];
+  if (time() > (strtotime($validUntil))) { 
+    return false; 
+  }
+  
+  return true;
+}
 
 function printLoginForm (string $reason, int $formDo, string $submitText): void {
   echo '
@@ -118,7 +176,7 @@ function printLoginForm (string $reason, int $formDo, string $submitText): void 
     </div>
   </form>
   <hr class="my-8">';
-  if ($reason != 'change') {
+  if ($reason == 'login') { // note: does it make sense to present this option when not logged in?
     echo '
   <div class="flex flex-row justify-center">
     <div><a href="login.php?do=3" class="input-text basis-full">Passwort ändern</a></div>
@@ -140,7 +198,10 @@ $doSafe = safeIntFromExt('GET', 'do', 1); // this is an integer (range 1 to 9) o
 // do = 3: present changePW form
 // do = 4: execute the changePW
 // do = 5: present the forgotPW form
-// do = 6: TODO: execute the forgotPW
+// do = 6: execute the forgotPW
+// do = 7: execute the forgotPW link, present form
+// do = 8: execute the forgotPW form
+
 
 if ($doSafe === 0) {
   // check cookie
@@ -180,16 +241,16 @@ if ($doSafe === 0) {
     // check whether criterias are met (min-length = 4 characters)
     $newPw = filter_var(safeStrFromExt('POST', 'passwordNew', 63), FILTER_SANITIZE_STRING);
     if (strlen($newPw) < 4) {
-      printErrorAndDie('Error','Neues Passwort muss mindestens 4 Zeichen lang sein... Nochmals versuchen? <a href="login.php" class="underline">zurück zur Login-Seite</a>');
+      printPageAndDie('Error','Neues Passwort muss mindestens 4 Zeichen lang sein... Nochmals versuchen? <a href="login.php" class="underline">zurück zur Login-Seite</a>');
     }
     $userid = mail2userid(dbConn:$dbConn, emailUnsafe:$emailUnsafe);
     if (!($userid > 0) ) { // email found in db
-      printErrorAndDie('Error','Falsches Passwort oder Email... Nochmals versuchen? <a href="login.php" class="underline">zurück zur Login-Seite</a>');
+      printPageAndDie('Error','Falsches Passwort oder Email... Nochmals versuchen? <a href="login.php" class="underline">zurück zur Login-Seite</a>');
       return FALSE; 
     } 
 
     $pwHash = password_hash($newPw, PASSWORD_DEFAULT);
-    if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$userid.'"'))) {
+    if (!($dbConn->query('UPDATE `kunden` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$userid.'"'))) {
       return error($dbConn, 104402);      
     }
   }
@@ -199,10 +260,17 @@ if ($doSafe === 0) {
   printBeginOfPage(site:'login.php', title:'Passwort vergessen');
   printLoginForm (reason:'forgot', formDo:6, submitText:'Passwort zurücksetzen');  
 } elseif ($doSafe === 6) {
-  printBeginOfPage(site:'login.php', title:'TODO: Link zum Zurücksetzen des Passworts verschickt');
+  printBeginOfPage(site:'login.php', title:'Link zum Zurücksetzen des Passworts verschickt'); 
+  processPwForgot(dbConn:$dbConn, emailUnsafe:filter_var(safeStrFromExt('POST', 'email', 127), FILTER_SANITIZE_EMAIL));
+} elseif ($doSafe === 7) {
+  $useridGetSafe = safeIntFromExt('GET', 'userid', 11);
+  $verGet = safeHexFromExt('GET', 'ver', 64);
+  $verSqlSafe = mysqli_real_escape_string($dbConn, $verGet);
+  processPwRecLink(dbConn:$dbConn, useridGetSafe:$useridGetSafe, verSqlSafe:$verSqlSafe, verGet:$verGet);
+} elseif ($doSafe === 8) {  
   echo '<p>Funktion noch nicht implementiert...zurück zur <a href="login.php" class="underline">Loginseite</a></p>';
 } else {
-  printErrorAndDie('Error','unsupported do on login.php');
+  printPageAndDie('Error','unsupported do on login.php');
 }
 ?>
 </div></body></html>

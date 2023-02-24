@@ -12,7 +12,7 @@
    1. index.php
    1. login.php: PW forgotten
    1. rx.php
-   1. general: in-page navigation concept -> statistic-menu
+   1. general: in-page navigation concept -> statistic-menu. go-up link at bottom of page
 3. pico devices
    1. stability: So far so good, no hanging since 10.01.23. (one issue because of USB power supply issue)
       * check with WLAN disconnection

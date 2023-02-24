@@ -28,7 +28,7 @@ function initialize () {
 function get_dbConn() {
   require_once('dbConn.php'); // this will return the $dbConn variable as 'new mysqli'
   if ($dbConn->connect_error) {
-    printErrorAndDie('Connection to the data base failed', 'Please try again later and/or send me an email: web@strommesser.ch');
+    printPageAndDie('Connection to the data base failed', 'Please try again later and/or send me an email: web@strommesser.ch');
   }
   $dbConn->set_charset('utf8');
   return $dbConn;
@@ -55,17 +55,16 @@ function redirectRelative (string $page): void {
 
 // displays some very generic failure message
 function error (int $errorMsgNum): bool {  // used in login page
-  printErrorAndDie('Error', 'Fehlernummer: '.$errorMsgNum.'. Probier doch später nochmals oder schreib mir an messer@strommesser.ch');  
+  printPageAndDie('Error', 'Fehlernummer: '.$errorMsgNum.'. Probier doch später nochmals oder schreib mir an messer@strommesser.ch');  
   return FALSE; // (not executed). always returning FALSE to simplify coding. Can write "return error(1234);" which will return FALSE.
 }
 
-// prints a valid html error page and stops php execution
-function printErrorAndDie (string $heading, string $text): void {
+// prints a valid html page and stops php execution
+function printPageAndDie (string $heading, string $text): void {
   echo '
   <!DOCTYPE html><html><head>
     <meta charset="utf-8">
-    <title>Error page</title>
-    <meta name="description" content="a generic error page">  
+    <title>'.$heading.'</title>    
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="strommesser.css" type="text/css">';
   echo '</head><body><div class="row twelve columns textBox"><h4>'.$heading.'</h4><p>'.$text.'</p></div></body></html>';
@@ -79,7 +78,7 @@ function printRawErrorAndDie (string $heading, string $text): void {
 
 function validDevice (object $dbConn, string $postIndicator): array {        
   $unsafeDevice = safeStrFromExt('POST', $postIndicator, 8); // maximum length of 8
-  $result = $dbConn->query('SELECT `device` FROM `user` WHERE 1 ORDER BY `id`;');
+  $result = $dbConn->query('SELECT `device` FROM `kunden` WHERE 1 ORDER BY `id`;');
   while ($row = $result->fetch_assoc()) {
       if ($unsafeDevice === $row['device']) {
           return array(TRUE, $row['device']);
@@ -90,7 +89,7 @@ function validDevice (object $dbConn, string $postIndicator): array {
 
 function validUseridInPost (object $dbConn): int {        
   $unsafeUserid = safeIntFromExt('POST', 'userid', 11); // maximum length of 11
-  $result = $dbConn->query('SELECT `id` FROM `user` WHERE `id` = '.$unsafeUserid.' LIMIT 1;');
+  $result = $dbConn->query('SELECT `id` FROM `kunden` WHERE `id` = '.$unsafeUserid.' LIMIT 1;');
   if ($result->num_rows !== 1) {
     return 0; // invalid userid
   }
@@ -104,7 +103,7 @@ function checkHashUserid (object $dbConn, int $userid): bool {
   if ($unsafeRandNum === 0 or $unsafePostHash === '') {
       return FALSE;
   }
-  $result = $dbConn->query('SELECT `post_key` FROM `user` WHERE `id` = "'.$userid.'" LIMIT 1');
+  $result = $dbConn->query('SELECT `post_key` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1');
   if ($result->num_rows !== 1) {
       return FALSE;
   }

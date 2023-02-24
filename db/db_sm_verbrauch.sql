@@ -8,7 +8,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 
-CREATE TABLE `user` (
+CREATE TABLE `kunden` (
   `id` int(10) UNSIGNED NOT NULL,
   `description` varchar(63) NOT NULL,
   `post_key` varchar(32) NOT NULL,
@@ -18,6 +18,13 @@ CREATE TABLE `user` (
   `randCookie` char(64) NOT NULL,
   `ledMaxValue` smallint(5) UNSIGNED NOT NULL DEFAULT 405,
   `ledBrightness` tinyint(3) UNSIGNED NOT NULL DEFAULT 80
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `pwForgot` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `userid` int(11) NOT NULL,
+  `hexval` char(64) NOT NULL,
+  `validUntil` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `verbrauch` (
@@ -31,14 +38,20 @@ CREATE TABLE `verbrauch` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-ALTER TABLE `user`
+ALTER TABLE `kunden`
+  ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `pwForgot`
   ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `verbrauch`
   ADD PRIMARY KEY (`id`);
 
 
-ALTER TABLE `user`
+ALTER TABLE `kunden`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `pwForgot`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `verbrauch`

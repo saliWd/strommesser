@@ -23,7 +23,7 @@
         $valid = 0;
     }
 
-    $result = $dbConn->query('SELECT `ledMaxValue`,`ledBrightness` FROM `user` WHERE `id` = "'.$userid.'" LIMIT 1;');
+    $result = $dbConn->query('SELECT `ledMaxValue`,`ledBrightness` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
     if ($result->num_rows !== 1) {
         printRawErrorAndDie('Error', 'no config data');
     } 

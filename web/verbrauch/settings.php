@@ -12,7 +12,7 @@ $doSafe = safeIntFromExt('GET', 'do', 2); // this is an integer (range 1 to 99) 
 // do = 2: process setting changes
 printBeginOfPage(site:'settings.php', title:'Einstellungen');
 if ($doSafe === 0) { // entry point of this site
-    $result = $dbConn->query('SELECT `ledMaxValue`,`ledBrightness` FROM `user` WHERE `id` = "'.$userid.'" LIMIT 1;');
+    $result = $dbConn->query('SELECT `ledMaxValue`,`ledBrightness` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
     $row = $result->fetch_assoc();
 
     echo '
@@ -30,8 +30,11 @@ if ($doSafe === 0) { // entry point of this site
       <p class="mx-auto"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="'.$LIMIT_LED_BRIGHTNESS.'" step="5" value="'.$row['ledBrightness'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledBrightness'].'</output></p>
       <p class="mx-auto"><input id="settingsFormSubmit" class="mt-8 input-text mx-auto" name="settingsFormSubmit" type="submit" value="speichern"></p>
     </form>
-    <hr class="mt-8">
-    <p class="mt-8"><a href="login.php?do=3" class="input-text">Passwort ändern</a></p>';
+    <hr class="my-8">
+    <div class="flex flex-row justify-center">
+      <div><a href="login.php?do=3" class="input-text basis-full">Passwort ändern</a></div>
+    </div>
+    ';
 
     // echo '<p>&nbsp;</p><p>&nbsp;</p><p><div class="btn mt-8 input-text"><a href="settings.php?do=1">alle Einträge löschen</a></div></p>';        
 } elseif ($doSafe === 1) { // delete all entries
@@ -50,7 +53,7 @@ if ($doSafe === 0) { // entry point of this site
   $ledMaxValue = limitInt(input:$ledMaxValue,lower:0,upper:$LIMIT_LED_MAX_VALUE);
   $ledBrightness = limitInt(input:$ledBrightness,lower:0,upper:$LIMIT_LED_BRIGHTNESS);
 
-  $result = $dbConn->query('UPDATE `user` SET `ledMaxValue` = "'.$ledMaxValue.'", `ledBrightness` = "'.$ledBrightness.'" WHERE `id` = "'.$userid.'";');
+  $result = $dbConn->query('UPDATE `kunden` SET `ledMaxValue` = "'.$ledMaxValue.'", `ledBrightness` = "'.$ledBrightness.'" WHERE `id` = "'.$userid.'";');
 
   echo 'gespeichert<br>';
   echo '<script>setTimeout(() => { window.location.href = \'settings.php\'; }, 2000);</script>';
