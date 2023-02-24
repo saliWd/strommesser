@@ -97,10 +97,16 @@ function processPwForgot(object $dbConn, string $emailUnsafe): bool {
   }
   $emailBody = "Sali,\n\nDein Passwortwiederherstellungs-Link (gültig für eine Stunde):\nhttps://strommesser.ch/verbrauch/login.php?do=7&userid=".$pwForgotUserid."&ver=".$hexStr64."\n";
   $emailBody = $emailBody."\n\nMerci und Gruess,\nDaniel von StromMesser\n\n--\nKontakt: messer@strommesser.ch\n";
-  if (!(mail($emailUnsafe, 'Passwortwiederherstellung auf strommesser.ch', $emailBody))) {
+  $headers = array(
+    'From' => 'messer@strommesser.ch',
+    'Reply-To' => 'messer@strommesser.ch',
+    'X-Mailer' => 'PHP/' . phpversion()
+  );
+  
+  if (!(mail($emailUnsafe, 'Passwortwiederherstellung auf strommesser.ch', $emailBody, $headers))) {
     return error(110800);
   }          
-  printPageAndDie(heading:'Email verschickt', text:'Das Email zur Passwortwiederherstellung wurde verschickt (an '.htmlentities($emailUnsafe).').<br>Die Wiederherstellung ist nun für eine Stunde aktiv...<br><br><a href="../index.php">zur Startseite</a>');
+  printPageAndDie(heading:'Email verschickt', text:'Das Email zur Passwortwiederherstellung wurde verschickt (an '.htmlentities($emailUnsafe).').<br>Die Wiederherstellung ist nun für eine Stunde aktiv...<br><br><a href="../index.php" class="underline">zur Startseite</a>');
   return true;
 }
 
@@ -140,6 +146,25 @@ function checkPwForgot(object $dbConn, int $useridGetSafe, $verSqlSafe) : bool {
     return false; 
   }
   
+  return true;
+}
+
+function processNewPw(object $dbConn, int $useridPostSafe, string $verPost): bool {
+  if (!(checkPwForgot($dbConn, $useridPostSafe, mysqli_real_escape_string($dbConn, $verPost)))) { // check whether this account is really in the pwRecovery data base
+    return error(111002);
+  }
+  $passwordUnsafe = filter_var(safeStrFromExt('POST','passwordNew', 63), FILTER_SANITIZE_STRING);
+  if (strlen($passwordUnsafe) < 4) {
+    return error(104400);
+  }
+  $pwHash = password_hash($passwordUnsafe, PASSWORD_DEFAULT); 
+  if (!($dbConn->query('UPDATE `user` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$userid.'"'))) {
+    return error($dbConn, 104402);
+  }
+  if (!($dbConn->query('DELETE FROM `pwForgot` WHERE `userid` = "'.$useridPostSafe.'"'))) {
+    return error(111001);
+  }
+  printPageAndDie('Passwort wurde aktualisiert', 'Dein Passwort wurde aktualisiert, du kannst dich neu einloggen: <a href="login.php" class="underline">Login Seite</a>');      
   return true;
 }
 
@@ -261,14 +286,20 @@ if ($doSafe === 0) {
   printLoginForm (reason:'forgot', formDo:6, submitText:'Passwort zurücksetzen');  
 } elseif ($doSafe === 6) {
   printBeginOfPage(site:'login.php', title:'Link zum Zurücksetzen des Passworts verschickt'); 
-  processPwForgot(dbConn:$dbConn, emailUnsafe:filter_var(safeStrFromExt('POST', 'email', 127), FILTER_SANITIZE_EMAIL));
+  processPwForgot(
+    dbConn:$dbConn, 
+    emailUnsafe:filter_var(safeStrFromExt('POST', 'email', 127), FILTER_SANITIZE_EMAIL));
 } elseif ($doSafe === 7) {
-  $useridGetSafe = safeIntFromExt('GET', 'userid', 11);
-  $verGet = safeHexFromExt('GET', 'ver', 64);
-  $verSqlSafe = mysqli_real_escape_string($dbConn, $verGet);
-  processPwRecLink(dbConn:$dbConn, useridGetSafe:$useridGetSafe, verSqlSafe:$verSqlSafe, verGet:$verGet);
+  processPwRecLink(
+    dbConn:$dbConn, 
+    useridGetSafe:safeIntFromExt('GET', 'userid', 11), 
+    verSqlSafe:mysqli_real_escape_string($dbConn, $verGet), 
+    verGet:safeHexFromExt('GET', 'ver', 64));
 } elseif ($doSafe === 8) {  
-  echo '<p>Funktion noch nicht implementiert...zurück zur <a href="login.php" class="underline">Loginseite</a></p>';
+  processNewPw(
+    dbConn:$dbConn, 
+    useridPostSafe:safeIntFromExt('POST', 'userid', 11), 
+    verPost:safeHexFromExt('POST', 'ver', 64));
 } else {
   printPageAndDie('Error','unsupported do on login.php');
 }
