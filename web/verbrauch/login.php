@@ -284,7 +284,7 @@ if ($doSafe === 0) {
   echo '<p>Dein Passwort wurde erfolgreich geändert. Du kannst dich nun damit auf der <a href="login.php" class="underline">Loginseite</a> einloggen</p>';
 } elseif ($doSafe === 5) {
   printBeginOfPage(site:'login.php', title:'Passwort vergessen');
-  printLoginForm (reason:'forgot', formDo:6, submitText:'Passwort zurücksetzen');  
+  printLoginForm (reason:'forgot', formDo:6, submitText:'Passwort zurücksetzen');
 } elseif ($doSafe === 6) {
   printBeginOfPage(site:'login.php', title:'Link zum Zurücksetzen des Passworts verschickt'); 
   processPwForgot(
