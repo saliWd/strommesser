@@ -89,7 +89,7 @@ function validDevice (object $dbConn, string $postIndicator): array {
 
 function validUseridInPost (object $dbConn): int {        
   $unsafeUserid = safeIntFromExt('POST', 'userid', 11); // maximum length of 11
-  $result = $dbConn->query('SELECT `id` FROM `kunden` WHERE `id` = '.$unsafeUserid.' LIMIT 1;');
+  $result = $dbConn->query('SELECT `id` FROM `kunden` WHERE `id` = "'.$unsafeUserid.'" LIMIT 1;');
   if ($result->num_rows !== 1) {
     return 0; // invalid userid
   }
@@ -103,7 +103,7 @@ function checkHashUserid (object $dbConn, int $userid): bool {
   if ($unsafeRandNum === 0 or $unsafePostHash === '') {
       return FALSE;
   }
-  $result = $dbConn->query('SELECT `post_key` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1');
+  $result = $dbConn->query('SELECT `post_key` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
   if ($result->num_rows !== 1) {
       return FALSE;
   }
