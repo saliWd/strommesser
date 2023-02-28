@@ -6,7 +6,6 @@ def get_wlan_config():
         ])
     return(config_wlan)
 
-# device name must not be more than 8 characters (stored in db)
 def get_device_config():
     config_device = dict([
         ("userid","3"),
