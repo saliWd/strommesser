@@ -10,14 +10,14 @@ $dbConn = initialize();
 // always: displaying the data as I have it. If only two days this month, I display those...
 
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
-printBeginOfPage(site:'statistic.php', title:'Statistiken');
+printBeginOfPage(site:'statistic.php', title:'');
 
 echo '
 <nav class="p-3 border-gray-200 rounded bg-gray-50">
   <div class="container flex flex-wrap items-center justify-between mx-auto">
     <a href="#" class="flex items-center">
         <img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo" />
-        <span class="self-center text-xl font-semibold whitespace-nowrap">Statistiken</span>
+        <span class="self-center text-2xl font-semibold whitespace-nowrap">Statistiken</span>
     </a>
     <button data-collapse-toggle="navbar-solid-bg" type="button" class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-solid-bg" aria-expanded="false">
       <span class="sr-only">in page menu</span>
