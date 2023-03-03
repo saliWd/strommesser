@@ -5,7 +5,11 @@
    1. link to login 
 2. StromMesser/verbrauch
    1. general
-      * in-page navigation concept
+      * navbar: 
+         * sticky navbar
+         * two levels of nav with in-page nav: always both levels available? or one is removed when not 'navigating'?
+         * breadcrumbs?
+         * search?
    2. getRaw.php
    3. index.php
    4. login.php

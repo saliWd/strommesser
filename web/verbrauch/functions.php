@@ -9,6 +9,13 @@ enum EnumTimerange
   case Month;
   case Year;
 }
+enum EnumSvg
+{
+  case QuestionMark;
+  case ArrowRight;
+  case ArrowDown;
+}
+
 
 // --------------------------
 // function definitions
@@ -136,7 +143,67 @@ function checkInputs(object $dbConn): int {
   return $userid;
 }
 
-function printNavMenu (string $siteSafe): void {  
+function printNavMenu_v2 (string $siteSafe): void {
+  $topLevelSites = array(
+    ['index.php', 'Verbrauch'],
+    ['statistic.php', 'Statistiken'],
+    ['settings.php', 'Einstellungen'],
+    ['#', '&nbsp;'],
+    ['login.php?do=2', 'LogOut']
+  );
+  echo '
+<nav class="flex justify-between" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center mb-3 sm:mb-0">
+    <li>
+      <div class="flex items-center">
+        <button id="dropdownProject" data-dropdown-toggle="dropdown-project" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
+          <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+          StromMesser'.getSvg(whichSvg:EnumSvg::ArrowDown).'
+        </button>
+        <div id="dropdown-project" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+          <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
+          foreach ($topLevelSites as $site)
+  echo '
+            <li>
+              <a href="'.$site[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$site[1].'</a>
+            </li>';
+  echo '
+          </ul>
+        </div> 
+      </div>
+    </li>';
+    if ($siteSafe === 'statistic.php') {
+      echo '
+      <span class="mx-2 text-gray-400">/</span>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <button id="dropdownDatabase" data-dropdown-toggle="dropdown-database" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-600 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
+            Statistiken'.getSvg(whichSvg:EnumSvg::ArrowDown).'
+          </button>
+          <div id="dropdown-database" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+            <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
+              <li>
+                <a href="#anchorWeeklyNow" class="block px-4 py-2 hover:bg-gray-100">Wöchentlich</a>
+              </li>
+              <li>
+                <a href="#anchorMonthlyNow" class="block px-4 py-2 hover:bg-gray-100">Monatlich</a>
+              </li>
+              <li>
+                <a href="#anchorYearlyNow" class="block px-4 py-2 hover:bg-gray-100">Jährlich</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </li>
+    ';
+    } 
+    echo '
+  </ol>
+</nav>';
+}
+
+
+function printNavMenu (string $siteSafe): void {
   $home   = ($siteSafe === 'index.php') ? '<li class="differentColor">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
   $statistic  = ($siteSafe === 'statistic.php') ? '<li class="differentColor">Statistik</li>' : '<li><a href="statistic.php">Statistik</a></li>';
   $settings  = ($siteSafe === 'settings.php') ? '<li class="differentColor">Einstellungen</li>' : '<li><a href="settings.php">Einstellungen</a></li>';
@@ -178,12 +245,15 @@ function printColors(int $limit):void {
   echo '],';
 }
 
-function getSvg(bool $isQuestionMark):string {
-  if ($isQuestionMark) { // a "?" sign in a circle
+function getSvg(EnumSvg $whichSvg):string {
+  if ($whichSvg === EnumSvg::QuestionMark) { // a "?" sign in a circle
     return '<svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>';
-  } else { // a ">" sign (but nicely drawn)
+  } elseif ($whichSvg === EnumSvg::ArrowRight) { // a ">" sign (but nicely drawn)
     return '<svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>';
-  }
+  } elseif ($whichSvg === EnumSvg::ArrowDown) { // a "\/" sign (but nicely drawn)
+    return '<svg class="w-5 h-5 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>';
+  } 
+  return ' '; // will never be executed  
 }
 
 function getHr():string {
@@ -201,7 +271,7 @@ function getHr():string {
 function printPopOverLnk(string $chartId):void {    
   echo '
   <p class="flex items-center text-sm font-light text-gray-500">Info / Details:
-    <button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button">'.getSvg(isQuestionMark:TRUE).'<span class="sr-only">Info</span></button>
+    <button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button">'.getSvg(whichSvg:EnumSvg::QuestionMark).'<span class="sr-only">Info</span></button>
   </p>
   <div data-popover id="popover-description'.$chartId.'" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
     <div class="p-3 space-y-2">
@@ -238,7 +308,7 @@ function printBarGraph (array $values, string $chartId, string $title, bool $isI
         <p>Durchschnittsverbrauch in Watt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh</p>
         <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
         <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(isQuestionMark:FALSE).'</a>
+        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:EnumSvg::ArrowRight).'</a>
       </div>
     <div data-popper-arrow></div>
   </div>';
