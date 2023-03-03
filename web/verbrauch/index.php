@@ -24,7 +24,9 @@ $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
-printBeginOfPage(site:'index.php', title:'Verbrauch', isReloadEnabled:$enableReload, timerange:'&range='.$timeSelected, );
+$refreshMeta = '';
+if ($enableReload) { $refreshMeta = '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1&range='.$timeSelected.'">'; }
+printBeginOfPage_v2(site:'index.php',  refreshMeta:$refreshMeta);
 if ($totalCount > 0) {// this may be 0
   $zeitNewest = date_create($rowFreshest['zeit']);    
   if ($timeSelected < 25) {

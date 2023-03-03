@@ -143,71 +143,6 @@ function checkInputs(object $dbConn): int {
   return $userid;
 }
 
-function printNavMenu_v2 (string $site): void {
-  $topLevelSites = array(
-    ['index.php', 'Verbrauch'],
-    ['statistic.php', 'Statistiken'],
-    ['settings.php', 'Einstellungen'],
-    ['#', '&nbsp;'],
-    ['login.php?do=2', 'LogOut']
-  );  
-  echo '
-<nav class="border-gray-400 rounded bg-gray-50 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
-  <ol class="inline-flex items-center mb-3 sm:mb-0">
-    <li>
-      <div class="flex items-center">
-        <button id="dropdownProject" data-dropdown-toggle="dropdown-project" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
-          <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
-          StromMesser'.getSvg(whichSvg:EnumSvg::ArrowDown).'
-        </button>
-        <div id="dropdown-project" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
-          <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
-  printListItems($topLevelSites);          
-  echo '
-          </ul>
-        </div> 
-      </div>
-    </li>';
-  if ($site === 'statistic.php') {
-    $inPageTargets = array(
-      ['#anchorWeeklyNow', 'Wöchentlich'],
-      ['#anchorMonthlyNow', 'Monatlich'],
-      ['#anchorYearlyNow', 'Jährlich']
-    );  
-    printInPageNav(inPageTargets:$inPageTargets, siteName:'Statistiken');
-  } 
-  echo '
-  </ol>
-</nav>';
-}
-
-function printInPageNav(array $inPageTargets, string $siteName): void {
-  echo '
-  <span class="mx-2 text-gray-400">/</span>
-  <li aria-current="page">
-    <div class="flex items-center">
-      <button id="dropdownDatabase" data-dropdown-toggle="dropdown-database" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-600 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
-        '.$siteName.getSvg(whichSvg:EnumSvg::ArrowDown).'
-      </button>
-      <div id="dropdown-database" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
-        <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
-  printListItems($inPageTargets);
-  echo '
-        </ul>
-      </div>
-    </div>
-  </li>
-';
-}
-
-function printListItems(array $items): void {
-  foreach ($items as $item) {
-    echo '
-        <li>
-          <a href="'.$item[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$item[1].'</a>
-        </li>';
-  }
-}
 
 function printNavMenu (string $siteSafe): void {
   $home   = ($siteSafe === 'index.php') ? '<li class="differentColor">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
@@ -398,6 +333,132 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
   $val_x = substr($val_x, 0, -2).' ]';
   return [$val_x, $val_y, $numOfEntries];
 }
+
+// prints header with css/js and body, container-div and h1 title
+function printBeginOfPage_v2(string $site, string $refreshMeta=''):void {
+  $SITE_TITLES = array(
+    'index.php' => 'Verbrauch',
+    'settings.php' => 'Einstellungen',
+    'login.php' => 'Login, Logout',
+    'statistic.php' => 'Statistiken');
+  echo '<!DOCTYPE html>
+  <html>
+  <head>
+  <meta charset="utf-8">
+  ';
+  $scripts = '';
+  if (($site === 'index.php') or ($site === 'statistic.php')) {
+    $scripts = '<script src="script/chart.min.js"></script>
+  <script src="script/moment.min.mine.js"></script>
+  <script src="script/chartjs-adapter-moment.mine.js"></script>
+  <script src="script/flowbite.min.js"></script>
+  ';
+  } 
+  
+  echo '<title>StromMesser '.$SITE_TITLES[$site].'</title>
+  ';
+  echo '<meta name="description" content="zeigt deinen Energieverbrauch">  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="strommesser.css" type="text/css">
+  '.$scripts.$refreshMeta.'
+  </head>
+  <body>
+  ';
+  printNavMenu_v2($site);
+  echo '
+  <div class="container mx-auto px-4 py-2 lg text-center mt-16" id="anchorTopOfPage">
+  ';
+  return;
+}
+
+function printNavMenu_v2 (string $site): void {
+  $topLevelSites = array( // TODO: partial repetition of SITE_TITLES
+    ['index.php', 'Verbrauch'],
+    ['statistic.php', 'Statistiken'],
+    ['settings.php', 'Einstellungen'],
+    ['#', '&nbsp;'],
+    ['login.php?do=2', 'LogOut']
+  );  
+  echo '
+<nav class="border-gray-400 rounded bg-gray-50 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center mb-3 sm:mb-0">
+    <li>
+      <div class="flex items-center">
+        <button id="dropdownProject" data-dropdown-toggle="dropdown-project" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
+          <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+          StromMesser'.getSvg(whichSvg:EnumSvg::ArrowDown).'
+        </button>
+        <div id="dropdown-project" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+          <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
+  printListItems($topLevelSites);          
+  echo '
+          </ul>
+        </div> 
+      </div>
+    </li>';
+
+  $inPageTargets = array();  
+  $siteName = '';
+  if ($site === 'index.php') {
+    $inPageTargets = array(
+      ['#myChart', 'Aktueller Verbrauch'],
+      ['#anchorWeeklyNow', 'Wöchentlich'],
+      ['#anchorMonthlyNow', 'Monatlich']
+    );
+    $siteName = 'Verbrauch';
+  } elseif ($site === 'statistic.php') {
+    $inPageTargets = array(
+      ['#anchorWeeklyNow', 'Wöchentlich'],
+      ['#anchorMonthlyNow', 'Monatlich'],
+      ['#anchorYearlyNow', 'Jährlich']
+    );
+    $siteName = 'Statistiken';
+  } elseif ($site === 'settings.php') {
+    $inPageTargets = array(
+      ['#anchorMiniDisplay', 'Mini-Display'],
+      ['#anchorUserAccount', 'Benutzereinstellungen']
+    );
+    $siteName = 'Einstellungen';
+  } elseif ($site === 'login.php') {
+    // $inPageTargets = array(
+    //  ['#loginForm', 'Mini-Display']
+    // );
+    $siteName = 'Login / Logout';
+  }
+  printInPageNav(inPageTargets:$inPageTargets, siteName:$siteName);
+  echo '
+  </ol>
+</nav>';
+}
+
+function printInPageNav(array $inPageTargets, string $siteName): void {
+  echo '
+  <span class="mx-2 text-gray-400">/</span>
+  <li aria-current="page">
+    <div class="flex items-center">
+      <button id="dropdownDatabase" data-dropdown-toggle="dropdown-database" class="inline-flex items-center px-3 py-2 text-xl font-semibold text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
+        '.$siteName.getSvg(whichSvg:EnumSvg::ArrowDown).'
+      </button>
+      <div id="dropdown-database" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+        <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
+  printListItems($inPageTargets);
+  echo '
+        </ul>
+      </div>
+    </div>
+  </li>
+';
+}
+
+function printListItems(array $items): void {
+  foreach ($items as $item) {
+    echo '
+        <li>
+          <a href="'.$item[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$item[1].'</a>
+        </li>';
+  }
+}
+
 
 // prints header with css/js and body, container-div and h1 title
 function printBeginOfPage(string $site, string $title, bool $isReloadEnabled=FALSE, string $timerange=''):void {
