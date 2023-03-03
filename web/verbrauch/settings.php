@@ -56,7 +56,7 @@ if ($doSafe === 0) { // entry point of this site
       <p class="mx-auto"><input id="settingsFormSubmit" class="mt-8 input-text mx-auto" name="settingsFormSubmit" type="submit" value="speichern"></p>
     </form>
   </div>
-  <hr class="my-8">
+  '.getHr().'
   <div id="anchorUserAccount" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Benutzereinstellungen</h3>
     <div class="flex flex-row justify-center">

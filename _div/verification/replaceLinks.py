@@ -12,7 +12,8 @@ def replace_content(dict_replace, target):
 dict_replace = {
   'login.php"': 'static.login.html"',
   'login.php\?do=.?' : 'static.login.html',
-  'settings.php': 'static.settings.html',
+  'settings.php"': 'static.settings.html"',
+  'settings.php\?do=.?': 'static.settings.html',
   'statistic.php"': 'static.statistic.html"',
   'statistic.php\?weeksPast=1': 'static.statistic.html',
   'index.php"': 'static.index.6h.html"',

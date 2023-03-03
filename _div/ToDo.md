@@ -4,15 +4,15 @@
    1. fill with more content: explanation?
    1. link to login 
 2. StromMesser/verbrauch
-   1. statistic.php: 
-      * scrollable: per week, per month, per year
-      * design / explanations
-   1. settings.php: design (distinguish between pico-disp and rest). Change email.
-   1. getRaw.php
-   1. index.php
-   1. login.php
-   1. rx.php
-   1. general: in-page navigation concept -> statistic-menu. go-up link at bottom of page
+   1. general
+      * in-page navigation concept
+   2. getRaw.php
+   3. index.php
+   4. login.php
+   5. rx.php
+   6. settings.php: change email.
+   7. statistic.php: 
+      * scrollable: per week, per month, per year      
 3. pico devices
    1. stability: good since 10.01.23
       * check with WLAN disconnection

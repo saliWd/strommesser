@@ -73,7 +73,7 @@ printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTim
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
   <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Wochenwerte übers Jahr</h3>
-  <p class="font-normal text-gray-700">Für jede Woche ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Wochenverbrauch von 7*24 kWh.</p>
+  <p class="font-normal text-gray-700">Für jede Woche ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Wochenverbrauch von 168 kWh.</p>
   <p class="font-normal text-gray-700">Gemessen wird von Montag 00:00 bis Sonntag 23:59 bzw. in der aktuellen Woche von Montag 00:00 bis `jetzt`.</p>
 </div>
 ';

@@ -186,6 +186,18 @@ function getSvg(bool $isQuestionMark):string {
   }
 }
 
+function getHr():string {
+  return '
+  <div class="inline-flex items-center justify-center w-full">
+    <hr class="w-full h-px my-8 bg-gray-200 border-0">
+    <div class="absolute px-4 -translate-x-1/2 bg-white left-1/2">
+      <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+    </div>
+  </div>
+  ';
+
+}
+
 function printPopOverLnk(string $chartId):void {    
   echo '
   <p class="flex items-center text-sm font-light text-gray-500">Info / Details:
@@ -231,8 +243,7 @@ function printBarGraph (array $values, string $chartId, string $title, bool $isI
     <div data-popper-arrow></div>
   </div>';
   }
-  echo '
-  <hr>
+  echo getHr().'
   <br>
   ';
 }
@@ -347,7 +358,7 @@ function printBeginOfPage(string $site, string $title, bool $isReloadEnabled=FAL
   ';
   printNavMenu($site);
   echo '
-  <div class="container mx-auto px-4 py-2 lg text-center">
+  <div class="container mx-auto px-4 py-2 lg text-center" id="anchorTopOfPage">
   ';
   if ($title === '') {
     echo '<br><br>'; // TODO: temporary, to prevent knife under nav menu
