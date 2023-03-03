@@ -349,7 +349,9 @@ function printBeginOfPage(string $site, string $title, bool $isReloadEnabled=FAL
   echo '
   <div class="container mx-auto px-4 py-2 lg text-center">
   ';
-  if ($title != '') {
+  if ($title === '') {
+    echo '<br><br>'; // TODO: temporary, to prevent knife under nav menu
+  } else {
     echo '<h1 class="text-2xl m-2">'.$title.'</h1>
   ';
   }
