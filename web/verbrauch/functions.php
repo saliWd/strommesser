@@ -143,65 +143,71 @@ function checkInputs(object $dbConn): int {
   return $userid;
 }
 
-function printNavMenu_v2 (string $siteSafe): void {
+function printNavMenu_v2 (string $site): void {
   $topLevelSites = array(
     ['index.php', 'Verbrauch'],
     ['statistic.php', 'Statistiken'],
     ['settings.php', 'Einstellungen'],
     ['#', '&nbsp;'],
     ['login.php?do=2', 'LogOut']
-  );
+  );  
   echo '
-<nav class="flex justify-between" aria-label="Breadcrumb">
+<nav class="border-gray-400 rounded bg-gray-50 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
   <ol class="inline-flex items-center mb-3 sm:mb-0">
     <li>
       <div class="flex items-center">
-        <button id="dropdownProject" data-dropdown-toggle="dropdown-project" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
+        <button id="dropdownProject" data-dropdown-toggle="dropdown-project" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
           <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
           StromMesser'.getSvg(whichSvg:EnumSvg::ArrowDown).'
         </button>
         <div id="dropdown-project" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
           <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
-          foreach ($topLevelSites as $site)
-  echo '
-            <li>
-              <a href="'.$site[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$site[1].'</a>
-            </li>';
+  printListItems($topLevelSites);          
   echo '
           </ul>
         </div> 
       </div>
     </li>';
-    if ($siteSafe === 'statistic.php') {
-      echo '
-      <span class="mx-2 text-gray-400">/</span>
-      <li aria-current="page">
-        <div class="flex items-center">
-          <button id="dropdownDatabase" data-dropdown-toggle="dropdown-database" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-600 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
-            Statistiken'.getSvg(whichSvg:EnumSvg::ArrowDown).'
-          </button>
-          <div id="dropdown-database" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
-            <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
-              <li>
-                <a href="#anchorWeeklyNow" class="block px-4 py-2 hover:bg-gray-100">Wöchentlich</a>
-              </li>
-              <li>
-                <a href="#anchorMonthlyNow" class="block px-4 py-2 hover:bg-gray-100">Monatlich</a>
-              </li>
-              <li>
-                <a href="#anchorYearlyNow" class="block px-4 py-2 hover:bg-gray-100">Jährlich</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </li>
-    ';
-    } 
-    echo '
+  if ($site === 'statistic.php') {
+    $inPageTargets = array(
+      ['#anchorWeeklyNow', 'Wöchentlich'],
+      ['#anchorMonthlyNow', 'Monatlich'],
+      ['#anchorYearlyNow', 'Jährlich']
+    );  
+    printInPageNav(inPageTargets:$inPageTargets, siteName:'Statistiken');
+  } 
+  echo '
   </ol>
 </nav>';
 }
 
+function printInPageNav(array $inPageTargets, string $siteName): void {
+  echo '
+  <span class="mx-2 text-gray-400">/</span>
+  <li aria-current="page">
+    <div class="flex items-center">
+      <button id="dropdownDatabase" data-dropdown-toggle="dropdown-database" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-600 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
+        '.$siteName.getSvg(whichSvg:EnumSvg::ArrowDown).'
+      </button>
+      <div id="dropdown-database" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+        <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
+  printListItems($inPageTargets);
+  echo '
+        </ul>
+      </div>
+    </div>
+  </li>
+';
+}
+
+function printListItems(array $items): void {
+  foreach ($items as $item) {
+    echo '
+        <li>
+          <a href="'.$item[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$item[1].'</a>
+        </li>';
+  }
+}
 
 function printNavMenu (string $siteSafe): void {
   $home   = ($siteSafe === 'index.php') ? '<li class="differentColor">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
