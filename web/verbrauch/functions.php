@@ -351,7 +351,6 @@ function printBeginOfPage_v2(string $site, string $refreshMeta=''):void {
     $scripts = '<script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>
-  <script src="script/flowbite.min.js"></script>
   ';
   } 
   
@@ -360,6 +359,7 @@ function printBeginOfPage_v2(string $site, string $refreshMeta=''):void {
   echo '<meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="strommesser.css" type="text/css">
+  <script src="script/flowbite.min.js"></script>
   '.$scripts.$refreshMeta.'
   </head>
   <body>
@@ -423,7 +423,7 @@ function printNavMenu_v2 (string $site): void {
     // $inPageTargets = array(
     //  ['#loginForm', 'Mini-Display']
     // );
-    $siteName = 'Login / Logout';
+    $siteName = 'Login, Logout';
   }
   printInPageNav(inPageTargets:$inPageTargets, siteName:$siteName);
   echo '

@@ -12,33 +12,11 @@ $doSafe = safeIntFromExt('GET', 'do', 2); // this is an integer (range 1 to 99) 
 // do = 2: process setting changes
 
 if ($doSafe === 0) { // entry point of this site
-  printBeginOfPage(site:'settings.php', title:'');
   $result = $dbConn->query('SELECT `ledMaxValue`,`ledBrightness` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
   $row = $result->fetch_assoc();
   
+  printBeginOfPage_v2(site:'settings.php');
   echo '
-  <nav class="p-3 border-gray-200 rounded bg-gray-50">
-    <div class="container flex flex-wrap items-center justify-between mx-auto">
-      <a href="#" class="flex items-center">
-        <img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo" />
-        <span class="self-center text-2xl font-semibold whitespace-nowrap">Einstellungen</span>
-      </a>
-      <button data-collapse-toggle="navbar-solid-bg" type="button" class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-solid-bg" aria-expanded="false">
-        <span class="sr-only">in page menu</span>
-        <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-      </button>
-      <div class="hidden w-full md:block md:w-auto" id="navbar-solid-bg">
-        <ul class="flex flex-col mt-4 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 md:bg-transparent">        
-          <li>
-            <a href="#anchorMiniDisplay" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0">Mini-Display</a>
-          </li>
-          <li>
-            <a href="#anchorUserAccount" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0">Benutzereinstellungen</a>
-          </li>            
-        </ul>
-      </div>
-    </div>
-  </nav>
   <div id="anchorMiniDisplay" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Mini-Display</h3>
     <img class="w-48 mx-auto" src="img/display.jpg" alt="Anzeige Stromverbrauch. Mit einem kleinen, stromsparenden Bildschirm und gut sichtbarer LED">
@@ -70,7 +48,7 @@ if ($doSafe === 0) { // entry point of this site
       <div><a href="settings.php?do=1" class="input-text basis-full w-96">Alle Messdaten als csv herunterladen</a></div>
     </div>
   </div>
-  <br><br><br><br><br><br>
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
   ';
 } elseif ($doSafe === 1) { // export all entries
   header("Content-Type: application/octet-stream");
