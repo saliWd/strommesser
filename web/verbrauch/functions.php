@@ -143,34 +143,6 @@ function checkInputs(object $dbConn): int {
   return $userid;
 }
 
-
-function printNavMenu (string $siteSafe): void {
-  $home   = ($siteSafe === 'index.php') ? '<li class="differentColor">Verbrauch</li>' : '<li><a href="index.php">Verbrauch</a></li>';
-  $statistic  = ($siteSafe === 'statistic.php') ? '<li class="differentColor">Statistik</li>' : '<li><a href="statistic.php">Statistik</a></li>';
-  $settings  = ($siteSafe === 'settings.php') ? '<li class="differentColor">Einstellungen</li>' : '<li><a href="settings.php">Einstellungen</a></li>';
-  // login site not available as list item, will be redirected to login site from various pages
-  $logout = '<li><a href="login.php?do=2" id="navLogoutLink">Log out</a></li>'; 
-  
-  echo '
-  <nav style="width:400px">
-    <div id="menuToggle">
-      <input type="checkbox">
-      <span></span>
-      <span></span>
-      <span></span>
-      <ul id="menu">
-        <li>&nbsp;</li>
-        <li><a href="../">Home</a></li>
-        '.$home.'
-        '.$statistic.'
-        '.$settings.'
-        <li>&nbsp;</li>
-        '.$logout.'
-      </ul>
-    </div>
-  </nav>';
-}
-
 function printColors(int $limit):void {
   $COLORS = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
   echo "\n      backgroundColor: [\n";
@@ -335,7 +307,7 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
 }
 
 // prints header with css/js and body, container-div and h1 title
-function printBeginOfPage_v2(string $site, string $refreshMeta=''):void {
+function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title=''):void {
   $SITE_TITLES = array(
     'index.php' => 'Verbrauch',
     'settings.php' => 'Einstellungen',
@@ -364,14 +336,14 @@ function printBeginOfPage_v2(string $site, string $refreshMeta=''):void {
   </head>
   <body>
   ';
-  printNavMenu_v2($site);
+  printNavMenu_v2(site:$site, title:$title);
   echo '
   <div class="container mx-auto px-4 py-2 lg text-center mt-16" id="anchorTopOfPage">
   ';
   return;
 }
 
-function printNavMenu_v2 (string $site): void {
+function printNavMenu_v2 (string $site, string $title): void {
   $topLevelSites = array( // TODO: partial repetition of SITE_TITLES
     ['index.php', 'Verbrauch'],
     ['statistic.php', 'Statistiken'],
@@ -423,8 +395,9 @@ function printNavMenu_v2 (string $site): void {
     // $inPageTargets = array(
     //  ['#loginForm', 'Mini-Display']
     // );
-    $siteName = 'Login, Logout';
+    $siteName = 'Login';
   }
+  if ($title) { $siteName = $title; }
   printInPageNav(inPageTargets:$inPageTargets, siteName:$siteName);
   echo '
   </ol>
@@ -437,14 +410,18 @@ function printInPageNav(array $inPageTargets, string $siteName): void {
   <li aria-current="page">
     <div class="flex items-center">
       <button id="dropdownDatabase" data-dropdown-toggle="dropdown-database" class="inline-flex items-center px-3 py-2 text-xl font-semibold text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
-        '.$siteName.getSvg(whichSvg:EnumSvg::ArrowDown).'
-      </button>
+        '.$siteName; if ($inPageTargets) { echo getSvg(whichSvg:EnumSvg::ArrowDown); } 
+        echo '
+      </button>';
+      if ($inPageTargets) { echo '
       <div id="dropdown-database" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
         <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
   printListItems($inPageTargets);
   echo '
         </ul>
-      </div>
+      </div>';
+      }
+      echo '
     </div>
   </li>
 ';
@@ -457,53 +434,6 @@ function printListItems(array $items): void {
           <a href="'.$item[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$item[1].'</a>
         </li>';
   }
-}
-
-
-// prints header with css/js and body, container-div and h1 title
-function printBeginOfPage(string $site, string $title, bool $isReloadEnabled=FALSE, string $timerange=''):void {
-  $VALID_SITES = array('index.php','settings.php','login.php','statistic.php');
-  if (! in_array($site, $VALID_SITES)) {
-    return;
-  }
-  echo '<!DOCTYPE html>
-  <html>
-  <head>
-  <meta charset="utf-8">
-  ';
-  $scripts = '';
-  if (($site === "index.php") or ($site === 'statistic.php')) {
-    $scripts = '<script src="script/chart.min.js"></script>
-  <script src="script/moment.min.mine.js"></script>
-  <script src="script/chartjs-adapter-moment.mine.js"></script>
-  <script src="script/flowbite.min.js"></script>
-  ';
-  } 
-  
-  echo '<title>StromMesser '.$title.'</title>
-  ';
-  echo '<meta name="description" content="zeigt deinen Energieverbrauch">  
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="strommesser.css" type="text/css">
-  '.$scripts;  
-  if ($isReloadEnabled) {
-    echo '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1'.$timerange.'">
-    ';
-  }
-  echo '</head>
-  <body>
-  ';
-  printNavMenu($site);
-  echo '
-  <div class="container mx-auto px-4 py-2 lg text-center" id="anchorTopOfPage">
-  ';
-  if ($title === '') {
-    echo '<br><br>'; // TODO: temporary, to prevent knife under nav menu
-  } else {
-    echo '<h1 class="text-2xl m-2">'.$title.'</h1>
-  ';
-  }
-  return;
 }
 
 // checks the params retrieved over get and returns TRUE if they are ok

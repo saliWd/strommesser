@@ -115,7 +115,7 @@ function processPwRecLink(object $dbConn, int $useridGetSafe, string $verSqlSafe
     printPageAndDie('Error', 'Recovery link expired');
     return error(110900);
   }
-  printBeginOfPage(site:'login.php', title:'Neues Passwort setzen');
+  printBeginOfPage_v2(site:'login.php', title:'Neues Passwort setzen');
   // maybe could integrate it into printLoginForm
   echo '
 <form action="login.php?do=8" method="post" id="loginForm">
@@ -238,7 +238,7 @@ if ($doSafe === 0) {
     die(); // will not be executed
   } // no cookie present and no userid. print the login form
 
-  printBeginOfPage(site:'login.php', title:'Log in');
+  printBeginOfPage_v2(site:'login.php', title:'Log in');
   printLoginForm(reason:'login', formDo:1, submitText:'Log in');
 } elseif ($doSafe === 1) {
   processLoginData(
@@ -249,10 +249,10 @@ if ($doSafe === 0) {
   ); // this redirects on success
 } elseif ($doSafe === 2) {
   sessionAndCookieDelete();
-  printBeginOfPage(site:'login.php', title:'Log out');
+  printBeginOfPage_v2(site:'login.php', title:'Log out');
   echo '<p>log out ok, zurück zur <a href="../index.php" class="underline">Startseite</a></p>';
 } elseif ($doSafe === 3) {    
-  printBeginOfPage(site:'login.php', title:'Passwort ändern');
+  printBeginOfPage_v2(site:'login.php', title:'Passwort ändern');
   printLoginForm (reason:'change', formDo:4, submitText:'Neues Passwort speichern');
 } elseif ($doSafe === 4) {
   $emailUnsafe = filter_var(safeStrFromExt('POST', 'email', 127), FILTER_SANITIZE_EMAIL);
@@ -280,13 +280,13 @@ if ($doSafe === 0) {
       return error($dbConn, 104402);      
     }
   }
-  printBeginOfPage(site:'login.php', title:'Passwort wurde geändert');
+  printBeginOfPage_v2(site:'login.php' , title:'Passwort wurde geändert');
   echo '<p>Dein Passwort wurde erfolgreich geändert. Du kannst dich nun damit auf der <a href="login.php" class="underline">Loginseite</a> einloggen</p>';
 } elseif ($doSafe === 5) {
-  printBeginOfPage(site:'login.php', title:'Passwort vergessen');
+  printBeginOfPage_v2(site:'login.php', title:'Passwort vergessen');
   printLoginForm (reason:'forgot', formDo:6, submitText:'Passwort zurücksetzen');
 } elseif ($doSafe === 6) {
-  printBeginOfPage(site:'login.php', title:'Link zum Zurücksetzen des Passworts verschickt'); 
+  printBeginOfPage_v2(site:'login.php', title:'Link zum Zurücksetzen des Passworts verschickt'); 
   processPwForgot(
     dbConn:$dbConn, 
     emailUnsafe:filter_var(safeStrFromExt('POST', 'email', 127), FILTER_SANITIZE_EMAIL));
