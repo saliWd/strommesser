@@ -2,62 +2,73 @@
   <html>
   <head>
   <meta charset="utf-8">
-  <title>StromMesser </title>
+  <title>StromMesser Statistiken</title>
   <meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="strommesser.css" type="text/css">
+  <script src="script/flowbite.min.js"></script>
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>
-  <script src="script/flowbite.min.js"></script>
+  
   </head>
   <body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
   
-  <nav style="width:400px">
-    <div id="menuToggle">
-      <input type="checkbox">
-      <span></span>
-      <span></span>
-      <span></span>
-      <ul id="menu">
-        <li>&nbsp;</li>
-        <li><a href="../">Home</a></li>
-        <li><a href="static.index.6h.html">Verbrauch</a></li>
-        <li class="differentColor">Statistik</li>
-        <li><a href="static.settings.html">Einstellungen</a></li>
-        <li>&nbsp;</li>
-        <li><a href="static.login.html" id="navLogoutLink">Log out</a></li>
-      </ul>
+<nav class="border-gray-400 rounded bg-gray-50 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center mb-3 sm:mb-0">
+    <li>
+      <div class="flex items-center">
+        <button id="dropdownProject" data-dropdown-toggle="dropdown-project" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
+          <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+          StromMesser<svg class="w-5 h-5 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </button>
+        <div id="dropdown-project" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+          <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
+        <li>
+          <a href="static.index.6h.html" class="block px-4 py-2 hover:bg-gray-100">Verbrauch</a>
+        </li>
+        <li>
+          <a href="static.statistic.html" class="block px-4 py-2 hover:bg-gray-100">Statistiken</a>
+        </li>
+        <li>
+          <a href="static.settings.html" class="block px-4 py-2 hover:bg-gray-100">Einstellungen</a>
+        </li>
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100">&nbsp;</a>
+        </li>
+        <li>
+          <a href="static.login.html" class="block px-4 py-2 hover:bg-gray-100">LogOut</a>
+        </li>
+          </ul>
+        </div> 
+      </div>
+    </li>
+  <span class="mx-2 text-gray-400">/</span>
+  <li aria-current="page">
+    <div class="flex items-center">
+      <button id="dropdownDatabase" data-dropdown-toggle="dropdown-database" class="inline-flex items-center px-3 py-2 text-xl font-semibold text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
+        Statistiken<svg class="w-5 h-5 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+      </button>
+      <div id="dropdown-database" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+        <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
+        <li>
+          <a href="#anchorWeeklyNow" class="block px-4 py-2 hover:bg-gray-100">Wöchentlich</a>
+        </li>
+        <li>
+          <a href="#anchorMonthlyNow" class="block px-4 py-2 hover:bg-gray-100">Monatlich</a>
+        </li>
+        <li>
+          <a href="#anchorYearlyNow" class="block px-4 py-2 hover:bg-gray-100">Jährlich</a>
+        </li>
+        </ul>
+      </div>
     </div>
-  </nav>
-  <div class="container mx-auto px-4 py-2 lg text-center" id="anchorTopOfPage">
-  <br><br>
-<nav class="p-3 border-gray-200 rounded bg-gray-50">
-  <div class="container flex flex-wrap items-center justify-between mx-auto">
-    <a href="#" class="flex items-center">
-        <img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo" />
-        <span class="self-center text-2xl font-semibold whitespace-nowrap">Statistiken</span>
-    </a>
-    <button data-collapse-toggle="navbar-solid-bg" type="button" class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-solid-bg" aria-expanded="false">
-      <span class="sr-only">in page menu</span>
-      <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-    </button>
-    <div class="hidden w-full md:block md:w-auto" id="navbar-solid-bg">
-      <ul class="flex flex-col mt-4 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 md:bg-transparent">        
-        <li>
-          <a href="#anchorWeeklyNow" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0">Wöchentlich</a>
-        </li>
-        <li>
-          <a href="#anchorMonthlyNow" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0">Monatlich</a>
-        </li>
-        <li>
-          <a href="#anchorYearlyNow" class="block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0">Jährlich</a>
-        </li>
-      </ul>
-    </div>
-  </div>
+  </li>
+
+  </ol>
 </nav>
-<br><br>
+  <div class="container mx-auto px-4 py-2 lg text-center mt-16" id="anchorTopOfPage">
+  
 <div class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
   <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Tageswerte pro Woche</h3>
   <p class="font-normal text-gray-700">Für jeden Wochentag ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh.</p>
@@ -73,7 +84,7 @@
   const dataWeeklyNow = {
     labels: labelsWeeklyNow,
     datasets: [{
-      data: [ 1015, 887, 959, 888, 691,  ,   ],
+      data: [ 1015, 887, 959, 888, 632, 814, 648 ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",
@@ -168,7 +179,7 @@
   const dataMonthlyNow = {
     labels: labelsMonthlyNow,
     datasets: [{
-      data: [ 959, 888, 691,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
+      data: [ 959, 888, 632, 814, 648,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",
@@ -340,7 +351,7 @@
   
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
   <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Wochenwerte übers Jahr</h3>
-  <p class="font-normal text-gray-700">Für jede Woche ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Wochenverbrauch von 7*24 kWh.</p>
+  <p class="font-normal text-gray-700">Für jede Woche ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Wochenverbrauch von 168 kWh.</p>
   <p class="font-normal text-gray-700">Gemessen wird von Montag 00:00 bis Sonntag 23:59 bzw. in der aktuellen Woche von Montag 00:00 bis `jetzt`.</p>
 </div>
 
@@ -352,7 +363,7 @@
   const dataYearlyNow = {
     labels: labelsYearlyNow,
     datasets: [{
-      data: [  ,  ,  , 1133, 932, 974, 715, 663, 907,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
+      data: [  ,  ,  , 1133, 932, 974, 715, 663, 837,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",

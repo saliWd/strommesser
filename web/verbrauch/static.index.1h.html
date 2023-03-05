@@ -6,55 +6,91 @@
   <meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="strommesser.css" type="text/css">
+  <script src="script/flowbite.min.js"></script>
   <script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
   <script src="script/chartjs-adapter-moment.mine.js"></script>
-  <script src="script/flowbite.min.js"></script>
+  
   </head>
   <body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
   
-  <nav style="width:400px">
-    <div id="menuToggle">
-      <input type="checkbox">
-      <span></span>
-      <span></span>
-      <span></span>
-      <ul id="menu">
-        <li>&nbsp;</li>
-        <li><a href="../">Home</a></li>
-        <li class="differentColor">Verbrauch</li>
-        <li><a href="static.statistic.html">Statistik</a></li>
-        <li><a href="static.settings.html">Einstellungen</a></li>
-        <li>&nbsp;</li>
-        <li><a href="static.login.html" id="navLogoutLink">Log out</a></li>
-      </ul>
+<nav class="border-gray-400 rounded bg-gray-50 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center mb-3 sm:mb-0">
+    <li>
+      <div class="flex items-center">
+        <button id="dropdownProject" data-dropdown-toggle="dropdown-project" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
+          <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+          StromMesser<svg class="w-5 h-5 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </button>
+        <div id="dropdown-project" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+          <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
+        <li>
+          <a href="static.index.6h.html" class="block px-4 py-2 hover:bg-gray-100">Verbrauch</a>
+        </li>
+        <li>
+          <a href="static.statistic.html" class="block px-4 py-2 hover:bg-gray-100">Statistiken</a>
+        </li>
+        <li>
+          <a href="static.settings.html" class="block px-4 py-2 hover:bg-gray-100">Einstellungen</a>
+        </li>
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100">&nbsp;</a>
+        </li>
+        <li>
+          <a href="static.login.html" class="block px-4 py-2 hover:bg-gray-100">LogOut</a>
+        </li>
+          </ul>
+        </div> 
+      </div>
+    </li>
+  <span class="mx-2 text-gray-400">/</span>
+  <li aria-current="page">
+    <div class="flex items-center">
+      <button id="dropdownDatabase" data-dropdown-toggle="dropdown-database" class="inline-flex items-center px-3 py-2 text-xl font-semibold text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
+        Verbrauch<svg class="w-5 h-5 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+      </button>
+      <div id="dropdown-database" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+        <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
+        <li>
+          <a href="#myChart" class="block px-4 py-2 hover:bg-gray-100">Aktueller Verbrauch</a>
+        </li>
+        <li>
+          <a href="#anchorWeeklyNow" class="block px-4 py-2 hover:bg-gray-100">Wöchentlich</a>
+        </li>
+        <li>
+          <a href="#anchorMonthlyNow" class="block px-4 py-2 hover:bg-gray-100">Monatlich</a>
+        </li>
+        </ul>
+      </div>
     </div>
-  </nav>
-  <div class="container mx-auto px-4 py-2 lg text-center" id="anchorTopOfPage">
-  <h1 class="text-2xl m-2">Verbrauch</h1>
+  </li>
+
+  </ol>
+</nav>
+  <div class="container mx-auto px-4 py-2 lg text-center mt-16" id="anchorTopOfPage">
   <hr>
   <div class="flex">
-    <div class="flex-auto text-left">Verbrauch: <b>0W</b> (13:19).</div>
-    <div class="flex-auto text-right">Ø-Verbrauch: <b>113W</b></div>
+    <div class="flex-auto text-left">Verbrauch: <b>234W</b> (21:59).</div>
+    <div class="flex-auto text-right">Ø-Verbrauch: <b>607W</b></div>
   </div>
   <hr>
   
     <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
-    const labels = [ new Date("2023-03-03 12:20:56"), new Date("2023-03-03 12:22:57"), new Date("2023-03-03 12:25:00"), new Date("2023-03-03 12:27:02"), new Date("2023-03-03 12:29:02"), new Date("2023-03-03 12:31:03"), new Date("2023-03-03 12:33:05"), new Date("2023-03-03 12:35:06"), new Date("2023-03-03 12:37:07"), new Date("2023-03-03 12:39:10"), new Date("2023-03-03 12:41:11"), new Date("2023-03-03 12:43:12"), new Date("2023-03-03 12:45:12"), new Date("2023-03-03 12:47:15"), new Date("2023-03-03 12:49:17"), new Date("2023-03-03 12:51:17"), new Date("2023-03-03 12:53:18"), new Date("2023-03-03 12:55:21"), new Date("2023-03-03 12:57:21"), new Date("2023-03-03 12:59:22"), new Date("2023-03-03 13:01:24"), new Date("2023-03-03 13:03:25"), new Date("2023-03-03 13:05:36"), new Date("2023-03-03 13:07:37"), new Date("2023-03-03 13:09:43"), new Date("2023-03-03 13:11:44"), new Date("2023-03-03 13:13:45"), new Date("2023-03-03 13:15:46"), new Date("2023-03-03 13:17:48") ];
+    const labels = [ new Date("2023-03-05 21:01:09"), new Date("2023-03-05 21:03:11"), new Date("2023-03-05 21:05:12"), new Date("2023-03-05 21:07:13"), new Date("2023-03-05 21:09:14"), new Date("2023-03-05 21:11:15"), new Date("2023-03-05 21:13:16"), new Date("2023-03-05 21:15:19"), new Date("2023-03-05 21:17:20"), new Date("2023-03-05 21:19:20"), new Date("2023-03-05 21:21:22"), new Date("2023-03-05 21:23:25"), new Date("2023-03-05 21:25:27"), new Date("2023-03-05 21:27:27"), new Date("2023-03-05 21:29:28"), new Date("2023-03-05 21:31:31"), new Date("2023-03-05 21:33:31"), new Date("2023-03-05 21:35:32"), new Date("2023-03-05 21:37:35"), new Date("2023-03-05 21:39:36"), new Date("2023-03-05 21:41:37"), new Date("2023-03-05 21:43:38"), new Date("2023-03-05 21:45:41"), new Date("2023-03-05 21:47:42"), new Date("2023-03-05 21:49:43"), new Date("2023-03-05 21:51:44"), new Date("2023-03-05 21:53:46"), new Date("2023-03-05 21:55:47"), new Date("2023-03-05 21:57:47") ];
     const data = {
       labels: labels,
       datasets: [{
         label: "Verbrauch [W]",
-        data: [ 10, 10, 10, 10, 10, 10, 30, 30, 30, 29, 30, 30, 10, 10, 10, 540, 1131, 644, 600, 208, 10, 10, 10, 10, 10, 10, 10, 10, 10 ],
+        data: [ 293, 295, 298, 298, 208, 208, 179, 176, 179, 180, 177, 176, 1180, 2700, 2678, 2693, 2820, 863, 146, 179, 179, 179, 176, 179, 208, 238, 207, 208, 210 ],
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
         showLine: false
       },
       {
         label: "Verbrauch total [kWh]",
-        data: [ 0, 0, 0, 0, 0, 0, 0.00099999999656575, 0.0020000000004075, 0.0029999999969732, 0.0040000000008149, 0.0049999999973807, 0.0060000000012224, 0.0060000000012224, 0.0060000000012224, 0.0060000000012224, 0.023999999997613, 0.061999999998079, 0.084000000002561, 0.10399999999936, 0.11099999999715, 0.11099999999715, 0.11099999999715, 0.11099999999715, 0.11099999999715, 0.11099999999715, 0.11099999999715, 0.11099999999715, 0.11099999999715, 0.11099999999715 ],
+        data: [ 0, 0.010000000002037, 0.020000000004075, 0.029999999998836, 0.0370000000039, 0.044000000001688, 0.05000000000291, 0.056000000004133, 0.061999999998079, 0.067999999999302, 0.074000000000524, 0.080000000001746, 0.12000000000262, 0.20999999999913, 0.30000000000291, 0.39199999999983, 0.48600000000442, 0.51499999999942, 0.52000000000407, 0.52599999999802, 0.53199999999924, 0.53800000000047, 0.54400000000169, 0.55000000000291, 0.5570000000007, 0.56500000000233, 0.57200000000012, 0.5789999999979, 0.58600000000297 ],
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
@@ -83,7 +119,7 @@
     Info / Details:
     <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Info</span></button>
   </div>
-  <div class="flex-auto text-right">Insgesamt 865 Einträge</div>
+  <div class="flex-auto text-right">Insgesamt 867 Einträge</div>
 </div>
 <div data-popover id="popover-descriptionIndex" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
     <div class="p-3 space-y-2">
@@ -108,7 +144,7 @@
   const dataWeeklyNow = {
     labels: labelsWeeklyNow,
     datasets: [{
-      data: [ 1015, 887, 959, 888, 691,  ,   ],
+      data: [ 1015, 887, 959, 888, 632, 814, 648 ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",
@@ -166,7 +202,7 @@
   const dataMonthlyNow = {
     labels: labelsMonthlyNow,
     datasets: [{
-      data: [ 959, 888, 691,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
+      data: [ 959, 888, 632, 814, 648,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",

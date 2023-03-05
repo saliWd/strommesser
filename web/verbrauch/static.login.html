@@ -2,32 +2,56 @@
   <html>
   <head>
   <meta charset="utf-8">
-  <title>StromMesser Log in</title>
+  <title>StromMesser Login, Logout</title>
   <meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="strommesser.css" type="text/css">
+  <script src="script/flowbite.min.js"></script>
+  
   </head>
   <body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
   
-  <nav style="width:400px">
-    <div id="menuToggle">
-      <input type="checkbox">
-      <span></span>
-      <span></span>
-      <span></span>
-      <ul id="menu">
-        <li>&nbsp;</li>
-        <li><a href="../">Home</a></li>
-        <li><a href="static.index.6h.html">Verbrauch</a></li>
-        <li><a href="static.statistic.html">Statistik</a></li>
-        <li><a href="static.settings.html">Einstellungen</a></li>
-        <li>&nbsp;</li>
-        <li><a href="static.login.html" id="navLogoutLink">Log out</a></li>
-      </ul>
+<nav class="border-gray-400 rounded bg-gray-50 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
+  <ol class="inline-flex items-center mb-3 sm:mb-0">
+    <li>
+      <div class="flex items-center">
+        <button id="dropdownProject" data-dropdown-toggle="dropdown-project" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
+          <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+          StromMesser<svg class="w-5 h-5 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </button>
+        <div id="dropdown-project" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+          <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
+        <li>
+          <a href="static.index.6h.html" class="block px-4 py-2 hover:bg-gray-100">Verbrauch</a>
+        </li>
+        <li>
+          <a href="static.statistic.html" class="block px-4 py-2 hover:bg-gray-100">Statistiken</a>
+        </li>
+        <li>
+          <a href="static.settings.html" class="block px-4 py-2 hover:bg-gray-100">Einstellungen</a>
+        </li>
+        <li>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100">&nbsp;</a>
+        </li>
+        <li>
+          <a href="static.login.html" class="block px-4 py-2 hover:bg-gray-100">LogOut</a>
+        </li>
+          </ul>
+        </div> 
+      </div>
+    </li>
+  <span class="mx-2 text-gray-400">/</span>
+  <li aria-current="page">
+    <div class="flex items-center">
+      <button id="dropdownDatabase" data-dropdown-toggle="dropdown-database" class="inline-flex items-center px-3 py-2 text-xl font-semibold text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
+        Log in
+      </button>
     </div>
-  </nav>
-  <div class="container mx-auto px-4 py-2 lg text-center" id="anchorTopOfPage">
-  <h1 class="text-2xl m-2">Log in</h1>
+  </li>
+
+  </ol>
+</nav>
+  <div class="container mx-auto px-4 py-2 lg text-center mt-16" id="anchorTopOfPage">
   
   <form action="static.login.html" method="post" id="loginForm">
     <div class="flex flex-row mt-8">
