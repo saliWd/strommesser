@@ -75,6 +75,7 @@ if ($totalCount > 0) {// this may be 0
   if ($queryCount >= $GRAPH_LIMIT) {
     $axis_x = ''; // rightmost value comes first. Remove something again after the while loop
     $val_y0_consumption = '';
+    $val_y0_average = '';
     $val_y1_watt = '';
     
     $lastConsumption = 0;
@@ -87,11 +88,13 @@ if ($totalCount > 0) {// this may be 0
       // revert the ordering
       $axis_x = 'new Date("'.$row['zeit'].'"), '.$axis_x; // new Date("2020-03-01 12:00:12")
       $val_y0_consumption = $consumption.', '.$val_y0_consumption;
+      $val_y0_average = $aveConsumption.', '.$val_y0_average;
       $val_y1_watt = $watt.', '.$val_y1_watt;      
     } // while
     // remove the last two caracters (a comma-space) and add the brackets before and after
     $axis_x = '[ '.substr($axis_x, 0, -2).' ]';
     $val_y0_consumption = '[ '.substr($val_y0_consumption, 0, -2).' ]';
+    $val_y0_average = '[ '.substr($val_y0_average, 0, -2).' ]';
     $val_y1_watt = '[ '.substr($val_y1_watt, 0, -2).' ]';
     
     // maybe: add some text about the absolute value (of kWh)
@@ -115,6 +118,16 @@ if ($totalCount > 0) {// this may be 0
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
+      },
+      {
+        label: "Durchschnitt",        
+        data: '.$val_y0_average.',
+        yAxisID: "yleft",
+        borderColor: "rgb(0, 0, 0)",
+        backgroundColor: "rgb(255,255,255)",
+        borderWidth: 4,
+        borderDash: [10, 5],       
+        pointStyle: false
       }
     ],
     };
@@ -133,7 +146,7 @@ if ($totalCount > 0) {// this may be 0
             echo 'unit: "hour"';
           }            
           echo ' }
-              },
+          },
           yleft: { type: "logarithmic", position: "left", ticks: {color: "rgb(25, 99, 132)"} },
           yright: { type: "linear",  position: "right", ticks: {color: "rgba(255, 99, 132, 0.8)"}, grid: {drawOnChartArea: false} }
         }
