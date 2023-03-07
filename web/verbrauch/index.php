@@ -123,9 +123,9 @@ if ($totalCount > 0) {// this may be 0
         label: "Durchschnitt",        
         data: '.$val_y0_average.',
         yAxisID: "yleft",
-        borderColor: "rgb(0, 0, 0)",
+        borderColor: "rgba(20, 20, 20, 0.8)",
         backgroundColor: "rgb(255,255,255)",
-        borderWidth: 4,
+        borderWidth: 2,
         borderDash: [10, 5],       
         pointStyle: false
       }
@@ -135,6 +135,11 @@ if ($totalCount > 0) {// this may be 0
       type: "line",
       data: data,
       options: {
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
         scales: {
           x: { type: "time", 
             time: { '; 
