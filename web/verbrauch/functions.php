@@ -173,7 +173,7 @@ function getHr():string {
   return '
   <div class="inline-flex items-center justify-center w-full">
     <hr class="w-full h-px my-8 bg-gray-200 border-0">
-    <div class="absolute px-4 -translate-x-1/2 bg-white left-1/2">
+    <div class="absolute px-4 -translate-x-1/2 left-1/2">
       <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
     </div>
   </div>
