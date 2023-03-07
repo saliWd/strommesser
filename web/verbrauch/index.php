@@ -65,8 +65,7 @@ if ($totalCount > 0) {// this may be 0
   if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
     $zeitString = '('.$zeitNewest->format('H:i').')';
   }
-  echo '<hr>
-  <div class="flex">
+  echo '<div class="flex">
     <div class="flex-auto text-left">Verbrauch: <b>'.$newestConsumption.'W</b> '.$zeitString.'.</div>
     <div class="flex-auto text-right">Ø-Verbrauch: <b>'.$aveConsumption.'W</b></div>
   </div>

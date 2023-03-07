@@ -6,10 +6,9 @@
 2. StromMesser/verbrauch
    1. general
       * navbar: 
-         * sticky navbar
-         * two levels of nav with in-page nav: always both levels available? or one is removed when not 'navigating'?
-         * breadcrumbs?
          * search?
+         * slightly different design
+      * messer: transparent bg
    2. getRaw.php
    3. index.php
    4. login.php
@@ -26,7 +25,7 @@
 4. div
 
 
-Next:  2.1 
+Next:  2.7 (use chartjs functionality) 
 
 
 [lnkCase]: https://www.thingiverse.com/thing:4767008

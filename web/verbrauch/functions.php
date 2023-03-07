@@ -338,7 +338,7 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
   ';
   printNavMenu_v2(site:$site, title:$title);
   echo '
-  <div class="container mx-auto px-4 py-2 lg text-center mt-16" id="anchorTopOfPage">
+  <div class="container mx-auto px-4 py-2 lg text-center mt-16 scroll-mt-16" id="anchorTopOfPage">
   ';
   return;
 }
