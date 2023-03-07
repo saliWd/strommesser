@@ -143,16 +143,16 @@ function checkInputs(object $dbConn): int {
   return $userid;
 }
 
-function printColors(int $limit):void {
+function printColors(int $limit, int $offset):void {
   $COLORS = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
   echo "\n      backgroundColor: [\n";
   for($i = 0; $i < $limit; $i++) {
-    echo '      "rgba('.$COLORS[$i % 7].', 0.2)"';
+    echo '      "rgba('.$COLORS[($i+$offset) % 7].', 0.2)"';
     if($i != ($limit-1)) { echo ",\n"; }
   }
   echo "],\n      borderColor: [\n";
   for($i = 0; $i < $limit; $i++) {
-    echo '      "rgb('.$COLORS[$i % 7].')"';
+    echo '      "rgb('.$COLORS[($i+$offset) % 7].')"';
     if($i != ($limit-1)) { echo ",\n"; }
   }
   echo '],';
@@ -178,7 +178,6 @@ function getHr():string {
     </div>
   </div>
   ';
-
 }
 
 function printPopOverLnk(string $chartId):void {    
@@ -191,7 +190,7 @@ function printPopOverLnk(string $chartId):void {
 ';
 }
 
-function printBarGraph (array $values, string $chartId, string $title, bool $isIndexPage=FALSE):void {  
+function printBarGraph (array $values, string $chartId, string $title, bool $isIndexPage=FALSE):void {
   echo '
   <div class="mt-4 text-xl" id="anchor'.$chartId.'">Durchschnittsverbrauch '.$title.'</div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
@@ -202,7 +201,7 @@ function printBarGraph (array $values, string $chartId, string $title, bool $isI
     labels: labels'.$chartId.',
     datasets: [{
       data: '.$values[1].',';
-      printColors(limit:$values[2]);
+      printColors(limit:$values[2], offset:$values[3]);
       echo '
       borderWidth: 1
     }]
@@ -253,6 +252,7 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
   $month = (int)$now->format('m'); // current month
   $day = (int)$now->format('d'); // current day
   $numOfEntries = 0;
+  $weekDayOffset = 0;
 
   if ($timerange === EnumTimerange::Year) { // generates one value per week
     $monNames = array('Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'); // need german naming, not using format('M')
@@ -279,7 +279,9 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
       $year--;
       $month += 12;
     }
-    $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
+    $startDay = date_create($year.'-'.$month.'-01');
+    $weekDayOffset = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday). Colors are matching between week and month
+    $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');    
     for ($day = 1; $day <= $lastDay; $day++) { // 1 to 28 (for February)
       $dayStr = $year.'-'.$month.'-'.$day;
       $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr).', ';
@@ -303,7 +305,7 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
   
   $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
   $val_x = substr($val_x, 0, -2).' ]';
-  return [$val_x, $val_y, $numOfEntries];
+  return [$val_x, $val_y, $numOfEntries, $weekDayOffset];
 }
 
 // prints header with css/js and body, container-div and h1 title
@@ -356,11 +358,11 @@ function printNavMenu_v2 (string $site, string $title): void {
   <ol class="inline-flex items-center mb-3 sm:mb-0">
     <li>
       <div class="flex items-center">
-        <button id="dropdownProject" data-dropdown-toggle="dropdown-project" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
+        <button id="dropdownNavMain" data-dropdown-toggle="dropdown-NavMain" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
           <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
           StromMesser'.getSvg(whichSvg:EnumSvg::ArrowDown).'
         </button>
-        <div id="dropdown-project" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+        <div id="dropdown-NavMain" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
           <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
   printListItems($topLevelSites);          
   echo '
@@ -409,19 +411,20 @@ function printInPageNav(array $inPageTargets, string $siteName): void {
   <span class="mx-2 text-gray-400">/</span>
   <li aria-current="page">
     <div class="flex items-center">
-      <button id="dropdownDatabase" data-dropdown-toggle="dropdown-database" class="inline-flex items-center px-3 py-2 text-xl font-semibold text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
-        '.$siteName; if ($inPageTargets) { echo getSvg(whichSvg:EnumSvg::ArrowDown); } 
-        echo '
-      </button>';
-      if ($inPageTargets) { echo '
-      <div id="dropdown-database" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
-        <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
-  printListItems($inPageTargets);
+      <button id="dropdownNav2nd" data-dropdown-toggle="dropdown-Nav2nd" class="inline-flex items-center px-3 py-2 text-xl font-semibold text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
+        '.$siteName; if ($inPageTargets) { echo getSvg(whichSvg:EnumSvg::ArrowDown); }
   echo '
+      </button>';
+  if ($inPageTargets) { 
+    echo '
+      <div id="dropdown-Nav2nd" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
+        <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
+        printListItems($inPageTargets);
+    echo '
         </ul>
       </div>';
-      }
-      echo '
+  }
+  echo '
     </div>
   </li>
 ';
