@@ -203,7 +203,19 @@ function printBarGraph (array $values, string $chartId, string $title, bool $isI
       data: '.$values[1].',';
       printColors(limit:$values[2], offset:$values[3]);
       echo '
-      borderWidth: 1
+      borderWidth: 1,
+      order: 1
+    },
+    {      
+      label: "Durchschnitt",
+      data: '.$values[4].',
+      borderColor: "rgba(20, 20, 20, 0.8)",
+      backgroundColor: "rgb(255,255,255)",
+      borderWidth: 2,
+      borderDash: [10, 5],
+      pointStyle: false,
+      type: "line",
+      order: 0
     }]
   };
   const config'.$chartId.' = {
@@ -245,6 +257,7 @@ function getWattSum(object $dbConn, int $userid, string $dayA, string $dayB) { /
 
 function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $goBack = 0):array {
   $val_y = '[ ';
+  $val_y_ave = '[ ';
   $val_x = '[ ';
   $now = date_create();
 
@@ -262,12 +275,14 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
     if ($weekday > 0) {
       $startDay->modify('+'.(7-$weekday).' days'); // that gets me first Monday in the year
     }
+    $average = getWattSum(dbConn:$dbConn, userid:$userid, dayA:$startDay->format('Y-m-d'), dayB:$year.'-12-31');
     for ($week = 1; $week <= 52; $week++) { // 364 days (one or two days are left over)
       $dayStrA = $startDay->format('Y-m-d');
       $month = (int)$startDay->format('m'); // plot the month of the Monday
       $startDay->modify('+6 days'); // Sunday
       $dayStrB = $startDay->format('Y-m-d');
       $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStrA, dayB:$dayStrB).', ';
+      $val_y_ave .= $average.', ';
       $val_x .= '"'.$monNames[$month-1].'", ';
       $numOfEntries++;
       
@@ -281,10 +296,12 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
     }
     $startDay = date_create($year.'-'.$month.'-01');
     $weekDayOffset = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday). Colors are matching between week and month
-    $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');    
+    $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
+    $average = getWattSum(dbConn:$dbConn, userid:$userid, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
     for ($day = 1; $day <= $lastDay; $day++) { // 1 to 28 (for February)
       $dayStr = $year.'-'.$month.'-'.$day;
       $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr).', ';
+      $val_y_ave .= $average.', ';
       $val_x .= $day.', ';
       $numOfEntries++;
     }
@@ -294,18 +311,22 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
     $startDay->modify('-'.$goBack.' weeks');
     $weekday = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday)
     $startDay->modify('-'.$weekday.' days'); // that gets me Monday in this week
-    
+    $endDay = clone $startDay; // clone is needed here
+    $endDay->modify('+6 days');
+    $average = getWattSum(dbConn:$dbConn, userid:$userid, dayA:$startDay->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
     for ($day = 1; $day <= $numOfEntries; $day++) {
       $dayStr = $startDay->format('Y-m-d');
       $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr).', ';
+      $val_y_ave .= $average.', ';
       $startDay->modify('+1 days');
     }
     $val_x .= '"Mo", "Di", "Mi", "Do", "Fr", "Sa", "So", ';
   }
   
   $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
+  $val_y_ave = substr($val_y_ave, 0, -2).' ]'; 
   $val_x = substr($val_x, 0, -2).' ]';
-  return [$val_x, $val_y, $numOfEntries, $weekDayOffset];
+  return [$val_x, $val_y, $numOfEntries, $weekDayOffset, $val_y_ave];
 }
 
 // prints header with css/js and body, container-div and h1 title
@@ -324,8 +345,7 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
   if (($site === 'index.php') or ($site === 'statistic.php')) {
     $scripts = '<script src="script/chart.min.js"></script>
   <script src="script/moment.min.mine.js"></script>
-  <script src="script/chartjs-adapter-moment.mine.js"></script>
-  ';
+  <script src="script/chartjs-adapter-moment.mine.js"></script>';
   } 
   
   echo '<title>StromMesser '.$SITE_TITLES[$site].'</title>

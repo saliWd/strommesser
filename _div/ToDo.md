@@ -6,7 +6,7 @@
 2. StromMesser/verbrauch
    1. general
       * navbar: 
-         * slightly different design
+         * slightly different design      
    2. getRaw.php
    3. index.php
    4. login.php
@@ -15,7 +15,7 @@
    7. statistic.php: 
       * scrollable: per week, per month, per year
 3. pico devices
-   1. stability: good since 10.01.23
+   1. stability: good since 10.01.23. issue 08.03.2023: several power cycles needed. issue on usb power supply? Order anker ones
       * check with WLAN disconnection
       * does not (always) recover from issue on server side. Need more stable reset mechanism
    1. disp

@@ -25,7 +25,7 @@ $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
 $refreshMeta = '';
-if ($enableReload) { $refreshMeta = '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1&range='.$timeSelected.'">'; }
+if ($enableReload) { $refreshMeta = '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1&range='.$timeSelected.'">'."\n"; }
 printBeginOfPage_v2(site:'index.php',  refreshMeta:$refreshMeta);
 if ($totalCount > 0) {// this may be 0
   $zeitNewest = date_create($rowFreshest['zeit']);    
@@ -126,7 +126,7 @@ if ($totalCount > 0) {// this may be 0
         borderColor: "rgba(20, 20, 20, 0.8)",
         backgroundColor: "rgb(255,255,255)",
         borderWidth: 2,
-        borderDash: [10, 5],       
+        borderDash: [10, 5],
         pointStyle: false
       }
     ],
