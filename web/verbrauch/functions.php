@@ -190,6 +190,38 @@ function printPopOverLnk(string $chartId):void {
 ';
 }
 
+// chartId:'WeeklyNow', title:'diese Woche', 
+// printBarGraph_v2(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:0, isIndexPage:TRUE);
+function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange, int $goBack,  bool $isIndexPage=FALSE):void {
+  if ($timerange === EnumTimerange::Year) { 
+    $year = ((int)$now->format('Y')) - $goBack;
+    if ($goBack === 0) { $title = 'dieses Jahr'; }
+    elseif ($goBack === 1) { $title = 'letztes Jahr'; }
+    else { $title = 'Jahr '.$year; }
+    $chartId = 'Yearly';
+  } elseif ($timerange === EnumTimerange::Month) {
+    $monNames = array('Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'); // need german naming, not using format('M')
+    $month = ((int)$now->format('m')) - $goBack;
+    while ($month < 1) {
+      $month += 12;
+    }
+    if ($goBack === 0) { $title = 'diesen Monat'; }
+    elseif ($goBack === 1) { $title = 'letzten Monat'; }
+    else { $title = $monNames[$month-1]; }
+    $chartId = 'Monthly';
+  } elseif ($timerange === EnumTimerange::Week) {
+    if ($goBack === 0) { $title = 'diese Woche'; }
+    elseif ($goBack === 1) { $title = 'letzte Woche'; }
+    else { 
+      $startDay = $now;
+      $startDay->modify('-'.$goBack.' weeks');
+      $weekNr = $startDay->format("W");
+      $title = 'Woche '.$weekNr;    
+    }
+    $chartId = 'Weekly';
+  }
+}
+
 function printBarGraph (array $values, string $chartId, string $title, bool $isIndexPage=FALSE):void {
   echo '
   <div class="mt-4 text-xl" id="anchor'.$chartId.'">Durchschnittsverbrauch '.$title.'</div>
@@ -290,7 +322,7 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
     }
   } elseif ($timerange === EnumTimerange::Month) { // maybe to do: could switch to date->modify method
     $month = $month - $goBack; // NB: goBack must not be greater than 12
-    if ($month < 1) {
+    while ($month < 1) {
       $year--;
       $month += 12;
     }

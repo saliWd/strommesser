@@ -2,11 +2,11 @@
 
 1. StromMesser wordpress
    1. fill with more content: explanation?
-   1. link to login 
+   1. login form on WP / 'bigger' link
 2. StromMesser/verbrauch
    1. general
       * navbar: 
-         * slightly different design      
+         * slightly different design
    2. getRaw.php
    3. index.php
    4. login.php
@@ -15,7 +15,7 @@
    7. statistic.php: 
       * scrollable: per week, per month, per year
 3. pico devices
-   1. stability: good since 10.01.23. issue 08.03.2023: several power cycles needed. issue on usb power supply? Order anker ones
+   1. stability: good since 10.01.23. issue 08.03.2023: several power cycles needed. 9.3.23 again. issue on usb power supply?
       * check with WLAN disconnection
       * does not (always) recover from issue on server side. Need more stable reset mechanism
    1. disp
@@ -23,7 +23,7 @@
 4. div
 
 
-Next:  2.7 (use chartjs functionality) 
+Next:  2.7 (use chartjs functionality)
 
 
 [lnkCase]: https://www.thingiverse.com/thing:4767008
