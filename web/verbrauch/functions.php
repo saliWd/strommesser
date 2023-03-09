@@ -190,15 +190,15 @@ function printPopOverLnk(string $chartId):void {
 ';
 }
 
-// chartId:'WeeklyNow', title:'diese Woche', 
 // printBarGraph_v2(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:0, isIndexPage:TRUE);
-function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange, int $goBack,  bool $isIndexPage=FALSE):void {
+function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange, int $goBack, bool $isIndexPage=FALSE):void {
+  $now = date_create();
   if ($timerange === EnumTimerange::Year) { 
     $year = ((int)$now->format('Y')) - $goBack;
     if ($goBack === 0) { $title = 'dieses Jahr'; }
     elseif ($goBack === 1) { $title = 'letztes Jahr'; }
     else { $title = 'Jahr '.$year; }
-    $chartId = 'Yearly';
+    $chartId = 'Y';
   } elseif ($timerange === EnumTimerange::Month) {
     $monNames = array('Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'); // need german naming, not using format('M')
     $month = ((int)$now->format('m')) - $goBack;
@@ -208,18 +208,76 @@ function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange
     if ($goBack === 0) { $title = 'diesen Monat'; }
     elseif ($goBack === 1) { $title = 'letzten Monat'; }
     else { $title = $monNames[$month-1]; }
-    $chartId = 'Monthly';
+    $chartId = 'M';
   } elseif ($timerange === EnumTimerange::Week) {
     if ($goBack === 0) { $title = 'diese Woche'; }
     elseif ($goBack === 1) { $title = 'letzte Woche'; }
-    else { 
-      $startDay = $now;
-      $startDay->modify('-'.$goBack.' weeks');
-      $weekNr = $startDay->format("W");
+    else {       
+      $now->modify('-'.$goBack.' weeks');
+      $weekNr = $now->format("W");
       $title = 'Woche '.$weekNr;    
     }
-    $chartId = 'Weekly';
+    $chartId = 'W';
   }
+  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, goBack:$goBack);
+  if ($goBack > 0) {
+    $forwardLink = '<a href="?goBack'.$chartId.'='.($goBack-1).'" class="text-2xl">&gt;</a>';
+  } else {
+    $forwardLink = '&nbsp;';
+  }
+  echo '
+  <div class="flex">
+    <div class="flex-auto text-left"><a href="?goBack'.$chartId.'='.($goBack+1).'" class="text-2xl">&lt;</a></div>
+    <div class="flex-auto text-right">'.$forwardLink.'</div>
+  </div>
+  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Durchschnittsverbrauch '.$title.'</div>
+  <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
+  <script>
+  const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
+  const labels'.$chartId.' = '.$values[0].';
+  const data'.$chartId.' = {
+    labels: labels'.$chartId.',
+    datasets: [{
+      data: '.$values[1].',';
+      printColors(limit:$values[2], offset:$values[3]);
+      echo '
+      borderWidth: 1,
+      order: 1
+    },
+    {      
+      label: "Durchschnitt",
+      data: '.$values[4].',
+      borderColor: "rgba(20, 20, 20, 0.8)",
+      backgroundColor: "rgb(255,255,255)",
+      borderWidth: 2,
+      borderDash: [10, 5],
+      pointStyle: false,
+      type: "line",
+      order: 0
+    }]
+  };
+  const config'.$chartId.' = {
+    type: "bar",
+    data: data'.$chartId.',
+    options: { plugins : { legend: { display: false } } },
+  };
+  const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
+  </script>';
+  if ($isIndexPage) {
+    printPopOverLnk(chartId:$chartId);
+    echo '
+        <h3 class="font-semibold text-gray-900">Durchschnittsverbrauch</h3>
+        <p>Durchschnittsverbrauch in Watt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh</p>
+        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:EnumSvg::ArrowRight).'</a>
+      </div>
+    <div data-popper-arrow></div>
+  </div>';
+  }
+  echo getHr().'
+  <br>
+  ';
 }
 
 function printBarGraph (array $values, string $chartId, string $title, bool $isIndexPage=FALSE):void {
