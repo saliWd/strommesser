@@ -228,9 +228,9 @@ function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange
   echo '
   <div class="flex">
     <div class="flex-auto text-left"><a href="?goBack'.$chartId.'='.($goBack+1).'" class="text-2xl">&lt;</a></div>
+    <div class="mt-4 text-xl" id="anchor'.$chartId.'">Durchschnittsverbrauch '.$title.'</div>
     <div class="flex-auto text-right">'.$forwardLink.'</div>
-  </div>
-  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Durchschnittsverbrauch '.$title.'</div>
+  </div>  
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
