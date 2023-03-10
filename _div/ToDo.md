@@ -23,7 +23,7 @@
 4. div
 
 
-Next:  2.7 (use chartjs functionality)
+Next:  2.7
 
 
 [lnkCase]: https://www.thingiverse.com/thing:4767008
