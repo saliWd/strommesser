@@ -198,14 +198,12 @@ function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange
     else { $title = 'Jahr '.$year; }
     $chartId = 'Y';
   } elseif ($timerange === EnumTimerange::Month) {
-    $monNames = array('Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'); // need german naming, not using format('M')
+    $monNames = array('Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'); // need german naming, not using format('M')
     $month = ((int)$now->format('m')) - $goBack;
     while ($month < 1) {
       $month += 12;
     }
-    if ($goBack === 0) { $title = 'diesen Monat'; }
-    elseif ($goBack === 1) { $title = 'letzten Monat'; }
-    else { $title = $monNames[$month-1]; }
+    $title = $monNames[$month-1];
     $chartId = 'M';
   } elseif ($timerange === EnumTimerange::Week) {
     if ($goBack === 0) { $title = 'diese Woche'; }
@@ -219,15 +217,17 @@ function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange
   }
   $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, goBack:$goBack);
   if ($goBack > 0) {
-    $forwardLink = '<a href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowRight, classString:'w-8 h-8').'</a>';
+    $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowRight, classString:'w-8 h-8').'</a>';
   } else {
-    $forwardLink = '&nbsp;';
+    $forwardLink = '<span class="inline-flex">&nbsp;</span>';
   }
   echo '
   <div class="flex mt-4">
-    <div class="flex-none w-8 h-8 text-blue-600 hover:text-blue-700"><a href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowLeft, classString:'w-8 h-8').'</a></div>
-    <div class="grow h-8 text-xl scroll-mt-16" id="anchor'.$chartId.'">Verbrauch '.$title.'</div>
-    <div class="flex-none w-8 h-8 text-blue-600 hover:text-blue-700">'.$forwardLink.'</div>
+    <div class="grow h-8 scroll-mt-16" id="anchor'.$chartId.'">
+      <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowLeft, classString:'w-8 h-8').'</a>
+      <span class="text-xl mx-4 inline-flex h-8 align-middle mb-4">Verbrauch '.$title.'</span>
+      '.$forwardLink.'
+    </div>
   </div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
