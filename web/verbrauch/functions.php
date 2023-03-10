@@ -219,68 +219,16 @@ function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange
   }
   $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, goBack:$goBack);
   if ($goBack > 0) {
-    $forwardLink = '<a href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'" class="text-2xl">&gt;</a>';
+    $forwardLink = '<a href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowRight, classString:'w-6 h-6').'</a>';
   } else {
     $forwardLink = '&nbsp;';
   }
   echo '
-  <div class="flex">
-    <span class="flex-auto text-left inline-block"><a href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowLeft, classString:'w-6 h-6 align-middle ').'</a></span>
-    <span class="mt-4 text-xl inline-block" id="anchor'.$chartId.'">Durchschnittsverbrauch '.$title.'</span>
-    <span class="flex-auto text-right inline-block">'.$forwardLink.'</span>
-  </div>  
-  <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
-  <script>
-  const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
-  const labels'.$chartId.' = '.$values[0].';
-  const data'.$chartId.' = {
-    labels: labels'.$chartId.',
-    datasets: [{
-      data: '.$values[1].',';
-      printColors(limit:$values[2], offset:$values[3]);
-      echo '
-      borderWidth: 1,
-      order: 1
-    },
-    {      
-      label: "Durchschnitt",
-      data: '.$values[4].',
-      borderColor: "rgba(20, 20, 20, 0.8)",
-      backgroundColor: "rgb(255,255,255)",
-      borderWidth: 2,
-      borderDash: [10, 5],
-      pointStyle: false,
-      type: "line",
-      order: 0
-    }]
-  };
-  const config'.$chartId.' = {
-    type: "bar",
-    data: data'.$chartId.',
-    options: { plugins : { legend: { display: false } } },
-  };
-  const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
-  </script>';
-  if ($isIndexPage) {
-    printPopOverLnk(chartId:$chartId);
-    echo '
-        <h3 class="font-semibold text-gray-900">Durchschnittsverbrauch</h3>
-        <p>Durchschnittsverbrauch in Watt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh</p>
-        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:EnumSvg::ArrowRight).'</a>
-      </div>
-    <div data-popper-arrow></div>
-  </div>';
-  }
-  echo getHr().'
-  <br>
-  ';
-}
-
-function printBarGraph (array $values, string $chartId, string $title, bool $isIndexPage=FALSE):void {
-  echo '
-  <div class="mt-4 text-xl" id="anchor'.$chartId.'">Durchschnittsverbrauch '.$title.'</div>
+  <div class="flex mt-4">
+    <div class="flex-none w-8 h-8"><a href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowLeft, classString:'w-6 h-6').'</a></div>
+    <div class="grow h-8 text-xl scroll-mt-16" id="anchor'.$chartId.'">Verbrauch '.$title.'</div>
+    <div class="flex-none w-8 h-8">'.$forwardLink.'</div>
+  </div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>
   const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
@@ -484,15 +432,15 @@ function printNavMenu_v2 (string $site, string $title): void {
   if ($site === 'index.php') {
     $inPageTargets = array(
       ['#myChart', 'Aktueller Verbrauch'],
-      ['#anchorWeeklyNow', 'Wöchentlich'],
-      ['#anchorMonthlyNow', 'Monatlich']
+      ['#anchorW', 'Wöchentlich'],
+      ['#anchorM', 'Monatlich']
     );
     $siteName = 'Verbrauch';
   } elseif ($site === 'statistic.php') {
     $inPageTargets = array(
-      ['#anchorWeeklyNow', 'Wöchentlich'],
-      ['#anchorMonthlyNow', 'Monatlich'],
-      ['#anchorYearlyNow', 'Jährlich']
+      ['#anchorW', 'Wöchentlich'],
+      ['#anchorM', 'Monatlich'],
+      ['#anchorY', 'Jährlich']
     );
     $siteName = 'Statistiken';
   } elseif ($site === 'settings.php') {

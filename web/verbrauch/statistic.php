@@ -6,7 +6,7 @@ $dbConn = initialize();
 // - daily consumption this week (starting monday), consumption last week
 // - daily consumption this month (starting 1st of), consumption last month
 // - weekly consumption this year
-// TODO: always: scrollable (select this month or go back to last month etc.)
+// always: scrollable (select this month or go back to last month etc.)
 // always: displaying the data as I have it. If only two days this month, I display those...
 
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
@@ -18,21 +18,10 @@ echo '
   <p class="font-normal text-gray-700">Für jeden Wochentag ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh.</p>
   <p class="font-normal text-gray-700">Gemessen wird von 00:00 bis 23:59 bzw. am aktuellen Tag von 00:00 bis `jetzt`.</p>
   <p class="font-normal text-gray-700">Der Durchschnitt über die ganze Woche ist gestrichelt eingezeichnet.</p>
-  <p class="font-normal text-gray-700">Mit den Navigationspfeilen kannst du zwischen den Wochen blättern (TODO: noch in Arbeit)</p>
+  <p class="font-normal text-gray-700">Mit den Navigationspfeilen kannst du zwischen den Wochen blättern.</p>
 </div>
 ';
-printBarGraph(
-  values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:0), 
-  chartId:'WeeklyNow', 
-  title:'diese Woche',
-  isIndexPage:FALSE
-);
-printBarGraph(
-  values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:1), 
-  chartId:'WeeklyLast', 
-  title:'letzte Woche',
-  isIndexPage:FALSE
-);
+printBarGraph_v2(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
@@ -40,11 +29,10 @@ echo '
   <p class="font-normal text-gray-700">Für jeden Tag ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh.</p>
   <p class="font-normal text-gray-700">Gemessen wird von 00:00 bis 23:59 bzw. am aktuellen Tag von 00:00 bis `jetzt`.</p>
   <p class="font-normal text-gray-700">Der Durchschnitt über den ganzen Monat ist gestrichelt eingezeichnet.</p>
-  <p class="font-normal text-gray-700">Mit den Navigationspfeilen kannst du zwischen den Monaten blättern (TODO: noch in Arbeit)</p>
+  <p class="font-normal text-gray-700">Mit den Navigationspfeilen kannst du zwischen den Monaten blättern.</p>
 </div>
 ';
-printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:0), chartId:'MonthlyNow', title:'diesen Monat');
-printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:1), chartId:'MonthlyLast', title:'letzten Monat');
+printBarGraph_v2(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:safeIntFromExt('GET','goBackM', 2), isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
@@ -54,6 +42,6 @@ echo '
   <p class="font-normal text-gray-700">Der Durchschnitt über das ganze Jahr ist gestrichelt eingezeichnet.</p>
 </div>
 ';
-printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Year, goBack:0), chartId:'YearlyNow', title:'dieses Jahr');
+printBarGraph_v2(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Year, goBack:safeIntFromExt('GET','goBackY', 2), isIndexPage:FALSE);
 ?>
 </div></body></html>

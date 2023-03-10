@@ -211,9 +211,8 @@ echo '<br><br>
     <div data-popper-arrow></div>
 </div>
 <br>';
-
-printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:0), chartId:'WeeklyNow', title:'diese Woche', isIndexPage:TRUE);
-printBarGraph(values:getValues(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:0), chartId:'MonthlyNow', title:'diesen Monat', isIndexPage:TRUE);
+printBarGraph_v2(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:TRUE);
+printBarGraph_v2(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, goBack:safeIntFromExt('GET','goBackM', 2), isIndexPage:TRUE);
 
 echo '<p>Weitere Auswertungen findest du auf der<a href="statistic.php" class="font-medium text-blue-600 hover:text-blue-700">'.getSvg(whichSvg:EnumSvg::ArrowRight, classString:'w-6 h-6 inline').'Statistikseite</a></p>';
 

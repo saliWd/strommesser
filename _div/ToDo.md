@@ -12,8 +12,7 @@
    4. login.php
    5. rx.php
    6. settings.php: change email.
-   7. statistic.php: 
-      * scrollable: per week, per month, per year
+   7. statistic.php
 3. pico devices
    1. stability: good since 10.01.23. issue 08.03.2023: several power cycles needed. 9.3.23 again. issue on usb power supply?
       * check with WLAN disconnection
@@ -23,7 +22,7 @@
 4. div
 
 
-Next:  2.7
+Next: 
 
 
 [lnkCase]: https://www.thingiverse.com/thing:4767008
