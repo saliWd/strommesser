@@ -219,15 +219,15 @@ function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange
   }
   $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, goBack:$goBack);
   if ($goBack > 0) {
-    $forwardLink = '<a href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowRight, classString:'w-6 h-6').'</a>';
+    $forwardLink = '<a href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowRight, classString:'w-8 h-8').'</a>';
   } else {
     $forwardLink = '&nbsp;';
   }
   echo '
   <div class="flex mt-4">
-    <div class="flex-none w-8 h-8"><a href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowLeft, classString:'w-6 h-6').'</a></div>
+    <div class="flex-none w-8 h-8 text-blue-600 hover:text-blue-700"><a href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowLeft, classString:'w-8 h-8').'</a></div>
     <div class="grow h-8 text-xl scroll-mt-16" id="anchor'.$chartId.'">Verbrauch '.$title.'</div>
-    <div class="flex-none w-8 h-8">'.$forwardLink.'</div>
+    <div class="flex-none w-8 h-8 text-blue-600 hover:text-blue-700">'.$forwardLink.'</div>
   </div>
   <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
   <script>

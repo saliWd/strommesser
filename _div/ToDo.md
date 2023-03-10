@@ -5,8 +5,8 @@
    1. login form on WP / 'bigger' link
 2. StromMesser/verbrauch
    1. general
-      * navbar: 
-         * slightly different design
+      * design: navbar slightly different design
+      * design: scroll-arrows, position
    2. getRaw.php
    3. index.php
    4. login.php
