@@ -11,10 +11,12 @@
    4. login.php
    5. rx.php
    6. settings.php: change email.
-   7. statistic.php
+   7. statistic.php: explain-text hidden by default
 3. pico devices
-   1. stability: good since 10.01.23. issue 08.03.2023: several power cycles needed. 9.3.23 again. issue on usb power supply?
+   1. stability since 10.01.23: mixed. Lots of good streaks (several days ok). issue 08.03.2023: several power cycles needed. 9.3.23 again
+      * checking on WLAN side: if status is not 200, do a reboot? With a timeout? 
       * check with WLAN disconnection
+      * could also be an issue on usb power supply?
       * does not (always) recover from issue on server side. Need more stable reset mechanism
    1. disp
       1. [case?][lnkCase]
