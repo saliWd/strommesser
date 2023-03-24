@@ -1,24 +1,10 @@
 import network # type: ignore (this is a pylance ignore warning directive)
-import urequests # type: ignore
 from time import sleep
 from machine import Pin, UART # type: ignore
-import _thread
-
-def SecondCoreTask(): # reboots every ~8h
-    reset_counter = 240 # do a regular reboot (stability increase work around)
-    while True:
-        sleep(120) # seconds
-        if reset_counter > 0:
-            reset_counter -= 1
-        else:
-            from machine import reset # type: ignore
-            reset() # NB: connection to whatever device is getting lost; complicates debugging
-
-_thread.start_new_thread(SecondCoreTask, ())
 
 # my own files
 import my_config
-from my_functions import debug_print, debug_sleep, wlan_connect, urlencode, get_randNum_hash
+from my_functions import debug_print, debug_sleep, wlan_connect, get_randNum_hash, transmit_message
 
 
 def uart_ir_e350(DBGCFG:dict, uart_ir):
@@ -56,12 +42,8 @@ def send_message_and_wait_post(DBGCFG:dict, message:dict, wait_time:int, led_onb
     # 2 uses authentification with a hash when sending
     if(not DBGCFG["wlan_sim"]): # not sending anything in simulation
         URL = "https://strommesser.ch/verbrauch/rx.php?TX=pico&TXVER=2"
-        HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
+        transmit_message(DBGCFG=DBGCFG, URL=URL, message=message)
 
-        urlenc = urlencode(message)
-        response = urequests.post(URL, data=urlenc, headers=HEADERS)
-        debug_print(DBGCFG=DBGCFG, text="Text:"+response.text)
-        response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
     debug_sleep(DBGCFG=DBGCFG,time=wait_time)
     led_onboard.toggle() # signal success
 

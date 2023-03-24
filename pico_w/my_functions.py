@@ -2,6 +2,7 @@ from time import sleep
 from hashlib import sha256
 from binascii import hexlify
 from random import randint
+import urequests # type: ignore
 
 import my_config
 
@@ -48,6 +49,21 @@ def urlencode(dictionary:dict):
         urlenc += "%s=%s&" %(key,val)
     urlenc = urlenc[:-1] # gets me something like 'val0=23&val1=bla space'
     return(urlenc)
+
+def transmit_message(DBGCFG:dict, URL:str, message:dict):
+    HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
+    urlenc = urlencode(message)
+    # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue 
+    response = urequests.post(URL, data=urlenc, headers=HEADERS)
+    if (response.status_code != 200):
+        print("invalid status code. Resetting in 20 seconds...")
+        sleep(20) 
+        from machine import reset # type: ignore
+        reset() # NB: connection to whatever device is getting lost; complicates debugging
+    returnText = response.text
+    debug_print(DBGCFG=DBGCFG, text="Text:"+returnText)
+    response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
+    return(returnText)
 
 def get_randNum_hash(device_config):
     rand_num = randint(1, 10000)

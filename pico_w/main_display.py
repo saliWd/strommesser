@@ -1,14 +1,12 @@
 import network # type: ignore (this is a pylance ignore warning directive)
-import urequests # type: ignore
 from time import sleep
 from machine import Timer # type: ignore
 from pimoroni import RGBLED  # type: ignore
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
-import _thread
 
 # my own files
 import my_config
-from my_functions import debug_print, debug_sleep, wlan_connect, urlencode, get_randNum_hash
+from my_functions import debug_print, debug_sleep, wlan_connect, get_randNum_hash, transmit_message
 
 def SecondCoreTask(): # reboots after about ~1h
     reset_counter = 40 # do a regular reboot (stability increase work around)
@@ -25,13 +23,8 @@ def send_message_get_response(DBGCFG:dict, message:dict):
     SIM_STR = "1|57|2023|01|27|18|22|09|500|100"
     if (DBGCFG["wlan_sim"]):        
         return(sepStrToArr(separatedString=SIM_STR))            
-
-    HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
-    urlenc = urlencode(message)
-    response = urequests.post(URL, data=urlenc, headers=HEADERS)
-    debug_print(DBGCFG, response.text)
-    returnText = response.text
-    response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
+    
+    returnText = transmit_message(DBGCFG=DBGCFG, URL=URL, message=message)    
     return(sepStrToArr(separatedString=returnText))
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
@@ -162,13 +155,6 @@ while True:
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
     meas = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
     
-    # at two o'clock in the morning (or when receiving invalid data) I start a timer to reset 80mins later
-    if (meas["hour"] == 2) or (meas["valid"] == 0):
-        if second_core_idle: # start it only once
-            _thread.start_new_thread(SecondCoreTask, ())
-            second_core_idle = False
-            debug_print(DBGCFG, "did start the second core")
-
     # normalize the value. Is between 0 and max
     wattValueNonMaxed = meas["wattValue"]    
     meas["wattValue"] = min(meas["wattValue"], meas["max"])
