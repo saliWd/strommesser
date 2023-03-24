@@ -21,17 +21,19 @@ def callSingleTest(driver, testNum, ALL_TESTS, testsToRun):
   from index import doTimescales
   from staticHtml import getStatic
   
-  if ALL_TESTS[testNum] in testsToRun:       
+  if ALL_TESTS[testNum] in testsToRun:
     if testNum == 0:
-      result = doLoginLogout(driver, testNum)
-    if testNum == 1:
-      result = doTimescales(driver, testNum)
-    if testNum == 2:
-      result = getStatic(driver, testNum)    
+      result = doLoginLogout(driver, testNum)      
+    elif testNum == 1:
+      result = doTimescales(driver, testNum)      
+    elif testNum == 2:
+      result = getStatic(driver, testNum)
     else:
       result = False
     # end if-elif
+
     if (not(result)): 
+      print("Test "+str(testNum)+" failed. Finishing...")
       finish(driver)
     print("----")
   # end if

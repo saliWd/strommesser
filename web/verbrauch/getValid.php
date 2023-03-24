@@ -7,7 +7,7 @@
     $zeitNow->modify('- 5 minutes'); // latest entry must be newer than '5 minutes ago'
     $valid = 0;
 
-    $userids_to_check = [1, 2];
+    $userids_to_check = [1, 2]; // might get that from DB as well. Need to exclude test account and non-active ones though
     $output = '';
     foreach ($userids_to_check as $userid) {
         $result = $dbConn->query('SELECT `zeit` FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 1');

@@ -27,15 +27,21 @@ def getPage(driver, page, testNum, subTest):
 # end def  
 
 def getStatic(driver, testNum):
-  from functions import doLoginCorrect, printOkOrNot
+  from functions import printOkOrNot, checkSiteTitleAndPrint
+  from my_config import doLoginCorrect
   subTest = 1
   
   driver.get("view-source:https://strommesser.ch/verbrauch/login.php")
   pageSource=driver.find_element(By.TAG_NAME, 'html').text
   writeFile(fileName='staticHtml/static.login', fileContent=pageSource)    
   modDescription = [(str(testNum)+"."+str(subTest)), "getStatic_login"] 
-  
-  doLoginCorrect(driver, modDescription) # after this, I'm on index.php site
+
+  driver.get("https://strommesser.ch/verbrauch/login.php") # go to the login page
+
+  doLoginCorrect(driver) 
+  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle="StromMesser Verbrauch"))):
+    return False
+  # end if
   subTest = subTest + 1
 
   ranges = ('1','6','24','25')

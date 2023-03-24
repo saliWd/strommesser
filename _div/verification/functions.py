@@ -38,24 +38,9 @@ def doLogin (driver, username, password):
   passwordField.submit() # could also use a command like: driver.find_element_by_name("login").click() 
 # end def
 
-def doLoginCorrect(driver, modDescription):
-  
-  driver.get("https://strommesser.ch/verbrauch/login.php") # go to the login page
-
-  doLogin(driver, username="messer@strommesser.ch", password="messerPW") # this is the correct password
-  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle="StromMesser Verbrauch"))):
-    return False
-  # end if
-
-  return True
-# end def
-
 def doLogout (driver):
-  menuLink = driver.find_element(By.ID, "menuToggle")
-  menuLink.click()
+  driver.get("https://strommesser.ch/verbrauch/login.php?do=2") # go to the logout page
   time.sleep(1) # wait until menu did appear
-  logoutLink = driver.find_element(By.ID, "navLogoutLink")
-  logoutLink.click()
 # end def
 
 def finish (driver):
