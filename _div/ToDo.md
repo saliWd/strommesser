@@ -18,6 +18,7 @@
       * check with WLAN disconnection
       * could also be an issue on usb power supply?
       * does not (always) recover from issue on server side. Need more stable reset mechanism
+   1. print my own case for measurement
    1. disp
       1. [case?][lnkCase]
 4. div
