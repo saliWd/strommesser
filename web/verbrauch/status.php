@@ -22,9 +22,21 @@
             $output .= 'userid: '.$userid.' is invalid'."<br>\n";
         }
     }
-    echo ($valid === count($userids_to_check)) ? '1' : '0';
 
-    if ($output) {
-        echo "<br>\n".$output;
+    $nice = safeIntFromExt(source:'GET',varName:'nice',length:1);
+    if ($nice === 0) {
+        echo ($valid === count($userids_to_check)) ? '1' : '0';
+        if ($output) {
+            echo "<br>\n".$output;
+        }
+    } else {
+        printBeginOfPage_v2(site:'status.php', title:'Status');
+        $okOrNot = ($valid === count($userids_to_check)) ? 'ok' : '<span class="text-xl text-red-600">nicht ok</span>';
+        echo '
+<div class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+  <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Status ist '.$okOrNot.'</h3>
+  <p class="font-normal text-gray-700">'.$output.'</p>
+</div>
+</div></body></html>';       
     }
 ?>

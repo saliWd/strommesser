@@ -371,7 +371,9 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
     'index.php' => 'Verbrauch',
     'settings.php' => 'Einstellungen',
     'login.php' => 'Login, Logout',
-    'statistic.php' => 'Statistiken');
+    'statistic.php' => 'Statistiken',
+    'status.php' => 'Status'
+  );
   echo '<!DOCTYPE html>
   <html>
   <head>
