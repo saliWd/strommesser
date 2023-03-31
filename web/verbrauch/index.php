@@ -67,7 +67,7 @@ if ($totalCount > 0) {// this may be 0
   }
   echo '<div class="flex">
     <div class="flex-auto text-left">Verbrauch: <b>'.$newestConsumption.'W</b> '.$zeitString.'.</div>
-    <div class="flex-auto text-right">Ø-Verbrauch: <b>'.$aveConsumption.'W</b></div>
+    <div class="flex-auto text-right">Ø: <b>'.$aveConsumption.'W</b></div>
   </div>
   <hr>
   ';

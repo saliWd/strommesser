@@ -11,7 +11,7 @@
    4. login.php
    5. rx.php
    6. settings.php: change email.
-   7. statistic.php: explain-text hidden by default
+   7. statistic.php
 3. pico devices
    1. stability since 10.01.23: mixed. Lots of good streaks (several days ok). issue 08.03.2023: several power cycles needed. 9.3.23 again
       * checking on WLAN side: if status is not 200, do a reboot? With a timeout? 
