@@ -19,12 +19,16 @@
       * could also be an issue on usb power supply?
       * does not (always) recover from issue on server side. Need more stable reset mechanism
    1. print my own case for measurement
+      * [ir head case][irHeadCase]
+      * [pico case][picoCase]
    1. disp
-      1. [case?][lnkCase]
+      1. [case?][displayCase]
 4. div
 
 
-Next: 
+Next: 3.2 / 1.2
 
 
-[lnkCase]: https://www.thingiverse.com/thing:4767008
+[displayCase]: https://www.thingiverse.com/thing:4767008
+[irHeadCase]: https://www.thingiverse.com/thing:3378332
+[picoCase]: [https://www.thingiverse.com/thing:4895274]
