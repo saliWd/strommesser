@@ -8,16 +8,6 @@ from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
 import my_config
 from my_functions import debug_print, debug_sleep, wlan_connect, get_randNum_hash, transmit_message
 
-def SecondCoreTask(): # reboots after about ~1h
-    reset_counter = 40 # do a regular reboot (stability increase work around)
-    while True:
-        sleep(120) # seconds
-        if reset_counter > 0:
-            reset_counter -= 1
-        else:
-            from machine import reset # type: ignore
-            reset() # NB: connection to whatever device is getting lost; complicates debugging
-
 def send_message_get_response(DBGCFG:dict, message:dict):    
     URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
     SIM_STR = "1|57|2023|01|27|18|22|09|500|100"

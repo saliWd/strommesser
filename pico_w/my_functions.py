@@ -3,6 +3,7 @@ from hashlib import sha256
 from binascii import hexlify
 from random import randint
 import urequests # type: ignore
+from machine import reset # type: ignore
 
 import my_config
 
@@ -38,8 +39,7 @@ def wlan_connect(DBGCFG:dict, wlan, led_onboard, meas:bool):
                 if(meas): # pimoroni does not have the led_onboard
                     led_onboard.toggle()
                 return 
-        # timeout, did not manage to get a working WLAN
-        from machine import reset # type: ignore
+        # timeout, did not manage to get a working WLAN        
         reset() # NB: connection to whatever device is getting lost; complicates debugging
 
 
@@ -52,18 +52,23 @@ def urlencode(dictionary:dict):
 
 def transmit_message(DBGCFG:dict, URL:str, message:dict):
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
-    urlenc = urlencode(message)
-    # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue 
-    response = urequests.post(URL, data=urlenc, headers=HEADERS)
-    if (response.status_code != 200):
-        print("invalid status code. Resetting in 20 seconds...")
-        sleep(20) 
-        from machine import reset # type: ignore
+    try:
+        urlenc = urlencode(message)
+        # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue 
+        response = urequests.post(URL, data=urlenc, headers=HEADERS)
+        if (response.status_code != 200):
+            print("invalid status code. Resetting in 20 seconds...")
+            sleep(20)             
+            reset() # NB: connection to whatever device is getting lost; complicates debugging
+        returnText = response.text
+        debug_print(DBGCFG=DBGCFG, text="Text:"+returnText)
+        response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
+        return(returnText)
+    except:
+        sleep(20) # add a bit of debug possibility        
         reset() # NB: connection to whatever device is getting lost; complicates debugging
-    returnText = response.text
-    debug_print(DBGCFG=DBGCFG, text="Text:"+returnText)
-    response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
-    return(returnText)
+        return # this return will never be executed
+
 
 def get_randNum_hash(device_config):
     rand_num = randint(1, 10000)
