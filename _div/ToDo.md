@@ -3,6 +3,11 @@
 1. StromMesser wordpress
    1. fill with more content: explanation?
    1. login form on WP / 'bigger' link
+   1. different WP design? Single page
+      * ~~blender is wp. bthree theme. Custom theme only for blender -> can't be used~~
+      * Shoreditch maybe. Looks fine and simple. 
+      * Pique has a nice menu
+
 2. StromMesser/verbrauch
    1. general
       * design: navbar slightly different design      
