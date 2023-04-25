@@ -1,20 +1,22 @@
 # StromMesser TODOs
 
 1. StromMesser wordpress
+   1. do it myself but use Pique as an inspiration. Better looking than lodestar (but too much stuff around)
+      * How-to? Have a (non-crawlable) WP-temp folder. Method II: https://wordpress.org/documentation/article/giving-wordpress-its-own-directory/
    1. fill with more content: explanation?
    1. login form on WP / 'bigger' link
-   1. different WP design? Single page. Decision taken for "Pique" (alternative: shoreditch)
-      * cfa button on main page
+   1. different WP design. Single page. Decision taken for "lodestar" (alternative: Pique)
+      * cta button on main page
       * need pages (short ones) as panel
-         1. ~~Was ist es?~~
+         1. ~~Was ist es?~~ -> own panel
          1. Was brauchst du?
-         1. Demo-Account
-         1. Interesse (cfa)
+         1. Demo-Account (cta-2)
+         1. Interesse (cta)
          1. Login (add form on it)
          1. Kontakt (not yet)
       * unclear how to integrate those two:
          * Abo
-         * Geräte
+         * Geräte -> long page, more info.
 
 2. StromMesser/verbrauch
    1. general
