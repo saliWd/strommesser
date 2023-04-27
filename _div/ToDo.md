@@ -1,11 +1,9 @@
 # StromMesser TODOs
 
 1. StromMesser wordpress
-   1. do it myself but use Pique as an inspiration. Better looking than lodestar (but too much stuff around)
-      * How-to? Have a (non-crawlable) WP-temp folder. Method II: https://wordpress.org/documentation/article/giving-wordpress-its-own-directory/
-   1. fill with more content: explanation?
-   1. login form on WP / 'bigger' link
-   1. different WP design. Single page. Decision taken for "lodestar" (alternative: Pique)
+   1. ~~move to /wp is ok (editor is behaving strange though)~~
+   1. change back to Pique (better looking than lodestar). Do not use jetpack
+   1. copy the content   
       * cta button on main page
       * need pages (short ones) as panel
          1. ~~Was ist es?~~ -> own panel
@@ -17,6 +15,9 @@
       * unclear how to integrate those two:
          * Abo
          * Geräte -> long page, more info.
+   1. fill with more content: explanation?
+   1. login form on WP / 'bigger' link
+   
 
 2. StromMesser/verbrauch
    1. general
