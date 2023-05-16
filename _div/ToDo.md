@@ -21,6 +21,8 @@
 
 2. StromMesser/verbrauch
    1. general
+      * have archive data base
+      * expand with ht/nt values
       * design: navbar slightly different design      
    2. getRaw.php
    3. index.php

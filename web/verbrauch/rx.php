@@ -5,39 +5,46 @@
     // with POST data (url encoded)
 
     // I want to readout: total_consumption NB: phases do not help that much without cosphi                
-    function getInterestingValues (string $haystack, string $param_consumption): array {        
-        // process the whole IR string
-        // \x02F.F(00)                     
-        // 0.0(          120858)
-        // C.1.0(13647123)
-        // C.1.1(        )
-        // 1.8.1(042951.721*kWh)       total_nt_consumption
-        // 1.8.2(018609.568*kWh)       total_ht_consumption
-        // 2.8.1(000000.302*kWh)       total_nt_generation
-        // 2.8.2(000010.188*kWh)       total_ht_generation
-        // 1.8.0(061561.289*kWh)       total_consumption
-        // 2.8.0(000010.490*kWh)       total_generation
-        // 15.8.0(061571.780*kWh)      total_energy
-        // C.7.0(0008)                 power_off_counter
-        // 32.7(241*V)                 phase_0_volt
-        // 52.7(243*V)                 phase_1_volt
-        // 72.7(242*V)                 phase_2_volt
-        // 31.7(000.35*A)              phase_0_amp
-        // 51.7(000.52*A)              phase_1_amp
-        // 71.7(000.47*A)              phase_2_amp
-        // 82.8.1(0000)
-        // 82.8.2(0000)
-        // 0.2.0(M26)
-        // C.5.0(0401)
-        // !
-        // x03\x01'
-        $return_array = array(FALSE, ''); // valid/consumption
-        $consumption_pos = strpos($haystack,$param_consumption);
-        if ($consumption_pos) {
-            $return_array[1] = substr($haystack,$consumption_pos+6,10); // I know it's 10 characters long and starts after the bracket
-            $return_array[0] = TRUE; // only true if value haS been found                
+    function getInterestingValues (string $haystack): array {        
+      // process the whole IR string
+      // \x02F.F(00)                     
+      // 0.0(          120858)
+      // C.1.0(13647123)
+      // C.1.1(        )
+      // 1.8.1(042951.721*kWh)       total_nt_consumption
+      // 1.8.2(018609.568*kWh)       total_ht_consumption
+      // 2.8.1(000000.302*kWh)       total_nt_generation
+      // 2.8.2(000010.188*kWh)       total_ht_generation
+      // 1.8.0(061561.289*kWh)       total_consumption
+      // 2.8.0(000010.490*kWh)       total_generation
+      // 15.8.0(061571.780*kWh)      total_energy
+      // C.7.0(0008)                 power_off_counter
+      // 32.7(241*V)                 phase_0_volt
+      // 52.7(243*V)                 phase_1_volt
+      // 72.7(242*V)                 phase_2_volt
+      // 31.7(000.35*A)              phase_0_amp
+      // 51.7(000.52*A)              phase_1_amp
+      // 71.7(000.47*A)              phase_2_amp
+      // 82.8.1(0000)
+      // 82.8.2(0000)
+      // 0.2.0(M26)
+      // C.5.0(0401)
+      // !
+      // x03\x01'
+      
+      $needleStrings = array("1.8.0(", "1.8.1(", "1.8.2(", "2.8.0(", "2.8.1(", "2.8.2("); // consumption,nt,ht, generation,nt,ht
+      $return_array = array(TRUE, '', '', '', '', '', ''); // valid and 6 values (as string)
+      
+      for($i = 0; $i < 6; $i++) {
+        $position = strpos($haystack,$needleStrings[$i]);
+        if ($position) {
+          $return_array[($i+1)] = substr($haystack,$position+6,10); // I know it's 10 characters long and starts after the bracket            
+        } else {
+          $return_array[0] = FALSE; // only true if value has been found
+          break; // leave the for loop
         }
-        return $return_array;
+      }
+      return $return_array;
     }
 
     function doReduction($dbConn, int $userid, bool $smlTimeScale):void {
@@ -96,13 +103,12 @@
 
     $sqlSafe_ir_answer = sqlSafeStrFromPost($dbConn, 'ir_answer', 511); // safe to insert into sql (not to output on html)   
     // interested in total_consumption param (unfortunately no 16.7 and no cosPhi param. So phase-values are just indicative)
-    $values = getInterestingValues($sqlSafe_ir_answer, "1.8.0(");
+    $values = getInterestingValues($sqlSafe_ir_answer);
     if (! $values[0]) {
         printRawErrorAndDie('Error', 'values not found');
     }
-    $total_consumption = $values[1];
 
-    if (! $result = $dbConn->query('INSERT INTO `verbrauch` (`userid`, `consumption`) VALUES ("'.$userid.'", "'.$total_consumption.'")')) {
+    if (! $result = $dbConn->query('INSERT INTO `verbrauch` (`userid`, `consumption`, `consNt`, `consHt`, `gen`, `genNt`, `genHt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'", "'.$values[5].'", "'.$values[6].'")')) {
         printRawErrorAndDie('Error', 'db insert not ok');
     }
 
