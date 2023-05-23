@@ -56,8 +56,27 @@ if ($doSafe === 0) { // entry point of this site
   header("Content-disposition: attachment; filename=\"verbrauch.csv\"");
  
   $outFile = fopen("php://output", "w");
-  fputcsv($outFile, array('id', 'userid', 'consumption', 'consDiff', 'zeit', 'zeitDiff', 'thin'));
-  $result = $dbConn->query('SELECT * FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id`;');
+  /*
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `userid` int(10) UNSIGNED NOT NULL,
+  `consumption` decimal(10,3) NOT NULL,
+  `consDiff` decimal(10,3) NOT NULL,
+  `consNt` decimal(10,3) NOT NULL,
+  `consNtDiff` decimal(10,3) NOT NULL,
+  `consHt` decimal(10,3) NOT NULL,
+  `consHtDiff` decimal(10,3) NOT NULL,
+  `gen` decimal(10,3) NOT NULL,
+  `genDiff` decimal(10,3) NOT NULL,
+  `genNt` decimal(10,3) NOT NULL,
+  `genNtDiff` decimal(10,3) NOT NULL,
+  `genHt` decimal(10,3) NOT NULL,
+  `genHtDiff` decimal(10,3) NOT NULL,
+  `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
+  `zeitDiff` int(11) NOT NULL,
+  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
+  */
+  fputcsv($outFile, array('id','userid','consumption','consDiff','consNt','consNtDiff','consHt','consHtDiff','gen','genDiff','genNt','genNtDiff','genHt','genHtDiff','zeit','zeitDiff','thin'));
+  $result = $dbConn->query('SELECT * FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC;');
   while ($row = $result->fetch_row()) { 
     fputcsv($outFile, $row); 
   }
