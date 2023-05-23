@@ -4,10 +4,10 @@
     // expecting a call like "https://strommesser.ch/verbrauch/rx.php?TX=pico&TXVER=2"
     // with POST data (url encoded)
 
-    // I want to readout: total_consumption NB: phases do not help that much without cosphi                
+    // I want to readout: consumption and generation, both with total/Nt/Ht values. NB: phases do not help that much without cosphi
     function getInterestingValues (string $haystack): array {        
       // process the whole IR string
-      // \x02F.F(00)                     
+      // \x02F.F(00)
       // 0.0(          120858)
       // C.1.0(13647123)
       // C.1.1(        )
@@ -38,7 +38,7 @@
       for($i = 0; $i < 6; $i++) {
         $position = strpos($haystack,$needleStrings[$i]);
         if ($position) {
-          $return_array[($i+1)] = substr($haystack,$position+6,10); // I know it's 10 characters long and starts after the bracket            
+          $return_array[($i+1)] = substr($haystack,$position+6,10); // I know it's 10 characters long and starts after the bracket
         } else {
           $return_array[0] = FALSE; // only true if value has been found
           break; // leave the for loop
@@ -47,7 +47,7 @@
       return $return_array;
     }
 
-    function getDiffs($row_now, $row_before):string {      
+    function getDiffs($row_now, $row_before):string {
       // `consumption` -> `consDiff`
       // `consNt`      -> `consNtDiff`
       // `consHt`      -> `consHtDiff`
@@ -86,10 +86,10 @@
       $row = $result->fetch_assoc();
 
       // compact all from the last hour before this entry
-      $zeit = date_create($row['zeit']); // e.g. 18:43      
+      $zeit = date_create($row['zeit']); // e.g. 18:43
       $zeitHourAlignedString = $zeit->format($formatString); // start of the last hour, e.g. 18:00
 
-      // get the last one where thinning was not yet applied      
+      // get the last one where thinning was not yet applied
       $result = $dbConn->query('SELECT `id` FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'" ORDER BY `id` ASC LIMIT 1;');
       $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
       $idToUpdate = $row['id'];
@@ -122,7 +122,7 @@
 
     $userid = checkInputs($dbConn);
 
-    $sqlSafe_ir_answer = sqlSafeStrFromPost($dbConn, 'ir_answer', 511); // safe to insert into sql (not to output on html)   
+    $sqlSafe_ir_answer = sqlSafeStrFromPost($dbConn, 'ir_answer', 511); // safe to insert into sql (not to output on html)
     // interested in total_consumption param (unfortunately no 16.7 and no cosPhi param. So phase-values are just indicative)
     $values = getInterestingValues($sqlSafe_ir_answer);
     if (! $values[0]) {
@@ -151,7 +151,5 @@
     } else {
         echo 'no previous data'; // not an error
     }
-    
-  
     
 ?>
