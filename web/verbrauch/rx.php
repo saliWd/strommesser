@@ -105,7 +105,7 @@
       $sql .= '`genDiff` = "'.$row['sumGenDiff'].'", `genNtDiff` = "'.$row['sumGenNtDiff'].'", `genHtDiff` = "'.$row['sumGenHtDiff'].'", ';
       $sql .= '`zeitDiff` = "'.$row['sumZeitDiff'].'", `thin` = "'.$thinUpdate.'" WHERE `id` = "'.$idToUpdate.'";';
       $result = $dbConn->query($sql);
-      
+            
       $sql = 'DELETE FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'";';
       $result = $dbConn->query($sql);
     }
@@ -118,6 +118,15 @@
       // do so in a way the remaining data point after thinning is the first in his period, meaning the first datapoint of a day has always a timestamp of 00:00 or 00:01...
       doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:TRUE);
       doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:FALSE);
+    }
+
+    // copies the newest set into the archive db (where no thinning is executed)
+    function copyToArchive ($dbConn, $rowId):void {      
+      $sql =  'INSERT INTO `verbrauchArchive` ';
+      $sql .= '(`userid`, `consumption`, `consDiff`, `consNt`, `consNtDiff`, `consHt`, `consHtDiff`, `gen`, `genDiff`, `genNt`, `genNtDiff`, `genHt`, `genHtDiff`, `zeit`, `zeitDiff`) ';
+      $sql .= 'SELECT `userid`, `consumption`, `consDiff`, `consNt`, `consNtDiff`, `consHt`, `consHtDiff`, `gen`, `genDiff`, `genNt`, `genNtDiff`, `genHt`, `genHtDiff`, `zeit`, `zeitDiff` ';
+      $sql .= 'FROM `verbrauch` WHERE `id` = "'.$rowId.'";';
+      $result = $dbConn->query($sql);
     }
 
     $userid = checkInputs($dbConn);
@@ -144,6 +153,8 @@
         $zeitSecs = ($zeitDiff->d * 24 * 3600) + ($zeitDiff->h*3600) + ($zeitDiff->i * 60) + ($zeitDiff->s);
         
         $result = $dbConn->query('UPDATE `verbrauch` SET '.$valueDiffsSql.'`zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
+
+        copyToArchive(dbConn:$dbConn, rowId:$row_now['id']);
         
         // dbThinnings: do not need to run every time but it doesn't hurt either        
         doDbThinning(dbConn:$dbConn, userid:$userid);
