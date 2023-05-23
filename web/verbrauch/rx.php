@@ -1,7 +1,7 @@
 <?php declare(strict_types=1); 
     require_once('functions.php');
     $dbConn = get_dbConn(); // do not use initialize as I don't use sessions
-    // expecting a call like "https://strommesser.ch/verbrauch/rx_v2.php?TX=pico&TXVER=2"
+    // expecting a call like "https://strommesser.ch/verbrauch/rx.php?TX=pico&TXVER=2"
     // with POST data (url encoded)
 
     // I want to readout: total_consumption NB: phases do not help that much without cosphi                
@@ -45,6 +45,24 @@
         }
       }
       return $return_array;
+    }
+
+    function getDiffs($row_now, $row_before):string {      
+      // `consumption` -> `consDiff`
+      // `consNt`      -> `consNtDiff`
+      // `consHt`      -> `consHtDiff`
+      // `gen`         -> `genDiff`
+      // `genNt`       -> `genNtDiff`
+      // `genHt`       -> `genHtDiff`
+      $sqlString = '';
+      $sqlString .= '`consDiff` = "'.($row_now['consumption'] - $row_before['consumption']).'", ';      
+      $sqlString .= '`consNtDiff` = "'.($row_now['consNt'] - $row_before['consNt']).'", '; 
+      $sqlString .= '`consHtDiff` = "'.($row_now['consHt'] - $row_before['consHt']).'", '; 
+      $sqlString .= '`genDiff` = "'.($row_now['gen'] - $row_before['gen']).'", '; 
+      $sqlString .= '`genNtDiff` = "'.($row_now['genNt'] - $row_before['genNt']).'", ';
+      $sqlString .= '`genHtDiff` = "'.($row_now['genHt'] - $row_before['genHt']).'", ';
+
+      return $sqlString;
     }
 
     function doReduction($dbConn, int $userid, bool $smlTimeScale):void {
@@ -112,18 +130,17 @@
         printRawErrorAndDie('Error', 'db insert not ok');
     }
 
-
     //NB: not using last inserted ID as other inserts may have happened in the meantime
     $result = $dbConn->query('SELECT * FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 2');
     $queryCount = $result->num_rows; // this may be 1 or 2
     if ($queryCount === 2) {
         $row_now = $result->fetch_assoc();
         $row_before = $result->fetch_assoc();
-        $consDiff = $row_now['consumption'] - $row_before['consumption']; // 0 or positive                        
+        $valueDiffsSql = getDiffs(row_now:$row_now, row_before:$row_before);
         $zeitDiff = date_diff(date_create($row_before['zeit']), date_create($row_now['zeit']));
         $zeitSecs = ($zeitDiff->d * 24 * 3600) + ($zeitDiff->h*3600) + ($zeitDiff->i * 60) + ($zeitDiff->s);
         
-        $result = $dbConn->query('UPDATE `verbrauch` SET `consDiff` = "'.$consDiff.'", `zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
+        $result = $dbConn->query('UPDATE `verbrauch` SET '.$valueDiffsSql.'`zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
         
         // dbThinnings: do not need to run every time but it doesn't hurt either        
         doDbThinning(dbConn:$dbConn, userid:$userid);
