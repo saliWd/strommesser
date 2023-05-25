@@ -77,7 +77,7 @@ if ($doSafe === 0) { // entry point of this site
   `zeitDiff` int(11) NOT NULL,
   */
   fputcsv($outFile, array('id','userid','consumption','consDiff','consNt','consNtDiff','consHt','consHtDiff','gen','genDiff','genNt','genNtDiff','genHt','genHtDiff','zeit','zeitDiff'));
-  $result = $dbConn->query('SELECT * FROM `verbrauchArchive` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC;');
+  $result = $dbConn->query('SELECT * FROM `verbrauchArchive` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 24000;'); // limit 24k = bit more than one month. To limit file size
   while ($row = $result->fetch_row()) { 
     fputcsv($outFile, $row); 
   }
