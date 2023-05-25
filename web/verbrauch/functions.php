@@ -448,13 +448,11 @@ function printNavMenu_v2 (string $site, string $title): void {
   } elseif ($site === 'settings.php') {
     $inPageTargets = array(
       ['#anchorMiniDisplay', 'Mini-Display'],
-      ['#anchorUserAccount', 'Benutzereinstellungen']
+      ['#anchorUserAccount', 'Benutzereinstellungen'],
+      ['#anchorDataExport', 'Daten exportieren']
     );
     $siteName = 'Einstellungen';
-  } elseif ($site === 'login.php') {
-    // $inPageTargets = array(
-    //  ['#loginForm', 'Mini-Display']
-    // );
+  } elseif ($site === 'login.php') {    
     $siteName = 'Login';
   }
   if ($title) { $siteName = $title; }

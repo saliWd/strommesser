@@ -21,14 +21,14 @@
 
 2. StromMesser/verbrauch
    1. general
-      * have archive data base
-      * expand with ht/nt values
-      * design: navbar slightly different design      
+      * design: navbar slightly different design?
    2. getRaw.php
    3. index.php
    4. login.php
    5. rx.php
-   6. settings.php: change email.
+   6. settings.php:
+      * change email
+      * csv-Export: delete exported data from dB
    7. statistic.php
 3. pico devices
    1. stability since 10.01.23: mixed. Lots of good streaks (several days ok). issue 08.03.2023: several power cycles needed. 9.3.23 again

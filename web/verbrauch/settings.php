@@ -40,15 +40,17 @@ if ($doSafe === 0) { // entry point of this site
     <div class="flex flex-row justify-center">
       <div><a href="login.php?do=3" class="input-text basis-full">Passwort ändern</a></div>
     </div>
-    <hr class="my-4">
-    <h4 class="mb-2 text-l font-bold tracking-tight text-gray-900">Daten exportieren</h4>
+  </div>
+  '.getHr().'
+  <div id="anchorDataExport" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+    <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Daten exportieren</h3>
     <p>Deine Messdaten werden im CSV-Format unter `verbrauch.csv` gespeichert</p>
     <br>
     <div class="flex flex-row justify-center">
       <div><a href="settings.php?do=1" class="input-text basis-full w-96">Alle Messdaten als csv herunterladen</a></div>
     </div>
   </div>
-  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
   ';
 } elseif ($doSafe === 1) { // export all entries
   header("Content-Type: application/octet-stream");
@@ -73,10 +75,9 @@ if ($doSafe === 0) { // entry point of this site
   `genHtDiff` decimal(10,3) NOT NULL,
   `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
   `zeitDiff` int(11) NOT NULL,
-  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
   */
-  fputcsv($outFile, array('id','userid','consumption','consDiff','consNt','consNtDiff','consHt','consHtDiff','gen','genDiff','genNt','genNtDiff','genHt','genHtDiff','zeit','zeitDiff','thin'));
-  $result = $dbConn->query('SELECT * FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC;');
+  fputcsv($outFile, array('id','userid','consumption','consDiff','consNt','consNtDiff','consHt','consHtDiff','gen','genDiff','genNt','genNtDiff','genHt','genHtDiff','zeit','zeitDiff'));
+  $result = $dbConn->query('SELECT * FROM `verbrauchArchive` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC;');
   while ($row = $result->fetch_row()) { 
     fputcsv($outFile, $row); 
   }
