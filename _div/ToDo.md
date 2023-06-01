@@ -28,7 +28,6 @@
    5. rx.php
    6. settings.php:
       * change email
-      * csv-Export: delete exported data from dB
    7. statistic.php
 3. pico devices
    1. stability since 05.23: good since installing the try-except block on the devices. Need to update ID-2 measure pico as well
@@ -44,7 +43,7 @@
 4. div
 
 
-Next: 3.2 / 1.2
+Next: 1.2 / 
 
 
 [displayCase]: https://www.thingiverse.com/thing:4767008
