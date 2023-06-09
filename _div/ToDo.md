@@ -1,15 +1,13 @@
 # StromMesser TODOs
 
 1. StromMesser wordpress
-   1. ~~move to /wp is ok (editor is behaving strange though)~~
-   1. change back to Pique (better looking than lodestar). Do not use jetpack
-   1. copy the content   
+   1. copy the content
       * cta button on main page
       * need pages (short ones) as panel
          1. ~~Was ist es?~~ -> own panel
          1. Was brauchst du?
          1. Demo-Account (cta-2)
-         1. Interesse (cta)
+         1. Interesse (cta) -> source code fragment, solve blueish border
          1. Login (add form on it)
          1. Kontakt (not yet)
       * unclear how to integrate those two:
