@@ -3,14 +3,12 @@
 1. StromMesser wordpress
    1. copy the content
       * cta button on main page
-      * need pages (short ones) as panel
-         1. ~~Was ist es?~~ -> own panel
+      * mini-pages as panel: add CTA on top page
          1. Was brauchst du?
          1. Demo-Account (cta-2)
-         1. Interesse (cta) -> source code fragment, solve blueish border
-         1. Login (add form on it)
-         1. Kontakt (not yet)
-      * unclear how to integrate those two:
+         1. Kontakt (cta) -> source code fragment, solve blueish border
+         1. Login (add form on it)         
+      * Two additional pages:
          * Abo
          * Geräte -> long page, more info.
    1. fill with more content: explanation?
