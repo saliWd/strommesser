@@ -372,7 +372,8 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
     'settings.php' => 'Einstellungen',
     'login.php' => 'Login, Logout',
     'statistic.php' => 'Statistiken',
-    'status.php' => 'Status'
+    'status.php' => 'Status',
+    'contact.php' => 'Kontaktformular'
   );
   echo '<!DOCTYPE html>
   <html>

@@ -1,0 +1,35 @@
+<p>Fülle untenstehendes Formular aus und ich melde mich bei dir. Alles unverbindlich und ohne Kosten.</p>
+<form action="https://strommesser.ch/pages/contact.php" id="contact_form" method="post">
+    <label for="contactForm_name"><span class="label">Name</span></label>
+    <input id="contactForm_name" type="text" name="contactForm_name" value="" placeholder="Vorname Nachname" spellcheck="false" /><br>
+    <label for="contactForm_email"><span class="label">E-Mail-Adresse</span></label>
+    <input type="email" name="contactForm_email" id="contactForm_email" value="" placeholder="" spellcheck="false" /><br>
+    <label for="contactForm_radio"><span class="label">Modell Leistungsmesser</span></label><br>
+    <label class="option-label">
+        <input type="radio" name="contactForm_radio" value="1">
+        <span class="label-wrap"><span class="label">Landis+Gyr™ E350</span></span>
+    </label><br>
+    <label class="option-label">
+        <input type="radio" name="contactForm_radio" value="2">
+        <span class="label-wrap"><span class="label">anderes Modell (bitte im Infofeld angeben)</span></span>
+    </label><br>
+    <label class="option-label">
+        <input type="radio" name="contactForm_radio" value="3">
+        <span class="label-wrap"><span class="label">&#8230;ich weiss es nicht.</span></span>
+    </label><br>
+
+    <label for="contactForm_div">
+        <span class="label">Weitere Infos</span>
+        <span>(optional)</span>
+    </label>
+    <textarea id="contactForm_div" name="contactForm_div" rows="5" placeholder="" ></textarea>
+    
+    <label class="option-label">
+        <input type="checkbox" name="contactForm_process" value="1" >
+        <span class="label-wrap">
+            <span class="label">Ich bin damit einverstanden, dass diese Website die übermittelten personenbezogenen Daten speichert und verarbeitet.</span>
+        </span>
+    </label><br>
+    
+    <button type="submit">Unverbindliche Anfrage abschicken</button>
+</form>

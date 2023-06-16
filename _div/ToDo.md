@@ -1,6 +1,7 @@
 # StromMesser TODOs
 
 1. StromMesser wordpress
+   1. contact form process
    1. copy the content
       * cta button on main page
       * mini-pages as panel: add CTA on top page
@@ -13,8 +14,6 @@
          * Geräte -> long page, more info.
    1. fill with more content: explanation?
    1. login form on WP / 'bigger' link
-   
-
 2. StromMesser/verbrauch
    1. general
       * design: navbar slightly different design?
@@ -39,7 +38,7 @@
 4. div
 
 
-Next: 1.2 / 
+Next: 1.1 / 
 
 
 [displayCase]: https://www.thingiverse.com/thing:4767008
