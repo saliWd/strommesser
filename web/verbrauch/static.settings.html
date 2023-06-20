@@ -5,8 +5,8 @@
   <title>StromMesser Einstellungen</title>
   <meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="strommesser.css" type="text/css">
-  <script src="script/flowbite.min.js"></script>
+  <link rel="stylesheet" href="../verbrauch/strommesser.css" type="text/css">
+  <script src="../verbrauch/script/flowbite.min.js"></script>
   
   </head>
   <body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
@@ -16,25 +16,25 @@
     <li>
       <div class="flex items-center">
         <button id="dropdownNavMain" data-dropdown-toggle="dropdown-NavMain" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
-          <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+          <a href="#anchorTopOfPage"><img src="../verbrauch/img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
           StromMesser<svg class="w-5 h-5 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
         </button>
         <div id="dropdown-NavMain" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
           <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
         <li>
-          <a href="static.index.6h.html" class="block px-4 py-2 hover:bg-gray-100">Verbrauch</a>
+          <a href="../verbrauch/static.index.6h.html" class="block px-4 py-2 hover:bg-gray-100">Verbrauch</a>
         </li>
         <li>
-          <a href="static.statistic.html" class="block px-4 py-2 hover:bg-gray-100">Statistiken</a>
+          <a href="../verbrauch/static.statistic.html" class="block px-4 py-2 hover:bg-gray-100">Statistiken</a>
         </li>
         <li>
-          <a href="static.settings.html" class="block px-4 py-2 hover:bg-gray-100">Einstellungen</a>
+          <a href="../verbrauch/static.settings.html" class="block px-4 py-2 hover:bg-gray-100">Einstellungen</a>
         </li>
         <li>
-          <a href="#" class="block px-4 py-2 hover:bg-gray-100">&nbsp;</a>
+          <a href="../verbrauch/#" class="block px-4 py-2 hover:bg-gray-100">&nbsp;</a>
         </li>
         <li>
-          <a href="static.login.html" class="block px-4 py-2 hover:bg-gray-100">LogOut</a>
+          <a href="../verbrauch/static.login.html" class="block px-4 py-2 hover:bg-gray-100">LogOut</a>
         </li>
           </ul>
         </div> 
@@ -49,13 +49,13 @@
       <div id="dropdown-Nav2nd" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
         <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
         <li>
-          <a href="#anchorMiniDisplay" class="block px-4 py-2 hover:bg-gray-100">Mini-Display</a>
+          <a href="../verbrauch/#anchorMiniDisplay" class="block px-4 py-2 hover:bg-gray-100">Mini-Display</a>
         </li>
         <li>
-          <a href="#anchorUserAccount" class="block px-4 py-2 hover:bg-gray-100">Benutzereinstellungen</a>
+          <a href="../verbrauch/#anchorUserAccount" class="block px-4 py-2 hover:bg-gray-100">Benutzereinstellungen</a>
         </li>
         <li>
-          <a href="#anchorDataExport" class="block px-4 py-2 hover:bg-gray-100">Daten exportieren</a>
+          <a href="../verbrauch/#anchorDataExport" class="block px-4 py-2 hover:bg-gray-100">Daten exportieren</a>
         </li>
         </ul>
       </div>
@@ -87,21 +87,21 @@
   <div class="inline-flex items-center justify-center w-full">
     <hr class="w-full h-px my-8 bg-gray-200 border-0">
     <div class="absolute px-4 -translate-x-1/2 left-1/2">
-      <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+      <a href="#anchorTopOfPage"><img src="../verbrauch/img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
     </div>
   </div>
   
   <div id="anchorUserAccount" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Benutzereinstellungen</h3>
-    <div class="flex flex-row justify-center">
-      <div><a href="static.login.html" class="input-text basis-full">Passwort ändern</a></div>
-    </div>
+    <form id="pwChangeForm" action="static.login.html" method="post">
+      <p class="mx-auto"><input id="pwChangeFormSubmit" class="mt-8 input-text mx-auto" name="pwChangeFormSubmit" type="submit" value="Passwort ändern"></p>
+    </form>
   </div>
   
   <div class="inline-flex items-center justify-center w-full">
     <hr class="w-full h-px my-8 bg-gray-200 border-0">
     <div class="absolute px-4 -translate-x-1/2 left-1/2">
-      <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+      <a href="#anchorTopOfPage"><img src="../verbrauch/img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
     </div>
   </div>
   
@@ -109,9 +109,8 @@
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Daten exportieren</h3>
     <p>Deine Messdaten werden im CSV-Format unter `verbrauch.csv` gespeichert</p>
     <br>
-    <div class="flex flex-row justify-center">
-      <div><a href="static.settings.html" class="input-text basis-full w-96">Alle Messdaten als csv herunterladen</a></div>
-    </div>
-  </div>
-  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-  </div></body></html>
+    <form id="dataExportForm" action="static.settings.html" method="post">
+      <p class="mx-auto"><input id="dataExportSubmit" class="mt-8 input-text mx-auto" name="dataExportSubmit" type="submit" value="Messdaten als csv speichern"></p>
+    </form>
+  </div>  
+  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div></body></html>
