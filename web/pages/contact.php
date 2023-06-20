@@ -24,11 +24,11 @@ $output = ''; // sucess message
 
 if ($process !== 1) {
   $procErr = TRUE;
-  $procErrDet .= 'Du musst der Datenverarbeitung zustimmen...<br><br>';
+  $procErrDet .= 'Du musst der Datenverarbeitung zustimmen...<br>';
 }
 if (($type < 1) or ($type > 3)) {
   $procErr = TRUE;
-  $procErrDet .= 'Modell Leistungsmesser nicht angegeben...<br><br>';
+  $procErrDet .= 'Modell Leistungsmesser nicht angegeben...<br>';
 } else {
   if ($type === 1) {$type = 'E350';}
   if ($type === 2) {$type = 'anderes Modell';}
@@ -36,12 +36,12 @@ if (($type < 1) or ($type > 3)) {
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
   $procErr = TRUE;
-  $procErrDet .= 'Emailadresse scheint ungültig zu sein...<br><br>';  
+  $procErrDet .= 'Emailadresse scheint ungültig zu sein...<br>';  
 }
 
 if ($procErr) {
   $okOrNot = 'Fehler';
-  $output .= $procErrDet.'Es wurde keine Email verschickt.<br><br><br>Bitte Kontaktformular nochmals ausfüllen: <a href="https://strommesser.ch/#post-194" class="underline">zurück</a><br><br>';
+  $output .= '<div class="text-red-600">'.$procErrDet.'</div>Es wurde keine Email verschickt.<br><br>Bitte Kontaktformular nochmals ausfüllen: <a href="https://strommesser.ch/#post-194" class="underline">zurück</a><br><br>';
 } else {
   $mailBody  = 'Name: '.$name."\n";
   $mailBody .= 'Email:'.$email."\n";
@@ -64,11 +64,13 @@ if ($procErr) {
 
 }
 
-$output .= 'Name: '.$name.', Email:'.$email.', Leistungsmesser: '.$type.', Weitere Infos: '.$div.', Datenverarbeitung: '.$process.'<br>';
+$output .= '<div class="font-bold">Daten Kontaktformular</div>Name: '.$name.', Email:'.$email.', Leistungsmesser: '.$type.', Weitere Infos: '.$div.', Datenverarbeitung: '.$process.'<br>';
 echo '
 <div class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
   <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">'.$okOrNot.'</h3>
   <p class="font-normal text-gray-700">'.$output.'</p>
+  <p>&nbsp;</p>
+  <p class="font-normal text-gray-700"><a href="https://strommesser.ch" class="underline">zurück zur Startseite</a></p>
 </div>
 </div></body></html>';
 ?>
