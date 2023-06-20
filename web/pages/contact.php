@@ -1,16 +1,7 @@
 <?php
- require_once('../verbrauch/functions.php');
-/* 
-<input type="text"  name="contactForm_name" value="" placeholder="Vorname Nachname" spellcheck="false" /><br>
-<input type="email" name="contactForm_email" id="contactForm_email" value="" placeholder="" spellcheck="false" /><br>
-<input type="radio" name="contactForm_radio" value="1">
-<input type="radio" name="contactForm_radio" value="2">
-<input type="radio" name="contactForm_radio" value="3">
-<textarea name="contactForm_div" rows="5" placeholder="" ></textarea>
-<input type="checkbox" name="contactForm_process" value="1" >
-*/
+require_once('../verbrauch/functions.php');
 printBeginOfPage_v2(site:'contact.php', title:'Kontaktformular');
-// $okOrNot = ($valid === count($userids_to_check)) ? 'ok' : '<span class="text-xl text-red-600">nicht ok</span>';
+
 $name = safeStrFromExt(source:'POST', varName:'contactForm_name', length:63);
 $email = safeStrFromExt(source:'POST', varName:'contactForm_email', length:63);
 $type = safeIntFromExt(source:'POST', varName:'contactForm_radio', length:1); // 1: E350, 2: anders, 3: unbekannt
@@ -20,7 +11,7 @@ $process = safeIntFromExt(source:'POST', varName:'contactForm_process', length:1
 $okOrNot = '';
 $procErr = FALSE;
 $procErrDet = ''; // error message
-$output = ''; // sucess message
+$output = ''; // success message
 
 if ($process !== 1) {
   $procErr = TRUE;
@@ -32,11 +23,11 @@ if (($type < 1) or ($type > 3)) {
 } else {
   if ($type === 1) {$type = 'E350';}
   if ($type === 2) {$type = 'anderes Modell';}
-  if ($type === 2) {$type = 'unbekannt';}
+  if ($type === 3) {$type = 'unbekannt';}
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
   $procErr = TRUE;
-  $procErrDet .= 'Emailadresse scheint ungültig zu sein...<br>';  
+  $procErrDet .= 'Emailadresse scheint ungültig zu sein...<br>';
 }
 
 if ($procErr) {
@@ -52,7 +43,7 @@ if ($procErr) {
   $mailOk = mail(
     to:'messer@strommesser.ch;'.$email,
     subject:'Strommesser Kontaktanfrage',
-    message:$mailBody    
+    message:$mailBody
   );
   if ($mailOk) {
     $okOrNot = 'Kontaktdaten wurden verschickt';
@@ -61,7 +52,6 @@ if ($procErr) {
     $okOrNot = 'Fehler beim Mailversand';
     $output .= 'Das Kontaktformular wurde korrekt ausgefüllt aber Email konnte nicht verschickt werden...<br>Nochmals versuchen? <br><a href="https://strommesser.ch/#post-194" class="underline">zurück</a>';
   }
-
 }
 
 $output .= '<div class="font-bold">Daten Kontaktformular</div>Name: '.$name.', Email:'.$email.', Leistungsmesser: '.$type.', Weitere Infos: '.$div.', Datenverarbeitung: '.$process.'<br>';
