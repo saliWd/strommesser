@@ -1,9 +1,9 @@
 <p>Fülle untenstehendes Formular aus und ich melde mich bei dir. Alles unverbindlich und ohne Kosten.</p>
 <form action="https://strommesser.ch/pages/contact.php" id="contact_form" method="post">
     <label for="contactForm_name"><span class="label">Name</span></label>
-    <input id="contactForm_name" type="text" name="contactForm_name" value="" placeholder="Vorname Nachname" spellcheck="false" /><br>
+    <input id="contactForm_name" type="text" name="contactForm_name" value="" placeholder="Vorname Nachname" spellcheck="false" maxlength="63" /><br>
     <label for="contactForm_email"><span class="label">E-Mail-Adresse</span></label>
-    <input type="email" name="contactForm_email" id="contactForm_email" value="" placeholder="" spellcheck="false" /><br>
+    <input type="email" name="contactForm_email" id="contactForm_email" value="" placeholder="" spellcheck="false" maxlength="63" /><br>
     <label for="contactForm_radio"><span class="label">Modell Leistungsmesser</span></label><br>
     <label class="option-label">
         <input type="radio" name="contactForm_radio" value="1">
@@ -22,7 +22,7 @@
         <span class="label">Weitere Infos</span>
         <span>(optional)</span>
     </label>
-    <textarea id="contactForm_div" name="contactForm_div" rows="5" placeholder="" ></textarea>
+    <textarea id="contactForm_div" name="contactForm_div" rows="4" placeholder="" maxlength="1023"></textarea>
     
     <label class="option-label">
         <input type="checkbox" name="contactForm_process" value="1" >

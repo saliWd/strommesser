@@ -34,7 +34,7 @@ function initialize () {
 }
 
 function get_dbConn() {
-  require_once('dbConn.php'); // this will return the $dbConn variable as 'new mysqli'
+  require_once('../verbrauch/dbConn.php'); // this will return the $dbConn variable as 'new mysqli'
   if ($dbConn->connect_error) {
     printPageAndDie('Connection to the data base failed', 'Please try again later and/or send me an email: web@strommesser.ch');
   }
@@ -74,7 +74,7 @@ function printPageAndDie (string $heading, string $text): void {
     <meta charset="utf-8">
     <title>'.$heading.'</title>    
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="strommesser.css" type="text/css">';
+    <link rel="stylesheet" href="../verbrauch/strommesser.css" type="text/css">';
   echo '</head><body><div class="row twelve columns textBox"><h4>'.$heading.'</h4><p>'.$text.'</p></div></body></html>';
   die();
 }
@@ -173,7 +173,7 @@ function getHr():string {
   <div class="inline-flex items-center justify-center w-full">
     <hr class="w-full h-px my-8 bg-gray-200 border-0">
     <div class="absolute px-4 -translate-x-1/2 left-1/2">
-      <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+      <a href="#anchorTopOfPage"><img src="../verbrauch/img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
     </div>
   </div>
   ';
@@ -268,7 +268,7 @@ function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange
         <p>Durchschnittsverbrauch in Watt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh</p>
         <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
         <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:EnumSvg::ArrowRight).'</a>
+        <a href="../verbrauch/statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:EnumSvg::ArrowRight).'</a>
       </div>
     <div data-popper-arrow></div>
   </div>';
@@ -382,17 +382,17 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
   ';
   $scripts = '';
   if (($site === 'index.php') or ($site === 'statistic.php')) {
-    $scripts = '<script src="script/chart.min.js"></script>
-  <script src="script/moment.min.mine.js"></script>
-  <script src="script/chartjs-adapter-moment.mine.js"></script>';
+    $scripts = '<script src="../verbrauch/script/chart.min.js"></script>
+  <script src="../verbrauch/script/moment.min.mine.js"></script>
+  <script src="../verbrauch/script/chartjs-adapter-moment.mine.js"></script>';
   } 
   
   echo '<title>StromMesser '.$SITE_TITLES[$site].'</title>
   ';
   echo '<meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="strommesser.css" type="text/css">
-  <script src="script/flowbite.min.js"></script>
+  <link rel="stylesheet" href="../verbrauch/strommesser.css" type="text/css">
+  <script src="../verbrauch/script/flowbite.min.js"></script>
   '.$scripts.$refreshMeta.'
   </head>
   <body>
@@ -418,7 +418,7 @@ function printNavMenu_v2 (string $site, string $title): void {
     <li>
       <div class="flex items-center">
         <button id="dropdownNavMain" data-dropdown-toggle="dropdown-NavMain" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
-          <a href="#anchorTopOfPage"><img src="img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+          <a href="#anchorTopOfPage"><img src="../verbrauch/img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
           StromMesser'.getSvg(whichSvg:EnumSvg::ArrowDown, classString:'w-5 h-5 ml-1').'
         </button>
         <div id="dropdown-NavMain" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
@@ -491,7 +491,7 @@ function printListItems(array $items): void {
   foreach ($items as $item) {
     echo '
         <li>
-          <a href="'.$item[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$item[1].'</a>
+          <a href="../verbrauch/'.$item[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$item[1].'</a>
         </li>';
   }
 }
