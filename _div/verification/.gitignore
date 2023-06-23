@@ -1,0 +1,7 @@
+tmp.png
+trial.py
+my_config.py
+geckodriver.log
+staticHtml/*
+__pycache__/*
+

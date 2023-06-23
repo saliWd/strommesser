@@ -80,3 +80,22 @@ def checkSiteHasIdAndPrint(driver, modDescription, idToSearchFor):
   printOkOrNot(ok=True, testNum=modDescription[0], text=modDescription[1])
   return True
 # end def
+
+
+def writeFile(fileName, fileContent):
+    from os.path import abspath, join, dirname
+    new_file = abspath(join(dirname(__file__), fileName))
+    new_file_open = open(new_file, 'wb')
+    new_file_open.write(fileContent.encode('utf8'))
+    new_file_open.close()
+
+def getPage(driver, page, testNum, subTest):
+  from functions import printOkOrNot
+  driver.get('view-source:https://strommesser.ch/verbrauch/'+page+'.php')
+  pageSource=driver.find_element(By.TAG_NAME, 'html').text
+  writeFile(fileName='staticHtml/static.'+page, fileContent=pageSource)
+
+  modDescription = [(str(testNum)+"."+str(subTest)), 'getStatic_'+page] 
+  printOkOrNot(ok=True, testNum=modDescription[0], text=modDescription[1])
+  return subTest + 1
+# end def  

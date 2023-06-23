@@ -7,8 +7,3 @@ _div/nodejs/package.json
 _div/nodejs/node_modules/*
 _div/nodejs/script/*
 web/verbrauch/tmp.html
-_div/verification/geckodriver.log
-_div/verification/__pycache__/*
-_div/verification/staticHtml/*
-_div/verification/trial.py
-_div/verification/my_config.py

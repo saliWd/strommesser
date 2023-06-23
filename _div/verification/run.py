@@ -20,6 +20,7 @@ def callSingleTest(driver, testNum, ALL_TESTS, testsToRun):
   from loginLogout import doLoginLogout
   from index import doTimescales
   from staticHtml import getStatic
+  from getImg import getImg
   
   if ALL_TESTS[testNum] in testsToRun:
     if testNum == 0:
@@ -28,6 +29,8 @@ def callSingleTest(driver, testNum, ALL_TESTS, testsToRun):
       result = doTimescales(driver, testNum)      
     elif testNum == 2:
       result = getStatic(driver, testNum)
+    elif testNum == 3:
+      result = getImg(driver, testNum)
     else:
       result = False
     # end if-elif
@@ -40,7 +43,7 @@ def callSingleTest(driver, testNum, ALL_TESTS, testsToRun):
 # end def
 
 
-ALL_TESTS = ['loginLogout', 'differentTimescales', 'getStatic']
+ALL_TESTS = ['loginLogout', 'differentTimescales', 'getStatic', 'getImg']
 
 
 # input processing
