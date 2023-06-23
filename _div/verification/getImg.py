@@ -7,7 +7,9 @@ from functions import printOkOrNot, checkSiteTitleAndPrint
 
 
 def takeScreenshot(driver, testNum, url, imgName, subTest):
+  import time
   driver.get(url)
+  time.sleep(2) # wait until the graph did raise up (js effect)
   driver.save_screenshot('tmp.png')
 
   ### image processing
