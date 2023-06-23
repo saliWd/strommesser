@@ -1,19 +1,37 @@
 # from selenium.webdriver.common.by import By
 from PIL import Image
+from functions import printOkOrNot, checkSiteTitleAndPrint
+
+# 1. login
+# 2. save different graphs as screenshots, do cropping and store images in ../pictures folder
 
 
-# 1. does a login
-# 2. selects the different timescales
+def takeScreenshot(driver, testNum, url, imgName, subTest):
+  driver.get(url)
+  driver.save_screenshot('tmp.png')
 
-# 4. does a logout
+  ### image processing
+  im = Image.open('tmp.png')
+ 
+  # size of the input image: width, height = im.size
+  left, top = 111, 57 # one setting works for all graphs
+  size_x, size_y = 783, 471 # size of the cropped image must be the same for all graphs, thus not a function param
+  cropped = im.crop((left, top, left+size_x, top+size_y)) # cropped.show()
+  cropped.save('../pictures/slideShow_auswertungen/'+imgName)
+
+  modDescription = [(str(testNum)+"."+str(subTest)), "getImg_"+imgName] 
+  printOkOrNot(ok=True, testNum=modDescription[0], text=modDescription[1])
+
+  subTest = subTest + 1
+  return subTest
+# end def
 
 
 def getImg(driver, testNum):
-  from functions import printOkOrNot, checkSiteTitleAndPrint, getPage
   from my_config import doLoginCorrect
   subTest = 1
   
-  modDescription = [(str(testNum)+"."+str(subTest)), "getImg_login"] 
+  modDescription = [(str(testNum)+"."+str(subTest)), "getImg_login"]
   driver.get("https://strommesser.ch/verbrauch/login.php") # go to the login page
 
   doLoginCorrect(driver) 
@@ -24,31 +42,37 @@ def getImg(driver, testNum):
 
   driver.set_window_size(1024, 800) # bigger window size
 
-  driver.get("https://strommesser.ch/verbrauch/index.php?range=24")
-  driver.save_screenshot('tmp.png')
-
-  # image processing
-  im = Image.open('tmp.png')
- 
-  # Size of the image in pixels (size of original image): width, height = im.size
-  left, top = 111, 67
-  size_x, size_y = 783, 503
-    
-  cropped = im.crop((left, top, left+size_x, top+size_y))
-  
-  # cropped.show()
-  cropped.save('../pictures/slideShow_auswertungen/graphDay.png')
-
-  modDescription = [(str(testNum)+"."+str(subTest)), "getImg_range_24"] 
-  printOkOrNot(ok=True, testNum=modDescription[0], text=modDescription[1])
-
-  subTest = subTest + 1
+  subTest = takeScreenshot(
+    driver=driver,
+    testNum=testNum,
+    url='https://strommesser.ch/verbrauch/index.php?range=24',
+    imgName='00_graphDay.png',
+    subTest=subTest
+  )
+  subTest = takeScreenshot(
+    driver=driver,
+    testNum=testNum,
+    url='https://strommesser.ch/verbrauch/statistic.php#anchorW',
+    imgName='01_graphWeek.png',
+    subTest=subTest
+  )
+  subTest = takeScreenshot(
+    driver=driver,
+    testNum=testNum,
+    url='https://strommesser.ch/verbrauch/statistic.php?goBackW=1#anchorW',
+    imgName='02_graphWeekLast.png',
+    subTest=subTest
+  )
+  subTest = takeScreenshot(
+    driver=driver,
+    testNum=testNum,
+    url='https://strommesser.ch/verbrauch/statistic.php#anchorM',
+    imgName='03_graphMonth.png',
+    subTest=subTest
+  )
 
   # set it back to old value
   driver.set_window_size(500, 700) # about mobile size, portrait style
-
-  # subTest = getPage(driver, 'settings', testNum, subTest)
-  # subTest = getPage(driver, 'statistic', testNum, subTest)
 
   return True
 # end def
