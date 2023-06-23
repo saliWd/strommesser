@@ -24,8 +24,7 @@ def takeScreenshot(driver, testNum, url, imgName, subTest):
   modDescription = [(str(testNum)+"."+str(subTest)), "getImg_"+imgName] 
   printOkOrNot(ok=True, testNum=modDescription[0], text=modDescription[1])
 
-  subTest = subTest + 1
-  return subTest
+  return (subTest + 1)
 # end def
 
 

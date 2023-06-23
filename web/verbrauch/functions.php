@@ -491,7 +491,7 @@ function printListItems(array $items): void {
   foreach ($items as $item) {
     echo '
         <li>
-          <a href="../verbrauch/'.$item[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$item[1].'</a>
+          <a href="'.$item[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$item[1].'</a>
         </li>';
   }
 }

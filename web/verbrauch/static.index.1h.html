@@ -24,19 +24,19 @@
         <div id="dropdown-NavMain" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
           <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
         <li>
-          <a href="../verbrauch/static.index.6h.html" class="block px-4 py-2 hover:bg-gray-100">Verbrauch</a>
+          <a href="static.index.6h.html" class="block px-4 py-2 hover:bg-gray-100">Verbrauch</a>
         </li>
         <li>
-          <a href="../verbrauch/static.statistic.html" class="block px-4 py-2 hover:bg-gray-100">Statistiken</a>
+          <a href="static.statistic.html" class="block px-4 py-2 hover:bg-gray-100">Statistiken</a>
         </li>
         <li>
-          <a href="../verbrauch/static.settings.html" class="block px-4 py-2 hover:bg-gray-100">Einstellungen</a>
+          <a href="static.settings.html" class="block px-4 py-2 hover:bg-gray-100">Einstellungen</a>
         </li>
         <li>
-          <a href="../verbrauch/#" class="block px-4 py-2 hover:bg-gray-100">&nbsp;</a>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100">&nbsp;</a>
         </li>
         <li>
-          <a href="../verbrauch/static.login.html" class="block px-4 py-2 hover:bg-gray-100">LogOut</a>
+          <a href="static.login.html" class="block px-4 py-2 hover:bg-gray-100">LogOut</a>
         </li>
           </ul>
         </div> 
@@ -51,13 +51,13 @@
       <div id="dropdown-Nav2nd" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
         <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
         <li>
-          <a href="../verbrauch/#myChart" class="block px-4 py-2 hover:bg-gray-100">Aktueller Verbrauch</a>
+          <a href="#myChart" class="block px-4 py-2 hover:bg-gray-100">Aktueller Verbrauch</a>
         </li>
         <li>
-          <a href="../verbrauch/#anchorW" class="block px-4 py-2 hover:bg-gray-100">Wöchentlich</a>
+          <a href="#anchorW" class="block px-4 py-2 hover:bg-gray-100">Wöchentlich</a>
         </li>
         <li>
-          <a href="../verbrauch/#anchorM" class="block px-4 py-2 hover:bg-gray-100">Monatlich</a>
+          <a href="#anchorM" class="block px-4 py-2 hover:bg-gray-100">Monatlich</a>
         </li>
         </ul>
       </div>
@@ -68,34 +68,34 @@
 </nav>
   <div class="container mx-auto px-4 py-2 lg text-center mt-16 scroll-mt-16" id="anchorTopOfPage">
   <div class="flex">
-    <div class="flex-auto text-left">Verbrauch: <b>0W</b> (16:00).</div>
-    <div class="flex-auto text-right">Ø: <b>0W</b></div>
+    <div class="flex-auto text-left">Verbrauch: <b>0W</b> (14:19).</div>
+    <div class="flex-auto text-right">Ø: <b>1W</b></div>
   </div>
   <hr>
   
     <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
     <script>
     const ctx = document.getElementById("myChart");
-    const labels = [ new Date("2023-06-20 15:01:47"), new Date("2023-06-20 15:03:47"), new Date("2023-06-20 15:05:48"), new Date("2023-06-20 15:07:51"), new Date("2023-06-20 15:09:51"), new Date("2023-06-20 15:11:53"), new Date("2023-06-20 15:13:55"), new Date("2023-06-20 15:15:56"), new Date("2023-06-20 15:17:57"), new Date("2023-06-20 15:19:59"), new Date("2023-06-20 15:22:02"), new Date("2023-06-20 15:24:03"), new Date("2023-06-20 15:26:04"), new Date("2023-06-20 15:28:05"), new Date("2023-06-20 15:30:07"), new Date("2023-06-20 15:32:07"), new Date("2023-06-20 15:34:09"), new Date("2023-06-20 15:36:11"), new Date("2023-06-20 15:38:13"), new Date("2023-06-20 15:40:13"), new Date("2023-06-20 15:42:15"), new Date("2023-06-20 15:44:18"), new Date("2023-06-20 15:46:19"), new Date("2023-06-20 15:48:19"), new Date("2023-06-20 15:50:20"), new Date("2023-06-20 15:52:22"), new Date("2023-06-20 15:54:23"), new Date("2023-06-20 15:56:24"), new Date("2023-06-20 15:58:27") ];
+    const labels = [ new Date("2023-06-23 13:20:33"), new Date("2023-06-23 13:22:35"), new Date("2023-06-23 13:24:36"), new Date("2023-06-23 13:26:37"), new Date("2023-06-23 13:28:39"), new Date("2023-06-23 13:30:42"), new Date("2023-06-23 13:32:43"), new Date("2023-06-23 13:34:43"), new Date("2023-06-23 13:36:44"), new Date("2023-06-23 13:38:47"), new Date("2023-06-23 13:40:47"), new Date("2023-06-23 13:42:49"), new Date("2023-06-23 13:44:51"), new Date("2023-06-23 13:46:53"), new Date("2023-06-23 13:48:53"), new Date("2023-06-23 13:50:54"), new Date("2023-06-23 13:52:57"), new Date("2023-06-23 13:54:58"), new Date("2023-06-23 13:57:00"), new Date("2023-06-23 13:59:01"), new Date("2023-06-23 14:01:03"), new Date("2023-06-23 14:03:03"), new Date("2023-06-23 14:05:05"), new Date("2023-06-23 14:07:07"), new Date("2023-06-23 14:09:08"), new Date("2023-06-23 14:11:09"), new Date("2023-06-23 14:13:10"), new Date("2023-06-23 14:15:13"), new Date("2023-06-23 14:17:15") ];
     const data = {
       labels: labels,
       datasets: [{
         label: "Verbrauch [W]",
-        data: [ 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 ],
+        data: [ 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 29, 10 ],
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
         showLine: false
       },
       {
         label: "Verbrauch total [kWh]",
-        data: [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        data: [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.0010000000038417, 0.0010000000038417 ],
         yAxisID: "yright",
         backgroundColor: "rgba(255, 99, 132, 0.4)",
         showLine: false
       },
       {
         label: "Durchschnitt",        
-        data: [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+        data: [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ],
         yAxisID: "yleft",
         borderColor: "rgba(20, 20, 20, 0.8)",
         backgroundColor: "rgb(255,255,255)",
@@ -132,7 +132,7 @@
     Info / Details:
     <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button"><svg class="w-4 h-4 ml-1" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Info</span></button>
   </div>
-  <div class="flex-auto text-right">Insgesamt 969 Einträge</div>
+  <div class="flex-auto text-right">Insgesamt 979 Einträge</div>
 </div>
 <div data-popover id="popover-descriptionIndex" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
     <div class="p-3 space-y-2">
@@ -163,7 +163,7 @@
   const dataW = {
     labels: labelsW,
     datasets: [{
-      data: [ 245, 201,  ,  ,  ,  ,   ],
+      data: [ 245, 222, 407, 356, 395,  ,   ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",
@@ -185,7 +185,7 @@
     },
     {      
       label: "Durchschnitt",
-      data: [ 227, 227, 227, 227, 227, 227, 227 ],
+      data: [ 319, 319, 319, 319, 319, 319, 319 ],
       borderColor: "rgba(20, 20, 20, 0.8)",
       backgroundColor: "rgb(255,255,255)",
       borderWidth: 2,
@@ -239,7 +239,7 @@
   const dataM = {
     labels: labelsM,
     datasets: [{
-      data: [ 358, 321, 443, 278, 204, 288, 279, 290, 273, 450, 292, 324, 226, 277, 374, 237, 369, 346, 245, 201,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
+      data: [ 358, 321, 443, 278, 204, 288, 279, 290, 273, 450, 292, 324, 226, 277, 374, 237, 369, 346, 245, 222, 407, 356, 395,  ,  ,  ,  ,  ,  ,   ],
       backgroundColor: [
       "rgba(75,192,192, 0.2)",
       "rgba(54,162,235, 0.2)",
@@ -307,7 +307,7 @@
     },
     {      
       label: "Durchschnitt",
-      data: [ 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306 ],
+      data: [ 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314 ],
       borderColor: "rgba(20, 20, 20, 0.8)",
       backgroundColor: "rgb(255,255,255)",
       borderWidth: 2,

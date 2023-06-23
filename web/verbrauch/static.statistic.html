@@ -24,19 +24,19 @@
         <div id="dropdown-NavMain" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
           <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
         <li>
-          <a href="../verbrauch/static.index.6h.html" class="block px-4 py-2 hover:bg-gray-100">Verbrauch</a>
+          <a href="static.index.6h.html" class="block px-4 py-2 hover:bg-gray-100">Verbrauch</a>
         </li>
         <li>
-          <a href="../verbrauch/static.statistic.html" class="block px-4 py-2 hover:bg-gray-100">Statistiken</a>
+          <a href="static.statistic.html" class="block px-4 py-2 hover:bg-gray-100">Statistiken</a>
         </li>
         <li>
-          <a href="../verbrauch/static.settings.html" class="block px-4 py-2 hover:bg-gray-100">Einstellungen</a>
+          <a href="static.settings.html" class="block px-4 py-2 hover:bg-gray-100">Einstellungen</a>
         </li>
         <li>
-          <a href="../verbrauch/#" class="block px-4 py-2 hover:bg-gray-100">&nbsp;</a>
+          <a href="#" class="block px-4 py-2 hover:bg-gray-100">&nbsp;</a>
         </li>
         <li>
-          <a href="../verbrauch/static.login.html" class="block px-4 py-2 hover:bg-gray-100">LogOut</a>
+          <a href="static.login.html" class="block px-4 py-2 hover:bg-gray-100">LogOut</a>
         </li>
           </ul>
         </div> 
@@ -51,13 +51,13 @@
       <div id="dropdown-Nav2nd" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
         <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
         <li>
-          <a href="../verbrauch/#anchorW" class="block px-4 py-2 hover:bg-gray-100">Wöchentlich</a>
+          <a href="#anchorW" class="block px-4 py-2 hover:bg-gray-100">Wöchentlich</a>
         </li>
         <li>
-          <a href="../verbrauch/#anchorM" class="block px-4 py-2 hover:bg-gray-100">Monatlich</a>
+          <a href="#anchorM" class="block px-4 py-2 hover:bg-gray-100">Monatlich</a>
         </li>
         <li>
-          <a href="../verbrauch/#anchorY" class="block px-4 py-2 hover:bg-gray-100">Jährlich</a>
+          <a href="#anchorY" class="block px-4 py-2 hover:bg-gray-100">Jährlich</a>
         </li>
         </ul>
       </div>
@@ -103,7 +103,7 @@
   const dataW = {
     labels: labelsW,
     datasets: [{
-      data: [ 245, 201,  ,  ,  ,  ,   ],
+      data: [ 245, 222, 407, 356, 395,  ,   ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",
@@ -125,7 +125,7 @@
     },
     {      
       label: "Durchschnitt",
-      data: [ 227, 227, 227, 227, 227, 227, 227 ],
+      data: [ 319, 319, 319, 319, 319, 319, 319 ],
       borderColor: "rgba(20, 20, 20, 0.8)",
       backgroundColor: "rgb(255,255,255)",
       borderWidth: 2,
@@ -186,7 +186,7 @@
   const dataM = {
     labels: labelsM,
     datasets: [{
-      data: [ 358, 321, 443, 278, 204, 288, 279, 290, 273, 450, 292, 324, 226, 277, 374, 237, 369, 346, 245, 201,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
+      data: [ 358, 321, 443, 278, 204, 288, 279, 290, 273, 450, 292, 324, 226, 277, 374, 237, 369, 346, 245, 222, 407, 356, 395,  ,  ,  ,  ,  ,  ,   ],
       backgroundColor: [
       "rgba(75,192,192, 0.2)",
       "rgba(54,162,235, 0.2)",
@@ -254,7 +254,7 @@
     },
     {      
       label: "Durchschnitt",
-      data: [ 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306, 306 ],
+      data: [ 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314, 314 ],
       borderColor: "rgba(20, 20, 20, 0.8)",
       backgroundColor: "rgb(255,255,255)",
       borderWidth: 2,
@@ -314,7 +314,7 @@
   const dataY = {
     labels: labelsY,
     datasets: [{
-      data: [  ,  ,  , 1133, 932, 974, 715, 663, 843, 686, 524, 490, 531, 648, 547, 509, 458, 392, 386, 404, 314, 322, 297, 308, 227,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
+      data: [  ,  ,  , 1133, 932, 974, 715, 663, 843, 686, 524, 490, 531, 648, 547, 509, 458, 392, 386, 404, 314, 322, 297, 308, 319,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,   ],
       backgroundColor: [
       "rgba(255,99,132, 0.2)",
       "rgba(255,159,64, 0.2)",
@@ -426,7 +426,7 @@
     },
     {      
       label: "Durchschnitt",
-      data: [ 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554, 554 ],
+      data: [ 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550, 550 ],
       borderColor: "rgba(20, 20, 20, 0.8)",
       backgroundColor: "rgb(255,255,255)",
       borderWidth: 2,
