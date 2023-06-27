@@ -5,15 +5,15 @@
       * cta button on main page: Kontakt + Demo-Account
       * parts / panels
          0. main page: change strommesser image (currently white background)
-         1. (panel1, currently 5, move up): Auswertungen
-         2. Was brauchst du?
+         1. Auswertungen
+         2. Was braucht es dazu?
          3. Demo-Account (cta-2)
          4. Kontakt (cta) -> source code fragment, solve blueish border
          5. Login (add form on it)
-         6. (currently, panel 5): Auswertungen. Get new images (all 899x483): graph_hour.png / graph_monthly.png / graph_weekly1.png / graph_weekly0.png / 
       * Two additional pages:
          * Abo
          * Geräte -> long page, more info.
+   1. clean up Mediathek (delete old slides: graph_hour.png/graph_monthly.png/graph_weekly1.png/graph_weekly0.png)
    1. fill with more content: explanation?
    1. login form on WP / 'bigger' link
 2. StromMesser/verbrauch
