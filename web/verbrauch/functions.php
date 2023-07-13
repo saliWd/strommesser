@@ -16,7 +16,17 @@ enum EnumSvg
   case ArrowLeft;
   case ArrowDown;
 }
-
+enum EnumParam
+{
+  case ConsTot;
+  case ConsNt;
+  case ConsHt;
+  case ConsCost;
+  case GenTot;
+  case GenNt;
+  case GenHt;
+  case GenCost;
+}
 
 // --------------------------
 // function definitions
@@ -189,7 +199,11 @@ function printPopOverLnk(string $chartId):void {
 ';
 }
 
-function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange, int $goBack, bool $isIndexPage=FALSE):void {
+function printBarGraph (
+  object $dbConn, int $userid, 
+  EnumTimerange $timerange, EnumParam $param, 
+  int $goBack, bool $isIndexPage=FALSE
+):void {
   $now = date_create(); // NB: some stuff here is repeated in getValues, not nice
   if ($timerange === EnumTimerange::Year) { 
     $year = ((int)$now->format('Y')) - $goBack;
@@ -215,7 +229,13 @@ function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange
     }
     $chartId = 'W';
   }
-  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, goBack:$goBack);
+  $paramText = 'Verbrauch';
+  if ($param === EnumParam::GenTot) { 
+    $chartId .= 'genTot';
+    $paramText = 'Einspeisung';
+  }
+
+  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, goBack:$goBack);
   if ($goBack > 0) {
     $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowRight, classString:'w-8 h-8').'</a>';
   } else {
@@ -225,7 +245,7 @@ function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange
   <div class="flex mt-4">
     <div class="grow h-8 scroll-mt-16" id="anchor'.$chartId.'">
       <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowLeft, classString:'w-8 h-8').'</a>
-      <span class="text-xl mx-4 inline-flex h-8 align-middle mb-4">Verbrauch '.$title.'</span>
+      <span class="text-xl mx-4 inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
       '.$forwardLink.'
     </div>
   </div>
@@ -278,20 +298,30 @@ function printBarGraph_v2 (object $dbConn, int $userid, EnumTimerange $timerange
   ';
 }
 
-function getWattSum(object $dbConn, int $userid, string $dayA, string $dayB) { // returns either a number or a string
-  $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+function getWattSum(object $dbConn, int $userid, EnumParam $param, string $dayA, string $dayB) { // returns either a number or a string
+  if ($param === EnumParam::ConsTot) {
+    $sql = 'SELECT SUM(`consDiff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+  } elseif ($param === EnumParam::GenTot) {
+    $sql = 'SELECT SUM(`genDiff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+  } else {
+    printPageAndDie('Invalid parameter at graph generation', 'Please try again later and/or send me an email: web@strommesser.ch');
+  }
+  
   $sql .= ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
-  //echo $sql."\n<br>";
   $result = $dbConn->query($sql); // returns only one row
   $row = $result->fetch_assoc();
     
   if ($row['sumZeitDiff'] > 0) { // divide by 0 exception
-    return round($row['sumConsDiff']*3600*1000 / $row['sumZeitDiff']);
+    return round($row['sumDiff']*3600*1000 / $row['sumZeitDiff']);
   } 
   return ' '; // not really nice, returning a string
 }
 
-function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $goBack = 0):array {
+function getValues(
+  object $dbConn, int $userid, 
+  EnumTimerange $timerange, EnumParam $param, 
+  int $goBack
+):array {
   $val_y = '[ ';
   $val_y_ave = '[ ';
   $val_x = '[ ';
@@ -311,13 +341,13 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
     if ($weekday > 0) {
       $startDay->modify('+'.(7-$weekday).' days'); // that gets me first Monday in the year
     }
-    $average = getWattSum(dbConn:$dbConn, userid:$userid, dayA:$startDay->format('Y-m-d'), dayB:$year.'-12-31');
+    $average = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDay->format('Y-m-d'), dayB:$year.'-12-31');
     for ($week = 1; $week <= 52; $week++) { // 364 days (one or two days are left over)
       $dayStrA = $startDay->format('Y-m-d');
       $month = (int)$startDay->format('m'); // plot the month of the Monday
       $startDay->modify('+6 days'); // Sunday
       $dayStrB = $startDay->format('Y-m-d');
-      $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStrA, dayB:$dayStrB).', ';
+      $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStrA, dayB:$dayStrB).', ';
       $val_y_ave .= $average.', ';
       $val_x .= '"'.$monNames[$month-1].'", ';
       $numOfEntries++;
@@ -333,10 +363,10 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
     $startDay = date_create($year.'-'.$month.'-01');
     $weekDayOffset = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday). Colors are matching between week and month
     $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
-    $average = getWattSum(dbConn:$dbConn, userid:$userid, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
+    $average = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
     for ($day = 1; $day <= $lastDay; $day++) { // 1 to 28 (for February)
       $dayStr = $year.'-'.$month.'-'.$day;
-      $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr).', ';
+      $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr).', ';
       $val_y_ave .= $average.', ';
       $val_x .= $day.', ';
       $numOfEntries++;
@@ -349,10 +379,10 @@ function getValues(object $dbConn, int $userid, EnumTimerange $timerange, int $g
     $startDay->modify('-'.$weekday.' days'); // that gets me Monday in this week
     $endDay = clone $startDay; // clone is needed here
     $endDay->modify('+6 days');
-    $average = getWattSum(dbConn:$dbConn, userid:$userid, dayA:$startDay->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
+    $average = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDay->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
     for ($day = 1; $day <= $numOfEntries; $day++) {
       $dayStr = $startDay->format('Y-m-d');
-      $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr).', ';
+      $val_y .= getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr).', ';
       $val_y_ave .= $average.', ';
       $startDay->modify('+1 days');
     }

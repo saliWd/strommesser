@@ -27,14 +27,12 @@
    6. settings.php:
       1. set ht/nt price for both consumption and generation 
       1. which info to show on the pico device (generation, consumption, both?)
+      1. which info to use on the graphs (generation, consumption, cost?)
       1. change email
    7. ~~statistic.php~~
 3. pico devices
-   1. stability since 05.23: good since installing the try-except block on the devices. Need to update ID-2 measure pico as well
-      * check with WLAN disconnection
-      * checking on WLAN side: if status is not 200, do a reboot? With a timeout?
-      * could also be an issue on usb power supply?
-      * check with issues on server side, does it recover?
+   1. ~~stability since 05.23: good since installing the try-except block on the devices, recovers from power outage.~~
+      * Need to update ID-2 measure pico as well -> new laptop
    1. print my own case for measurement
       * [ir head case][irHeadCase]
       * [pico case][picoCase]
