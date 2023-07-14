@@ -192,7 +192,7 @@ echo '<br><br>
 <div class="flex items-center">
   <div class="text-sm font-light text-gray-500">
     Info / Details:
-    <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button">'.getSvg(whichSvg:EnumSvg::QuestionMark).'<span class="sr-only">Info</span></button>
+    <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button">'.getSvg(whichSvg:Svg::QuestionMark).'<span class="sr-only">Info</span></button>
   </div>
   <div class="flex-auto text-right">Insgesamt '.$totalCount.' Einträge</div>
 </div>
@@ -206,15 +206,15 @@ echo '<br><br>
         <p>Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 72 Stunden), bzw. mit einem Punkt pro Tag (älter).</p>
         <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
         <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:EnumSvg::ArrowRight).'</a>
+        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
     </div>
     <div data-popper-arrow></div>
 </div>
 <br>';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, param:EnumParam::cons, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:TRUE);
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, param:EnumParam::cons, goBack:safeIntFromExt('GET','goBackM', 2), isIndexPage:TRUE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::cons, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:TRUE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::cons, goBack:safeIntFromExt('GET','goBackM', 2), isIndexPage:TRUE);
 
-echo '<p>Weitere Auswertungen findest du auf der<a href="statistic.php" class="font-medium text-blue-600 hover:text-blue-700">'.getSvg(whichSvg:EnumSvg::ArrowRight, classString:'w-6 h-6 inline').'Statistikseite</a></p>';
+echo '<p>Weitere Auswertungen findest du auf der<a href="statistic.php" class="font-medium text-blue-600 hover:text-blue-700">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-6 h-6 inline').'Statistikseite</a></p>';
 
 ?>
 <br><br>

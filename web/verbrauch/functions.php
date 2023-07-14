@@ -3,20 +3,20 @@
 
 // --------------------------
 // class definitions
-enum EnumTimerange
+enum Timerange
 {
   case Week;
   case Month;
   case Year;
 }
-enum EnumSvg
+enum Svg
 {
   case QuestionMark;
   case ArrowRight;
   case ArrowLeft;
   case ArrowDown;
 }
-enum EnumParam
+enum Param
 {
   case cons;
   case consNt;
@@ -169,12 +169,12 @@ function printColors(int $limit, int $offset):void {
   echo '],';
 }
 
-function getSvg(EnumSvg $whichSvg, string $classString='w-4 h-4 ml-1'):string {
+function getSvg(Svg $whichSvg, string $classString='w-4 h-4 ml-1'):string {
   return match ($whichSvg) {
-    EnumSvg::QuestionMark => '<svg class="'.$classString.'" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>',
-    EnumSvg::ArrowRight   => '<svg class="'.$classString.'" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>',
-    EnumSvg::ArrowLeft    => '<svg class="'.$classString.' rotate-180" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>',
-    EnumSvg::ArrowDown    => '<svg class="'.$classString.'" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>'
+    Svg::QuestionMark => '<svg class="'.$classString.'" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>',
+    Svg::ArrowRight   => '<svg class="'.$classString.'" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>',
+    Svg::ArrowLeft    => '<svg class="'.$classString.' rotate-180" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>',
+    Svg::ArrowDown    => '<svg class="'.$classString.'" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>'
   };
 }
 
@@ -192,7 +192,7 @@ function getHr():string {
 function printPopOverLnk(string $chartId):void {    
   echo '
   <p class="flex items-center text-sm font-light text-gray-500">Info / Details:
-    <button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button">'.getSvg(whichSvg:EnumSvg::QuestionMark, classString:'w-4 h-4 ml-2 text-gray-400 hover:text-gray-500').'<span class="sr-only">Info</span></button>
+    <button data-popover-target="popover-description'.$chartId.'" data-popover-placement="bottom-end" type="button">'.getSvg(whichSvg:Svg::QuestionMark, classString:'w-4 h-4 ml-2 text-gray-400 hover:text-gray-500').'<span class="sr-only">Info</span></button>
   </p>
   <div data-popover id="popover-description'.$chartId.'" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
     <div class="p-3 space-y-2">
@@ -201,17 +201,17 @@ function printPopOverLnk(string $chartId):void {
 
 function printBarGraph (
   object $dbConn, int $userid, 
-  EnumTimerange $timerange, EnumParam $param, 
+  Timerange $timerange, Param $param, 
   int $goBack, bool $isIndexPage=FALSE
 ):void {
   $now = date_create(); // TODO: some stuff here is repeated in getValues, not nice
-  if ($timerange === EnumTimerange::Year) { 
+  if ($timerange === Timerange::Year) { 
     $year = ((int)$now->format('Y')) - $goBack;
     if ($goBack === 0) { $title = 'dieses Jahr'; }
     elseif ($goBack === 1) { $title = 'letztes Jahr'; }
     else { $title = 'Jahr '.$year; }
     $chartId = 'Y';
-  } elseif ($timerange === EnumTimerange::Month) {
+  } elseif ($timerange === Timerange::Month) {
     $monNames = array('Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'); // need german naming, not using format('M')
     $month = ((int)$now->format('m')) - $goBack;
     while ($month < 1) {
@@ -219,7 +219,7 @@ function printBarGraph (
     }
     $title = $monNames[$month-1];
     $chartId = 'M';
-  } elseif ($timerange === EnumTimerange::Week) {
+  } elseif ($timerange === Timerange::Week) {
     if ($goBack === 0) { $title = 'diese Woche'; }
     elseif ($goBack === 1) { $title = 'letzte Woche'; }
     else {       
@@ -231,27 +231,27 @@ function printBarGraph (
   }
   
   $chartId .= $param->name;
-  if ($param === EnumParam::cons)         { $paramText = 'Verbrauch'; }
-  elseif ($param === EnumParam::consNt)   { $paramText = 'Verbrauch NT'; } 
-  elseif ($param === EnumParam::consHt)   { $paramText = 'Verbrauch HT'; } 
-  elseif ($param === EnumParam::gen)      { $paramText = 'Einspeisung'; } 
-  elseif ($param === EnumParam::genNt)    { $paramText = 'Einspeisung NT'; } 
-  elseif ($param === EnumParam::genHt)    { $paramText = 'Einspeisung HT'; } 
-  elseif ($param === EnumParam::consCost) { $paramText = 'Kosten'; } 
-  elseif ($param === EnumParam::genCost)  { $paramText = 'Verdienst'; } 
+  if ($param === Param::cons)         { $paramText = 'Verbrauch'; }
+  elseif ($param === Param::consNt)   { $paramText = 'Verbrauch NT'; } 
+  elseif ($param === Param::consHt)   { $paramText = 'Verbrauch HT'; } 
+  elseif ($param === Param::gen)      { $paramText = 'Einspeisung'; } 
+  elseif ($param === Param::genNt)    { $paramText = 'Einspeisung NT'; } 
+  elseif ($param === Param::genHt)    { $paramText = 'Einspeisung HT'; } 
+  elseif ($param === Param::consCost) { $paramText = 'Kosten'; } 
+  elseif ($param === Param::genCost)  { $paramText = 'Verdienst'; } 
   else {$paramText = 'Fehler Enum';}
   
   $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, goBack:$goBack);
   $title .= ' (Ø: '.$values[5].'W)';
   if ($goBack > 0) {
-    $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowRight, classString:'w-8 h-8').'</a>';
+    $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-8 h-8').'</a>';
   } else {
     $forwardLink = '<span class="inline-flex">&nbsp;</span>';
   }
   echo '
   <div class="flex mt-4">
     <div class="grow h-8 scroll-mt-16" id="anchor'.$chartId.'">
-      <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowLeft, classString:'w-8 h-8').'</a>
+      <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowLeft, classString:'w-8 h-8').'</a>
       <span class="text-xl mx-4 inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
       '.$forwardLink.'
     </div>
@@ -295,7 +295,7 @@ function printBarGraph (
         <p>Durchschnittsverbrauch in Watt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh</p>
         <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
         <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-        <a href="../verbrauch/statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:EnumSvg::ArrowRight).'</a>
+        <a href="../verbrauch/statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
       </div>
     <div data-popper-arrow></div>
   </div>';
@@ -305,8 +305,8 @@ function printBarGraph (
   ';
 }
 
-function getWattSum(object $dbConn, int $userid, EnumParam $param, string $dayA, string $dayB) { // returns either a number or a string
-  if (($param === EnumParam::consCost) or ($param === EnumParam::genCost)) {  // TODO: those two need special treatment
+function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, string $dayB) { // returns either a number or a string
+  if (($param === Param::consCost) or ($param === Param::genCost)) {  // TODO: those two need special treatment
     printPageAndDie('Invalid parameter at graph generation', 'Please try again later and/or send me an email: web@strommesser.ch');    
   }
   $sql = 'SELECT SUM(`'.$param->name.'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
@@ -322,7 +322,7 @@ function getWattSum(object $dbConn, int $userid, EnumParam $param, string $dayA,
 
 function getValues(
   object $dbConn, int $userid, 
-  EnumTimerange $timerange, EnumParam $param, 
+  Timerange $timerange, Param $param, 
   int $goBack
 ):array {
   $val_x = '[ ';
@@ -339,7 +339,7 @@ function getValues(
   $numOfEntries = 0;
   $weekDayOffset = 0;
 
-  if ($timerange === EnumTimerange::Year) { // generates one value per week
+  if ($timerange === Timerange::Year) { // generates one value per week
     $monNames = array('Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'); // need german naming, not using format('M')
     $year = $year - $goBack;
     $startDay = date_create($year.'-01-01');
@@ -360,7 +360,7 @@ function getValues(
       
       $startDay->modify('+1 days'); // Monday again
     }
-  } elseif ($timerange === EnumTimerange::Month) { // maybe to do: could switch to date->modify method
+  } elseif ($timerange === Timerange::Month) { // maybe to do: could switch to date->modify method
     $month = $month - $goBack; // NB: goBack must not be greater than 12
     while ($month < 1) {
       $year--;
@@ -377,7 +377,7 @@ function getValues(
       $val_x .= $day.', ';
       $numOfEntries++;
     }
-  } elseif ($timerange === EnumTimerange::Week) {
+  } elseif ($timerange === Timerange::Week) {
     $numOfEntries = 7;
     $startDay = $now;
     $startDay->modify('-'.$goBack.' weeks');
@@ -455,7 +455,7 @@ function printNavMenu_v2 (string $site, string $title): void {
       <div class="flex items-center">
         <button id="dropdownNavMain" data-dropdown-toggle="dropdown-NavMain" class="inline-flex items-center px-3 py-2 text-sm font-normal text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">
           <a href="#anchorTopOfPage"><img src="../verbrauch/img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
-          StromMesser'.getSvg(whichSvg:EnumSvg::ArrowDown, classString:'w-5 h-5 ml-1').'
+          StromMesser'.getSvg(whichSvg:Svg::ArrowDown, classString:'w-5 h-5 ml-1').'
         </button>
         <div id="dropdown-NavMain" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
           <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
@@ -505,7 +505,7 @@ function printInPageNav(array $inPageTargets, string $siteName): void {
   <li aria-current="page">
     <div class="flex items-center">
       <button id="dropdownNav2nd" data-dropdown-toggle="dropdown-Nav2nd" class="inline-flex items-center px-3 py-2 text-xl font-semibold text-center text-gray-900 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-100">          
-        '.$siteName; if ($inPageTargets) { echo getSvg(whichSvg:EnumSvg::ArrowDown, classString:'w-5 h-5 ml-1'); }
+        '.$siteName; if ($inPageTargets) { echo getSvg(whichSvg:Svg::ArrowDown, classString:'w-5 h-5 ml-1'); }
   echo '
       </button>';
   if ($inPageTargets) { 

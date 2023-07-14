@@ -17,21 +17,21 @@ echo '
   <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900">Verbrauch pro Woche<span></div>  
 </div>
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, param:EnumParam::cons, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::cons, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
   <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900">Verbrauch NT pro Woche<span></div>
 </div>
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, param:EnumParam::consNt, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::consNt, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
   <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900">Verbrauch HT pro Woche<span></div>  
 </div>
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Week, param:EnumParam::consHt, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::consHt, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
@@ -55,7 +55,7 @@ echo '
   </div>
 </div>
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Month, param:EnumParam::cons, goBack:safeIntFromExt('GET','goBackM', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::cons, goBack:safeIntFromExt('GET','goBackM', 2), isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
@@ -78,7 +78,7 @@ echo '
   </div>
 </div>
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Year, param:EnumParam::cons, goBack:safeIntFromExt('GET','goBackY', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::cons, goBack:safeIntFromExt('GET','goBackY', 2), isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
@@ -101,7 +101,7 @@ echo '
   </div>
 </div>
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:EnumTimerange::Year, param:EnumParam::gen, goBack:safeIntFromExt('GET','goBackY', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::gen, goBack:safeIntFromExt('GET','goBackY', 2), isIndexPage:FALSE);
 
 ?>
 </div></body></html>
