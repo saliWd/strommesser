@@ -18,14 +18,14 @@ enum EnumSvg
 }
 enum EnumParam
 {
-  case ConsTot;
-  case ConsNt;
-  case ConsHt;
-  case ConsCost;
-  case GenTot;
-  case GenNt;
-  case GenHt;
-  case GenCost;
+  case cons;
+  case consNt;
+  case consHt;
+  case consCost;
+  case gen;
+  case genNt;
+  case genHt;
+  case genCost;
 }
 
 // --------------------------
@@ -229,12 +229,18 @@ function printBarGraph (
     }
     $chartId = 'W';
   }
-  $paramText = 'Verbrauch';
-  if ($param === EnumParam::GenTot) { 
-    $chartId .= 'genTot';
-    $paramText = 'Einspeisung';
-  }
-
+  
+  $chartId .= $param->name;
+  if ($param === EnumParam::cons)         { $paramText = 'Verbrauch'; }
+  elseif ($param === EnumParam::consNt)   { $paramText = 'Verbrauch NT'; } 
+  elseif ($param === EnumParam::consHt)   { $paramText = 'Verbrauch HT'; } 
+  elseif ($param === EnumParam::gen)      { $paramText = 'Einspeisung'; } 
+  elseif ($param === EnumParam::genNt)    { $paramText = 'Einspeisung NT'; } 
+  elseif ($param === EnumParam::genHt)    { $paramText = 'Einspeisung HT'; } 
+  elseif ($param === EnumParam::consCost) { $paramText = 'Kosten'; } 
+  elseif ($param === EnumParam::genCost)  { $paramText = 'Verdienst'; } 
+  else {$paramText = 'Fehler Enum';}
+  
   $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, goBack:$goBack);
   $title .= ' (Ø: '.$values[5].'W)';
   if ($goBack > 0) {
@@ -300,14 +306,10 @@ function printBarGraph (
 }
 
 function getWattSum(object $dbConn, int $userid, EnumParam $param, string $dayA, string $dayB) { // returns either a number or a string
-  if ($param === EnumParam::ConsTot) {
-    $sql = 'SELECT SUM(`consDiff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-  } elseif ($param === EnumParam::GenTot) {
-    $sql = 'SELECT SUM(`genDiff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-  } else {
-    printPageAndDie('Invalid parameter at graph generation', 'Please try again later and/or send me an email: web@strommesser.ch');
+  if (($param === EnumParam::consCost) or ($param === EnumParam::genCost)) {  // TODO: those two need special treatment
+    printPageAndDie('Invalid parameter at graph generation', 'Please try again later and/or send me an email: web@strommesser.ch');    
   }
-  
+  $sql = 'SELECT SUM(`'.$param->name.'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
   $sql .= ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
   $result = $dbConn->query($sql); // returns only one row
   $row = $result->fetch_assoc();
