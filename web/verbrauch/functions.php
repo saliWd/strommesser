@@ -204,7 +204,7 @@ function printBarGraph (
   EnumTimerange $timerange, EnumParam $param, 
   int $goBack, bool $isIndexPage=FALSE
 ):void {
-  $now = date_create(); // NB: some stuff here is repeated in getValues, not nice
+  $now = date_create(); // TODO: some stuff here is repeated in getValues, not nice
   if ($timerange === EnumTimerange::Year) { 
     $year = ((int)$now->format('Y')) - $goBack;
     if ($goBack === 0) { $title = 'dieses Jahr'; }
@@ -236,6 +236,7 @@ function printBarGraph (
   }
 
   $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, goBack:$goBack);
+  $title .= ' (Ø: '.$values[5].'W)';
   if ($goBack > 0) {
     $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:EnumSvg::ArrowRight, classString:'w-8 h-8').'</a>';
   } else {
@@ -322,11 +323,14 @@ function getValues(
   EnumTimerange $timerange, EnumParam $param, 
   int $goBack
 ):array {
-  $val_y = '[ ';
-  $val_y_ave = '[ ';
   $val_x = '[ ';
+  $val_y = '[ ';
+  $numOfEntries = 0;
+  $weekDayOffset = 0;
+  $val_y_ave = '[ ';
+  $average = 0.0;
+  
   $now = date_create();
-
   $year = (int)$now->format('Y'); // current year
   $month = (int)$now->format('m'); // current month
   $day = (int)$now->format('d'); // current day
@@ -392,7 +396,7 @@ function getValues(
   $val_y = substr($val_y, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
   $val_y_ave = substr($val_y_ave, 0, -2).' ]'; 
   $val_x = substr($val_x, 0, -2).' ]';
-  return [$val_x, $val_y, $numOfEntries, $weekDayOffset, $val_y_ave];
+  return [$val_x, $val_y, $numOfEntries, $weekDayOffset, $val_y_ave, $average];
 }
 
 // prints header with css/js and body, container-div and h1 title

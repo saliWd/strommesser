@@ -27,9 +27,10 @@
    6. settings.php:
       1. set ht/nt price for both consumption and generation 
       1. which info to show on the pico device (generation, consumption, both?)
-      1. which info to use on the graphs (generation, consumption, cost?)
+      1. which info to use on the graphs (generation, consumption, cost, combination (goes up with cons, goes down with gen))
       1. change email
-   7. ~~statistic.php~~
+   7. statistic.php
+      1. explain text same as on start page, same layout etc.
 3. pico devices
    1. ~~stability since 05.23: good since installing the try-except block on the devices, recovers from power outage.~~
       * Need to update ID-2 measure pico as well -> new laptop
