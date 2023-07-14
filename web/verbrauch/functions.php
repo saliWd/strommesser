@@ -33,7 +33,7 @@ enum Param
 
 // this function is called on every (user related) page on the very start  
 // it does the session start and opens connection to the data base. Returns the dbConn variable or a boolean
-function initialize () {
+function initialize (): mysqli {
   session_start(); // this code must precede any HTML output
   if (!getUserid()) {
     redirectRelative('login.php');    
@@ -43,7 +43,7 @@ function initialize () {
   return get_dbConn();  
 }
 
-function get_dbConn() {
+function get_dbConn(): mysqli {
   require_once('../verbrauch/dbConn.php'); // this will return the $dbConn variable as 'new mysqli'
   if ($dbConn->connect_error) {
     printPageAndDie('Connection to the data base failed', 'Please try again later and/or send me an email: web@strommesser.ch');
@@ -93,17 +93,6 @@ function printRawErrorAndDie (string $heading, string $text): void {
   echo $heading.': '.$text;
   die();
 }  
-
-function validDevice (object $dbConn, string $postIndicator): array {        
-  $unsafeDevice = safeStrFromExt('POST', $postIndicator, 8); // maximum length of 8
-  $result = $dbConn->query('SELECT `device` FROM `kunden` WHERE 1 ORDER BY `id`;');
-  while ($row = $result->fetch_assoc()) {
-      if ($unsafeDevice === $row['device']) {
-          return array(TRUE, $row['device']);
-      }
-  }
-  return array(FALSE, ''); // valid/deviceString
-}
 
 function validUseridInPost (object $dbConn): int {        
   $unsafeUserid = safeIntFromExt('POST', 'userid', 11); // maximum length of 11
