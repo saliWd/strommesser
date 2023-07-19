@@ -14,24 +14,12 @@ printBeginOfPage_v2(site:'statistic.php');
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
-  <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900">Verbrauch pro Woche<span></div>  
-</div>
+  <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900" id="anchorW">Verbrauch pro Woche<span></div>
+</div>  
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::cons, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:FALSE);
-
-echo '
-<div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
-  <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900">Verbrauch NT pro Woche<span></div>
-</div>
-';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::consNt, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:FALSE);
-
-echo '
-<div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
-  <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900">Verbrauch HT pro Woche<span></div>  
-</div>
-';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::consHt, goBack:safeIntFromExt('GET','goBackW', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::cons,   goBack:safeIntFromExt('GET','goBackWcons', 2),   isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::consNt, goBack:safeIntFromExt('GET','goBackWconsNt', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::consHt, goBack:safeIntFromExt('GET','goBackWconsHt', 2), isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 

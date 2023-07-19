@@ -220,15 +220,14 @@ function printBarGraph (
   }
   
   $chartId .= $param->name;
-  if ($param === Param::cons)         { $paramText = 'Verbrauch'; }
-  elseif ($param === Param::consNt)   { $paramText = 'Verbrauch NT'; } 
-  elseif ($param === Param::consHt)   { $paramText = 'Verbrauch HT'; } 
+  if ($param === Param::cons)         { $paramText = ''; }
+  elseif ($param === Param::consNt)   { $paramText = 'NT'; } 
+  elseif ($param === Param::consHt)   { $paramText = 'HT'; } 
   elseif ($param === Param::gen)      { $paramText = 'Einspeisung'; } 
   elseif ($param === Param::genNt)    { $paramText = 'Einspeisung NT'; } 
   elseif ($param === Param::genHt)    { $paramText = 'Einspeisung HT'; } 
   elseif ($param === Param::consCost) { $paramText = 'Kosten'; } 
-  elseif ($param === Param::genCost)  { $paramText = 'Verdienst'; } 
-  else {$paramText = 'Fehler Enum';}
+  elseif ($param === Param::genCost)  { $paramText = 'Verdienst'; }
   
   $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, goBack:$goBack);
   $title .= ' (Ø: '.$values[5].'W)';
