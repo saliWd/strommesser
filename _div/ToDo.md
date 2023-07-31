@@ -13,7 +13,6 @@
       * ~~Two additional pages:~~
          * ~~Abo~~
          * ~~Geräte -> long page, more info.~~
-   1. clean up Mediathek (delete old slides: graph_hour.png/graph_monthly.png/graph_weekly1.png/graph_weekly0.png)
    1. fill with more content: explanation?
 2. StromMesser/verbrauch
    1. general
@@ -33,7 +32,7 @@
       1. explain text same as on start page, same layout etc.
 3. pico devices
    1. ~~stability since 05.23: good since installing the try-except block on the devices, recovers from power outage.~~
-      * Need to update ID-2 measure pico as well -> new laptop
+   1. change to new micropython version
    1. print my own case for measurement
       * [ir head case][irHeadCase]
       * [pico case][picoCase]
