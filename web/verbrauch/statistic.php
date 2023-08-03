@@ -43,7 +43,7 @@ echo '
   </div>
 </div>
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::cons, goBack:safeIntFromExt('GET','goBackM', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::cons, goBack:safeIntFromExt('GET','goBackMcons', 2), isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
@@ -66,7 +66,7 @@ echo '
   </div>
 </div>
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::cons, goBack:safeIntFromExt('GET','goBackY', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::cons, goBack:safeIntFromExt('GET','goBackYcons', 2), isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
@@ -89,7 +89,7 @@ echo '
   </div>
 </div>
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::gen, goBack:safeIntFromExt('GET','goBackY', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::gen, goBack:safeIntFromExt('GET','goBackYgen', 2), isIndexPage:FALSE);
 
 ?>
 </div></body></html>
