@@ -406,7 +406,7 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
   ';
   $scripts = '';
   if (($site === 'index.php') or ($site === 'statistic.php')) {
-    $scripts = '<script src="../verbrauch/script/chart.min.js"></script>
+    $scripts = '<script src="../verbrauch/script/chart.umd.js"></script>
   <script src="../verbrauch/script/moment.min.mine.js"></script>
   <script src="../verbrauch/script/chartjs-adapter-moment.mine.js"></script>';
   } 
