@@ -1,7 +1,7 @@
 /*!
-  * chartjs-adapter-moment v1.0.0
+  * chartjs-adapter-moment v1.0.1
   * https://www.chartjs.org
-  * (c) 2021 chartjs-adapter-moment Contributors
+  * (c) 2022 chartjs-adapter-moment Contributors
   * Released under the MIT license
   */
 !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(require("moment"),require("chart.js")):"function"==typeof define&&define.amd?define(["moment","chart.js"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).moment,e.Chart)}(this,(function(e,t){"use strict";function n(e){return e&&"object"==typeof e&&"default"in e?e:{default:e}}var f=n(e);
