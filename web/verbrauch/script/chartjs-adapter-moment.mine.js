@@ -16,4 +16,3 @@ const a={
 	month:"MM.YYYY",
 	quarter:"[Q]Q - YYYY",year:"YYYY"
 	};t._adapters._date.override("function"==typeof f.default?{_id:"moment",formats:function(){return a},parse:function(e,t){return"string"==typeof e&&"string"==typeof t?e=f.default(e,t):e instanceof f.default||(e=f.default(e)),e.isValid()?e.valueOf():null},format:function(e,t){return f.default(e).format(t)},add:function(e,t,n){return f.default(e).add(t,n).valueOf()},diff:function(e,t,n){return f.default(e).diff(f.default(t),n)},startOf:function(e,t,n){return e=f.default(e),"isoWeek"===t?(n=Math.trunc(Math.min(Math.max(0,n),6)),e.isoWeekday(n).startOf("day").valueOf()):e.startOf(t).valueOf()},endOf:function(e,t){return f.default(e).endOf(t).valueOf()}}:{})}));
-//# sourceMappingURL=chartjs-adapter-moment.min.js.map
