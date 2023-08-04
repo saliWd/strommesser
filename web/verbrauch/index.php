@@ -40,9 +40,9 @@ if ($totalCount > 0) {// this may be 0
   $QUERY_LIMIT = 10000; // have some upper limit, both for js and db-performance
   $GRAPH_LIMIT = 3; // does not make sense to display a graph otherwise
 
-  $sql = 'SELECT `consumption`, `zeit`, `consDiff`, `zeitDiff` ';
+  $sql = 'SELECT `consumption`, `zeit`, `consDiff`, `zeitDiff`, `genDiff` ';
   $sql .= 'from `verbrauch` WHERE `userid` = "'.$userid.'" AND `zeit` > "'.$zeitOldestString.'" ';
-  $sql .= 'ORDER BY `zeit` DESC LIMIT '.$QUERY_LIMIT.';';    
+  $sql .= 'ORDER BY `zeit` DESC LIMIT '.$QUERY_LIMIT.';';
 
   $result = $dbConn->query($sql);
   $result->data_seek($result->num_rows - 1); // skip to the last entry of the rows
@@ -75,8 +75,9 @@ if ($totalCount > 0) {// this may be 0
   if ($queryCount >= $GRAPH_LIMIT) {
     $axis_x = ''; // rightmost value comes first. Remove something again after the while loop
     $val_y0_consumption = '';
-    $val_y0_average = '';
-    $val_y1_watt = '';
+    $val_y1_average = '';
+    $val_y2_watt = '';
+    $val_y3_gen = '';
     
     $lastConsumption = 0;
     while ($row = $result->fetch_assoc()) { // did already fetch the newest one. At least 2 remaining  
@@ -88,14 +89,14 @@ if ($totalCount > 0) {// this may be 0
       // revert the ordering
       $axis_x = 'new Date("'.$row['zeit'].'"), '.$axis_x; // new Date("2020-03-01 12:00:12")
       $val_y0_consumption = $consumption.', '.$val_y0_consumption;
-      $val_y0_average = $aveConsumption.', '.$val_y0_average;
-      $val_y1_watt = $watt.', '.$val_y1_watt;      
+      $val_y1_average = $aveConsumption.', '.$val_y1_average;
+      $val_y2_watt = $watt.', '.$val_y2_watt;      
     } // while
     // remove the last two caracters (a comma-space) and add the brackets before and after
     $axis_x = '[ '.substr($axis_x, 0, -2).' ]';
     $val_y0_consumption = '[ '.substr($val_y0_consumption, 0, -2).' ]';
-    $val_y0_average = '[ '.substr($val_y0_average, 0, -2).' ]';
-    $val_y1_watt = '[ '.substr($val_y1_watt, 0, -2).' ]';
+    $val_y1_average = '[ '.substr($val_y1_average, 0, -2).' ]';
+    $val_y2_watt = '[ '.substr($val_y2_watt, 0, -2).' ]';
     
     // maybe: add some text about the absolute value (of kWh)
     echo '
@@ -106,13 +107,6 @@ if ($totalCount > 0) {// this may be 0
     const data = {
       labels: labels,
       datasets: [{
-        label: "Verbrauch [W]",
-        data: '.$val_y1_watt.',
-        yAxisID: "yleft",
-        backgroundColor: "rgb(25, 99, 132)",
-        showLine: false
-      },
-      {
         label: "Verbrauch total [kWh]",
         data: '.$val_y0_consumption.',
         yAxisID: "yright",
@@ -121,14 +115,21 @@ if ($totalCount > 0) {// this may be 0
       },
       {
         label: "Durchschnitt",        
-        data: '.$val_y0_average.',
+        data: '.$val_y1_average.',
         yAxisID: "yleft",
         borderColor: "rgba(20, 20, 20, 0.8)",
         backgroundColor: "rgb(255,255,255)",
         borderWidth: 2,
         borderDash: [10, 5],
         pointStyle: false
-      }
+      },
+      {
+        label: "Verbrauch [W]",
+        data: '.$val_y2_watt.',
+        yAxisID: "yleft",
+        backgroundColor: "rgb(25, 99, 132)",
+        showLine: false
+      }      
     ],
     };
     const config = {
