@@ -220,9 +220,9 @@ function printBarGraph (
   }
   
   $chartId .= $param->name;
-  if ($param === Param::cons)         { $paramText = ''; }
-  elseif ($param === Param::consNt)   { $paramText = 'NT'; } 
-  elseif ($param === Param::consHt)   { $paramText = 'HT'; } 
+  if ($param === Param::cons)         { $paramText = 'Verbrauch'; }
+  elseif ($param === Param::consNt)   { $paramText = 'Verbrauch NT'; } 
+  elseif ($param === Param::consHt)   { $paramText = 'Verbrauch HT'; } 
   elseif ($param === Param::gen)      { $paramText = 'Einspeisung'; } 
   elseif ($param === Param::genNt)    { $paramText = 'Einspeisung NT'; } 
   elseif ($param === Param::genHt)    { $paramText = 'Einspeisung HT'; } 
@@ -240,7 +240,7 @@ function printBarGraph (
   <div class="flex mt-4">
     <div class="grow h-8 scroll-mt-16" id="anchor'.$chartId.'">
       <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowLeft, classString:'w-8 h-8').'</a>
-      <span class="text-xl mx-4 inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
+      <span class="text-l inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
       '.$forwardLink.'
     </div>
   </div>
