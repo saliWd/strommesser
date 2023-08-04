@@ -36,7 +36,7 @@ enum Param
 function initialize (): mysqli {
   session_start(); // this code must precede any HTML output
   if (!getUserid()) {
-    redirectRelative('login.php');    
+    redirectRelative('login.php');
     die(); // this code is not reached because redirect does an exit but it's anyhow cleaner like this
   }
   
@@ -44,7 +44,8 @@ function initialize (): mysqli {
 }
 
 function get_dbConn(): mysqli {
-  require_once('../verbrauch/dbConn.php'); // this will return the $dbConn variable as 'new mysqli'
+  require_once('../verbrauch/dbConn.php'); // this sets the User and the PW. It's checked in but only encrypted
+  $dbConn = new mysqli("localhost", $dbConnUser, $dbConnPw, "db_sm_verbrauch", 3306); // Create connection
   if ($dbConn->connect_error) {
     printPageAndDie('Connection to the data base failed', 'Please try again later and/or send me an email: web@strommesser.ch');
   }
@@ -66,7 +67,7 @@ function getUserid (): int {
 function redirectRelative (string $page): void {
   // redirecting relative to current page NB: some clients require absolute paths
   $host  = $_SERVER['HTTP_HOST'];
-  $uri   = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');  
+  $uri   = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
   header('Location: https://'.$host.htmlentities($uri).'/'.$page);
   exit;
 }
