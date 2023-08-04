@@ -19,7 +19,7 @@
       * design: navbar slightly different design, darker colour?
    2. ~~getRaw.php~~
    3. index.php
-      1. have other 'columns' for graph generation, not just cons_tot/cons_diff but also cons_ht/cons_nt/ gen_tot/gen_diff/gen_ht/gen_nt
+      1. make it configurable, which graphs to show (in settings). Also new name instead of 'Verbrauch'      
       1. have cost_chf graph (-> combine info from ht/nt and price info)
    4. ~~login.php~~
    5. ~~rx.php~~

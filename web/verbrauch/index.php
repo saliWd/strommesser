@@ -83,20 +83,29 @@ if ($totalCount > 0) {// this may be 0
     while ($row = $result->fetch_assoc()) { // did already fetch the newest one. At least 2 remaining  
       $consumption = $row['consumption'] - $rowOldest['consumption']; // to get a relative value (and not some huge numbers)
       if ($row['zeitDiff'] > 0) { // divide by 0 exception
-        $watt = max(round($row['consDiff']*3600*1000 / $row['zeitDiff']), 10.0); // max(val,10.0) because 0 in log will not be displayed correctly. 10 to save a 'decade' in range
-      } else { $watt = 0; }
+        // 0 in log will not be displayed correctly... values smaller than 10 will not be displayed (empty space ' ')
+        $tmp = round($row['consDiff']*3600*1000 / $row['zeitDiff']);
+        $watt = ( $tmp > 10 ) ? $tmp : ' ';
+        $tmp = round($row['genDiff']*3600*1000 / $row['zeitDiff']);
+        $gen = ($tmp > 10 ) ? $tmp : ' ';        
+      } else { 
+        $watt = 10.0;
+        $gen = 10.0;
+      }
       
       // revert the ordering
       $axis_x = 'new Date("'.$row['zeit'].'"), '.$axis_x; // new Date("2020-03-01 12:00:12")
       $val_y0_consumption = $consumption.', '.$val_y0_consumption;
       $val_y1_average = $aveConsumption.', '.$val_y1_average;
-      $val_y2_watt = $watt.', '.$val_y2_watt;      
+      $val_y2_watt = $watt.', '.$val_y2_watt;
+      $val_y3_gen = $gen.', '.$val_y3_gen;      
     } // while
     // remove the last two caracters (a comma-space) and add the brackets before and after
     $axis_x = '[ '.substr($axis_x, 0, -2).' ]';
     $val_y0_consumption = '[ '.substr($val_y0_consumption, 0, -2).' ]';
     $val_y1_average = '[ '.substr($val_y1_average, 0, -2).' ]';
     $val_y2_watt = '[ '.substr($val_y2_watt, 0, -2).' ]';
+    $val_y3_gen = '[ '.substr($val_y3_gen, 0, -2).' ]';
     
     // maybe: add some text about the absolute value (of kWh)
     echo '
@@ -128,6 +137,13 @@ if ($totalCount > 0) {// this may be 0
         data: '.$val_y2_watt.',
         yAxisID: "yleft",
         backgroundColor: "rgb(25, 99, 132)",
+        showLine: false
+      },
+      {
+        label: "Einspeisung [W]",
+        data: '.$val_y3_gen.',
+        yAxisID: "yleft",
+        backgroundColor: "rgba(25, 142, 79, 0.4)",
         showLine: false
       }      
     ],
