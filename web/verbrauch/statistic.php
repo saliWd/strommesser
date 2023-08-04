@@ -15,37 +15,34 @@ printBeginOfPage_v2(site:'statistic.php');
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
   <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900" id="anchorW">Pro Woche<span></div>
-</div>  
+</div>
 ';
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::cons,   goBack:safeIntFromExt('GET','goBackWcons', 2),   isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::gen,    goBack:safeIntFromExt('GET','goBackWgen', 2),    isIndexPage:FALSE);
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::consNt, goBack:safeIntFromExt('GET','goBackWconsNt', 2), isIndexPage:FALSE);
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::consHt, goBack:safeIntFromExt('GET','goBackWconsHt', 2), isIndexPage:FALSE);
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::gen,    goBack:safeIntFromExt('GET','goBackWgen', 2),    isIndexPage:FALSE);
 
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
-  <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900">Tageswerte pro Monat<span></div>
-  <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="button" data-modal-toggle="modal-m">Erklärungen anzeigen</button></div>  
-</div>
-<div id="modal-m" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 h-modal">
-  <div class="relative p-4 w-full h-full">
-      <div class="relative bg-white rounded-lg shadow">
-          <div class="p-6 text-left">
-            <h3 class="mb-4 text-xl font-bold tracking-tight text-gray-900">Tageswerte pro Monat</h3>
-            <p class="font-normal text-gray-700">Für jeden Tag ist der Durchschnittsverbrauch in Watt dargestellt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh.</p>
-            <p class="font-normal text-gray-700">Gemessen wird von 00:00 bis 23:59 bzw. am aktuellen Tag von 00:00 bis `jetzt`.</p>
-            <p class="font-normal text-gray-700">Der Durchschnitt über den ganzen Monat ist gestrichelt eingezeichnet.</p>
-            <p class="font-normal text-gray-700 mb-4">Mit den Navigationspfeilen kannst du zwischen den Monaten blättern.</p>
-            <button data-modal-toggle="modal-m" type="button" class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-              weniger
-            </button>
-          </div>
-      </div>
-  </div>
+  <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900" id="anchorM">Pro Monat<span></div>
 </div>
 ';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::cons, goBack:safeIntFromExt('GET','goBackMcons', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::cons,   goBack:safeIntFromExt('GET','goBackMcons', 2),   isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::gen,    goBack:safeIntFromExt('GET','goBackMgen', 2),    isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::consNt, goBack:safeIntFromExt('GET','goBackMconsNt', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::consHt, goBack:safeIntFromExt('GET','goBackMconsHt', 2), isIndexPage:FALSE);
 
+echo '
+<div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
+  <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900" id="anchorY">Pro Jahr<span></div>
+</div>
+';
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::cons,   goBack:safeIntFromExt('GET','goBackYcons', 2),   isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::gen,    goBack:safeIntFromExt('GET','goBackYgen', 2),    isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::consNt, goBack:safeIntFromExt('GET','goBackYconsNt', 2), isIndexPage:FALSE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::consHt, goBack:safeIntFromExt('GET','goBackYconsHt', 2), isIndexPage:FALSE);
+
+/*
 echo '
 <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
   <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900">Wochenwerte übers Jahr<span></div>
@@ -91,6 +88,7 @@ echo '
 </div>
 ';
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::gen, goBack:safeIntFromExt('GET','goBackYgen', 2), isIndexPage:FALSE);
+*/
 
 ?>
 </div></body></html>
