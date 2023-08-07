@@ -40,7 +40,7 @@ if ($totalCount > 0) {// this may be 0
   $QUERY_LIMIT = 10000; // have some upper limit, both for js and db-performance
   $GRAPH_LIMIT = 3; // does not make sense to display a graph otherwise
 
-  $sql = 'SELECT `consumption`, `zeit`, `consDiff`, `zeitDiff`, `genDiff` ';
+  $sql = 'SELECT `consumption`, `gen`, `zeit`, `consDiff`, `zeitDiff`, `genDiff` ';
   $sql .= 'from `verbrauch` WHERE `userid` = "'.$userid.'" AND `zeit` > "'.$zeitOldestString.'" ';
   $sql .= 'ORDER BY `zeit` DESC LIMIT '.$QUERY_LIMIT.';';
 
@@ -53,21 +53,29 @@ if ($totalCount > 0) {// this may be 0
   $queryCount = $result->num_rows; // this may be < graph-limit ( = display at least the newest) or >= graph-limit ( = all good)
 
   if ($rowNewest['zeitDiff'] > 0) { // divide by 0 exception
-      $newestConsumption = round($rowNewest['consDiff']*3600*1000 / $rowNewest['zeitDiff']); // kWh compared to seconds
-  } else { $newestConsumption = 0.0; }
+      $newestCons = round($rowNewest['consDiff']*3600*1000 / $rowNewest['zeitDiff']); // kWh compared to seconds
+      $newestGen = round($rowNewest['genDiff']*3600*1000 / $rowNewest['zeitDiff']);
+  } else { 
+    $newestCons = 0.0;
+    $newestGen = 0.0;
+  }
 
   $zeitDiff = strtotime($rowNewest['zeit']) - strtotime($rowOldest['zeit']); // difference in seconds
   if ($zeitDiff > 0) { // divide by 0 exception
-    $aveConsumption = round(($rowNewest['consumption'] - $rowOldest['consumption'])*3600*1000 / $zeitDiff); // kWh compared to seconds
-  } else { $aveConsumption = 0.0; }
+    $aveCons = round(($rowNewest['consumption'] - $rowOldest['consumption'])*3600*1000 / $zeitDiff); // kWh compared to seconds
+    $aveGen = round(($rowNewest['gen'] - $rowOldest['gen'])*3600*1000 / $zeitDiff);
+  } else { 
+    $aveCons = 0.0;
+    $aveGen = 0.0;
+  }
   
   $zeitString = 'um '.$zeitNewest->format('Y-m-d H:i:s');
   if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
     $zeitString = '('.$zeitNewest->format('H:i').')';
   }
   echo '<div class="flex">
-    <div class="flex-auto text-left">Verbrauch: <b>'.$newestConsumption.'W</b> '.$zeitString.'.</div>
-    <div class="flex-auto text-right">Ø: <b>'.$aveConsumption.'W</b></div>
+    <div class="flex-auto text-left"><b>'.$newestCons.'W / '.$newestGen.'W</b> '.$zeitString.'.</div>
+    <div class="flex-auto text-right">Ø: <b>'.$aveCons.'W / '.$aveGen.'W</b></div>
   </div>
   <hr>
   ';
@@ -79,7 +87,6 @@ if ($totalCount > 0) {// this may be 0
     $val_y2_watt = '';
     $val_y3_gen = '';
     
-    $lastConsumption = 0;
     while ($row = $result->fetch_assoc()) { // did already fetch the newest one. At least 2 remaining  
       $consumption = $row['consumption'] - $rowOldest['consumption']; // to get a relative value (and not some huge numbers)
       if ($row['zeitDiff'] > 0) { // divide by 0 exception
@@ -96,7 +103,7 @@ if ($totalCount > 0) {// this may be 0
       // revert the ordering
       $axis_x = 'new Date("'.$row['zeit'].'"), '.$axis_x; // new Date("2020-03-01 12:00:12")
       $val_y0_consumption = $consumption.', '.$val_y0_consumption;
-      $val_y1_average = $aveConsumption.', '.$val_y1_average;
+      $val_y1_average = $aveCons.', '.$val_y1_average;
       $val_y2_watt = $watt.', '.$val_y2_watt;
       $val_y3_gen = $gen.', '.$val_y3_gen;      
     } // while
