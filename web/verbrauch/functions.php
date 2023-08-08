@@ -257,20 +257,22 @@ function printBarGraph (
   const data'.$chartId.' = {
     labels: labels'.$chartId.',
     datasets: [{
+      label: "Einspeisung [W]",
       data: '.$values[3].',';
       printColors(limit:$values[0], offset:$values[8], isGen:TRUE);
       echo '
-      borderWidth: 1,
-      order: 1
+      borderWidth: 2,
+      order: 0
     },
     {
       data: '.$values[2].',';
       printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
       echo '
-      borderWidth: 1,
+      borderWidth: 2,
       order: 1
     },
     {
+      label: "Verbrauch [W]",
       label: "Durchschnittsverbrauch [W]",
       data: '.$values[4].',
       borderColor: "rgba(239, 68, 68, 0.8)",
@@ -279,7 +281,7 @@ function printBarGraph (
       borderDash: [10, 5],
       pointStyle: false,
       type: "line",
-      order: 0
+      order: 2
     },
     {
       label: "Durchschnitt Einspeisung [W]",      
@@ -290,13 +292,13 @@ function printBarGraph (
       borderDash: [10, 5],
       pointStyle: false,
       type: "line",
-      order: 0
+      order: 3
     }]
   };
   const config'.$chartId.' = {
     type: "bar",
     data: data'.$chartId.',
-    options: { plugins : { legend: { display: false } } },
+    options: { plugins : { legend: { display: false } }, scales: { x: { stacked: true, }  }  },
   };
   const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
   </script>';
