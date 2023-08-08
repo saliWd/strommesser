@@ -317,29 +317,10 @@ function printBarGraph (
   ';
 }
 
-
-
 function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, string $dayB) { // returns either a number or a string
-  if (($param === Param::consCost) or ($param === Param::genCost)) {  // TODO: those two need special treatment
+  if ($param === Param::consCost) {  // TODO: this needs special treatment, not yet implemented
     printPageAndDie('Invalid parameter at graph generation', 'Please try again later and/or send me an email: web@strommesser.ch');
   }
-  $sql = 'SELECT SUM(`'.$param->name.'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-  $sql .= ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
-  $result = $dbConn->query($sql); // returns only one row
-  $row = $result->fetch_assoc();
-    
-  if ($row['sumZeitDiff'] > 0) { // divide by 0 exception
-    return round($row['sumDiff']*3600*1000 / $row['sumZeitDiff']);
-  } 
-  return ' '; // not really nice, returning a string
-}
-
-function getValues(
-  object $dbConn, int $userid, 
-  Timerange $timerange, Param $param, 
-  int $goBack
-):array {
-
   if ($param === Param::cons)         { $paramGen = Param::gen;}
   elseif ($param === Param::consNt)   { $paramGen = Param::genNt;}
   elseif ($param === Param::consHt)   { $paramGen = Param::genHt;}
@@ -348,17 +329,34 @@ function getValues(
     printPageAndDie('Invalid parameter at getValues', 'Please try again later and/or send me an email: web@strommesser.ch');
   }
 
-  $val_x = '[ ';
-  $val_y_cons = '[ ';
-  $val_y_gen = '[ ';
-
-  $numOfEntries = 0;
-  $weekDayOffset = 0;
-  $val_y_cons_ave = '[ ';
-  $val_y_gen_ave = '[ ';
-  $ave_cons = 0.0;
-  $ave_gen = 0.0;
+  $sql[0] = 'SELECT SUM(`'.$param->name.   'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+  $sql[1] = 'SELECT SUM(`'.$paramGen->name.'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+  $sql_where = ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
   
+  $watt = [0, 0];
+  for ($i = 0; $i < 2; $i++) {
+    $result = $dbConn->query($sql[$i].$sql_where); // returns only one row
+    $row = $result->fetch_assoc();
+    if ($row['sumZeitDiff'] <= 0) { // divide by 0 exception
+      return [' ', ' ']; // not really nice, returning strings
+    }
+    $watt[$i] = round($row['sumDiff']*3600*1000 / $row['sumZeitDiff']);
+  }
+
+  return $watt; 
+}
+
+function getValues(
+  object $dbConn, int $userid, 
+  Timerange $timerange, Param $param, 
+  int $goBack
+):array {
+  $val_x = '[ ';
+  $val_y = ['[ ', '[ ']; // arrays: consumption is entry0, generation is entry1
+  $val_y_ave = ['[ ', '[ '];  
+  $ave = [0.0, 0.0];  
+  $numOfEntries = 0;
+  $weekDayOffset = 0; 
   
   $now = date_create();
   $year = (int)$now->format('Y'); // current year
@@ -375,17 +373,17 @@ function getValues(
     if ($weekday > 0) {
       $startDay->modify('+'.(7-$weekday).' days'); // that gets me first Monday in the year
     }    
-    $ave_cons = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDay->format('Y-m-d'), dayB:$year.'-12-31');
-    $ave_gen = getWattSum(dbConn:$dbConn, userid:$userid, param:$paramGen, dayA:$startDay->format('Y-m-d'), dayB:$year.'-12-31');
+    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDay->format('Y-m-d'), dayB:$year.'-12-31');
     for ($week = 1; $week <= 52; $week++) { // 364 days (one or two days are left over)
       $dayStrA = $startDay->format('Y-m-d');
       $month = (int)$startDay->format('m'); // plot the month of the Monday
       $startDay->modify('+6 days'); // Sunday
       $dayStrB = $startDay->format('Y-m-d');
-      $val_y_cons .= getWattSum(dbConn:$dbConn, userid:$userid, param:$param,    dayA:$dayStrA, dayB:$dayStrB).', ';
-      $val_y_gen  .= getWattSum(dbConn:$dbConn, userid:$userid, param:$paramGen, dayA:$dayStrA, dayB:$dayStrB).', ';
-      $val_y_cons_ave .= $ave_cons.', ';
-      $val_y_gen_ave .= $ave_gen.', ';
+      $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStrA, dayB:$dayStrB);
+      $val_y[0] .= $tmp_arr[0].', ';
+      $val_y[1] .= $tmp_arr[1].', ';
+      $val_y_ave[0] .= $ave[0].', ';
+      $val_y_ave[1] .= $ave[1].', ';
       $val_x .= '"'.$monNames[$month-1].'", ';
       $numOfEntries++;
       
@@ -400,14 +398,14 @@ function getValues(
     $startDay = date_create($year.'-'.$month.'-01');
     $weekDayOffset = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday). Colors are matching between week and month
     $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
-    $ave_cons = getWattSum(dbConn:$dbConn, userid:$userid, param:$param,    dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
-    $ave_gen =  getWattSum(dbConn:$dbConn, userid:$userid, param:$paramGen, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
+    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);    
     for ($day = 1; $day <= $lastDay; $day++) { // 1 to 28 (for February)
       $dayStr = $year.'-'.$month.'-'.$day;
-      $val_y_cons .= getWattSum(dbConn:$dbConn, userid:$userid, param:$param,    dayA:$dayStr, dayB:$dayStr).', ';
-      $val_y_gen  .= getWattSum(dbConn:$dbConn, userid:$userid, param:$paramGen, dayA:$dayStr, dayB:$dayStr).', ';
-      $val_y_cons_ave .= $ave_cons.', ';
-      $val_y_gen_ave .= $ave_gen.', ';
+      $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
+      $val_y[0] .= $tmp_arr[0].', ';
+      $val_y[1] .= $tmp_arr[1].', ';
+      $val_y_ave[0] .= $ave[0].', ';
+      $val_y_ave[1] .= $ave[1].', ';
       $val_x .= $day.', ';
       $numOfEntries++;
     }
@@ -419,25 +417,25 @@ function getValues(
     $startDay->modify('-'.$weekday.' days'); // that gets me Monday in this week
     $endDay = clone $startDay; // clone is needed here
     $endDay->modify('+6 days');
-    $ave_cons = getWattSum(dbConn:$dbConn, userid:$userid, param:$param,    dayA:$startDay->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
-    $ave_gen  = getWattSum(dbConn:$dbConn, userid:$userid, param:$paramGen, dayA:$startDay->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
+    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDay->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));    
     for ($day = 1; $day <= $numOfEntries; $day++) {
       $dayStr = $startDay->format('Y-m-d');
-      $val_y_cons .= getWattSum(dbConn:$dbConn, userid:$userid, param:$param,    dayA:$dayStr, dayB:$dayStr).', ';
-      $val_y_gen  .= getWattSum(dbConn:$dbConn, userid:$userid, param:$paramGen, dayA:$dayStr, dayB:$dayStr).', ';
-      $val_y_cons_ave .= $ave_cons.', ';
-      $val_y_gen_ave  .= $ave_gen.', ';
+      $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
+      $val_y[0] .= $tmp_arr[0].', ';
+      $val_y[1] .= $tmp_arr[1].', ';
+      $val_y_ave[0] .= $ave[0].', ';
+      $val_y_ave[1]  .= $ave[1].', ';
       $startDay->modify('+1 days');
     }
     $val_x .= '"Mo", "Di", "Mi", "Do", "Fr", "Sa", "So", ';
   }
   
-  $val_y_cons = substr($val_y_cons, 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
-  $val_y_gen =  substr($val_y_gen , 0, -2).' ]';
-  $val_y_cons_ave = substr($val_y_cons_ave, 0, -2).' ]';
-  $val_y_gen_ave =  substr($val_y_gen_ave , 0, -2).' ]';
+  $val_y[0] = substr($val_y[0], 0, -2).' ]'; // remove the last two caracters (a comma-space) and add the brackets after
+  $val_y[1] = substr($val_y[1] , 0, -2).' ]';
+  $val_y_ave[0] = substr($val_y_ave[0], 0, -2).' ]';
+  $val_y_ave[1] = substr($val_y_ave[1] , 0, -2).' ]';
   $val_x = substr($val_x, 0, -2).' ]';
-  return [$numOfEntries, $val_x, $val_y_cons, $val_y_gen, $val_y_cons_ave, $val_y_gen_ave, $ave_cons, $ave_gen, $weekDayOffset];
+  return [$numOfEntries, $val_x, $val_y[0], $val_y[1], $val_y_ave[0], $val_y_ave[1], $ave[0], $ave[1], $weekDayOffset];
 }
 
 // prints header with css/js and body, container-div and h1 title
