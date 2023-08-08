@@ -132,14 +132,14 @@ if ($totalCount > 0) {// this may be 0
         label: "Verbrauch total [kWh]",
         data: '.$val_yr_cons_kwh.',
         yAxisID: "yright",
-        backgroundColor: "rgba(239, 68, 68, 0.4)",
+        backgroundColor: "rgba(239, 68, 68, 0.3)",
         showLine: false
       },
       {
         label: "Einspeisung total [kWh]",
         data: '.$val_yr_gen_kwh.',
         yAxisID: "yright",
-        backgroundColor: "rgba(22, 163, 74, 0.4)",
+        backgroundColor: "rgba(22, 163, 74, 0.3)",
         showLine: false
       },
       {
@@ -200,7 +200,7 @@ if ($totalCount > 0) {// this may be 0
           echo ' }
           },
           yleft: { type: "logarithmic", position: "left", ticks: {color: "rgb(25, 99, 132)"} },
-          yright: { type: "linear",  position: "right", ticks: {color: "rgba(255, 99, 132, 0.8)"}, grid: {drawOnChartArea: false} }
+          yright: { type: "linear",  position: "right", ticks: {color: "rgba(25, 99, 132, 0.6)"}, grid: {drawOnChartArea: false} }
         }
       }
     };
@@ -245,10 +245,21 @@ echo '<br><br>
 </div>
 <div data-popover id="popover-descriptionIndex" role="tooltip" class="text-left absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72">
     <div class="p-3 space-y-2">
-        <h3 class="font-semibold text-gray-900">Verbrauch in Watt (blau)</h3>
-        <p>Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 0.001 kWh, d.h. 1 Wh = 3600 W über einen Zeitraum von ca. zwei Minuten = 120 Sekunden. Für die einzelne Wattmessung entspricht das einer Auflösung von ca. 30 W. Dies wird in blau auf der linken Skala logarithmisch aufgetragen.</p>
-        <h3 class="font-semibold text-gray-900">Verbrauch Total (rot)</h3>
-        <p>Der Totalverbrauch (in Wh-Auflösung) wird rot und auf der rechten Skala aufgetragen. Diese Skala beginnt immer bei 0 kWh.</p>
+        <h3 class="font-semibold text-gray-900">Leistungsmessung</h3>
+        <p>
+          Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 0.001 kWh, d.h. 1 Wh = 3600 W über einen Zeitraum von ca. zwei Minuten = 120 Sekunden. Für die einzelne Messung entspricht das einer Auflösung von ca. 30 W. Es wird sowohl der Verbrauch als auch die Einspeisung ausgelesen. In dieser Grafik sieht man den totalen Verbrauch / Einspeisung. Also Niedertarif (NT) und Hochtarif (HT) zusammen. <br>
+          Auf der linken Skala werden die aktuellen Werte logarithmisch in Watt aufgetragen, auf der rechten Skala die summierten Werte linear in kWh.
+        </p>
+        <h3 class="font-semibold text-gray-900">Aktueller Verbrauch (rot, linke Skala)</h3>
+        <p>Der aktuelle Verbrauch (in W-Auflösung) wird rot und auf der linken Skala aufgetragen. Diese Skala ist logarithmisch.</p>
+        <h3 class="font-semibold text-gray-900">Verbrauch Total (blass-rot, rechte Skala)</h3>
+        <p>Der Totalverbrauch (in Wh-Auflösung) wird blass-rot und linear auf der rechten Skala aufgetragen. Diese Skala beginnt über den gewählten Zeitraum immer bei 0 kWh.</p>
+        
+        <h3 class="font-semibold text-gray-900">Aktuelle Einspeisung (grün, linke Skala)</h3>
+        <p>Die aktuelle Einspeisung (in W-Auflösung) wird grün und auf der linken Skala aufgetragen. Diese Skala ist logarithmisch.</p>
+        <h3 class="font-semibold text-gray-900">Einspeisung Gesamt (blass-grün, rechte Skala)</h3>
+        <p>Die gesamte Einspeisung (in Wh-Auflösung) wird blass-grün und linear auf der rechten Skala aufgetragen. Diese Skala beginnt über den gewählten Zeitraum immer bei 0 kWh.</p>
+
         <h3 class="font-semibold text-gray-900">Zeitliche Auflösung (x-Achse)</h3>
         <p>Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 72 Stunden), bzw. mit einem Punkt pro Tag (älter).</p>
         <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
