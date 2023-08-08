@@ -258,9 +258,9 @@ echo '<br><br>
     <div data-popper-arrow></div>
 </div>
 <br>';
-printBarGraph_v2(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week,  param:Param::cons, goBack:safeIntFromExt('GET','goBackWcons', 2), isIndexPage:TRUE);
-printBarGraph_v2(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::cons, goBack:safeIntFromExt('GET','goBackMcons', 2), isIndexPage:TRUE);
-printBarGraph_v2(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year,  param:Param::cons, goBack:safeIntFromExt('GET','goBackYcons', 2), isIndexPage:TRUE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week,  param:Param::cons, goBack:safeIntFromExt('GET','goBackWcons', 2), isIndexPage:TRUE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::cons, goBack:safeIntFromExt('GET','goBackMcons', 2), isIndexPage:TRUE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year,  param:Param::cons, goBack:safeIntFromExt('GET','goBackYcons', 2), isIndexPage:TRUE);
 echo '<p>Weitere Auswertungen findest du auf der<a href="statistic.php" class="font-medium text-blue-600 hover:text-blue-700">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-6 h-6 inline').'Statistikseite</a></p>';
 
 ?>

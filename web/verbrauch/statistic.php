@@ -18,7 +18,6 @@ echo '
 </div>
 ';
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::cons,   goBack:safeIntFromExt('GET','goBackWcons', 2),   isIndexPage:FALSE);
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::gen,    goBack:safeIntFromExt('GET','goBackWgen', 2),    isIndexPage:FALSE);
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::consNt, goBack:safeIntFromExt('GET','goBackWconsNt', 2), isIndexPage:FALSE);
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week, param:Param::consHt, goBack:safeIntFromExt('GET','goBackWconsHt', 2), isIndexPage:FALSE);
 
@@ -28,7 +27,6 @@ echo '
 </div>
 ';
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::cons,   goBack:safeIntFromExt('GET','goBackMcons', 2),   isIndexPage:FALSE);
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::gen,    goBack:safeIntFromExt('GET','goBackMgen', 2),    isIndexPage:FALSE);
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::consNt, goBack:safeIntFromExt('GET','goBackMconsNt', 2), isIndexPage:FALSE);
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::consHt, goBack:safeIntFromExt('GET','goBackMconsHt', 2), isIndexPage:FALSE);
 
@@ -38,7 +36,6 @@ echo '
 </div>
 ';
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::cons,   goBack:safeIntFromExt('GET','goBackYcons', 2),   isIndexPage:FALSE);
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::gen,    goBack:safeIntFromExt('GET','goBackYgen', 2),    isIndexPage:FALSE);
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::consNt, goBack:safeIntFromExt('GET','goBackYconsNt', 2), isIndexPage:FALSE);
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::consHt, goBack:safeIntFromExt('GET','goBackYconsHt', 2), isIndexPage:FALSE);
 
