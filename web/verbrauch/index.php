@@ -73,28 +73,30 @@ if ($totalCount > 0) {// this may be 0
   if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
     $zeitString = '('.$zeitNewest->format('H:i').')';
   }
+  // COLORS: consumption: red "text-red-500" = rgb(239 68 68); generation: green "text-green-600" = rgb(22 163 74);
   echo '<div class="flex">
-    <div class="flex-auto text-left"><b>'.$newestCons.'W / '.$newestGen.'W</b> '.$zeitString.'.</div>
-    <div class="flex-auto text-right">Ø: <b>'.$aveCons.'W / '.$aveGen.'W</b></div>
+    <div class="flex-auto text-left"><b><span class="text-green-600">'.$newestGen.'W</span> / <span class="text-red-500">'.$newestCons.'W</span></b> '.$zeitString.'.</div>
+    <div class="flex-auto text-right">Ø: <b><span class="text-green-600">'.$aveGen.'W</span> / <span class="text-red-500">'.$aveCons.'W</span></b></div>
   </div>
   <hr>
   ';
 
   if ($queryCount >= $GRAPH_LIMIT) {
     $axis_x = ''; // rightmost value comes first. Remove something again after the while loop
-    $val_y0_consumption = '';
-    $val_y1_average = '';
-    $val_y2_watt = '';
-    $val_y3_gen = '';
+    $val_yr_cons_kwh = '';
+    $val_yr_gen_kwh = '';
+    $val_yl_cons_ave = '';
+    $val_yl_gen_ave = '';
+    $val_yl_cons = '';
+    $val_yl_gen = '';
     
     while ($row = $result->fetch_assoc()) { // did already fetch the newest one. At least 2 remaining  
-      $consumption = $row['consumption'] - $rowOldest['consumption']; // to get a relative value (and not some huge numbers)
       if ($row['zeitDiff'] > 0) { // divide by 0 exception
         // 0 in log will not be displayed correctly... values smaller than 10 will not be displayed (empty space ' ')
         $tmp = round($row['consDiff']*3600*1000 / $row['zeitDiff']);
         $watt = ( $tmp > 10 ) ? $tmp : ' ';
         $tmp = round($row['genDiff']*3600*1000 / $row['zeitDiff']);
-        $gen = ($tmp > 10 ) ? $tmp : ' ';        
+        $gen = ($tmp > 10 ) ? $tmp : ' ';
       } else { 
         $watt = 10.0;
         $gen = 10.0;
@@ -102,17 +104,21 @@ if ($totalCount > 0) {// this may be 0
       
       // revert the ordering
       $axis_x = 'new Date("'.$row['zeit'].'"), '.$axis_x; // new Date("2020-03-01 12:00:12")
-      $val_y0_consumption = $consumption.', '.$val_y0_consumption;
-      $val_y1_average = $aveCons.', '.$val_y1_average;
-      $val_y2_watt = $watt.', '.$val_y2_watt;
-      $val_y3_gen = $gen.', '.$val_y3_gen;      
+      $val_yr_cons_kwh = ($row['consumption'] - $rowOldest['consumption']) .', '.$val_yr_cons_kwh; // to get a relative value (and not some huge numbers)
+      $val_yr_gen_kwh = ($row['gen'] - $rowOldest['gen']) .', '.$val_yr_gen_kwh; // to get a relative value (and not some huge numbers)
+      $val_yl_cons_ave = $aveCons.', '.$val_yl_cons_ave;
+      $val_yl_gen_ave = $aveGen.', '.$val_yl_gen_ave;
+      $val_yl_cons = $watt.', '.$val_yl_cons;
+      $val_yl_gen = $gen.', '.$val_yl_gen;
     } // while
     // remove the last two caracters (a comma-space) and add the brackets before and after
     $axis_x = '[ '.substr($axis_x, 0, -2).' ]';
-    $val_y0_consumption = '[ '.substr($val_y0_consumption, 0, -2).' ]';
-    $val_y1_average = '[ '.substr($val_y1_average, 0, -2).' ]';
-    $val_y2_watt = '[ '.substr($val_y2_watt, 0, -2).' ]';
-    $val_y3_gen = '[ '.substr($val_y3_gen, 0, -2).' ]';
+    $val_yr_cons_kwh = '[ '.substr($val_yr_cons_kwh, 0, -2).' ]';
+    $val_yr_gen_kwh = '[ '.substr($val_yr_gen_kwh, 0, -2).' ]';
+    $val_yl_cons_ave = '[ '.substr($val_yl_cons_ave, 0, -2).' ]';
+    $val_yl_gen_ave = '[ '.substr($val_yl_gen_ave, 0, -2).' ]';
+    $val_yl_cons = '[ '.substr($val_yl_cons, 0, -2).' ]';
+    $val_yl_gen = '[ '.substr($val_yl_gen, 0, -2).' ]';
     
     // maybe: add some text about the absolute value (of kWh)
     echo '
@@ -124,16 +130,33 @@ if ($totalCount > 0) {// this may be 0
       labels: labels,
       datasets: [{
         label: "Verbrauch total [kWh]",
-        data: '.$val_y0_consumption.',
+        data: '.$val_yr_cons_kwh.',
         yAxisID: "yright",
-        backgroundColor: "rgba(255, 99, 132, 0.4)",
+        backgroundColor: "rgba(239, 68, 68, 0.4)",
         showLine: false
       },
       {
-        label: "Durchschnitt",        
-        data: '.$val_y1_average.',
+        label: "Einspeisung total [kWh]",
+        data: '.$val_yr_gen_kwh.',
+        yAxisID: "yright",
+        backgroundColor: "rgba(22, 163, 74, 0.4)",
+        showLine: false
+      },
+      {
+        label: "Durchschnittsverbrauch [W]",        
+        data: '.$val_yl_cons_ave.',
         yAxisID: "yleft",
-        borderColor: "rgba(20, 20, 20, 0.8)",
+        borderColor: "rgba(239, 68, 68, 0.8)",
+        backgroundColor: "rgb(255,255,255)",
+        borderWidth: 2,
+        borderDash: [10, 5],
+        pointStyle: false
+      },
+      {
+        label: "Durchschnitt Einspeisung [W]",        
+        data: '.$val_yl_gen_ave.',
+        yAxisID: "yleft",
+        borderColor: "rgba(22, 163, 74, 0.8)",
         backgroundColor: "rgb(255,255,255)",
         borderWidth: 2,
         borderDash: [10, 5],
@@ -141,16 +164,16 @@ if ($totalCount > 0) {// this may be 0
       },
       {
         label: "Verbrauch [W]",
-        data: '.$val_y2_watt.',
+        data: '.$val_yl_cons.',
         yAxisID: "yleft",
-        backgroundColor: "rgb(25, 99, 132)",
+        backgroundColor: "rgb(239, 68, 68)",
         showLine: false
       },
       {
         label: "Einspeisung [W]",
-        data: '.$val_y3_gen.',
+        data: '.$val_yl_gen.',
         yAxisID: "yleft",
-        backgroundColor: "rgba(25, 142, 79, 0.4)",
+        backgroundColor: "rgb(22, 163, 74)",
         showLine: false
       }      
     ],
