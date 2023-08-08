@@ -144,7 +144,8 @@ function checkInputs(object $dbConn): int {
   return $userid;
 }
 
-function printColors(int $limit, int $offset):void {
+// prints color according to the weekday
+function printColors(int $limit, int $offset, bool $isGen):void {
   $COLORS = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
   echo "\n      backgroundColor: [\n";
   for($i = 0; $i < $limit; $i++) {
@@ -153,7 +154,11 @@ function printColors(int $limit, int $offset):void {
   }
   echo "],\n      borderColor: [\n";
   for($i = 0; $i < $limit; $i++) {
-    echo '      "rgb('.$COLORS[($i+$offset) % 7].')"';
+    if ($isGen) {
+      echo '      "rgba(22, 163, 74, 0.4)"';
+    } else {
+      echo '      "rgba(239, 68, 68, 0.4)"';
+    }    
     if($i != ($limit-1)) { echo ",\n"; }
   }
   echo '],';
@@ -253,14 +258,14 @@ function printBarGraph (
     labels: labels'.$chartId.',
     datasets: [{
       data: '.$values[3].',';
-      printColors(limit:$values[0], offset:$values[8]);
+      printColors(limit:$values[0], offset:$values[8], isGen:TRUE);
       echo '
       borderWidth: 1,
       order: 1
     },
     {
       data: '.$values[2].',';
-      printColors(limit:$values[0], offset:$values[8]); // TODO
+      printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
       echo '
       borderWidth: 1,
       order: 1
