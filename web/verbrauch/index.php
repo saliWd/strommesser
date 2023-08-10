@@ -132,14 +132,14 @@ if ($totalCount > 0) {// this may be 0
         label: "Verbrauch total [kWh]",
         data: '.$val_yr_cons_kwh.',
         yAxisID: "yright",
-        backgroundColor: "rgba(239, 68, 68, 0.3)",
+        backgroundColor: "rgba(239, 68, 68, 0.2)",
         showLine: false
       },
       {
         label: "Einspeisung total [kWh]",
         data: '.$val_yr_gen_kwh.',
         yAxisID: "yright",
-        backgroundColor: "rgba(22, 163, 74, 0.3)",
+        backgroundColor: "rgba(22, 163, 74, 0.2)",
         showLine: false
       },
       {
@@ -166,14 +166,14 @@ if ($totalCount > 0) {// this may be 0
         label: "Verbrauch [W]",
         data: '.$val_yl_cons.',
         yAxisID: "yleft",
-        backgroundColor: "rgb(239, 68, 68)",
+        backgroundColor: "rgba(239, 68, 68, 0.8)",
         showLine: false
       },
       {
         label: "Einspeisung [W]",
         data: '.$val_yl_gen.',
         yAxisID: "yleft",
-        backgroundColor: "rgb(22, 163, 74)",
+        backgroundColor: "rgba(22, 163, 74, 0.8)",
         showLine: false
       }      
     ],

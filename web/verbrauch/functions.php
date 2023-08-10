@@ -257,22 +257,22 @@ function printBarGraph (
   const data'.$chartId.' = {
     labels: labels'.$chartId.',
     datasets: [{
-      label: "Einspeisung [W]",
-      data: '.$values[3].',';
-      printColors(limit:$values[0], offset:$values[8], isGen:TRUE);
+      label: "Verbrauch [W]",
+      data: '.$values[2].',';
+      printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
       echo '
       borderWidth: 2,
       order: 0
     },
     {
-      data: '.$values[2].',';
-      printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
+      label: "Einspeisung [W]",
+      data: '.$values[3].',';
+      printColors(limit:$values[0], offset:$values[8], isGen:TRUE);
       echo '
       borderWidth: 2,
       order: 1
     },
-    {
-      label: "Verbrauch [W]",
+        {      
       label: "Durchschnittsverbrauch [W]",
       data: '.$values[4].',
       borderColor: "rgba(239, 68, 68, 0.8)",
