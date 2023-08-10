@@ -9,6 +9,7 @@
 def doLoginLogout(driver, testNum):
   from functions import doLogin, doLogout, checkSiteTitleAndPrint
   from my_config import doLoginCorrect
+  import constants # relative import constants.py
  
   driver.get("https://strommesser.ch/verbrauch/login.php") # go to the login page
   
@@ -23,7 +24,7 @@ def doLoginLogout(driver, testNum):
 
   modDescription = [(str(testNum)+".2"), "login_with_correct_password"]  
   doLoginCorrect(driver) # this is the correct password
-  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle="StromMesser Übersicht"))):
+  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle=constants.SITE_TITLE_INDEX))):
     return False
   # end if
 

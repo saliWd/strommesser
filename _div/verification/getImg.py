@@ -30,13 +30,14 @@ def takeScreenshot(driver, testNum, url, imgName, subTest):
 
 def getImg(driver, testNum):
   from my_config import doLoginCorrect
+  import constants
   subTest = 1
   
   modDescription = [(str(testNum)+"."+str(subTest)), "getImg_login"]
   driver.get("https://strommesser.ch/verbrauch/login.php") # go to the login page
 
   doLoginCorrect(driver) 
-  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle="StromMesser Verbrauch"))):
+  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle=constants.SITE_TITLE_INDEX))):
     return False
   # end if
   subTest = subTest + 1
@@ -53,21 +54,21 @@ def getImg(driver, testNum):
   subTest = takeScreenshot(
     driver=driver,
     testNum=testNum,
-    url='https://strommesser.ch/verbrauch/statistic.php#anchorW',
+    url='https://strommesser.ch/verbrauch/statistic.php#anchorWcons',
     imgName='01_graphWeek.png',
     subTest=subTest
   )
   subTest = takeScreenshot(
     driver=driver,
     testNum=testNum,
-    url='https://strommesser.ch/verbrauch/statistic.php?goBackW=1#anchorW',
+    url='https://strommesser.ch/verbrauch/statistic.php?goBackWcons=1#anchorWcons',
     imgName='02_graphWeekLast.png',
     subTest=subTest
   )
   subTest = takeScreenshot(
     driver=driver,
     testNum=testNum,
-    url='https://strommesser.ch/verbrauch/statistic.php#anchorM',
+    url='https://strommesser.ch/verbrauch/statistic.php#anchorMcons',
     imgName='03_graphMonth.png',
     subTest=subTest
   )

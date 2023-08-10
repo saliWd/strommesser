@@ -8,8 +8,9 @@ from selenium.webdriver.common.by import By
 # ... and saves all page source code as static files
 
 def getStatic(driver, testNum):
-  from functions import printOkOrNot, checkSiteTitleAndPrint, writeFile, getPage
+  from functions import printOkOrNot, checkSiteTitleAndPrint, writeFile, getPage, doLogout
   from my_config import doLoginCorrect
+  import constants # relative import constants.py
   subTest = 1
   
   driver.get("view-source:https://strommesser.ch/verbrauch/login.php")
@@ -20,7 +21,7 @@ def getStatic(driver, testNum):
   driver.get("https://strommesser.ch/verbrauch/login.php") # go to the login page
 
   doLoginCorrect(driver) 
-  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle="StromMesser Übersicht"))):
+  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle=constants.SITE_TITLE_INDEX))):
     return False
   # end if
   subTest = subTest + 1
@@ -41,6 +42,8 @@ def getStatic(driver, testNum):
 
   subTest = getPage(driver, 'settings', testNum, subTest)
   subTest = getPage(driver, 'statistic', testNum, subTest)
+
+  doLogout(driver)
 
   return True
 # end def
