@@ -443,7 +443,7 @@ function getValues(
 // prints header with css/js and body, container-div and h1 title
 function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title=''):void {
   $SITE_TITLES = array(
-    'index.php' => 'Verbrauch',
+    'index.php' => 'Übersicht',
     'settings.php' => 'Einstellungen',
     'login.php' => 'Login, Logout',
     'statistic.php' => 'Statistiken',
@@ -481,7 +481,7 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
 
 function printNavMenu_v2 (string $site, string $title): void {
   $topLevelSites = array( // TODO: partial repetition of SITE_TITLES
-    ['index.php', 'Verbrauch'],
+    ['index.php', 'Übersicht'],
     ['statistic.php', 'Statistiken'],
     ['settings.php', 'Einstellungen'],
     ['#', '&nbsp;'],
@@ -509,11 +509,12 @@ function printNavMenu_v2 (string $site, string $title): void {
   $siteName = '';
   if ($site === 'index.php') {
     $inPageTargets = array(
-      ['#myChart', 'Aktueller Verbrauch'],
-      ['#anchorW', 'Wöchentlich'],
-      ['#anchorM', 'Monatlich']
+      ['#myChart', 'Leistungsübersicht'],
+      ['#anchorWcons', 'Wöchentlich'],
+      ['#anchorMcons', 'Monatlich'],
+      ['#anchorYcons', 'Jährlich']
     );
-    $siteName = 'Verbrauch';
+    $siteName = 'Übersicht';
   } elseif ($site === 'statistic.php') {
     $inPageTargets = array(
       ['#anchorW', 'Wöchentlich'],
