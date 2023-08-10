@@ -23,7 +23,7 @@ def doLoginLogout(driver, testNum):
 
   modDescription = [(str(testNum)+".2"), "login_with_correct_password"]  
   doLoginCorrect(driver) # this is the correct password
-  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle="StromMesser Verbrauch"))):
+  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle="StromMesser Übersicht"))):
     return False
   # end if
 

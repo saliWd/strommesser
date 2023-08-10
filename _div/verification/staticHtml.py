@@ -20,7 +20,7 @@ def getStatic(driver, testNum):
   driver.get("https://strommesser.ch/verbrauch/login.php") # go to the login page
 
   doLoginCorrect(driver) 
-  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle="StromMesser Verbrauch"))):
+  if (not(checkSiteTitleAndPrint(driver, modDescription, expectedSiteTitle="StromMesser Übersicht"))):
     return False
   # end if
   subTest = subTest + 1
