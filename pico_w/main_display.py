@@ -10,7 +10,7 @@ from my_functions import debug_print, debug_sleep, wlan_connect, get_randNum_has
 
 def send_message_get_response(DBGCFG:dict, message:dict):    
     URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
-    SIM_STR = "1|57|2023|01|27|18|22|09|500|100"
+    SIM_STR = "1|57|2023|01|27|18|22|09|500|100|725"
     if (DBGCFG["wlan_sim"]):        
         return(sepStrToArr(separatedString=SIM_STR))            
     
@@ -54,22 +54,18 @@ class RgbControl(object):
             self.led_rgb.set_rgb(*(255, 0, 0))
         self.tick = not(self.tick)
 
-    def pulse_blue_cb(self, noIdeaWhyThisIsNeeded):
+    def pulse_cb(self, color, noIdeaWhyThisIsNeeded):
         if self.tick:
             self.led_rgb.set_rgb(*(0, 0, 0))
         else:
-            self.led_rgb.set_rgb(*(0, 0, 127))
-        self.tick = not(self.tick)    
+            self.led_rgb.set_rgb(*color)
+        self.tick = not(self.tick)
 
-    def start_pulse(self, blue:bool):
-        if blue:
-            self.timer_rgb.init(freq=2, callback=self.pulse_blue_cb)
-        else:
-            self.timer_rgb.init(freq=2, callback=self.pulse_red_cb)
+    def start_pulse(self, color):
+        self.timer_rgb.init(freq=2, callback=self.pulse_cb(color))
 
-    def stop_pulse(self):
-        self.timer_rgb.deinit()
-        self.led_rgb.set_rgb(*(0, 0, 0))
+    def start_pulse_error(self):
+        self.timer_rgb.init(freq=2, callback=self.pulse_red_cb())
 
     def set_const_color(self, color):
         self.timer_rgb.deinit() # not always needed
@@ -106,20 +102,22 @@ def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting i
     display.text(text, x+1, y, scale=1.1)
 
 def sepStrToArr(separatedString:str):
-    valueArray = separatedString.split("|") # Format: $valid|$newestConsumption|Y|m|d|H|i|s    
+    valueArray = separatedString.split("|") # Format: $valid|$newestCons|Y|m|d|H|i|s|$newestGen
     retVal = dict([
             ('valid', 0),
-            ('wattValue', 999),
+            ('wattCons', 999),
             ('hour', 99),
             ('max', 405),
-            ('brightness', 80)
+            ('brightness', 80),
+            ('wattGen', 987)
     ])
-    if (len(valueArray) > 9 ):
+    if (len(valueArray) > 10 ):
             retVal["valid"] = int(valueArray[0])
-            retVal["wattValue"] = int(valueArray[1])
+            retVal["wattCons"] = int(valueArray[1])
             retVal["hour"] = int(valueArray[5])
             retVal["max"] = int(valueArray[8])
-            retVal["brightness"] = int(valueArray[9])            
+            retVal["brightness"] = int(valueArray[9])
+            retVal["wattGen"] = int(valueArray[10])
     return retVal
 
 def getBrightness(meas:list):
@@ -129,9 +127,8 @@ def getBrightness(meas:list):
     return brightness
 
 rgb_control = RgbControl()
-rgb_control.start_pulse(blue=False) # signal startup
 
-second_core_idle = True
+previousGenerating = 0
 
 while True:
     randNum_hash = get_randNum_hash(device_config)
@@ -145,18 +142,25 @@ while True:
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
     meas = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
     
-    # normalize the value. Is between 0 and max
-    wattValueNonMaxed = meas["wattValue"]    
-    meas["wattValue"] = min(meas["wattValue"], meas["max"])
-    meas["wattValue"] = max(meas["wattValue"], 0)
+    generating = 0
+    wattValueNonMaxed = abs(meas["wattCons"] - meas["wattGen"]) # want this value always positive    
+    if meas["wattGen"] > meas["wattCons"]: # if both are the same, it's consumption
+        generating = 1
+        
+    if (generating != previousGenerating): # if the value changes from generated to consumed (or vice versa): erase the screen because it does not make sense anymore
+        wattValues.clear() 
 
-    debug_print(DBGCFG, "normalized watt value: "+str(meas["wattValue"])+", max/bright: "+str(meas["max"])+"/"+str(meas["brightness"]))
+    # normalize the value. Is between 0 and max
+    wattValueNormalized = wattValueNonMaxed
+    wattValueNormalized = min(wattValueNormalized, meas["max"])    
+
+    debug_print(DBGCFG, "normalized watt value: "+str(wattValueNormalized)+", max/bright: "+str(meas["max"])+"/"+str(meas["brightness"]))
 
     # fills the screen with black
     display.set_pen(BLACK)
     display.clear()
 
-    wattValues.append(meas["wattValue"])
+    wattValues.append(wattValueNormalized)
     if len(wattValues) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
         wattValues.pop(0)
 
@@ -179,15 +183,17 @@ while True:
     
     display.update()
 
-    # lets also set the LED to match
+    # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
     if (meas["valid"] == 0):
-        rgb_control.start_pulse(blue=False) # pulsate red
+        rgb_control.start_pulse_error() # pulsate red with high brightness
     else:
         brightness = getBrightness(meas=meas)
         COLORS_LED = [(0, 0, brightness), (0, brightness, 0), (brightness, brightness, 0), (brightness, 0, 0)]
-        rgb_control.set_const_color(value_to_color(value=meas["wattValue"],colors=COLORS_LED,value_max=meas["max"]))
-        if (wattValueNonMaxed == 0):
-            rgb_control.start_pulse(blue=True)
+        if (generating == 1):
+            rgb_control.start_pulse(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
+        else:
+            rgb_control.set_const_color(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
     
+    previousGenerating = generating
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
     

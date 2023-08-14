@@ -5,15 +5,20 @@
     
     $userid = checkInputs($dbConn);
 
-    $result = $dbConn->query('SELECT * FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 1');
+    $result = $dbConn->query('SELECT `consDiff`, `zeitDiff`, `genDiff`, `zeit` FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 1');
     $queryCount = $result->num_rows; // this may be 0 or 1
     if ($queryCount !== 1) {
         printRawErrorAndDie('Error', 'no meas data');
     } 
     $row = $result->fetch_assoc();
+
     if ($row['zeitDiff'] > 0) { // divide by 0 exception
-        $newestConsumption = round($row['consDiff']*3600*1000 / $row['zeitDiff']); // kWh compared to seconds
-    } else { $newestConsumption = 0.0; }
+        $newestCons = round($row['consDiff']*3600*1000 / $row['zeitDiff']); // kWh compared to seconds
+        $newestGen  = round($row['genDiff']*3600*1000 / $row['zeitDiff']);
+    } else { 
+        $newestCons = 0;
+        $newestGen  = 0;
+    }
     $zeitNewest = date_create($row['zeit']);
     $zeitNow = date_create("now");
     $zeitNow->modify('- 5 minutes'); // latest entry must be newer than '5 minutes ago'
@@ -30,5 +35,5 @@
     $row = $result->fetch_assoc();
     // not doing consistency checks (min < max and stuff) because this is done at edit/insert of the values
     
-    echo $valid.'|'.$newestConsumption.date_format($zeitNewest,"|Y|m|d|H|i|s|").$row['ledMaxValue'].'|'.$row['ledBrightness'];
+    echo $valid.'|'.$newestCons.date_format($zeitNewest,"|Y|m|d|H|i|s|").$row['ledMaxValue'].'|'.$row['ledBrightness'].'|'.$newestGen;
 ?>
