@@ -8,13 +8,13 @@ from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
 import my_config
 from my_functions import debug_print, debug_sleep, wlan_connect, get_randNum_hash, transmit_message
 
-def send_message_get_response(DBGCFG:dict, message:dict):    
+def send_message_get_response(DBGCFG:dict, message:dict):
     URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
     SIM_STR = "1|57|2023|01|27|18|22|09|500|100|725"
     if (DBGCFG["wlan_sim"]):        
-        return(sepStrToArr(separatedString=SIM_STR))            
+        return(sepStrToArr(separatedString=SIM_STR))
     
-    returnText = transmit_message(DBGCFG=DBGCFG, URL=URL, message=message)    
+    returnText = transmit_message(DBGCFG=DBGCFG, URL=URL, message=message)
     return(sepStrToArr(separatedString=returnText))
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
@@ -22,8 +22,6 @@ LOOP_WAIT_TIME = 80
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True) # activate it. NB: disabling does not work correctly
 sleep(1)
-
-tim_rgb = Timer() # no need to specify a number on pico, all SW timers       
 
 device_config = my_config.get_device_config()
 
@@ -45,27 +43,23 @@ class RgbControl(object):
     def __init__(self):
         self.tick = True
         self.led_rgb = RGBLED(6, 7, 8)
-        self.timer_rgb = Timer()
+        self.timer_rgb = Timer() # no need to specify a number on pico, all SW timers
+        self.color = (0,0,0)
 
-    def pulse_red_cb(self, noIdeaWhyThisIsNeeded):
+    def pulse_cb(self, noIdeaWhyThisIsNeeded):
         if self.tick:
             self.led_rgb.set_rgb(*(0, 0, 0))
         else:
-            self.led_rgb.set_rgb(*(255, 0, 0))
-        self.tick = not(self.tick)
-
-    def pulse_cb(self, color, noIdeaWhyThisIsNeeded):
-        if self.tick:
-            self.led_rgb.set_rgb(*(0, 0, 0))
-        else:
-            self.led_rgb.set_rgb(*color)
+            self.led_rgb.set_rgb(*(self.color))
         self.tick = not(self.tick)
 
     def start_pulse(self, color):
-        self.timer_rgb.init(freq=2, callback=self.pulse_cb(color))
+        self.color = color
+        self.timer_rgb.init(freq=0.5, callback=self.pulse_cb)
 
     def start_pulse_error(self):
-        self.timer_rgb.init(freq=2, callback=self.pulse_red_cb())
+        self.color = (127, 0, 0)
+        self.timer_rgb.init(freq=5, callback=self.pulse_cb)
 
     def set_const_color(self, color):
         self.timer_rgb.deinit() # not always needed
@@ -127,7 +121,7 @@ def getBrightness(meas:list):
     return brightness
 
 rgb_control = RgbControl()
-
+rgb_control.start_pulse_error() # pulsate red with high brightness
 previousGenerating = 0
 generating = 0
 
@@ -145,7 +139,7 @@ while True:
     
     previousGenerating = generating
     generating = 0
-    wattValueNonMaxed = abs(meas["wattCons"] - meas["wattGen"]) # want this value always positive    
+    wattValueNonMaxed = abs(meas["wattCons"] - meas["wattGen"]) # want this value always positive
     if meas["wattGen"] > meas["wattCons"]: # if both are the same, it's consumption
         generating = 1
         
@@ -176,7 +170,7 @@ while True:
     display.set_pen(WHITE)
     display.rectangle(1, 1, 137, 41) # draws a white background for the text
     wattValueNonMaxed = min(wattValueNonMaxed, 9999) # limit it to 4 digits
-    expand = right_align(wattValueNonMaxed) # string formatting does not work correctly. Do it myself    
+    expand = right_align(wattValueNonMaxed) # string formatting does not work correctly. Do it myself
 
     # writes the reading as text in the white rectangle
     display.set_pen(BLACK)
@@ -197,4 +191,3 @@ while True:
             rgb_control.set_const_color(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
         
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
-    
