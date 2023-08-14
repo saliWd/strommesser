@@ -129,6 +129,7 @@ def getBrightness(meas:list):
 rgb_control = RgbControl()
 
 previousGenerating = 0
+generating = 0
 
 while True:
     randNum_hash = get_randNum_hash(device_config)
