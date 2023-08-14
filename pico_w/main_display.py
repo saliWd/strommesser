@@ -142,6 +142,7 @@ while True:
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
     meas = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
     
+    previousGenerating = generating
     generating = 0
     wattValueNonMaxed = abs(meas["wattCons"] - meas["wattGen"]) # want this value always positive    
     if meas["wattGen"] > meas["wattCons"]: # if both are the same, it's consumption
@@ -173,8 +174,8 @@ while True:
 
     display.set_pen(WHITE)
     display.rectangle(1, 1, 137, 41) # draws a white background for the text
-    expand = right_align(wattValueNonMaxed) # string formatting does not work correctly. Do it myself
     wattValueNonMaxed = min(wattValueNonMaxed, 9999) # limit it to 4 digits
+    expand = right_align(wattValueNonMaxed) # string formatting does not work correctly. Do it myself    
 
     # writes the reading as text in the white rectangle
     display.set_pen(BLACK)
@@ -193,7 +194,6 @@ while True:
             rgb_control.start_pulse(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
         else:
             rgb_control.set_const_color(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
-    
-    previousGenerating = generating
+        
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
     
