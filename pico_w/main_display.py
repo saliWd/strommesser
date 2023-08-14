@@ -45,6 +45,7 @@ class RgbControl(object):
         self.led_rgb = RGBLED(6, 7, 8)
         self.timer_rgb = Timer() # no need to specify a number on pico, all SW timers
         self.color = (0,0,0)
+        self.freq = 5
 
     def pulse_cb(self, noIdeaWhyThisIsNeeded):
         if self.tick:
@@ -53,13 +54,14 @@ class RgbControl(object):
             self.led_rgb.set_rgb(*(self.color))
         self.tick = not(self.tick)
 
-    def start_pulse(self, color):
-        self.color = color
-        self.timer_rgb.init(freq=0.5, callback=self.pulse_cb)
-
-    def start_pulse_error(self):
-        self.color = (127, 0, 0)
-        self.timer_rgb.init(freq=5, callback=self.pulse_cb)
+    def start_pulse(self, valid, color):
+        if valid:
+            self.color = color
+            self.freq = 0.5
+        else:
+            self.color = (127, 0, 0)
+            self.freq = 5
+        self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
 
     def set_const_color(self, color):
         self.timer_rgb.deinit() # not always needed
@@ -121,7 +123,7 @@ def getBrightness(meas:list):
     return brightness
 
 rgb_control = RgbControl()
-rgb_control.start_pulse_error() # pulsate red with high brightness
+rgb_control.start_pulse(False, (0,0,0)) # pulsate red with high brightness
 previousGenerating = 0
 generating = 0
 
@@ -181,13 +183,14 @@ while True:
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
     if (meas["valid"] == 0):
-        rgb_control.start_pulse_error() # pulsate red with high brightness
+        rgb_control.start_pulse(False, (0,0,0)) # pulsate red with high brightness
     else:
         brightness = getBrightness(meas=meas)
         COLORS_LED = [(0, 0, brightness), (0, brightness, 0), (brightness, brightness, 0), (brightness, 0, 0)]
         if (generating == 1):
-            rgb_control.start_pulse(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
+            rgb_control.start_pulse(True, value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
         else:
             rgb_control.set_const_color(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
         
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
+
