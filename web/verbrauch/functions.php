@@ -199,31 +199,39 @@ function printBarGraph (
   Timerange $timerange, Param $param, 
   int $goBack, bool $isIndexPage=FALSE
 ):void {
-  $now = date_create(); // TODO: some stuff here is repeated in getValues, not nice
+  $startDate = date_create();
+  $year = (int)$startDate->format('Y'); // current year
+  $month = (int)$startDate->format('m'); // current month
   if ($timerange === Timerange::Year) { 
-    $year = ((int)$now->format('Y')) - $goBack;
-    if ($goBack === 0) { $title = 'dieses Jahr'; }
+    $year = $year - $goBack;
+    $startDate = date_create($year.'-01-01');
+
+    if ($goBack === 0)     { $title = 'dieses Jahr'; }
     elseif ($goBack === 1) { $title = 'letztes Jahr'; }
-    else { $title = 'Jahr '.$year; }
+    else                   { $title = 'Jahr '.$year; }
     $chartId = 'Y';
   } elseif ($timerange === Timerange::Month) {
-    $monNames = array('Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'); // need german naming, not using format('M')
-    $month = ((int)$now->format('m')) - $goBack;
+    $month = $month - $goBack;
     while ($month < 1) {
+      $year--;
       $month += 12;
     }
-    $title = $monNames[$month-1];
+    $startDate = date_create($year.'-'.$month.'-01');
+
+    $monthNames = array('Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'); // need german naming, not using format('M')
+    $title = $monthNames[$month-1];
     $chartId = 'M';
-  } elseif ($timerange === Timerange::Week) {
-    if ($goBack === 0) { $title = 'diese Woche'; }
+  } elseif ($timerange === Timerange::Week) {    
+    $startDate->modify('-'.$goBack.' weeks');
+    $weekday = (int)$startDate->format('N') - 1; // 0 (for Monday) through 6 (for Sunday)
+    $startDate->modify('-'.$weekday.' days'); // that gets me Monday in this week
+  
+    if ($goBack === 0)     { $title = 'diese Woche'; }
     elseif ($goBack === 1) { $title = 'letzte Woche'; }
-    else {       
-      $now->modify('-'.$goBack.' weeks');
-      $weekNr = $now->format("W");
-      $title = 'Woche '.$weekNr;    
+    else {                   $title = 'Woche '.$startDate->format("W");    
     }
     $chartId = 'W';
-  }
+  }  
   
   $chartId .= $param->name;
   if ($param === Param::cons)         { $paramText = 'Leistung';}
@@ -235,7 +243,7 @@ function printBarGraph (
   }
   
   //        [$numOfEntries, $val_x, $val_y_cons, $val_y_gen, $val_y_cons_ave, $val_y_gen_ave, $ave_cons, $ave_gen, $weekDayOffset];
-  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, goBack:$goBack);  
+  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, startDate:$startDate);  
   $title .= ' (Ø: <span class="text-green-600">'.$values[7].'</span>/<span class="text-red-500">'.$values[6].'</span>W)';
   if ($goBack > 0) {
     $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-8 h-8').'</a>';
@@ -351,52 +359,33 @@ function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, str
 function getValues(
   object $dbConn, int $userid, 
   Timerange $timerange, Param $param, 
-  int $goBack
+  DateTime $startDate
 ):array {
   $val_x = '[ ';
   $val_y = ['[ ', '[ ']; // arrays: consumption is entry0, generation is entry1
-  $val_y_ave = ['[ ', '[ '];  
-  $ave = [0.0, 0.0];  
-  $numOfEntries = 0;
-  $weekDayOffset = 0; 
-  
-  $now = date_create();
-  $year = (int)$now->format('Y'); // current year
-  $month = (int)$now->format('m'); // current month
-  $day = (int)$now->format('d'); // current day
+  $val_y_ave = ['[ ', '[ '];
+  $ave = [0.0, 0.0];
   $numOfEntries = 0;
   $weekDayOffset = 0;
+  
+  $year = (int)$startDate->format('Y'); // startDate year
+  $month = (int)$startDate->format('m');  
 
-  if ($timerange === Timerange::Year) { // generates one value per week
-    $monNames = array('Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'); // need german naming, not using format('M')
-    $year = $year - $goBack;
-    $startDay = date_create($year.'-01-01');
-    $weekday = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday)
-    if ($weekday > 0) {
-      $startDay->modify('+'.(7-$weekday).' days'); // that gets me first Monday in the year
-    }    
-    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDay->format('Y-m-d'), dayB:$year.'-12-31');
-    for ($week = 1; $week <= 52; $week++) { // 364 days (one or two days are left over)
-      $dayStrA = $startDay->format('Y-m-d');
-      $month = (int)$startDay->format('m'); // plot the month of the Monday
-      $startDay->modify('+6 days'); // Sunday
-      $dayStrB = $startDay->format('Y-m-d');
+  if ($timerange === Timerange::Year) { // generates one value per month
+    $numOfEntries = 12;    
+    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-01-01', dayB:$year.'-12-31');
+    for ($month = 1; $month <= 12; $month++) {
+      $dayStrA = $year.'-'.$month.'-01';
+      $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
+      $dayStrB = $year.'-'.$month.'-'.$lastDay;
       $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStrA, dayB:$dayStrB);
       $val_y[0] .= $tmp_arr[0].', ';
       $val_y[1] .= $tmp_arr[1].', ';
       $val_y_ave[0] .= $ave[0].', ';
       $val_y_ave[1] .= $ave[1].', ';
-      $val_x .= '"'.$monNames[$month-1].'", ';
-      $numOfEntries++;
-      
-      $startDay->modify('+1 days'); // Monday again
     }
-  } elseif ($timerange === Timerange::Month) { // maybe to do: could switch to date->modify method
-    $month = $month - $goBack; // NB: goBack must not be greater than 12
-    while ($month < 1) {
-      $year--;
-      $month += 12;
-    }
+    $val_x .= '"Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez", ';// need german short names, not using format('M')
+  } elseif ($timerange === Timerange::Month) { // maybe to do: could switch to date->modify method    
     $startDay = date_create($year.'-'.$month.'-01');
     $weekDayOffset = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday). Colors are matching between week and month
     $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
@@ -413,21 +402,17 @@ function getValues(
     }
   } elseif ($timerange === Timerange::Week) {
     $numOfEntries = 7;
-    $startDay = $now;
-    $startDay->modify('-'.$goBack.' weeks');
-    $weekday = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday)
-    $startDay->modify('-'.$weekday.' days'); // that gets me Monday in this week
-    $endDay = clone $startDay; // clone is needed here
+    $endDay = clone $startDate; // clone is needed here
     $endDay->modify('+6 days');
-    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDay->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));    
+    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDate->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));    
     for ($day = 1; $day <= $numOfEntries; $day++) {
-      $dayStr = $startDay->format('Y-m-d');
+      $dayStr = $startDate->format('Y-m-d');
       $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
       $val_y[0] .= $tmp_arr[0].', ';
       $val_y[1] .= $tmp_arr[1].', ';
       $val_y_ave[0] .= $ave[0].', ';
       $val_y_ave[1]  .= $ave[1].', ';
-      $startDay->modify('+1 days');
+      $startDate->modify('+1 days');
     }
     $val_x .= '"Mo", "Di", "Mi", "Do", "Fr", "Sa", "So", ';
   }
