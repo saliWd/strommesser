@@ -3,6 +3,7 @@ from time import sleep
 from machine import Timer # type: ignore
 from pimoroni import RGBLED  # type: ignore
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
+from math import sin
 
 # my own files
 import my_config
@@ -46,6 +47,8 @@ class RgbControl(object):
         self.timer_rgb = Timer() # no need to specify a number on pico, all SW timers
         self.color = (0,0,0)
         self.freq = 5
+        self.sineX = 0.0
+        self.timerIsInitialized = False
 
     def pulse_cb(self, noIdeaWhyThisIsNeeded):
         if self.tick:
@@ -53,18 +56,31 @@ class RgbControl(object):
         else:
             self.led_rgb.set_rgb(*(self.color))
         self.tick = not(self.tick)
+    
+    def pulse_cb_v2(self, noIdeaWhyThisIsNeeded):
+        if self.sineX < 3.13: # (slightly smaller than pi). In general: I don't want negative values
+            self.sineX += 0.05 # about 60 steps
+        else:
+            self.sineX = 0
+
+        self.led_rgb.set_rgb(*(sin(self.sineX) * self.color)) # have a factor for the 3 color entries
 
     def start_pulse(self, valid, color):
         if valid:
             self.color = color
-            self.freq = 0.5
+            self.freq = 10
+            if not (self.timerIsInitialized):
+                self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb_v2)
+                self.timerIsInitialized = True
         else:
             self.color = (127, 0, 0)
             self.freq = 5
-        self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
+            self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
+            self.timerIsInitialized = False # always do a fresh init for the error case. Don't check the isInitialized value
 
     def set_const_color(self, color):
         self.timer_rgb.deinit() # not always needed
+        self.timerIsInitialized = False
         self.led_rgb.set_rgb(*color)
 
 
