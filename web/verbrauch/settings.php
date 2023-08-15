@@ -24,8 +24,10 @@ if ($doSafe === 0) { // entry point of this site
     <p>&nbsp;</p>
     <form id="settingsValues" action="settings.php?do=2" method="post">
       <p class="text-left"><b>Maximalwert Farbskala:</b><br>
-      LED und Minibildschirm zeigen den aktuellen Verbrauch mit einer Farbskala von blau über grün nach gelb und schlussendlich rot.<br>
-      0 Watt entspricht der Farbe blau, der Maximalwert (und alles darüber) wird rot angezeigt.</p>
+      LED und Minibildschirm zeigen die aktuelle Leistung mit einer Farbskala von blau über grün nach gelb und schlussendlich rot. Blau ist "gut", rot ist "schlecht".<br>
+      Bei Verbrauch (Leistung wird aus dem Netz gezogen) entsprechen 0 Watt der Farbe blau, der Maximalwert (und alles darüber) wird rot angezeigt.<br>
+      Beim Einspeisen (Leistung geht ins Netz) pulsiert die LED und die Farbe blau entspricht dem Maximalwert (plus alles darüber), kleine Einspeisung wird rot dargestellt.</p>
+      <br><br>
       <p class="mx-auto"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="'.$LIMIT_LED_MAX_VALUE.'" step="20" value="'.$row['ledMaxValue'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledMaxValue'].'</output>W</p>
       <hr>
       <p class="text-left"><b>LED Helligkeit:</b><br>
