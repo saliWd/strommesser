@@ -188,6 +188,7 @@ while True:
         brightness = getBrightness(meas=meas)
         COLORS_LED = [(0, 0, brightness), (0, brightness, 0), (brightness, brightness, 0), (brightness, 0, 0)]
         if (generating == 1):
+            wattValueNormalized = meas["max"] - wattValueNormalized # reverse the value to have a 'blue is good'-meaning
             rgb_control.start_pulse(True, value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
         else:
             rgb_control.set_const_color(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
