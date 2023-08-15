@@ -309,19 +309,25 @@ function printBarGraph (
     options: { plugins : { legend: { display: false } }, scales: { x: { stacked: true, }  }  },
   };
   const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
-  </script>';
+  </script>';  
+  printPopOverLnk(chartId:$chartId);
+  echo '
+      <h3 class="font-semibold text-gray-900">Leistung in Watt</h3>
+      <p>Verbrauch (rot umrandete Balken) und Einspeisung (grün umrandete Balken) in Watt.<br>
+      Gestrichelt dargestellt werden der Durchschnittsverbrauch bzw. die durschnittliche Einspeisung.</p>
+      <p>Mit den blauen Pfeilen kann man zwischen den Wochen (bzw. Monate / Jahre) wechseln.</p>';
   if ($isIndexPage) {
-    printPopOverLnk(chartId:$chartId);
+      echo '
+      <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+      <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+      <a href="../verbrauch/statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
+    ';
+    }
     echo '
-        <h3 class="font-semibold text-gray-900">Durchschnittsverbrauch</h3>
-        <p>Durchschnittsverbrauch in Watt. Ein Durschnittsverbrauch von 1000 Watt enstpricht einem Tagesverbrauch von 24 kWh</p>
-        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-        <a href="../verbrauch/statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
       </div>
-    <div data-popper-arrow></div>
-  </div>';
-  }
+  <div data-popper-arrow></div>
+</div>';
+  
   echo getHr().'
   <br>
   ';
