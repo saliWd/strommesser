@@ -46,6 +46,7 @@ class RgbControl(object):
         self.led_rgb = RGBLED(6, 7, 8)
         self.timer_rgb = Timer() # no need to specify a number on pico, all SW timers
         self.color = (0,0,0)
+        self.rgb   = (0,0,0)
         self.freq = 5
         self.sineX = 0.0
         self.timerIsInitialized = False
@@ -62,8 +63,12 @@ class RgbControl(object):
             self.sineX += 0.05 # about 60 steps
         else:
             self.sineX = 0
-
-        self.led_rgb.set_rgb(*(sin(self.sineX) * self.color)) # have a factor for the 3 color entries
+        factor = sin(self.sineX)
+        self.rgb = ((int)(factor*self.color[0]),
+                    (int)(factor*self.color[1]),
+                    (int)(factor*self.color[2]))
+        
+        self.led_rgb.set_rgb(*(self.rgb))
 
     def start_pulse(self, valid, color):
         if valid:
@@ -179,8 +184,12 @@ while True:
         wattValues.pop(0)
 
     i = 0
-    for t in wattValues:        
-        VALUE_COLOUR = display.create_pen(*value_to_color(value=t,colors=COLORS_DISP,value_max=meas["max"]))
+    for t in wattValues:
+        colourVal = t
+        if generating == 1:
+            colourVal = meas["max"] - wattValueNormalized # reverse the value to have a 'blue is good'-meaning
+        
+        VALUE_COLOUR = display.create_pen(*value_to_color(value=colourVal,colors=COLORS_DISP,value_max=meas["max"]))
         display.set_pen(VALUE_COLOUR)
         display.rectangle(i, int(HEIGHT - (float(t) / float(meas["max"] / HEIGHT))), BAR_WIDTH, HEIGHT)
         i += BAR_WIDTH
@@ -210,4 +219,3 @@ while True:
             rgb_control.set_const_color(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
         
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
-
