@@ -69,13 +69,14 @@ if ($totalCount > 0) {// this may be 0
     $aveGen = 0.0;
   }
   
-  $zeitString = 'um '.$zeitNewest->format('Y-m-d H:i:s');
+  $zeitString = $zeitNewest->format('Y-m-d H:i');
   if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
-    $zeitString = '('.$zeitNewest->format('H:i').')';
+    $zeitString = $zeitNewest->format('H:i');
   }
   // COLORS: consumption: red "text-red-500" = rgb(239 68 68); generation: green "text-green-600" = rgb(22 163 74);
   echo '<div class="flex">
-    <div class="flex-auto text-left"><b><span class="text-green-600">'.$newestGen.'W</span> / <span class="text-red-500">'.$newestCons.'W</span></b> '.$zeitString.'.</div>
+    <div class="flex-auto text-left"><b><span class="text-green-600">'.$newestGen.'W</span> / <span class="text-red-500">'.$newestCons.'W</span></b></div>
+    <div class="flex-auto text-center">'.$zeitString.'</div>
     <div class="flex-auto text-right">Ø: <b><span class="text-green-600">'.$aveGen.'W</span> / <span class="text-red-500">'.$aveCons.'W</span></b></div>
   </div>
   <hr>
