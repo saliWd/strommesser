@@ -11,7 +11,7 @@ from my_functions import debug_print, debug_sleep, wlan_connect, get_randNum_has
 
 def send_message_get_response(DBGCFG:dict, message:dict):
     URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
-    SIM_STR = "1|57|2023|01|27|18|22|09|500|100|725"
+    SIM_STR = "1|57|2023|01|27|18|22|09|500|100|727"
     if (DBGCFG["wlan_sim"]):        
         return(sepStrToArr(separatedString=SIM_STR))
     
@@ -42,7 +42,6 @@ display.update()
 class RgbControl(object):
 
     def __init__(self):
-        self.tick = True
         self.led_rgb = RGBLED(6, 7, 8)
         self.timer_rgb = Timer() # no need to specify a number on pico, all SW timers
         self.color = (0,0,0)
@@ -52,15 +51,8 @@ class RgbControl(object):
         self.timerIsInitialized = False
 
     def pulse_cb(self, noIdeaWhyThisIsNeeded):
-        if self.tick:
-            self.led_rgb.set_rgb(*(0, 0, 0))
-        else:
-            self.led_rgb.set_rgb(*(self.color))
-        self.tick = not(self.tick)
-    
-    def pulse_cb_v2(self, noIdeaWhyThisIsNeeded):
         if self.sineX < 3.13: # (slightly smaller than pi). In general: I don't want negative values
-            self.sineX += 0.05 # about 60 steps
+            self.sineX += 0.03 # about 100 steps
         else:
             self.sineX = 0
         factor = sin(self.sineX)
@@ -73,13 +65,13 @@ class RgbControl(object):
     def start_pulse(self, valid, color):
         if valid:
             self.color = color
-            self.freq = 10
+            self.freq = 20
             if not (self.timerIsInitialized):
-                self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb_v2)
+                self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
                 self.timerIsInitialized = True
         else:
-            self.color = (127, 0, 0)
-            self.freq = 5
+            self.color = (240, 0, 0)
+            self.freq = 100
             self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
             self.timerIsInitialized = False # always do a fresh init for the error case. Don't check the isInitialized value
 
