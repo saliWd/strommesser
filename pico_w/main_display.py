@@ -12,7 +12,7 @@ from my_functions import debug_print, debug_sleep, wlan_connect, get_randNum_has
 def send_message_get_response(DBGCFG:dict, message:dict):
     URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
     SIM_STR = "1|57|2023|01|27|18|22|09|500|100|727"
-    if (DBGCFG["wlan_sim"]):
+    if (DBGCFG["wlan_sim"]):        
         return(sepStrToArr(separatedString=SIM_STR))
     
     returnText = transmit_message(DBGCFG=DBGCFG, URL=URL, message=message)
@@ -51,8 +51,8 @@ class RgbControl(object):
         self.timerIsInitialized = False
 
     def pulse_cb(self, noIdeaWhyThisIsNeeded):
-        if self.sineX < 3.13: # (slightly smaller than pi). In general: I don't want negative values
-            self.sineX += 0.03 # about 100 steps
+        if self.sineX < 3.1: # (slightly smaller than pi). In general: I don't want negative values
+            self.sineX += 0.04 # about 80 steps
         else:
             self.sineX = 0
         factor = sin(self.sineX)
@@ -65,7 +65,7 @@ class RgbControl(object):
     def start_pulse(self, valid, color):
         if valid:
             self.color = color
-            self.freq = 20
+            self.freq = 25
             if not (self.timerIsInitialized):
                 self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
                 self.timerIsInitialized = True
@@ -159,7 +159,7 @@ while True:
         generating = 1
         
     if (generating != previousGenerating): # if the value changes from generated to consumed (or vice versa): erase the screen because it does not make sense anymore
-        wattValues.clear()
+        wattValues.clear() 
 
     # normalize the value. Is between 0 and max
     wattValueNormalized = wattValueNonMaxed
