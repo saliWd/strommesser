@@ -17,7 +17,8 @@ CREATE TABLE `kunden` (
   `pwHash` char(255) NOT NULL,
   `randCookie` char(64) NOT NULL,
   `ledMaxValue` smallint(5) UNSIGNED NOT NULL DEFAULT 405,
-  `ledBrightness` tinyint(3) UNSIGNED NOT NULL DEFAULT 80
+  `ledMaxValGen` smallint(5) UNSIGNED NOT NULL DEFAULT 2000,
+  `ledBrightness` tinyint(3) UNSIGNED NOT NULL DEFAULT 160
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE `pwForgot` (

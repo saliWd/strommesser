@@ -25,27 +25,26 @@
    5. ~~rx.php~~
    6. settings.php:
       1. set ht/nt price for both consumption and generation 
-      1. which info to show on the pico device (generation, consumption, both?)
+      1. different ranges for consumption and generation
       1. which graphs to show on index
       1. change email
    7. statistic.php
-      1. explain text same as on start page, same layout etc.
       1. add table layout with numbers additional to graphs
 3. pico devices
    1. ~~stability since 05.23: good since installing the try-except block on the devices, recovers from power outage.~~
-   1. stability on mssgng-device. Unclear why it has issues... try with new device and different WLAN
-   1. change to new micropython version
    1. print my own case for measurement
       * [ir head case][irHeadCase]
       * [pico case][picoCase]
    1. disp
+      1. different color coding for the LED [algorithm][hsvToRgb]
       1. [case?][displayCase]
 4. div
 
 
-Next: 1.1.5? / 
+Next: / 
 
 
 [displayCase]: https://www.thingiverse.com/thing:4767008
 [irHeadCase]: https://www.thingiverse.com/thing:3378332
 [picoCase]: [https://www.thingiverse.com/thing:4895274]
+[hsvToRgb]: [https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both]
