@@ -3,7 +3,8 @@ require_once('functions.php');
 $dbConn = initialize();
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 
-$LIMIT_LED_MAX_VALUE = 2000;
+$LIMIT_LED_MAX_VALUE_CONS = 2000;
+$LIMIT_LED_MAX_VAL_GEN = 8000;
 $LIMIT_LED_BRIGHTNESS = 255;
 
 $doSafe = safeIntFromExt('GET', 'do', 2); // this is an integer (range 1 to 99) or non-existing
@@ -13,7 +14,7 @@ $doSafe = safeIntFromExt('GET', 'do', 2); // this is an integer (range 1 to 99) 
 // do = 3: present the 'delete exported data?'
 // do = 4: process 'delete archived'
 if ($doSafe === 0) { // entry point of this site
-  $result = $dbConn->query('SELECT `ledMaxValue`,`ledBrightness` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
+  $result = $dbConn->query('SELECT `ledMaxValue`, `ledMaxValGen`, `ledBrightness` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
   $row = $result->fetch_assoc();
   
   printBeginOfPage_v2(site:'settings.php');
@@ -28,11 +29,18 @@ if ($doSafe === 0) { // entry point of this site
       Bei Verbrauch (Leistung wird aus dem Netz gezogen) entsprechen 0 Watt der Farbe blau, der Maximalwert (und alles darüber) wird rot angezeigt.<br>
       Beim Einspeisen (Leistung geht ins Netz) pulsiert die LED und die Farbe blau entspricht dem Maximalwert (plus alles darüber), kleine Einspeisung wird rot dargestellt.</p>
       <br><br>
-      <p class="mx-auto"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="'.$LIMIT_LED_MAX_VALUE.'" step="20" value="'.$row['ledMaxValue'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledMaxValue'].'</output>W</p>
+      <p class="mx-auto">Verbrauch:<br>
+      <img class="w-48 h-1 left-0" src="img/blueToRed.png" alt="Farbskala Blau-nach-Rot"><br>
+      <input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="'.$LIMIT_LED_MAX_VALUE_CONS.'" step="20" value="'.$row['ledMaxValue'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledMaxValue'].'</output>W</p>
+      <br>
+      <p class="mx-auto">Einspeisung:<br>
+      <img class="w-48 h-1 left-0" src="img/redToBlue.png" alt="Farbskala Rot-nach-Blau"><br>
+      <input id="ledMaxValGen" name="ledMaxValGen" type="range" min="100" max="'.$LIMIT_LED_MAX_VAL_GEN.'" step="50" value="'.$row['ledMaxValGen'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledMaxValGen'].'</output>W</p>
+      <br>
       <hr>
       <p class="text-left"><b>LED Helligkeit:</b><br>
       Die Helligkeit der farbigen LED. Von 0 (ausgeschaltet) bis 255.<br>
-      In der Nacht (22 Uhr bis 6 Uhr) leuchtet sie übrigens 50% dunkler.</p>
+      In der Nacht (21 Uhr bis 6 Uhr) leuchtet sie übrigens 75% dunkler.</p>
       <p class="mx-auto"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="'.$LIMIT_LED_BRIGHTNESS.'" step="5" value="'.$row['ledBrightness'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledBrightness'].'</output></p>
       <p class="mx-auto"><input id="settingsFormSubmit" class="mt-8 input-text mx-auto" name="settingsFormSubmit" type="submit" value="speichern"></p>
     </form>
@@ -82,12 +90,14 @@ if ($doSafe === 0) { // entry point of this site
   echo '<script>setTimeout(() => { window.location.href = \'settings.php?do=3\'; }, 2000);</script>';
 } elseif ($doSafe === 2) {
   printBeginOfPage_v2(site:'settings.php', title:'Einstellungen');
-  $ledMaxValue = safeIntFromExt(source:'POST',varName:'ledMaxValue',length:4);  
+  $ledMaxValue  = safeIntFromExt(source:'POST',varName:'ledMaxValue', length:4);
+  $ledMaxValGen = safeIntFromExt(source:'POST',varName:'ledMaxValGen',length:4);
   $ledBrightness = safeIntFromExt(source:'POST',varName:'ledBrightness',length:3);
-  $ledMaxValue = limitInt(input:$ledMaxValue,lower:0,upper:$LIMIT_LED_MAX_VALUE);
+  $ledMaxValue  = limitInt(input:$ledMaxValue,   lower:0,upper:$LIMIT_LED_MAX_VALUE_CONS);
+  $ledMaxValGen = limitInt(input:$ledMaxValGen,lower:0,upper:$LIMIT_LED_MAX_VAL_GEN);
   $ledBrightness = limitInt(input:$ledBrightness,lower:0,upper:$LIMIT_LED_BRIGHTNESS);
 
-  $result = $dbConn->query('UPDATE `kunden` SET `ledMaxValue` = "'.$ledMaxValue.'", `ledBrightness` = "'.$ledBrightness.'" WHERE `id` = "'.$userid.'";');
+  $result = $dbConn->query('UPDATE `kunden` SET `ledMaxValue` = "'.$ledMaxValue.'", `ledMaxValGen` = "'.$ledMaxValGen.'", `ledBrightness` = "'.$ledBrightness.'" WHERE `id` = "'.$userid.'";');
 
   echo 'gespeichert<br>';
   echo '<script>setTimeout(() => { window.location.href = \'settings.php\'; }, 2000);</script>';
