@@ -51,11 +51,11 @@ class RgbControl(object):
         self.timerIsInitialized = False
 
     def pulse_cb(self, noIdeaWhyThisIsNeeded):
-        if self.sineX < 3.1: # (slightly smaller than pi). In general: I don't want negative values
+        if self.sineX < 6.27: # (slightly smaller than 2*pi)
             self.sineX += 0.04 # about 80 steps
         else:
             self.sineX = 0
-        factor = sin(self.sineX)
+        factor = max(sin(self.sineX), 0.0) # not using abs() because I really want the LED to be off for half the time, to clearly distinguish between cons and gen.
         self.rgb = ((int)(factor*self.color[0]),
                     (int)(factor*self.color[1]),
                     (int)(factor*self.color[2]))
@@ -179,7 +179,7 @@ while True:
     for t in wattValues:
         colourVal = t
         if generating == 1:
-            colourVal = meas["max"] - wattValueNormalized # reverse the value to have a 'blue is good'-meaning
+            colourVal = meas["max"] - colourVal # reverse the value to have a 'blue is good'-meaning
         
         VALUE_COLOUR = display.create_pen(*value_to_color(value=colourVal,colors=COLORS_DISP,value_max=meas["max"]))
         display.set_pen(VALUE_COLOUR)
