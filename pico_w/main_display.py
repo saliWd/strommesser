@@ -111,7 +111,7 @@ def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting i
     display.text(text, x+1, y, scale=1.1)
 
 def sepStrToArr(separatedString:str):
-    valueArray = separatedString.split("|") # Format: $valid|$newestCons|Y|m|d|H|i|s|$newestGen
+    valueArray = separatedString.split("|") # Format: valid|newestCons|Y|m|d|H|i|s|newestGen|ledMaxValGen
     retVal = dict([
             ('valid', 0),
             ('wattCons', 999),
@@ -119,20 +119,22 @@ def sepStrToArr(separatedString:str):
             ('max', 405),
             ('brightness', 80),
             ('wattGen', 987)
+            ('maxGen', 1050)
     ])
-    if (len(valueArray) > 10 ):
+    if (len(valueArray) > 11 ):
             retVal["valid"] = int(valueArray[0])
             retVal["wattCons"] = int(valueArray[1])
             retVal["hour"] = int(valueArray[5])
             retVal["max"] = int(valueArray[8])
             retVal["brightness"] = int(valueArray[9])
             retVal["wattGen"] = int(valueArray[10])
+            retVal["maxGen"] = int(valueArray[11])
     return retVal
 
 def getBrightness(meas:list):
     brightness = meas["brightness"]
-    if (meas["hour"] > 21) or (meas["hour"] < 6):
-        brightness = round(0.5 * meas["brightness"]) # darker from 22:00 to 05:59
+    if (meas["hour"] > 20) or (meas["hour"] < 6):
+        brightness = round(0.25 * meas["brightness"]) # darker from 21:00 to 05:59
     return brightness
 
 rgb_control = RgbControl()
@@ -161,11 +163,15 @@ while True:
     if (generating != previousGenerating): # if the value changes from generated to consumed (or vice versa): erase the screen because it does not make sense anymore
         wattValues.clear() 
 
+    ledMaxVal = meas["max"]
+    if generating == 1:
+        ledMaxVal = meas["maxGen"]
+
     # normalize the value. Is between 0 and max
     wattValueNormalized = wattValueNonMaxed
-    wattValueNormalized = min(wattValueNormalized, meas["max"])    
+    wattValueNormalized = min(wattValueNormalized, ledMaxVal)    
 
-    debug_print(DBGCFG, "normalized watt value: "+str(wattValueNormalized)+", max/bright: "+str(meas["max"])+"/"+str(meas["brightness"]))
+    debug_print(DBGCFG, "normalized watt value: "+str(wattValueNormalized)+", max/bright: "+str(ledMaxVal)+"/"+str(meas["brightness"]))
 
     # fills the screen with black
     display.set_pen(BLACK)
@@ -179,11 +185,11 @@ while True:
     for t in wattValues:
         colourVal = t
         if generating == 1:
-            colourVal = meas["max"] - colourVal # reverse the value to have a 'blue is good'-meaning
+            colourVal = ledMaxVal - colourVal # reverse the value to have a 'blue is good'-meaning
         
-        VALUE_COLOUR = display.create_pen(*value_to_color(value=colourVal,colors=COLORS_DISP,value_max=meas["max"]))
+        VALUE_COLOUR = display.create_pen(*value_to_color(value=colourVal,colors=COLORS_DISP,value_max=ledMaxVal))
         display.set_pen(VALUE_COLOUR)
-        display.rectangle(i, int(HEIGHT - (float(t) / float(meas["max"] / HEIGHT))), BAR_WIDTH, HEIGHT)
+        display.rectangle(i, int(HEIGHT - (float(t) / float(ledMaxVal / HEIGHT))), BAR_WIDTH, HEIGHT)
         i += BAR_WIDTH
 
     display.set_pen(WHITE)
@@ -205,9 +211,9 @@ while True:
         brightness = getBrightness(meas=meas)
         COLORS_LED = [(0, 0, brightness), (0, brightness, 0), (brightness, brightness, 0), (brightness, 0, 0)]
         if (generating == 1):
-            wattValueNormalized = meas["max"] - wattValueNormalized # reverse the value to have a 'blue is good'-meaning
-            rgb_control.start_pulse(True, value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
+            wattValueNormalized = ledMaxVal - wattValueNormalized # reverse the value to have a 'blue is good'-meaning
+            rgb_control.start_pulse(True, value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=ledMaxVal))
         else:
-            rgb_control.set_const_color(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=meas["max"]))
+            rgb_control.set_const_color(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=ledMaxVal))
         
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
