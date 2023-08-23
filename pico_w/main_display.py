@@ -51,8 +51,8 @@ class RgbControl(object):
         self.timerIsInitialized = False
 
     def pulse_cb(self, noIdeaWhyThisIsNeeded):
-        if self.sineX < 6.27: # (slightly smaller than 2*pi)
-            self.sineX += 0.04 # about 80 steps
+        if self.sineX < 5.0: # (smaller than 2*pi)
+            self.sineX += 0.02
         else:
             self.sineX = 0
         factor = max(sin(self.sineX), 0.0) # not using abs() because I really want the LED to be off for half the time, to clearly distinguish between cons and gen.
@@ -65,7 +65,7 @@ class RgbControl(object):
     def start_pulse(self, valid, color):
         if valid:
             self.color = color
-            self.freq = 25
+            self.freq = 30
             if not (self.timerIsInitialized):
                 self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
                 self.timerIsInitialized = True
@@ -138,7 +138,7 @@ def getBrightness(meas:list):
     return brightness
 
 rgb_control = RgbControl()
-rgb_control.start_pulse(False, (0,0,0)) # pulsate red with high brightness
+rgb_control.set_const_color((255,0,0))
 previousGenerating = 0
 generating = 0
 
@@ -217,3 +217,4 @@ while True:
             rgb_control.set_const_color(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=ledMaxVal))
         
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
+
