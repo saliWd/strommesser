@@ -118,7 +118,7 @@ def sepStrToArr(separatedString:str):
             ('hour', 99),
             ('max', 405),
             ('brightness', 80),
-            ('wattGen', 987)
+            ('wattGen', 987),
             ('maxGen', 1050)
     ])
     if (len(valueArray) > 11 ):
