@@ -1,6 +1,4 @@
 web/verbrauch/dbConn.php
-pico_w/my_config_0001.py
-pico_w/my_config_0002.py
-pico_w/my_config_0004.py
 web/verbrauch/tmp.html
 .vscode/settings.json
+*.pyc

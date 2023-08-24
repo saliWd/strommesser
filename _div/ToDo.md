@@ -25,26 +25,22 @@
    5. ~~rx.php~~
    6. settings.php:
       1. set ht/nt price for both consumption and generation 
-      1. different ranges for consumption and generation
       1. which graphs to show on index
       1. change email
    7. statistic.php
       1. add table layout with numbers additional to graphs
-3. pico devices
-   1. ~~stability since 05.23: good since installing the try-except block on the devices, recovers from power outage.~~
+3. pico devices   
    1. print my own case for measurement
       * [ir head case][irHeadCase]
       * [pico case][picoCase]
    1. disp
-      1. different color coding for the LED [algorithm][hsvToRgb]
       1. [case?][displayCase]
 4. div
 
 
-Next: / 
+Next: 2.3 
 
 
 [displayCase]: https://www.thingiverse.com/thing:4767008
 [irHeadCase]: https://www.thingiverse.com/thing:3378332
 [picoCase]: [https://www.thingiverse.com/thing:4895274]
-[hsvToRgb]: [https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both]
