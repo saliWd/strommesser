@@ -11,7 +11,8 @@ from my_functions import debug_print, debug_sleep, wlan_connect, get_randNum_has
 
 def send_message_get_response(DBGCFG:dict, message:dict):
     URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
-    SIM_STR = "1|57|2023|01|27|18|22|09|500|100|727"
+    #      valid|newestCons|Y|m|d|H|i|s|ledMaxValue|ledBrightness|newestGen|ledMaxValGen
+    SIM_STR = "1|57|2023|01|27|18|22|09|500|100|257|700"
     if (DBGCFG["wlan_sim"]):        
         return(sepStrToArr(separatedString=SIM_STR))
     
@@ -244,4 +245,3 @@ while True:
             rgb_control.set_const_color(value_to_rgb(value=wattValueNormalized, value_max=ledMaxVal,led_brightness=brightness))
         
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
-
