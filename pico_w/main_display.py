@@ -63,7 +63,7 @@ class RgbControl(object):
         
         self.led_rgb.set_rgb(*(self.rgb))
 
-    def start_pulse(self, valid, color):
+    def start_pulse(self, valid:bool, color):
         if valid:
             self.color = color
             self.freq = 30
@@ -100,26 +100,12 @@ def hsva_to_rgb(h:float, s:float, v:float, a:float) -> tuple:    # inputs: value
         if i==5: return (v, w, q)
     else: v = int(255*v); return (v, v, v)
 
-def value_to_rgb(value:int, value_max:int, led_brightness:int)-> list: # goes from red to blue
+def value_to_rgb(value:int, value_max:int, led_brightness:int, invert:bool)-> list: # goes from red to blue
+    if invert:
+        value = value_max - value # reverse the value to have a 'blue is good'-meaning
     h = float(value) / float(1.4*value_max) # h value makes a 'circle'. This means 0 degree is the same as 360°. -> Need to limit it (but not to 180°, just less than 360)
     a = float(led_brightness) / float(255)
     return list(hsva_to_rgb(h, 1.0, 1.0, a))
-
-# def value_to_color(value, colors:list, value_max:int): # value must be between 0 and value_max
-#     f_index = float(value) / float(value_max)
-#     f_index *= len(colors) - 1
-#     index = int(f_index)
-
-#     if index == len(colors) - 1:
-#         return colors[index]
-
-#     blend_b = f_index - index
-#     blend_a = 1.0 - blend_b
-
-#     a = colors[index]
-#     b = colors[index + 1]
-
-#     return [int((a[i] * blend_a) + (b[i] * blend_b)) for i in range(3)]
 
 def right_align(value):
     if value < 10:
@@ -208,12 +194,7 @@ while True:
     i = 0
     for t in wattValues:
         colorVal = t
-        if generating == 0:
-            colorVal = ledMaxVal - colorVal # reverse the value to have a 'blue is good'-meaning
-        
-        # VALUE_COLOUR = display.create_pen(*value_to_color(value=colorVal,colors=COLORS_DISP,value_max=ledMaxVal))       
-        # display.set_pen(VALUE_COLOUR)
-        color_pen = display.create_pen(*value_to_rgb(value=colorVal, value_max=ledMaxVal, led_brightness=255))
+        color_pen = display.create_pen(*value_to_rgb(value=colorVal, value_max=ledMaxVal, led_brightness=255, invert=(generating==0)))
         display.set_pen(color_pen)
         display.rectangle(i, int(HEIGHT - (float(t) / float(ledMaxVal / HEIGHT))), BAR_WIDTH, HEIGHT)
         i += BAR_WIDTH
@@ -232,16 +213,12 @@ while True:
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
     if (meas["valid"] == 0):
-        rgb_control.start_pulse(False, (0,0,0)) # pulsate red with high brightness
+        rgb_control.start_pulse(valid=False, color=(0,0,0)) # pulsate red with high brightness
     else:
         brightness = getBrightness(meas=meas)
-        # COLORS_LED = [(0, 0, brightness), (0, brightness, 0), (brightness, brightness, 0), (brightness, 0, 0)]
         if (generating == 1):            
-            # rgb_control.start_pulse(True, value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=ledMaxVal))
-            rgb_control.start_pulse(True, value_to_rgb(value=wattValueNormalized, value_max=ledMaxVal,led_brightness=brightness))
+            rgb_control.start_pulse(valid=True, color=value_to_rgb(value=wattValueNormalized, value_max=ledMaxVal,led_brightness=brightness,invert=False))
         else:
-            wattValueNormalized = ledMaxVal - wattValueNormalized # reverse the value to have a 'blue is good'-meaning
-            # rgb_control.set_const_color(value_to_color(value=wattValueNormalized,colors=COLORS_LED,value_max=ledMaxVal))
-            rgb_control.set_const_color(value_to_rgb(value=wattValueNormalized, value_max=ledMaxVal,led_brightness=brightness))
+            rgb_control.set_const_color(color=value_to_rgb(value=wattValueNormalized, value_max=ledMaxVal,led_brightness=brightness,invert=True))
         
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
