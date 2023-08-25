@@ -217,8 +217,14 @@ while True:
     else:
         brightness = getBrightness(meas=meas)
         if (generating == 1):            
-            rgb_control.start_pulse(valid=True, color=value_to_rgb(value=wattValueNormalized, value_max=ledMaxVal,led_brightness=brightness,invert=False))
+            rgb_control.start_pulse(valid=True, color=value_to_rgb(value=wattValueNormalized, 
+                                                                   value_max=ledMaxVal,
+                                                                   led_brightness=brightness,
+                                                                   invert=False))
         else:
-            rgb_control.set_const_color(color=value_to_rgb(value=wattValueNormalized, value_max=ledMaxVal,led_brightness=brightness,invert=True))
+            rgb_control.set_const_color(color=value_to_rgb(value=wattValueNormalized, 
+                                                           value_max=ledMaxVal,
+                                                           led_brightness=int(brightness/2), # led is quite bright when shining constantly
+                                                           invert=True))
         
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
