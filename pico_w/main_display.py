@@ -13,7 +13,7 @@ def send_message_get_response(DBGCFG:dict, message:dict):
     URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
     #      valid|newestCons|Y|m|d|H|i|s|ledMaxValue|ledBrightness|newestGen|ledMaxValGen
     SIM_STR = "1|57|2023|01|27|18|22|09|500|100|257|700"
-    if (DBGCFG["wlan_sim"]):        
+    if (DBGCFG["wlan_sim"]):
         return(sepStrToArr(separatedString=SIM_STR))
     
     returnText = transmit_message(DBGCFG=DBGCFG, URL=URL, message=message)
@@ -149,8 +149,6 @@ def getBrightness(meas:list):
 
 rgb_control = RgbControl()
 rgb_control.set_const_color((255,0,0))
-previousGenerating = 0
-generating = 0
 
 while True:
     randNum_hash = get_randNum_hash(device_config)
@@ -164,24 +162,22 @@ while True:
     wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
     meas = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
     
-    previousGenerating = generating
-    generating = 0
-    wattValueNonMaxed = abs(meas["wattCons"] - meas["wattGen"]) # want this value always positive
-    if meas["wattGen"] > meas["wattCons"]: # if both are the same, it's consumption
+    
+    wattValueNonMaxed = (-1 * meas["wattCons"]) + meas["wattGen"] # cons is negative, gen positive
+    if wattValueNonMaxed < 0: # if both are the same, it's treated as gen
+        generating = 0
+    else:
         generating = 1
-        
-    if (generating != previousGenerating): # if the value changes from generated to consumed (or vice versa): erase the screen because it does not make sense anymore
-        wattValues.clear() 
 
     ledMaxVal = meas["max"]
     if generating == 1:
         ledMaxVal = meas["maxGen"]
 
-    # normalize the value. Is between 0 and max
-    wattValueNormalized = wattValueNonMaxed
+    # normalize the value between 0 and max
+    wattValueNormalized = abs(wattValueNonMaxed)
     wattValueNormalized = min(wattValueNormalized, ledMaxVal)    
 
-    debug_print(DBGCFG, "normalized watt value: "+str(wattValueNormalized)+", max/bright: "+str(ledMaxVal)+"/"+str(meas["brightness"]))
+    debug_print(DBGCFG, "normalized watt value: "+str(wattValueNormalized)+", generating: "+str(generating)+", max/bright: "+str(ledMaxVal)+"/"+str(meas["brightness"]))
 
     # fills the screen with black
     display.set_pen(BLACK)
