@@ -163,18 +163,14 @@ while True:
     
     
     wattVal = (-1 * meas["wattCons"]) + meas["wattGen"] # cons is negative, gen positive
-    if wattVal < 0: # if both are the same, it's treated as gen
-        generating = False
-    else:
-        generating = True
-
+    
     minValCons = meas["max"] # this is a positive value but needs to be treated negative in some cases
     maxValGen = meas["maxGen"]
 
     # normalize the value between -ledMinValCons and ledMaxValGen (e.g. -400 to 3000)
     wattValMinMax = min(max(wattVal, (-1 * minValCons)),maxValGen)
 
-    debug_print(DBGCFG, "normalized watt value: "+str(wattValMinMax)+", generating: "+str(generating)+
+    debug_print(DBGCFG, "normalized watt value: "+str(wattValMinMax)+
                 ", min/max/bright: "+str(minValCons)+"/"+str(maxValGen)+"/"+str(meas["brightness"]))
 
     # fills the screen with black
@@ -196,14 +192,20 @@ while True:
     display.set_pen(display.create_pen(*valColor))
     if cons and not gen: 
         zeroLine_y = 0 # line at the top
+        text_yposition = HEIGHT-42
         fullRange = minValCons
     if gen and not cons: 
         zeroLine_y = HEIGHT-1 # line at the bottom
+        text_yposition = 1
         fullRange = maxValGen
     if gen and cons:
         zeroLine_y = HEIGHT - int(float(HEIGHT) * float(minValCons) / float(minValCons+maxValGen))
+        text_yposition = 1
         fullRange = minValCons+maxValGen
     display.rectangle(0, zeroLine_y, WIDTH, 1)
+
+    # Debug code, to get both cons and gen
+    # if len(wattVals) == 12: wattVals[7] = wattVals[7]*-1
 
     for t in wattVals:
         # cons grow down (so plus direction in pixels), gen grow up (so need to 'invert' everything). Full range is either minValCons/maxValCons/(min+max Vals)
@@ -218,14 +220,14 @@ while True:
         x += BAR_WIDTH
 
     display.set_pen(WHITE)
-    display.rectangle(1, 1, 137, 41) # draws a white background for the text
+    display.rectangle(1, text_yposition, 137, 41) # draws a white background for the text
     wattVal4digits = min(abs(wattVal), 9999) # limit it to 4 digits, range 0...9999. Sign is lost
     expand = right_align(value4digits=wattVal4digits) # string formatting does not work correctly. Do it myself
 
     # writes the reading as text in the white rectangle
     display.set_pen(BLACK)
-    make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
-    make_bold(display, "W", 104, 23)
+    make_bold(display, expand+str(wattVal4digits), 7, text_yposition+22) # str.format does not work as intended
+    make_bold(display, "W", 104, text_yposition+22)
     
     display.update()
 
