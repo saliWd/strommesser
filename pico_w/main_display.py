@@ -19,28 +19,7 @@ def send_message_get_response(DBGCFG:dict, message:dict):
     returnText = transmit_message(DBGCFG=DBGCFG, URL=URL, message=message)
     return(sepStrToArr(separatedString=returnText))
 
-DBGCFG = my_config.get_debug_settings() # debug stuff
-LOOP_WAIT_TIME = 80
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True) # activate it. NB: disabling does not work correctly
-sleep(1)
-
-device_config = my_config.get_device_config()
-
-display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, rotate=0)
-display.set_backlight(0.5)
-display.set_font("sans")
-WIDTH, HEIGHT = display.get_bounds() # 240x135
-BLACK = display.create_pen(0, 0, 0)
-WHITE = display.create_pen(255, 255, 255)
-BAR_WIDTH = 5
-wattValues = []
-COLORS_DISP = [(0, 0, 255), (0, 255, 0), (255, 255, 0), (255, 0, 0)]
-# fills the screen with black
-display.set_pen(BLACK)
-display.clear()
-display.update()
-class RgbControl(object):
+class RgbLed(object):
 
     def __init__(self):
         self.led_rgb = RGBLED(6, 7, 8)
@@ -62,27 +41,27 @@ class RgbControl(object):
                     (int)(factor*self.color[2]))
         
         self.led_rgb.set_rgb(*(self.rgb))
-
-    def start_pulse(self, valid:bool, color):
-        if valid:
-            self.color = color
-            self.freq = 30
-            if not (self.timerIsInitialized):
+        
+    def control(self, pulsating:bool, valid:bool, color):
+        if pulsating:
+            if valid:
+                self.color = color
+                self.freq = 30
+                if not (self.timerIsInitialized):
+                    self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
+                    self.timerIsInitialized = True
+            else:
+                self.color = (240, 0, 0)
+                self.freq = 100
                 self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
-                self.timerIsInitialized = True
+                self.timerIsInitialized = False # always do a fresh init for the error case. Don't check the isInitialized value
         else:
-            self.color = (240, 0, 0)
-            self.freq = 100
-            self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
-            self.timerIsInitialized = False # always do a fresh init for the error case. Don't check the isInitialized value
-
-    def set_const_color(self, color):
-        self.timer_rgb.deinit() # not always needed
-        self.timerIsInitialized = False
-        self.led_rgb.set_rgb(*color)
+            self.timer_rgb.deinit() # not always needed
+            self.timerIsInitialized = False
+            self.led_rgb.set_rgb(*color)
 
 # start with h = variable, s = 0.5, v = 0.5, a = LedBrightness/255
-def hsva_to_rgb(h:float, s:float, v:float, a:float) -> tuple:    # inputs: values from 0.0 to 1.0. Outputs are integers, range 0 to 255
+def hsva_to_rgb(h:float, s:float, v:float, a:float) -> tuple: # inputs: values from 0.0 to 1.0. Outputs are integers, range 0 to 255
     if s:
         if h == 1.0: h = 0.0
         i = int(h*6.0); f = h*6.0 - i
@@ -100,19 +79,19 @@ def hsva_to_rgb(h:float, s:float, v:float, a:float) -> tuple:    # inputs: value
         if i==5: return (v, w, q)
     else: v = int(255*v); return (v, v, v)
 
-def value_to_rgb(value:int, value_max:int, led_brightness:int, invert:bool)-> list: # goes from red to blue
-    if invert:
-        value = value_max - value # reverse the value to have a 'blue is good'-meaning
-    h = float(value) / float(1.4*value_max) # h value makes a 'circle'. This means 0 degree is the same as 360°. -> Need to limit it (but not to 180°, just less than 360)
+def val_to_rgb(val:int, minValCons:int, maxValGen:int, led_brightness:int)-> list: # goes from red to blue
+    # value has a range from -minValCons to +maxValGen. minVal and maxVal are both positive numbers but minVal may be treated as negative
+    val = val + minValCons # bring it to the range 0..(min+max)
+    h = float(val) / float(1.4*(minValCons+maxValGen)) # h value makes a 'circle'. This means 0 degree is the same as 360°. -> Need to limit it (but not to 180°, just less than 360)
     a = float(led_brightness) / float(255)
     return list(hsva_to_rgb(h, 1.0, 1.0, a))
 
-def right_align(value):
-    if value < 10:
+def right_align(value4digits:int):
+    if value4digits < 10:
         return "   "
-    if value < 100:
+    if value4digits < 100:
         return "  "
-    if value < 1000:
+    if value4digits < 1000:
         return " "
     return ""
 
@@ -147,8 +126,28 @@ def getBrightness(meas:list):
         brightness = round(0.25 * meas["brightness"]) # darker from 21:00 to 05:59
     return brightness
 
-rgb_control = RgbControl()
-rgb_control.set_const_color((255,0,0))
+DBGCFG = my_config.get_debug_settings() # debug stuff
+LOOP_WAIT_TIME = 80
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True) # activate it. NB: disabling does not work correctly
+sleep(1)
+
+device_config = my_config.get_device_config()
+
+display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, rotate=0)
+display.set_backlight(0.5)
+display.set_font("sans")
+WIDTH, HEIGHT = display.get_bounds() # 240x135
+BLACK = display.create_pen(0, 0, 0)
+WHITE = display.create_pen(255, 255, 255)
+BAR_WIDTH = 5
+wattVals = []
+# fills the screen with black
+display.set_pen(BLACK)
+display.clear()
+display.update()
+rgb_led = RgbLed()
+rgb_led.control(pulsating=False, valid=False, color=(255,0,0))
 
 while True:
     randNum_hash = get_randNum_hash(device_config)
@@ -163,64 +162,89 @@ while True:
     meas = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
     
     
-    wattValueNonMaxed = (-1 * meas["wattCons"]) + meas["wattGen"] # cons is negative, gen positive
-    if wattValueNonMaxed < 0: # if both are the same, it's treated as gen
-        generating = 0
+    wattVal = (-1 * meas["wattCons"]) + meas["wattGen"] # cons is negative, gen positive
+    if wattVal < 0: # if both are the same, it's treated as gen
+        generating = False
     else:
-        generating = 1
+        generating = True
 
-    ledMaxVal = meas["max"]
-    if generating == 1:
-        ledMaxVal = meas["maxGen"]
+    minValCons = meas["max"] # this is a positive value but needs to be treated negative in some cases
+    maxValGen = meas["maxGen"]
 
-    # normalize the value between 0 and max
-    wattValueNormalized = abs(wattValueNonMaxed)
-    wattValueNormalized = min(wattValueNormalized, ledMaxVal)    
+    # normalize the value between -ledMinValCons and ledMaxValGen (e.g. -400 to 3000)
+    wattValMinMax = min(max(wattVal, (-1 * minValCons)),maxValGen)
 
-    debug_print(DBGCFG, "normalized watt value: "+str(wattValueNormalized)+", generating: "+str(generating)+", max/bright: "+str(ledMaxVal)+"/"+str(meas["brightness"]))
+    debug_print(DBGCFG, "normalized watt value: "+str(wattValMinMax)+", generating: "+str(generating)+
+                ", min/max/bright: "+str(minValCons)+"/"+str(maxValGen)+"/"+str(meas["brightness"]))
 
     # fills the screen with black
     display.set_pen(BLACK)
     display.clear()
 
-    wattValues.append(wattValueNormalized)
-    if len(wattValues) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
-        wattValues.pop(0)
+    wattVals.append(wattValMinMax)
+    if len(wattVals) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
+        wattVals.pop(0)
+    valColor = val_to_rgb(val=wattValMinMax, minValCons=minValCons, maxValGen=maxValGen, led_brightness=255)
+    x = 0
+    # can have 3 cases: only cons, only gen, mixed (cons and gen). Default is mixed. Special case all zeros is treated as mixed
+    cons = True
+    gen = True
+    if max(wattVals) < 0: gen = False
+    if min(wattVals) > 0: cons = False
 
-    i = 0
-    for t in wattValues:
-        colorVal = t
-        color_pen = display.create_pen(*value_to_rgb(value=colorVal, value_max=ledMaxVal, led_brightness=255, invert=(generating==0)))
+    # draw the zero line in the current color (1 pix). Determine the range for a fully drawn value rectangle
+    display.set_pen(display.create_pen(*valColor))
+    if cons and not gen: 
+        zeroLine_y = 0 # line at the top
+        fullRange = minValCons
+    if gen and not cons: 
+        zeroLine_y = HEIGHT-1 # line at the bottom
+        fullRange = maxValGen
+    if gen and cons:
+        zeroLine_y = HEIGHT - int(float(HEIGHT) * float(minValCons) / float(minValCons+maxValGen))
+        fullRange = minValCons+maxValGen
+    display.rectangle(0, zeroLine_y, WIDTH, 1)
+
+    for t in wattVals:
+        # cons grow down (so plus direction in pixels), gen grow up (so need to 'invert' everything). Full range is either minValCons/maxValCons/(min+max Vals)
+        color_pen = display.create_pen(*val_to_rgb(val=t, minValCons=minValCons, maxValGen=maxValGen, led_brightness=255))        
         display.set_pen(color_pen)
-        display.rectangle(i, int(HEIGHT - (float(t) / float(ledMaxVal / HEIGHT))), BAR_WIDTH, HEIGHT)
-        i += BAR_WIDTH
+        
+        valHeight = int(float(HEIGHT) * float(abs(t)) / float(fullRange)) # between 0 and HEIGHT. E.g. 135*2827/3400
+        if t < 0: 
+            display.rectangle(x, zeroLine_y, BAR_WIDTH, valHeight)
+        else: # direction goes up
+            display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)        
+        x += BAR_WIDTH
 
     display.set_pen(WHITE)
     display.rectangle(1, 1, 137, 41) # draws a white background for the text
-    wattValueNonMaxed = min(wattValueNonMaxed, 9999) # limit it to 4 digits
-    expand = right_align(wattValueNonMaxed) # string formatting does not work correctly. Do it myself
+    wattVal4digits = min(abs(wattVal), 9999) # limit it to 4 digits, range 0...9999. Sign is lost
+    expand = right_align(value4digits=wattVal4digits) # string formatting does not work correctly. Do it myself
 
     # writes the reading as text in the white rectangle
     display.set_pen(BLACK)
-    make_bold(display, expand+str(wattValueNonMaxed), 7, 23) # str.format does not work as intended
+    make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
     make_bold(display, "W", 104, 23)
     
     display.update()
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
     if (meas["valid"] == 0):
-        rgb_control.start_pulse(valid=False, color=(0,0,0)) # pulsate red with high brightness
+        rgb_led.control(pulsating=True, valid=False, color=(255,0,0)) # pulsate red with high brightness
     else:
         brightness = getBrightness(meas=meas)
-        if (generating == 1):            
-            rgb_control.start_pulse(valid=True, color=value_to_rgb(value=wattValueNormalized, 
-                                                                   value_max=ledMaxVal,
-                                                                   led_brightness=brightness,
-                                                                   invert=False))
+        if (wattVal > 0):
+            rgb_led.control(pulsating=True, valid=True, 
+                            color=val_to_rgb(val=wattValMinMax, 
+                                             minValCons=minValCons, 
+                                             maxValGen=maxValGen, 
+                                             led_brightness=brightness))
         else:
-            rgb_control.set_const_color(color=value_to_rgb(value=wattValueNormalized, 
-                                                           value_max=ledMaxVal,
-                                                           led_brightness=int(brightness/2), # led is quite bright when shining constantly
-                                                           invert=True))
+            rgb_led.control(pulsating=False, valid=True, 
+                            color=val_to_rgb(val=wattValMinMax,
+                                             minValCons=minValCons, 
+                                             maxValGen=maxValGen, 
+                                             led_brightness=int(brightness/2))) # led is quite bright when shining constantly
         
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
