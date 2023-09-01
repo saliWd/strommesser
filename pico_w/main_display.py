@@ -141,10 +141,8 @@ display.set_backlight(0.5)
 display.set_font("sans")
 WIDTH, HEIGHT = display.get_bounds() # 240x135
 BLACK = display.create_pen(0, 0, 0)
-TEXT_BG_GEN = display.create_pen(0, 255, 0) # TODO: work on those colors
-TEXT_BG_CONS = display.create_pen(255, 0, 0)
-TEXT_GEN = display.create_pen(255, 0, 0)
-TEXT_CONS = display.create_pen(0, 255, 0)
+TEXT_BG_GEN = display.create_pen(170, 255, 170)
+TEXT_BG_CONS = display.create_pen(255, 170, 170)
 BAR_WIDTH = 5
 wattVals = []
 # fills the screen with black
@@ -207,16 +205,14 @@ while True:
             display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)        
         x += BAR_WIDTH
 
-    if wattVal > 0: display.set_pen(TEXT_BG_CONS)
+    if wattVal < 0: display.set_pen(TEXT_BG_CONS)
     else:           display.set_pen(TEXT_BG_GEN)
     display.rectangle(1, 1, 137, 41) # draws a background for the black text
     wattVal4digits = min(abs(wattVal), 9999) # limit it to 4 digits, range 0...9999. Sign is lost
     expand = right_align(value4digits=wattVal4digits) # string formatting does not work correctly. Do it myself
 
     # writes the reading as text in the rectangle
-    if wattVal > 0: display.set_pen(TEXT_CONS)
-    else:           display.set_pen(TEXT_GEN)
-    
+    display.set_pen(BLACK)
     make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
     make_bold(display, "W", 104, 23)
     
