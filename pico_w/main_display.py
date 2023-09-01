@@ -42,19 +42,20 @@ class RgbLed(object):
         
         self.led_rgb.set_rgb(*(self.rgb))
         
-    def control(self, pulsating:bool, valid:bool, color):
+    def control(self, valid:bool, pulsating:bool, color):
+        if not valid:
+            self.color = (240, 0, 0)
+            self.freq = 100
+            self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
+            self.timerIsInitialized = False # always do a fresh init for the error case. Don't check the isInitialized value
+            return
+
         if pulsating:
-            if valid:
-                self.color = color
-                self.freq = 30
-                if not (self.timerIsInitialized):
-                    self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
-                    self.timerIsInitialized = True
-            else:
-                self.color = (240, 0, 0)
-                self.freq = 100
+            self.color = color
+            self.freq = 30
+            if not (self.timerIsInitialized):
                 self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)
-                self.timerIsInitialized = False # always do a fresh init for the error case. Don't check the isInitialized value
+                self.timerIsInitialized = True
         else:
             self.timer_rgb.deinit() # not always needed
             self.timerIsInitialized = False
@@ -81,8 +82,9 @@ def hsva_to_rgb(h:float, s:float, v:float, a:float) -> tuple: # inputs: values f
 
 def val_to_rgb(val:int, minValCons:int, maxValGen:int, led_brightness:int)-> list: # goes from red to blue
     # value has a range from -minValCons to +maxValGen. minVal and maxVal are both positive numbers but minVal may be treated as negative
-    val = val + minValCons # bring it to the range 0..(min+max)
-    h = float(val) / float(1.4*(minValCons+maxValGen)) # h value makes a 'circle'. This means 0 degree is the same as 360°. -> Need to limit it (but not to 180°, just less than 360)
+    if val < 0: val = val * 2 # get a higher color 'resolution' for negative values
+    val = val + 2*minValCons # bring it to the range 0..(min+max)
+    h = float(val) / float(1.4*(2*minValCons+maxValGen)) # h value makes a 'circle'. This means 0 degree is the same as 360°. -> Need to limit it (but not to 180°, just less than 360)
     a = float(led_brightness) / float(255)
     return list(hsva_to_rgb(h, 1.0, 1.0, a))
 
@@ -139,7 +141,10 @@ display.set_backlight(0.5)
 display.set_font("sans")
 WIDTH, HEIGHT = display.get_bounds() # 240x135
 BLACK = display.create_pen(0, 0, 0)
-WHITE = display.create_pen(255, 255, 255)
+TEXT_BG_GEN = display.create_pen(0, 255, 0) # TODO: work on those colors
+TEXT_BG_CONS = display.create_pen(255, 0, 0)
+TEXT_GEN = display.create_pen(255, 0, 0)
+TEXT_CONS = display.create_pen(0, 255, 0)
 BAR_WIDTH = 5
 wattVals = []
 # fills the screen with black
@@ -147,7 +152,7 @@ display.set_pen(BLACK)
 display.clear()
 display.update()
 rgb_led = RgbLed()
-rgb_led.control(pulsating=False, valid=False, color=(255,0,0))
+rgb_led.control(valid=False, pulsating=False, color=(255,0,0))
 
 while True:
     randNum_hash = get_randNum_hash(device_config)
@@ -181,72 +186,55 @@ while True:
     if len(wattVals) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
         wattVals.pop(0)
     valColor = val_to_rgb(val=wattValMinMax, minValCons=minValCons, maxValGen=maxValGen, led_brightness=255)
-    x = 0
-    # can have 3 cases: only cons, only gen, mixed (cons and gen). Default is mixed. Special case all zeros is treated as mixed
-    cons = True
-    gen = True
-    if max(wattVals) < 0: gen = False
-    if min(wattVals) > 0: cons = False
-
-    # draw the zero line in the current color (1 pix). Determine the range for a fully drawn value rectangle
+    # draw the zero line in the current color (1 pix)
     display.set_pen(display.create_pen(*valColor))
-    if cons and not gen: 
-        zeroLine_y = 0 # line at the top
-        text_yposition = HEIGHT-42
-        fullRange = minValCons
-    if gen and not cons: 
-        zeroLine_y = HEIGHT-1 # line at the bottom
-        text_yposition = 1
-        fullRange = maxValGen
-    if gen and cons:
-        zeroLine_y = HEIGHT - int(float(HEIGHT) * float(minValCons) / float(minValCons+maxValGen))
-        text_yposition = 1
-        fullRange = minValCons+maxValGen
+    zeroLine_y = HEIGHT - int(float(HEIGHT) * float(minValCons) / float(minValCons+maxValGen))    
     display.rectangle(0, zeroLine_y, WIDTH, 1)
 
     # Debug code, to get both cons and gen
     # if len(wattVals) == 12: wattVals[7] = wattVals[7]*-1
 
+    x = 0
     for t in wattVals:
-        # cons grow down (so plus direction in pixels), gen grow up (so need to 'invert' everything). Full range is either minValCons/maxValCons/(min+max Vals)
+        # cons grow down (so plus direction in pixels), gen grow up (so need to 'invert' everything). Full range is (min+max Vals)
         color_pen = display.create_pen(*val_to_rgb(val=t, minValCons=minValCons, maxValGen=maxValGen, led_brightness=255))        
         display.set_pen(color_pen)
         
-        valHeight = int(float(HEIGHT) * float(abs(t)) / float(fullRange)) # between 0 and HEIGHT. E.g. 135*2827/3400
+        valHeight = int(float(HEIGHT) * float(abs(t)) / float(minValCons+maxValGen)) # between 0 and HEIGHT. E.g. 135*2827/3400
         if t < 0: 
             display.rectangle(x, zeroLine_y, BAR_WIDTH, valHeight)
         else: # direction goes up
             display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)        
         x += BAR_WIDTH
 
-    display.set_pen(WHITE)
-    display.rectangle(1, text_yposition, 137, 41) # draws a white background for the text
+    if wattVal > 0: display.set_pen(TEXT_BG_CONS)
+    else:           display.set_pen(TEXT_BG_GEN)
+    display.rectangle(1, 1, 137, 41) # draws a background for the black text
     wattVal4digits = min(abs(wattVal), 9999) # limit it to 4 digits, range 0...9999. Sign is lost
     expand = right_align(value4digits=wattVal4digits) # string formatting does not work correctly. Do it myself
 
-    # writes the reading as text in the white rectangle
-    display.set_pen(BLACK)
-    make_bold(display, expand+str(wattVal4digits), 7, text_yposition+22) # str.format does not work as intended
-    make_bold(display, "W", 104, text_yposition+22)
+    # writes the reading as text in the rectangle
+    if wattVal > 0: display.set_pen(TEXT_CONS)
+    else:           display.set_pen(TEXT_GEN)
+    
+    make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
+    make_bold(display, "W", 104, 23)
     
     display.update()
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
-    if (meas["valid"] == 0):
-        rgb_led.control(pulsating=True, valid=False, color=(255,0,0)) # pulsate red with high brightness
+    brightness = getBrightness(meas=meas)
+    if (wattVal > 0):
+        rgb_led.control(valid=(meas["valid"] == 1), pulsating=True,
+                        color=val_to_rgb(val=wattValMinMax, 
+                                         minValCons=minValCons, 
+                                         maxValGen=maxValGen, 
+                                         led_brightness=brightness))
     else:
-        brightness = getBrightness(meas=meas)
-        if (wattVal > 0):
-            rgb_led.control(pulsating=True, valid=True, 
-                            color=val_to_rgb(val=wattValMinMax, 
-                                             minValCons=minValCons, 
-                                             maxValGen=maxValGen, 
-                                             led_brightness=brightness))
-        else:
-            rgb_led.control(pulsating=False, valid=True, 
-                            color=val_to_rgb(val=wattValMinMax,
-                                             minValCons=minValCons, 
-                                             maxValGen=maxValGen, 
-                                             led_brightness=int(brightness/2))) # led is quite bright when shining constantly
-        
+        rgb_led.control(valid=(meas["valid"] == 1), pulsating=False,
+                        color=val_to_rgb(val=wattValMinMax,
+                                         minValCons=minValCons, 
+                                         maxValGen=maxValGen, 
+                                         led_brightness=int(brightness/2))) # led is quite bright when shining constantly
+    
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
