@@ -172,7 +172,7 @@ while True:
     meas = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
     
     
-    wattVal = (-1 * meas["wattCons"]) + meas["wattGen"] # cons is negative, gen positive
+    wattVal = (-1 * meas["wattCons"]) + meas["wattGen"] # cons is negative, gen positive. 0 is treated as gen
     
     minValCons = meas["max"] # this is a positive value but needs to be treated negative in some cases
     maxValGen = meas["maxGen"]
@@ -228,17 +228,17 @@ while True:
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
     brightness = getBrightness(meas=meas)
-    if (wattVal > 0):
-        rgb_led.control(valid=(meas["valid"] == 1), pulsating=True,
-                        color=val_to_rgb(val=wattValMinMax, 
-                                         minValCons=minValCons, 
-                                         maxValGen=maxValGen, 
-                                         led_brightness=brightness))
-    else:
+    if (wattVal < 0):
         rgb_led.control(valid=(meas["valid"] == 1), pulsating=False,
                         color=val_to_rgb(val=wattValMinMax,
                                          minValCons=minValCons, 
                                          maxValGen=maxValGen, 
                                          led_brightness=int(brightness/2))) # led is quite bright when shining constantly
+    else:
+        rgb_led.control(valid=(meas["valid"] == 1), pulsating=True,
+                        color=val_to_rgb(val=wattValMinMax, 
+                                         minValCons=minValCons, 
+                                         maxValGen=maxValGen, 
+                                         led_brightness=brightness))
     
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
