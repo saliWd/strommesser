@@ -122,11 +122,18 @@ def sepStrToArr(separatedString:str):
             retVal["maxGen"] = int(valueArray[11])
     return retVal
 
-def getBrightness(meas:list):
+def getBrightness(meas:list)->int:
+    """reads the brightness (from the server) and adjusts it during the night"""
     brightness = meas["brightness"]
     if (meas["hour"] > 20) or (meas["hour"] < 6):
-        brightness = round(0.25 * meas["brightness"]) # darker from 21:00 to 05:59
+        brightness = int(0.25 * meas["brightness"]) # darker from 21:00 to 05:59. rounded down
     return brightness
+
+def getDispYrange(values:list) -> list:
+    """returns the range of the given values. extends the range to at least -50 to +50 if the min/max are smaller. returns 2 positive values"""
+    minimum = abs(min(min(values),-50))
+    maximum = max(max(values),50)
+    return [minimum,maximum,(minimum+maximum)]
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
 LOOP_WAIT_TIME = 80
@@ -186,7 +193,8 @@ while True:
     valColor = val_to_rgb(val=wattValMinMax, minValCons=minValCons, maxValGen=maxValGen, led_brightness=255)
     # draw the zero line in the current color (1 pix)
     display.set_pen(display.create_pen(*valColor))
-    zeroLine_y = HEIGHT - int(float(HEIGHT) * float(minValCons) / float(minValCons+maxValGen))    
+    disp_y_range = getDispYrange(wattVals)
+    zeroLine_y = HEIGHT - int(float(HEIGHT) * float(disp_y_range[0]) / float(disp_y_range[2]))
     display.rectangle(0, zeroLine_y, WIDTH, 1)
 
     # Debug code, to get both cons and gen
@@ -198,7 +206,7 @@ while True:
         color_pen = display.create_pen(*val_to_rgb(val=t, minValCons=minValCons, maxValGen=maxValGen, led_brightness=255))        
         display.set_pen(color_pen)
         
-        valHeight = int(float(HEIGHT) * float(abs(t)) / float(minValCons+maxValGen)) # between 0 and HEIGHT. E.g. 135*2827/3400
+        valHeight = int(float(HEIGHT) * float(abs(t)) / float(disp_y_range[2])) # between 0 and HEIGHT. E.g. 135*2827/3400
         if t < 0: 
             display.rectangle(x, zeroLine_y, BAR_WIDTH, valHeight)
         else: # direction goes up
