@@ -29,19 +29,20 @@
       1. change email
    7. statistic.php
       1. add table layout with numbers additional to graphs
-3. pico devices   
+3. pico devices
+   1. OTA updates. Have a look at [this one][micropython-ota]
    1. print my own case for measurement
       * [ir head case][irHeadCase]
       * [pico case][picoCase]
    1. disp
-      1. no screen clearing when switching between consumption and generation
       1. [case?][displayCase]
 4. div
 
 
-Next: 2.3 
+Next: 3.1 
 
 
 [displayCase]: https://www.thingiverse.com/thing:4767008
 [irHeadCase]: https://www.thingiverse.com/thing:3378332
 [picoCase]: [https://www.thingiverse.com/thing:4895274]
+[micropython-ota]:[https://pypi.org/project/micropython-ota]
