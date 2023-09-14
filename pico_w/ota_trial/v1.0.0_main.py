@@ -1,55 +1,49 @@
 import network # type: ignore (this is a pylance ignore warning directive)
 from time import sleep
-from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
+# ota part
+import micropython_ota   # type: ignore
 
-# my own files
-import my_config
-from my_functions import debug_sleep, wlan_connect
+# import mip
+# mip.install('github:olivergregorius/micropython_ota/micropython_ota.py')
+## NB: when getting an "OSError: -6" --> issue with firewall or similar, when connected to hotspot this works
+
+
+def wlan_connect(wlan):
+    wlan_ok_flag = wlan.isconnected()
+    if(wlan_ok_flag):
+        return() # nothing to do
+    else: # wlan is not ok
+        for i in range(100): # set the time out
+            wlan.connect('strommesser', 'publicPW')
+            sleep(5)
+            wlan_ok_flag = wlan.isconnected()
+            print("WLAN connected? "+str(wlan_ok_flag)+", loop var: "+str(i)) # debug output
+            if (wlan_ok_flag):
+                return 
+        # timeout, did not manage to get a working WLAN
+        from machine import reset # type: ignore
+        reset() # NB: connection to whatever device is getting lost; complicates debugging
+
 
 VERSION_STRING = 'v1.0.0'
 
-def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting it 1px right (not very nice hack)
-    display.text(text, x, y, scale=1.1)
-    display.text(text, x+1, y, scale=1.1)
-
-DBGCFG = my_config.get_debug_settings() # debug stuff
-LOOP_WAIT_TIME = 80
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True) # activate it. NB: disabling does not work correctly
 sleep(1)
 
-device_config = my_config.get_device_config()
-display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, rotate=0)
-display.set_backlight(0.5)
-display.set_font("sans")
-WIDTH, HEIGHT = display.get_bounds() # 240x135
-BLACK = display.create_pen(0, 0, 0)
-WHITE = display.create_pen(255, 255, 255)
-# fills the screen with black
-display.set_pen(BLACK)
-display.clear()
-display.update()
-
-
-# ota part
-import micropython_ota   # type: ignore
-
 ota_host = 'https://strommesser.ch/verbrauch/pico_w/'
 project_name = 'ota_trial'
 
+i_whileLoop = 0
 
 while True:
-    wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
-    display.set_pen(BLACK)
-    display.clear()
-    display.set_pen(WHITE)
-    display.rectangle(1, 1, 200, 41) # draws a background for the black text
-    
-    # writes the reading as text in the rectangle
-    display.set_pen(BLACK)
-    make_bold(display,VERSION_STRING, 7, 23)
-    display.update()
-    
+    wlan_connect(wlan=wlan) # try to connect to the WLAN. Hangs there if no connection can be made
+    print("Version string: "+VERSION_STRING+", loop var: "+str(i_whileLoop))
+    sleep(5)
+
     micropython_ota.check_for_ota_update(ota_host, project_name, soft_reset_device=False, timeout=10)
 
-    debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
+    # this code should only be reached when no new version is available
+    print("Version string: "+VERSION_STRING+", loop var: "+str(i_whileLoop))
+    sleep(20)
+    i_whileLoop = i_whileLoop + 1
