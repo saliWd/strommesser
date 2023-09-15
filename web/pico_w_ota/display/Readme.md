@@ -1,3 +1,8 @@
+# Release generation
+
+Please use the python script ota_make_release.py in the pico_w folder to generate the release files.
+
+
 # Folder structure
 
 Following files are part of a release

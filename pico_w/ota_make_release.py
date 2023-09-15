@@ -1,7 +1,7 @@
 import os
 from re import sub
 
-version = 'v1.0.1' # TODO: take from command line, needs to match a "vNumberPointNumberPointNumber"-pattern, otherwise end the script
+version = 'v1.0.0' # TODO: take from command line, needs to match a "vNumberPointNumberPointNumber"-pattern, otherwise end the script
 project = 'display' # TODO: take from command line, must either be "display" or "measure"
 
 def replace_content(dict_replace, target):
@@ -29,9 +29,11 @@ fileNamesOut = ['boot.py',         'main.py',         'my_functions.py']
 
 # make sure the version directory exists
 outFilePath = '../web/pico_w_ota/'+project+'/'+version
-os.mkdir(outFilePath) # maybe: quit if it already exists?
-print ("created the directory: "+outFilePath)
-
+if os.path.exists(outFilePath):
+    print (">> warning. "+outFilePath+" already exists. Continuing anyway...") # files are just overwritten
+else:
+    os.mkdir(outFilePath) # maybe: quit if it already exists?
+    print ("created the directory: "+outFilePath)
 
 
 for i in range(0,len(fileNamesIn)):  
@@ -41,5 +43,9 @@ for i in range(0,len(fileNamesIn)):
      outputFile=outFilePath+'/'+fileNamesOut[i]
     )
 
+# need a file called 'version' one directory up. Containing only the version string
+new_file_open = open('../web/pico_w_ota/'+project+'/version', 'w')
+new_file_open.write(version)
+new_file_open.close()
 
-print (">>> Done. Created "+str(len(fileNamesIn))+" files in the "+outFilePath+"-directory")
+print (">>> Done. Created "+str(len(fileNamesIn))+" files in the "+outFilePath+"-directory and the corresponding version file")
