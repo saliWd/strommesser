@@ -1,5 +1,7 @@
+## xx_version_placeholder_xx
 import network # type: ignore (this is a pylance ignore warning directive)
 from time import sleep
+import micropython_ota # type: ignore
 from machine import Timer # type: ignore
 from pimoroni import RGBLED  # type: ignore
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
@@ -159,7 +161,10 @@ display.update()
 rgb_led = RgbLed()
 rgb_led.control(valid=False, pulsating=False, color=(255,0,0))
 
+while_true_counter = 0
+
 while True:
+    while_true_counter = 0 if while_true_counter > 255 else while_true_counter + 1 # overflow protection. I need the counter to do some checks only once in a while
     randNum_hash = get_randNum_hash(device_config)
     
     message = dict([
@@ -168,10 +173,19 @@ while True:
         ('hash', randNum_hash['hash'])
         ])
         
-    wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
+    wlan_connect(wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
     meas = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
     
-    
+    ## OTA stuff. Do it before the display calculation etc
+    ## do it once, shortly (2 mins) after booting, then don't do it for about 8 hours
+    if while_true_counter == 2:
+        micropython_ota.ota_update(
+            ota_host='https://strommesser.ch/pico_w_ota/',
+            project_name='display',
+            filenames=['boot.py', 'main.py', 'my_functions.py'], # config (and libraries) is not changed
+            use_version_prefix=False
+        )
+
     wattVal = (-1 * meas["wattCons"]) + meas["wattGen"] # cons is negative, gen positive. 0 is treated as gen
     
     minValCons = meas["max"] # this is a positive value but needs to be treated negative in some cases

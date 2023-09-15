@@ -85,6 +85,6 @@ while True:
         ('hash', randNum_hash['hash'])
         ])
     debug_print(DBGCFG=DBGCFG, text=str(message))
-    wlan_connect(DBGCFG=DBGCFG, wlan=wlan, led_onboard=led_onboard, meas=True) # try to connect to the WLAN. Hangs there if no connection can be made
+    wlan_connect(wlan=wlan, led_onboard=led_onboard, meas=True) # try to connect to the WLAN. Hangs there if no connection can be made
     send_message_and_wait_post(DBGCFG=DBGCFG, message=message, wait_time=LOOP_WAIT_TIME, led_onboard=led_onboard) # does not send anything when in simulation 
 # end while

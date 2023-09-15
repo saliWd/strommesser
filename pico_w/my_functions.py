@@ -19,21 +19,22 @@ def debug_sleep(DBGCFG:dict, time:int):
     sleep(time)
     return
 
-def get_wlan_ok(DBGCFG:dict, wlan):
+def get_wlan_ok(wlan):
+    DBGCFG = my_config.get_debug_settings() # debug stuff
     if(DBGCFG["wlan_sim"]):
         return(True)
     return(wlan.isconnected())
 
-def wlan_connect(DBGCFG:dict, wlan, led_onboard, meas:bool):
-    wlan_ok_flag = get_wlan_ok(DBGCFG=DBGCFG, wlan=wlan)        
+def wlan_connect(wlan, led_onboard, meas:bool):
+    wlan_ok_flag = get_wlan_ok(wlan=wlan)        
     if(wlan_ok_flag):
         return() # nothing to do
     else: # wlan is not ok
-        for i in range(10): # set the time out
+        for i in range(20): # set the time out
             config_wlan = my_config.get_wlan_config() # stored in external file
             wlan.connect(config_wlan['ssid'], config_wlan['pw'])
-            sleep(3)
-            wlan_ok_flag = get_wlan_ok(DBGCFG=DBGCFG, wlan=wlan)
+            sleep(8)
+            wlan_ok_flag = get_wlan_ok(wlan=wlan)
             print("WLAN connected? "+str(wlan_ok_flag)+", loop var: "+str(i)) # debug output
             if (wlan_ok_flag):
                 if(meas): # pimoroni does not have the led_onboard
