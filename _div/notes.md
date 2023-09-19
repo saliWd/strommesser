@@ -2,7 +2,10 @@
 
 ## power meter readout using pico_w and micropython
 1. project folder pico_w
-1. use micropython (version: use the most recent for pico_w, (20221118-unstable did work). use thonny to run/update code)
+   1. install micropython version with included pimoroni support, version v1.20.6 (use Thonny to set it up)
+   1. import mip
+      1. mip.install('github:olivergregorius/micropython_ota/micropython_ota.py')
+
    1. store main_measure.py as main.py together with other .py files
    1. serial connection with IR header. NB: pico pins not 5V tolerant, 3.3 only. Use 3.3V supply for IR header (37=3.3V_enable has a pull-up)
      * pin36=3.3V (300 mA recommendation)
@@ -23,7 +26,7 @@ Hidden=false
 X-GNOME-Autostart-enabled=true
 Comment=Chromium Browser Fullscreen
 Name=chromiumstart
-Exec=/usr/bin/chromium-browser --noerrdialogs --disable-session-crashed-bubble --disable-infobars --start-fullscreen https://strommesser.ch/verbrauch/index.php?reload=1
+Exec=/usr/bin/chromium-browser --noerrdialogs --disable-session-crashed-bubble --disable-infobars --start-fullscreen https://strommesser.ch/verbrauch/index.php?range=6&reload=1
 ```
 
 ### Volkszähler info

@@ -1,7 +1,9 @@
 # StromMesser TODOs
 
 1. StromMesser wordpress
-   1. copy the content from WP to static page... not an ideal solution, quite a big effort and in the end still missing links/non-working buttons
+   1. Datenschutzgesetz. Kontaktperson.
+   1. copy the content from WP to static page
+      * not an ideal solution, quite a big effort and in the end still missing links/non-working buttons      
    1. cta button on main page: Kontakt + Demo-Account
    1. parts / panels
       0. main page: change strommesser image (currently white background)
@@ -30,7 +32,7 @@
    7. statistic.php
       1. add table layout with numbers additional to graphs
 3. pico devices
-   1. OTA updates. Have a look at [this one][micropython-ota]
+   1. OTA updates: try out
    1. print my own case for measurement
       * [ir head case][irHeadCase]
       * [pico case][picoCase]
@@ -39,7 +41,7 @@
 4. div
 
 
-Next: 3.1 
+Next: 3.1 / 1.1
 
 
 [displayCase]: https://www.thingiverse.com/thing:4767008
