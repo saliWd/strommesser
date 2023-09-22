@@ -17,7 +17,7 @@ if ($doSafe === 0) { // entry point of this site
   $result = $dbConn->query('SELECT `ledMaxValue`, `ledMaxValGen`, `ledBrightness` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
   $row = $result->fetch_assoc();
   
-  printBeginOfPage_v2(site:'settings.php');
+  printBeginOfPage_v2(site:'settings.php');  
   echo '
   <div id="anchorMiniDisplay" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Mini-Display</h3>
@@ -25,17 +25,25 @@ if ($doSafe === 0) { // entry point of this site
     <p>&nbsp;</p>
     <form id="settingsValues" action="settings.php?do=2" method="post">
       <p class="text-left"><b>Maximalwert Farbskala:</b><br>
-      LED und Minibildschirm zeigen die aktuelle Leistung mit einer Farbskala von blau über grün nach gelb und schlussendlich rot. Blau ist "gut", rot ist "schlecht".<br>
-      Bei Verbrauch (Leistung wird aus dem Netz gezogen) entsprechen 0 Watt der Farbe blau, der Maximalwert (und alles darüber) wird rot angezeigt.<br>
-      Beim Einspeisen (Leistung geht ins Netz) pulsiert die LED und die Farbe blau entspricht dem Maximalwert (plus alles darüber), kleine Einspeisung wird rot dargestellt.</p>
+      LED und Minibildschirm zeigen die aktuelle Leistung mit einer Farbskala von rot über gelb nach grün schlussendlich blau. Blau ist "gut", rot ist "schlecht".<br>
+      Verbrauch (Leistung wird aus dem Netz gezogen) wird dementsprechend mit Rottönen angezeigt.<br>
+      Beim Einspeisen (Leistung geht ins Netz) pulsiert die LED und die Farben gehen von grün nach blau. Der Maximalwert (plus alles darüber) ist blau.</p>
       <br><br>
-      <p class="mx-auto">Verbrauch:<br>
-      <img class="w-48 h-1 left-0" src="img/blueToRed.png" alt="Farbskala Blau-nach-Rot"><br>
-      <input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="'.$LIMIT_LED_MAX_VALUE_CONS.'" step="20" value="'.$row['ledMaxValue'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledMaxValue'].'</output>W</p>
-      <br>
-      <p class="mx-auto">Einspeisung:<br>
-      <img class="w-48 h-1 left-0" src="img/redToBlue.png" alt="Farbskala Rot-nach-Blau"><br>
-      <input id="ledMaxValGen" name="ledMaxValGen" type="range" min="100" max="'.$LIMIT_LED_MAX_VAL_GEN.'" step="50" value="'.$row['ledMaxValGen'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledMaxValGen'].'</output>W</p>
+      <table>
+      <tr>
+        <td width="48%" align="right">Verbrauch &nbsp;&nbsp;&nbsp;</td>
+        <td width="4%" align="center">0</td>
+        <td width="48%" align="left">&nbsp;&nbsp;&nbsp; Einspeisung</td>
+      </tr>
+      <tr>
+        <td colspan="3" align="center"><img class="h-1 w-72" src="img/redToBlue.png" alt="Farbskala Rot-nach-Blau"></td>
+      </tr>
+      <tr>
+        <td width="48%" align="right">-<output>'.$row['ledMaxValue'].'</output>W <input dir="rtl" id="ledMaxValue" name="ledMaxValue" type="range" min="50" max="'.$LIMIT_LED_MAX_VALUE_CONS.'" step="50" value="'.$row['ledMaxValue'].'" class="range" oninput="this.previousElementSibling.value=this.value"></td>
+        <td width="4%"></td>
+        <td width="48%" align="left"><input id="ledMaxValGen" name="ledMaxValGen" type="range" min="50" max="'.$LIMIT_LED_MAX_VAL_GEN.'" step="50" value="'.$row['ledMaxValGen'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledMaxValGen'].'</output>W</td>
+      </tr>      
+      </table> 
       <br>
       <hr>
       <p class="text-left"><b>LED Helligkeit:</b><br>
@@ -90,12 +98,12 @@ if ($doSafe === 0) { // entry point of this site
   echo '<script>setTimeout(() => { window.location.href = \'settings.php?do=3\'; }, 2000);</script>';
 } elseif ($doSafe === 2) {
   printBeginOfPage_v2(site:'settings.php', title:'Einstellungen');
-  $ledMaxValue  = safeIntFromExt(source:'POST',varName:'ledMaxValue', length:4);
+  $ledMaxValue  = abs(safeIntFromExt(source:'POST',varName:'ledMaxValue', length:4)); // this one is displayed as negative value, stored as positive one though
   $ledMaxValGen = safeIntFromExt(source:'POST',varName:'ledMaxValGen',length:4);
   $ledBrightness = safeIntFromExt(source:'POST',varName:'ledBrightness',length:3);
-  $ledMaxValue  = limitInt(input:$ledMaxValue,   lower:0,upper:$LIMIT_LED_MAX_VALUE_CONS);
-  $ledMaxValGen = limitInt(input:$ledMaxValGen,lower:0,upper:$LIMIT_LED_MAX_VAL_GEN);
-  $ledBrightness = limitInt(input:$ledBrightness,lower:0,upper:$LIMIT_LED_BRIGHTNESS);
+  $ledMaxValue   = limitInt(input:$ledMaxValue,  lower:0, upper:$LIMIT_LED_MAX_VALUE_CONS);
+  $ledMaxValGen  = limitInt(input:$ledMaxValGen, lower:0, upper:$LIMIT_LED_MAX_VAL_GEN);
+  $ledBrightness = limitInt(input:$ledBrightness,lower:0, upper:$LIMIT_LED_BRIGHTNESS);
 
   $result = $dbConn->query('UPDATE `kunden` SET `ledMaxValue` = "'.$ledMaxValue.'", `ledMaxValGen` = "'.$ledMaxValGen.'", `ledBrightness` = "'.$ledBrightness.'" WHERE `id` = "'.$userid.'";');
 
