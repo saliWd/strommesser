@@ -1,7 +1,6 @@
 # StromMesser TODOs
 
-1. StromMesser wordpress
-   1. Datenschutzgesetz. Kontaktperson.
+1. StromMesser wordpress   
    1. copy the content from WP to static page
       * not an ideal solution, quite a big effort and in the end still missing links/non-working buttons      
    1. cta button on main page: Kontakt + Demo-Account
@@ -17,8 +16,7 @@
       2. ~~Geräte -> long page, more info.~~
    1. fill with more content: explanation?
 2. StromMesser/verbrauch
-   1. general
-      * design: navbar slightly different design, darker colour?
+   1. ~~general~~
    2. ~~getRaw.php~~
    3. index.php
       1. make it configurable, which graphs to show (in settings)
@@ -26,6 +24,7 @@
    4. ~~login.php~~
    5. ~~rx.php~~
    6. settings.php:
+      1. range design
       1. set ht/nt price for both consumption and generation 
       1. which graphs to show on index
       1. change email
@@ -41,7 +40,7 @@
 4. div
 
 
-Next: 3.1 / 1.1
+Next: 2.6.1 / 3.1 /
 
 
 [displayCase]: https://www.thingiverse.com/thing:4767008

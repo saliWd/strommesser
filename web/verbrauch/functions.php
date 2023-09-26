@@ -463,7 +463,7 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
   </head>
   <body>
   ';
-  // temporay, remove again
+  // TODO temporay, remove again
   echo '
   <div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Offline:</b> Vom 22.9.23 bis ca. 3.10.23 werden keine Daten ausgelesen.</div>
   ';
@@ -478,7 +478,7 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
 }
 
 function printNavMenu_v2 (string $site, string $title): void {
-  $topLevelSites = array( // TODO: partial repetition of SITE_TITLES
+  $topLevelSites = array( // NB: partial repetition of SITE_TITLES (only those within 'verbrauch' directory)
     ['index.php', 'Übersicht'],
     ['statistic.php', 'Statistiken'],
     ['settings.php', 'Einstellungen'],
@@ -486,7 +486,7 @@ function printNavMenu_v2 (string $site, string $title): void {
     ['login.php?do=2', 'LogOut']
   );  
   echo '
-<nav class="border-gray-400 rounded bg-gray-50 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
+<nav class="border-gray-400 rounded bg-gray-100 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
   <ol class="inline-flex items-center mb-3 sm:mb-0">
     <li>
       <div class="flex items-center">
