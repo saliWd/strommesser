@@ -31,19 +31,30 @@ if ($doSafe === 0) { // entry point of this site
       <br><br>
       <table>
       <tr>
-        <td width="48%" align="right">Verbrauch &nbsp;&nbsp;&nbsp;</td>
-        <td width="4%" align="center">0</td>
-        <td width="48%" align="left">&nbsp;&nbsp;&nbsp; Einspeisung</td>
+        <td width="49%" align="right">Verbrauch&nbsp;&nbsp;</td>
+        <td width="2%" align="center">|</td>
+        <td width="49%">&nbsp;&nbsp;Einspeisung</td>
       </tr>
       <tr>
-        <td colspan="3" align="center"><img class="h-1 w-72" src="img/redToBlue.png" alt="Farbskala Rot-nach-Blau"></td>
+        <td colspan="3" align="center"><img class="h-1" width="60%" src="img/redToBlue.png" alt="Farbskala Rot-nach-Blau"></td>
       </tr>
       <tr>
-        <td width="48%" align="right">-<output>'.$row['ledMaxValue'].'</output>W <input dir="rtl" id="ledMaxValue" name="ledMaxValue" type="range" min="50" max="'.$LIMIT_LED_MAX_VALUE_CONS.'" step="50" value="'.$row['ledMaxValue'].'" class="range" oninput="this.previousElementSibling.value=this.value"></td>
-        <td width="4%"></td>
-        <td width="48%" align="left"><input id="ledMaxValGen" name="ledMaxValGen" type="range" min="50" max="'.$LIMIT_LED_MAX_VAL_GEN.'" step="50" value="'.$row['ledMaxValGen'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledMaxValGen'].'</output>W</td>
-      </tr>      
-      </table> 
+        <td width="49%" align="right">
+          <input dir="rtl" id="ledMaxValue" name="ledMaxValue" type="range" min="50" max="'.$LIMIT_LED_MAX_VALUE_CONS.'" step="50" value="'.$row['ledMaxValue'].'" class="range w-36" oninput="getElementById(\'tooltip-ledMaxValue-value\').value=this.value">           
+          <div id="tooltip-ledMaxValue" class="absolute z-20 inline-block px-3 py-2 my-8 -mx-24 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm">
+            -<output id="tooltip-ledMaxValue-value">'.$row['ledMaxValue'].'</output>W
+          </div>
+        </td>
+        <td width="2%"></td>
+        <td width="49%">
+          <input id="ledMaxValGen" name="ledMaxValGen" type="range" min="50" max="'.$LIMIT_LED_MAX_VAL_GEN.'" step="50" value="'.$row['ledMaxValGen'].'" class="range w-36" oninput="getElementById(\'tooltip-ledMaxValGen-value\').value=this.value">           
+          <div id="tooltip-ledMaxValGen" class="absolute z-10 inline-block px-3 py-2 my-8 -mx-24 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm">
+            <output id="tooltip-ledMaxValGen-value">'.$row['ledMaxValGen'].'</output>W
+          </div>
+        </td>
+      </tr>
+      </table>
+      <br>
       <br>
       <hr>
       <p class="text-left"><b>LED Helligkeit:</b><br>
