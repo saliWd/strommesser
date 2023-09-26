@@ -60,7 +60,13 @@ if ($doSafe === 0) { // entry point of this site
       <p class="text-left"><b>LED Helligkeit:</b><br>
       Die Helligkeit der farbigen LED. Von 0 (ausgeschaltet) bis 255.<br>
       In der Nacht (21 Uhr bis 6 Uhr) leuchtet sie übrigens 75% dunkler.</p>
-      <p class="mx-auto"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="'.$LIMIT_LED_BRIGHTNESS.'" step="5" value="'.$row['ledBrightness'].'" class="range" oninput="this.nextElementSibling.value=this.value"> <output>'.$row['ledBrightness'].'</output></p>
+      <p class="mx-auto">
+        <input id="ledBrightness" name="ledBrightness" type="range" min="0" max="'.$LIMIT_LED_BRIGHTNESS.'" step="5" value="'.$row['ledBrightness'].'" class="range w-36" oninput="getElementById(\'tooltip-ledBrightness-value\').value=this.value">
+        <div id="tooltip-ledBrightness" class="absolute z-20 inline-block px-3 py-2 -my-8 mx-48 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm">
+          <output id="tooltip-ledBrightness-value">'.$row['ledBrightness'].'</output>
+        </div>    
+      </p>
+      <br>
       <p class="mx-auto"><input id="settingsFormSubmit" class="mt-8 input-text mx-auto" name="settingsFormSubmit" type="submit" value="speichern"></p>
     </form>
   </div>
