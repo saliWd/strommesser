@@ -599,6 +599,16 @@ function makeSafeInt($unsafe, int $length):int {
     return 0;
   }  
 }
+function makeSafeFloat($unsafe, int $length):float {  
+  $unsafe = filter_var(substr($unsafe, 0, $length), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION); // sanitize a length-limited variable
+  if (filter_var($unsafe, FILTER_VALIDATE_FLOAT)) { 
+    return (float)$unsafe;
+  } else { 
+    return 0.0;
+  }  
+}
+
+// (filter_var($number, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION)
 
 // returns a 'safe' string. Not that much to do though for a string
 function makeSafeStr($unsafe, int $length):string {
@@ -625,6 +635,18 @@ function safeIntFromExt(string $source, string $varName, int $length):int {
     return makeSafeInt($_COOKIE[$varName], $length);  
   } else {
     return 0;
+  }
+}
+
+function safeFloatFromExt(string $source, string $varName, int $length):float {
+  if (($source === 'GET') and (isset($_GET[$varName]))) {
+    return makeSafeFloat($_GET[$varName], $length);    
+  } elseif (($source === 'POST') and (isset($_POST[$varName]))) {
+    return makeSafeFloat($_POST[$varName], $length);    
+  } elseif (($source === 'COOKIE') and (isset($_COOKIE[$varName]))) {
+    return makeSafeFloat($_COOKIE[$varName], $length);  
+  } else {
+    return 0.0;
   }
 }
 

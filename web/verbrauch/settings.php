@@ -14,7 +14,7 @@ $doSafe = safeIntFromExt('GET', 'do', 2); // this is an integer (range 1 to 99) 
 // do = 3: present the 'delete exported data?'
 // do = 4: process 'delete archived'
 if ($doSafe === 0) { // entry point of this site
-  $result = $dbConn->query('SELECT `ledMaxValue`, `ledMaxValGen`, `ledBrightness` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
+  $result = $dbConn->query('SELECT `ledMaxValue`, `ledMaxValGen`, `ledBrightness`, `priceConsHt`, `priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
   $row = $result->fetch_assoc();
   
   printBeginOfPage_v2(site:'settings.php');  
@@ -75,6 +75,27 @@ if ($doSafe === 0) { // entry point of this site
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Benutzereinstellungen</h3>
     <form id="pwChangeForm" action="login.php?do=3" method="post">
       <p class="mx-auto"><input id="pwChangeFormSubmit" class="mt-8 input-text mx-auto" name="pwChangeFormSubmit" type="submit" value="Passwort ändern"></p>
+    </form>
+  </div>
+  '.getHr().'
+  <div id="anchorCost" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+    <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Strompreise</h3>
+    <form id="CostForm" action="settings.php?do=5" method="post">
+      <div class="flex flex-row mt-8">
+        <div class="basis-2/3 self-center">Verbrauch Hochtarif (HT), in CHF pro kWh</div>
+        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="priceConsHt" type="text" maxlength="6" value="'.$row['priceConsHt'].'" required></div>
+      </div>
+      <div class="flex flex-row mt-2">
+        <div class="basis-2/3 self-center">Verbrauch Niedertarif (NT), in CHF pro kWh</div>
+        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="priceConsNt" type="text" maxlength="6" value="'.$row['priceConsNt'].'" required></div>
+      </div>
+      <div class="flex flex-row mt-2">
+        <div class="basis-2/3 self-center">Einspeisung, in CHF pro kWh</div>
+        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="priceGen" type="text" maxlength="6" value="'.$row['priceGen'].'" required></div>
+      </div>    
+      <div class="flex flex-row justify-center mt-2">
+        <div><br><input id="CostFormSubmit" class="mt-8 input-text mx-auto" name="CostFormSubmit" type="submit" value="Strompreise speichern"></div>
+      </div>
     </form>
   </div>
   '.getHr().'
@@ -174,6 +195,17 @@ if ($doSafe === 0) { // entry point of this site
     </form>
   </div>
   ';
+} elseif ($doSafe === 5) {
+  printBeginOfPage_v2(site:'settings.php', title:'Einstellungen');
+  $priceConsHt = abs(safeFloatFromExt(source:'POST',varName:'priceConsHt', length:6));
+  $priceConsNt = abs(safeFloatFromExt(source:'POST',varName:'priceConsNt', length:6));
+  $priceGen    = abs(safeFloatFromExt(source:'POST',varName:'priceGen',    length:6));
+
+  $result = $dbConn->query('UPDATE `kunden` SET `priceConsHt` = "'.$priceConsHt.'", `priceConsNt` = "'.$priceConsNt.'", `priceGen` = "'.$priceGen.'" WHERE `id` = "'.$userid.'";');
+
+  echo 'gespeichert<br>';
+  echo '<script>setTimeout(() => { window.location.href = \'settings.php\'; }, 2000);</script>';
+
 } else { // should never happen
   echo '<p>...something went wrong (undefined do-variable)...</p>';
 }
