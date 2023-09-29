@@ -9,7 +9,7 @@ function sessionAndCookieDelete (): void {
 }
 
 // returns the userid which matches to the email given. Returns 0 if something went wrong
-function mail2userid (object $dbConn, string $emailUnsafe) : int {    
+function mail2userid (object $dbConn, string $emailUnsafe) : int {
   if (!($result = $dbConn->query('SELECT `id` FROM `kunden` WHERE `email` = "'.mysqli_real_escape_string($dbConn, $emailUnsafe).'";'))) {
     return 0;
   }
@@ -18,7 +18,7 @@ function mail2userid (object $dbConn, string $emailUnsafe) : int {
   }
   
   $row = $result->fetch_row();
-  return (int)$row[0];            
+  return (int)$row[0];
 }  
 
 function processLoginData(object $dbConn, string $emailUnsafe, string $passwordUnsafe, int $setCookieSafe, bool $doRedirect=TRUE): bool {
@@ -160,7 +160,7 @@ function processNewPw(object $dbConn, int $useridPostSafe, string $verPost): boo
   }
   $pwHash = password_hash($passwordUnsafe, PASSWORD_DEFAULT); 
   if (!($dbConn->query('UPDATE `kunden` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$useridPostSafe.'"'))) {
-    return error($dbConn, 104402);
+    return error(104402);
   }
   if (!($dbConn->query('DELETE FROM `pwForgot` WHERE `userid` = "'.$useridPostSafe.'"'))) {
     return error(111001);
@@ -277,7 +277,7 @@ if ($doSafe === 0) {
 
     $pwHash = password_hash($newPw, PASSWORD_DEFAULT);
     if (!($dbConn->query('UPDATE `kunden` SET `pwHash` = "'.$pwHash.'" WHERE `id` = "'.$userid.'"'))) {
-      return error($dbConn, 104402);      
+      return error(104402);      
     }
   }
   printBeginOfPage_v2(site:'login.php' , title:'Passwort wurde geändert');
