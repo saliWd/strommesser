@@ -18,7 +18,10 @@ CREATE TABLE `kunden` (
   `randCookie` char(64) NOT NULL,
   `ledMaxValue` smallint(5) UNSIGNED NOT NULL DEFAULT 405,
   `ledMaxValGen` smallint(5) UNSIGNED NOT NULL DEFAULT 2000,
-  `ledBrightness` tinyint(3) UNSIGNED NOT NULL DEFAULT 160
+  `ledBrightness` tinyint(3) UNSIGNED NOT NULL DEFAULT 160,
+  `priceConsHt` decimal(5,4) NOT NULL,
+  `priceConsNt` decimal(5,4) NOT NULL,
+  `priceGen` decimal(5,4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE `pwForgot` (
