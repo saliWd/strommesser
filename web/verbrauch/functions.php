@@ -463,13 +463,9 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
   </head>
   <body>
   ';
-  // TODO temporay, remove again
-  echo '
-  <div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Offline:</b> Vom 22.9.23 bis ca. 3.10.23 werden keine Daten ausgelesen.</div>
-  ';
-  // end of temporary
-
-
+  // possible status-notification
+  // echo '<div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Offline:</b> Vom 22.9.23 bis ca. 3.10.23 werden keine Daten ausgelesen.</div>';
+  
   printNavMenu_v2(site:$site, title:$title);
   echo '
   <div class="container mx-auto px-4 py-2 lg text-center mt-16 scroll-mt-16" id="anchorTopOfPage">
