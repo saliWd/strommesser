@@ -237,7 +237,7 @@ if ($totalCount > 0) {// this may be 0
     };
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>
-    <br><br>';
+    <hr>';
     
     if($costValid) {
       if ($costTotal >= 0.0) {
@@ -287,17 +287,17 @@ if ($totalCount > 0) {// this may be 0
               echo 'unit: "day"';
             } else {
               echo 'unit: "hour"';
-            }            
+            }
             echo ' }
             },
-            yrightCost: { type: "linear",  position: "right", ticks: {color: "rgba(0, 0, 0, 0.6)"}, grid: {drawOnChartArea: false} }
+            yrightCost: { type: "linear",  position: "left", ticks: {color: "rgb(0, 0, 0)"} }
           }
         }
       };
       const myChartCost = new Chart( document.getElementById("myChartCost"), configCost );
       </script>';
     }  else {
-      echo ' - keine Kosten-Infos verfügbar - <br><br><br>';    
+      echo ' - <br>';    
     }
   } else {
     echo '<br><br> - weniger als '.$GRAPH_LIMIT.' Einträge - <br><br><br>';
