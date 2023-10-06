@@ -2,7 +2,7 @@
 
 1. StromMesser wordpress   
    1. copy the content from WP to static page
-      * not an ideal solution, quite a big effort and in the end still missing links/non-working buttons      
+      * not an ideal solution, quite a big effort and in the end still missing links/non-working buttons
    1. cta button on main page: Kontakt + Demo-Account
    1. parts / panels
       0. main page: change strommesser image (currently white background)
@@ -20,6 +20,8 @@
    2. ~~getRaw.php~~
    3. index.php
       1. make it configurable, which graphs to show (in settings)
+      1. time ranges: remove 1h, add week / month / year. Different concept (get rid of the buttons)
+      1. go live with cost graph. Optimize design
    4. ~~login.php~~
    5. ~~rx.php~~
    6. settings.php:

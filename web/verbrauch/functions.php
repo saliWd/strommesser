@@ -21,11 +21,10 @@ enum Param
   case cons;
   case consNt;
   case consHt;
-  case consCost;
+  case cost;
   case gen;
   case genNt;
   case genHt;
-  case genCost;
 }
 
 // --------------------------
@@ -234,10 +233,10 @@ function printBarGraph (
   }  
   
   $chartId .= $param->name;
-  if ($param === Param::cons)         { $paramText = 'Leistung';}
-  elseif ($param === Param::consNt)   { $paramText = 'Leistung NT';}
-  elseif ($param === Param::consHt)   { $paramText = 'Leistung HT';}
-  elseif ($param === Param::consCost) { $paramText = 'Kosten';}
+  if ($param === Param::cons)       { $paramText = 'Leistung';}
+  elseif ($param === Param::consNt) { $paramText = 'Leistung NT';}
+  elseif ($param === Param::consHt) { $paramText = 'Leistung HT';}
+  elseif ($param === Param::cost)   { $paramText = 'Kosten/Ertrag';}
   else {
     $paramText = 'ungültiger Param';
   }
@@ -334,15 +333,11 @@ function printBarGraph (
 }
 
 function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, string $dayB) { // returns either a number or a string
-  if ($param === Param::consCost) {  // TODO: this needs special treatment, not yet implemented
-    printPageAndDie('Invalid parameter at graph generation', 'Please try again later and/or send me an email: web@strommesser.ch');
-  }
-  if ($param === Param::cons)         { $paramGen = Param::gen;}
-  elseif ($param === Param::consNt)   { $paramGen = Param::genNt;}
-  elseif ($param === Param::consHt)   { $paramGen = Param::genHt;}
-  elseif ($param === Param::consCost) { $paramGen = Param::genCost;}
-  else {
-    printPageAndDie('Invalid parameter at getValues', 'Please try again later and/or send me an email: web@strommesser.ch');
+  if ($param === Param::cons)      { $paramGen = Param::gen;}
+  elseif ($param === Param::consNt){ $paramGen = Param::genNt;}
+  elseif ($param === Param::consHt){ $paramGen = Param::genHt;}
+  else { // cost param is handled differently
+    printPageAndDie('Invalid parameter at getWattSum', 'Please try again later and/or send me an email: web@strommesser.ch');
   }
 
   $sql[0] = 'SELECT SUM(`'.$param->name.   'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
@@ -360,6 +355,34 @@ function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, str
   }
 
   return $watt; 
+}
+function getWattSumCost(object $dbConn, int $userid, Param $param, string $dayA, string $dayB) { // returns either a number or a string
+  if ($param !== Param::cost)  {
+    printPageAndDie('Invalid parameter at getWattSumCost', 'Please try again later and/or send me an email: web@strommesser.ch');
+  }
+
+  $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
+  if ($resultKunden->num_rows !== 1) {
+      printRawErrorAndDie('Error', 'no config data');
+  } 
+  $rowKunden = $resultKunden->fetch_assoc();
+
+  $sql = 'SELECT SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff` FROM `verbrauch`';
+  $sql.= ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
+ 
+  $result = $dbConn->query($sql); // returns only one row
+  $row = $result->fetch_assoc();
+
+  if ($row['sumConsNtDiff'] + $row['sumConsHtDiff'] + $row['sumGenDiff'] < 0.001) { // don't have the info for old values
+    return ' '; // not really nice, returning string
+  }
+
+  $costTotal = round( -1.0 * 
+                    ((($row['sumConsNtDiff'])*$rowKunden['priceConsNt']) +
+                      (($row['sumConsHtDiff'])*$rowKunden['priceConsHt']) -
+                      (($row['sumGenDiff']   )*$rowKunden['priceGen']   )), 2);
+  
+  return $costTotal;
 }
 
 function getValues(
