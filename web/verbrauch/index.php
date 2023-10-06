@@ -52,6 +52,26 @@ if ($totalCount > 0) {// this may be 0
   $rowNewest = $result->fetch_assoc();
   $queryCount = $result->num_rows; // this may be < graph-limit ( = display at least the newest) or >= graph-limit ( = all good)
 
+  // get some account specific infos from the db
+  $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
+  if ($resultKunden->num_rows !== 1) {
+      printRawErrorAndDie('Error', 'no config data');
+  } 
+  $rowKunden = $resultKunden->fetch_assoc();
+
+  // cost over the whole time range
+  // for the oldest entries, I don't have the Nt/Ht/Gen information
+  if ($rowOldest['consNt'] + $rowOldest['consHt'] + $rowOldest['gen'] > 0.001) { 
+    $costValid = TRUE;
+    $costTotal = round( -1.0 * 
+                        ((($rowNewest['consNt'] - $rowOldest['consNt'])*$rowKunden['priceConsNt']) +
+                         (($rowNewest['consHt'] - $rowOldest['consHt'])*$rowKunden['priceConsHt']) -
+                         (($rowNewest['gen']    - $rowOldest['gen'])*   $rowKunden['priceGen']   )), 2);
+  } else {
+    $costValid = FALSE;
+    $costTotal = 0.0;
+  } 
+
   if ($rowNewest['zeitDiff'] > 0) { // divide by 0 exception
       $newestCons = round($rowNewest['consDiff']*3600*1000 / $rowNewest['zeitDiff']); // kWh compared to seconds
       $newestGen = round($rowNewest['genDiff']*3600*1000 / $rowNewest['zeitDiff']);
@@ -82,14 +102,7 @@ if ($totalCount > 0) {// this may be 0
   <hr>
   ';
 
-  if ($queryCount >= $GRAPH_LIMIT) {
-    // get some account specific infos from the db
-    $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
-    if ($resultKunden->num_rows !== 1) {
-        printRawErrorAndDie('Error', 'no config data');
-    } 
-    $rowKunden = $resultKunden->fetch_assoc();    
-    
+  if ($queryCount >= $GRAPH_LIMIT) {   
     $axis_x = ''; // rightmost value comes first. Remove something again after the while loop
     $val_yr_cons_kwh = '';
     $val_yr_gen_kwh = '';
@@ -115,10 +128,14 @@ if ($totalCount > 0) {// this may be 0
       $axis_x = 'new Date("'.$row['zeit'].'"), '.$axis_x; // new Date("2020-03-01 12:00:12")
       $val_yr_cons_kwh = ($row['consumption'] - $rowOldest['consumption']) .', '.$val_yr_cons_kwh; // to get a relative value (and not some huge numbers)
       $val_yr_gen_kwh = ($row['gen'] - $rowOldest['gen']) .', '.$val_yr_gen_kwh;
-      $val_yr_cost = -1.0 * 
+      if($costValid) {
+        $val_yr_cost = -1.0 * 
                     ((($row['consNt'] - $rowOldest['consNt'])*$rowKunden['priceConsNt']) +
                      (($row['consHt'] - $rowOldest['consHt'])*$rowKunden['priceConsHt']) -
                      (($row['gen'] - $rowOldest['gen'])*$rowKunden['priceGen'])) .', '.$val_yr_cost;
+      } else {
+        $val_yr_cost = ' , '.$val_yr_cost; // just empty string. No meaningful value available
+      }
       $val_yl_cons_ave = $aveCons.', '.$val_yl_cons_ave;
       $val_yl_gen_ave = $aveGen.', '.$val_yl_gen_ave;
       $val_yl_cons = $watt.', '.$val_yl_cons;
@@ -220,56 +237,68 @@ if ($totalCount > 0) {// this may be 0
     };
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>
-    <br><br>
-
-    <div class="flex">
-      <div class="flex-auto text-left">&nbsp;</div>
-      <div class="flex-auto text-center"><b><span class="text-green-600">Ertrag</span> / <span class="text-red-500">Kosten</span></b></div>
-      <div class="flex-auto text-right">&nbsp;</div>
-    </div>
-    <hr>
-    <canvas id="myChartCost" width="600" height="300" class="mb-2"></canvas>
-    <script>
-    const ctxCost = document.getElementById("myChartCost");
-    const labelsCost = '.$axis_x.';
-    const dataCost = {
-      labels: labelsCost,
-      datasets: [{
-        label: "Kosten [CHF]",
-        data: '.$val_yr_cost.',
-        yAxisID: "yrightCost",
-        backgroundColor: "rgba(0, 0, 0, 0.2)",
-        showLine: false
-      }      
-    ],
-    };
-    const configCost = {
-      type: "line",
-      data: dataCost,
-      options: {
-        plugins: {
-          legend: {
-            display: false
-          }
-        },
-        scales: {
-          x: { type: "time", 
-            time: { '; 
-          if ($timeSelected === 1) {
-            echo 'unit: "minute"';
-          } elseif ($timeSelected === 25) {
-            echo 'unit: "day"';
-          } else {
-            echo 'unit: "hour"';
-          }            
-          echo ' }
-          },
-          yrightCost: { type: "linear",  position: "right", ticks: {color: "rgba(0, 0, 0, 0.6)"}, grid: {drawOnChartArea: false} }
-        }
+    <br><br>';
+    
+    if($costValid) {
+      if ($costTotal >= 0.0) {
+        $costClass = 'text-green-600';
+        $costText  = 'Ertrag';
+      } else {
+        $costClass = 'text-red-500';
+        $costText  = 'Kosten';
       }
-    };
-    const myChartCost = new Chart( document.getElementById("myChartCost"), configCost );
-    </script>';
+      echo '
+      <div class="flex">
+        <div class="flex-auto text-left"><b><span class="'.$costClass.'">'.$costText.' [CHF]</span></b></div>
+        <div class="flex-auto text-center">&nbsp;</div>
+        <div class="flex-auto text-right"><b><span class="'.$costClass.'">'.$costTotal.'.-</span></b></div>
+      </div>
+      <hr>
+      <canvas id="myChartCost" width="600" height="200" class="mb-2"></canvas>
+      <script>
+      const ctxCost = document.getElementById("myChartCost");
+      const labelsCost = '.$axis_x.';
+      const dataCost = {
+        labels: labelsCost,
+        datasets: [{
+          label: "Kosten [CHF]",
+          data: '.$val_yr_cost.',
+          yAxisID: "yrightCost",
+          backgroundColor: "rgba(0, 0, 0, 0.2)",
+          showLine: false
+        }      
+      ],
+      };
+      const configCost = {
+        type: "line",
+        data: dataCost,
+        options: {
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            x: { type: "time", 
+              time: { '; 
+            if ($timeSelected === 1) {
+              echo 'unit: "minute"';
+            } elseif ($timeSelected === 25) {
+              echo 'unit: "day"';
+            } else {
+              echo 'unit: "hour"';
+            }            
+            echo ' }
+            },
+            yrightCost: { type: "linear",  position: "right", ticks: {color: "rgba(0, 0, 0, 0.6)"}, grid: {drawOnChartArea: false} }
+          }
+        }
+      };
+      const myChartCost = new Chart( document.getElementById("myChartCost"), configCost );
+      </script>';
+    }  else {
+      echo ' - keine Kosten-Infos verfügbar - <br><br><br>';    
+    }
   } else {
     echo '<br><br> - weniger als '.$GRAPH_LIMIT.' Einträge - <br><br><br>';
   }    

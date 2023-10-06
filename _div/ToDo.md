@@ -20,11 +20,9 @@
    2. ~~getRaw.php~~
    3. index.php
       1. make it configurable, which graphs to show (in settings)
-      1. have cost_chf graph (-> combine info from ht/nt and price info)
    4. ~~login.php~~
    5. ~~rx.php~~
    6. settings.php:
-      1. set ht/nt price for both consumption and generation 
       1. which graphs to show on index
       1. change email
    7. statistic.php
@@ -39,7 +37,7 @@
 4. div
 
 
-Next: 3.1 / 1.3.x / 
+Next: 3.1 / 
 
 
 [displayCase]: https://www.thingiverse.com/thing:4767008
