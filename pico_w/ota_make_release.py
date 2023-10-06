@@ -1,7 +1,7 @@
 import os
 from re import sub
 
-version = 'v1.0.0' # TODO: take from command line, needs to match a "vNumberPointNumberPointNumber"-pattern, otherwise end the script
+version = 'v1.0.1' # TODO: take from command line, needs to match a "vNumberPointNumberPointNumber"-pattern, otherwise end the script
 project = 'display' # TODO: take from command line, must either be "display" or "measure"
 
 def replace_content(dict_replace, target):

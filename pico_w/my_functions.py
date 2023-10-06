@@ -1,3 +1,4 @@
+## xx_version_placeholder_xx
 from time import sleep
 from hashlib import sha256
 from binascii import hexlify

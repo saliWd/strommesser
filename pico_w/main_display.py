@@ -180,8 +180,8 @@ while True:
     ## do it once, shortly (2 mins) after booting, then don't do it for about 8 hours
     if while_true_counter == 2:
         micropython_ota.ota_update(
-            ota_host='https://strommesser.ch/pico_w_ota/',
-            project_name='display',
+            host='https://strommesser.ch/pico_w_ota/',
+            project='display',
             filenames=['boot.py', 'main.py', 'my_functions.py'], # config (and libraries) is not changed
             use_version_prefix=False
         )
@@ -242,6 +242,7 @@ while True:
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
     brightness = getBrightness(meas=meas)
+    if (wattVal == 0): brightness = 0 # disable LED when 0 consumption
     if (wattVal < 0):
         rgb_led.control(valid=(meas["valid"] == 1), pulsating=False,
                         color=val_to_rgb(val=wattValMinMax,

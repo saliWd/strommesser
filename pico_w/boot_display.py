@@ -11,8 +11,8 @@ sleep(1)
 wlan_connect(wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs/resets if no connection can be made
 
 micropython_ota.ota_update(
-    ota_host='https://strommesser.ch/pico_w_ota/', 
-    project_name='display', 
+    host='https://strommesser.ch/pico_w_ota/', 
+    project='display', 
     filenames=['boot.py', 'main.py', 'my_functions.py'], 
     use_version_prefix=False
 )
