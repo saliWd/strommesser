@@ -266,7 +266,21 @@ if ($totalCount > 0) {// this may be 0
           yAxisID: "yrightCost",
           backgroundColor: "rgba(0, 0, 0, 0.2)",
           showLine: false
-        }      
+        },
+        {
+          data: '.$val_yl_cons.',
+          yAxisID: "yleftCost",
+          backgroundColor: "rgba(255,255,255,0.0)",
+          borderColor: "rgba(255,255,255,0.0)",
+          showLine: false
+        },
+        {
+          data: '.$val_yl_gen.',
+          yAxisID: "yleftCost",
+          backgroundColor: "rgba(255,255,255,0.0)",
+          borderColor: "rgba(255,255,255,0.0)",
+          showLine: false
+        }
       ],
       };
       const configCost = {
@@ -279,7 +293,8 @@ if ($totalCount > 0) {// this may be 0
             }
           },
           scales: {
-            x: { type: "time", 
+            x: { display: false,
+              type: "time", 
               time: { '; 
             if ($timeSelected === 1) {
               echo 'unit: "minute"';
@@ -290,7 +305,8 @@ if ($totalCount > 0) {// this may be 0
             }
             echo ' }
             },
-            yrightCost: { type: "linear",  position: "left", ticks: {color: "rgb(0, 0, 0)"} }
+            yleftCost: { type: "logarithmic", position: "left", ticks: {color: "rgba(255, 255, 255, 0.01)"} },
+            yrightCost: { type: "linear",  position: "right", ticks: {color: "rgb(0, 0, 0)"} }
           }
         }
       };

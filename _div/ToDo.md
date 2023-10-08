@@ -21,7 +21,6 @@
    3. index.php
       1. make it configurable, which graphs to show (in settings)
       1. time ranges: remove 1h, add week / month / year. Different concept (get rid of the buttons)
-      1. go live with cost graph. Optimize design
    4. ~~login.php~~
    5. ~~rx.php~~
    6. settings.php:
@@ -30,7 +29,6 @@
    7. statistic.php
       1. add table layout with numbers additional to graphs
 3. pico devices
-   1. OTA updates: try out
    1. print my own case for measurement
       * [ir head case][irHeadCase]
       * [pico case][picoCase]
