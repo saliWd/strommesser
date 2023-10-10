@@ -219,7 +219,8 @@ if ($totalCount > 0) {// this may be 0
           }
         },
         scales: {
-          x: { type: "time", 
+          x: { 
+            type: "time",
             time: { '; 
           if ($timeSelected === 1) {
             echo 'unit: "minute"';
@@ -227,7 +228,7 @@ if ($totalCount > 0) {// this may be 0
             echo 'unit: "day"';
           } else {
             echo 'unit: "hour"';
-          }            
+          }
           echo ' }
           },
           yleft: { type: "logarithmic", position: "left", ticks: {color: "rgb(25, 99, 132)"} },
@@ -293,7 +294,7 @@ if ($totalCount > 0) {// this may be 0
             }
           },
           scales: {
-            x: { display: false,
+            x: { 
               type: "time", 
               time: { '; 
             if ($timeSelected === 1) {
@@ -303,7 +304,8 @@ if ($totalCount > 0) {// this may be 0
             } else {
               echo 'unit: "hour"';
             }
-            echo ' }
+            echo ' },
+              ticks: { display: false }
             },
             yleftCost: { type: "logarithmic", position: "left", ticks: {color: "rgba(255, 255, 255, 0.01)"} },
             yrightCost: { type: "linear",  position: "right", ticks: {color: "rgb(0, 0, 0)"} }
