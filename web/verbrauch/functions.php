@@ -580,7 +580,7 @@ function getValues(
 }
 
 // prints header with css/js and body, container-div and h1 title
-function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title=''):void {
+function printBeginOfPage_v2(string $site, string $title=''):void {
   $SITE_TITLES = array(
     'index.php' => 'Übersicht',
     'settings.php' => 'Einstellungen',
@@ -607,7 +607,6 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../verbrauch/strommesser.css" type="text/css">
   <script src="../verbrauch/script/flowbite.min.js"></script>
-  '.$scripts.$refreshMeta.'
   </head>
   <body>
   ';

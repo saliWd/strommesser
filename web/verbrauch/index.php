@@ -4,17 +4,15 @@ $dbConn = initialize();
 
 // returns the time range to be displayed as int. Possible values are: 1 (for last 1 hour), 6, 24, 25. 25 means: all data
 function getTimeRange():int {
-  $returnVal = 6;  // default time range
-  $unsafeInt = safeIntFromExt(source:'GET',varName:'range',length:2);
-  if (($unsafeInt === 1) or ($unsafeInt === 6) or ($unsafeInt === 24) or ($unsafeInt === 25)) {
+  $returnVal = 1;  // default time range
+  $unsafeInt = safeIntFromExt(source:'GET',varName:'range',length:3);
+  if (($unsafeInt === 1) or ($unsafeInt === 7) or ($unsafeInt === 30) or ($unsafeInt === 365)) {
     $returnVal = $unsafeInt; 
   }
   return $returnVal;
 }
 
-$reload = safeIntFromExt(source:'GET',varName:'reload',length:1);
 $timeSelected = getTimeRange();
-$enableReload = ($reload === 1);
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 
 $resultCnt = $dbConn->query('SELECT COUNT(*) as `total` FROM `verbrauch` WHERE `userid` = "'.$userid.'" LIMIT 1;'); // guaranteed to return one row
@@ -24,18 +22,35 @@ $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
-$refreshMeta = '';
-if ($enableReload) { $refreshMeta = '<meta http-equiv="refresh" content="40; url=https://strommesser.ch/verbrauch/index.php?reload=1&range='.$timeSelected.'">'."\n"; }
-printBeginOfPage_v2(site:'index.php',  refreshMeta:$refreshMeta);
+printBeginOfPage_v2(site:'index.php');
+
+$tabTexts = array (  
+  '1'   => array('1',  'Tag',  'border-transparent hover:text-gray-600 hover:border-gray-300'),
+  '7'   => array('7',  'Woche','border-transparent hover:text-gray-600 hover:border-gray-300'),
+  '30'  => array('30', 'Monat','border-transparent hover:text-gray-600 hover:border-gray-300'),
+  '365' => array('365','Jahr', 'border-transparent hover:text-gray-600 hover:border-gray-300')
+);
+$tabTexts[$timeSelected][2]  = 'border-blue-600 text-blue-600 active'; // highlight the selected one
+echo '
+<div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200">
+    <ul class="flex flex-wrap -mb-px">';
+foreach ($tabTexts as $tabText) {
+  echo '
+        <li class="mr-2">
+            <a href="index.php?range='.$tabText[0].'" class="inline-block p-4 border-b-2 rounded-t-lg '.$tabText[2].'">'.$tabText[1].'</a>
+        </li>';
+}
+echo '
+    </ul>
+</div>
+';
+
 if ($totalCount > 0) {// this may be 0
   $zeitNewest = date_create($rowFreshest['zeit']);    
-  if ($timeSelected < 25) {
-    $zeitOldest = date_create($rowFreshest['zeit']);
-    $zeitOldest->modify('-'.$timeSelected.' hours');
-    $zeitOldestString = $zeitOldest->format('Y-m-d H:i:s');
-  } else {
-    $zeitOldestString = '2020-01-01 08:00:00'; // some arbitrary date in the past
-  }
+  $zeitOldest = date_create($rowFreshest['zeit']);
+  $zeitOldest->modify('-'.$timeSelected.' days');
+  $zeitOldestString = $zeitOldest->format('Y-m-d H:i:s');
+  
 
   $QUERY_LIMIT = 10000; // have some upper limit, both for js and db-performance
   $GRAPH_LIMIT = 3; // does not make sense to display a graph otherwise
@@ -151,7 +166,13 @@ if ($totalCount > 0) {// this may be 0
     $val_yl_cons = '[ '.substr($val_yl_cons, 0, -2).' ]';
     $val_yl_gen = '[ '.substr($val_yl_gen, 0, -2).' ]';
     
-    // maybe: add some text about the absolute value (of kWh)
+    if ($timeSelected === 1) {
+      $timeUnit = 'unit: "hour"';
+    } elseif ($timeSelected === 7) {
+      $timeUnit = 'unit: "day"';
+    } else {
+      $timeUnit = 'unit: "week"';
+    }
     echo '
     <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
     <script>
@@ -221,15 +242,7 @@ if ($totalCount > 0) {// this may be 0
         scales: {
           x: { 
             type: "time",
-            time: { '; 
-          if ($timeSelected === 1) {
-            echo 'unit: "minute"';
-          } elseif ($timeSelected === 25) {
-            echo 'unit: "day"';
-          } else {
-            echo 'unit: "hour"';
-          }
-          echo ' }
+            time: { '.$timeUnit.' }
           },
           yleft: { type: "logarithmic", position: "left", ticks: {color: "rgb(25, 99, 132)"} },
           yright: { type: "linear",  position: "right", ticks: {color: "rgba(25, 99, 132, 0.6)"}, grid: {drawOnChartArea: false} }
@@ -296,15 +309,7 @@ if ($totalCount > 0) {// this may be 0
           scales: {
             x: { 
               type: "time", 
-              time: { '; 
-            if ($timeSelected === 1) {
-              echo 'unit: "minute"';
-            } elseif ($timeSelected === 25) {
-              echo 'unit: "day"';
-            } else {
-              echo 'unit: "hour"';
-            }
-            echo ' },
+              time: { '.$timeUnit.' },
               ticks: { display: false }
             },
             yleftCost: { type: "logarithmic", position: "left", ticks: {color: "rgba(255, 255, 255, 0.01)"} },
@@ -324,27 +329,6 @@ if ($totalCount > 0) {// this may be 0
   echo '<br><br> - noch keine Einträge - <br><br><br>';
 }
 
-$checkedText = '';
-$reloadLink = '';
-$reloadLinkChange = '?range='.$timeSelected.'&reload=1';
-if($enableReload) {
-  $checkedText = ' checked';
-  $reloadLink = '&reload=1';
-  $reloadLinkChange = '?range='.$timeSelected;
-}
-
-$submitTexts = array (
-  '1' => array('1','1 h','class="btn"'),
-  '6' => array('6','6 h','class="btn"'),
-  '24' => array('24','24 h','class="btn"'),
-  '25' => array('25','alles','class="btn"')
-);
-$submitTexts[$timeSelected][2]  = 'class="btn-diff"'; // highlight the selected one
-echo '
-<a href="index.php'.$reloadLinkChange.'"><input'.$checkedText.' id="reload-checkbox" type="checkbox" value="" class="chkbox-link"></a><label for="reload-checkbox" class="chkbox-link-label"><a href="index.php'.$reloadLinkChange.'">reload </a></label>';
-foreach ($submitTexts as $submitText) {
-  echo '<a id="range_'.$submitText[0].'h_link" href="index.php?range='.$submitText[0].$reloadLink.'" '.$submitText[2].'>'.$submitText[1].'</a>';
-}
 echo '<br><br>
 <hr>
 <div class="flex items-center">
