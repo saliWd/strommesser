@@ -73,7 +73,7 @@
         $thinUpdate = '1';
       } else {
         $sqlNoThin = '`userid` = "'.$userid.'" AND `thin` = "1"';
-        $interval = 72+24;
+        $interval = 168+24;
         $formatString = 'Y-m-d 00:00:00';
         $thinUpdate = '24';
       }
