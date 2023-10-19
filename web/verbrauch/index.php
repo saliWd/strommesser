@@ -32,7 +32,7 @@ $tabTexts = array (
 );
 $tabTexts[$timeSelected][2]  = 'border-blue-600 text-blue-600 active'; // highlight the selected one
 echo '
-<div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 mb-2">
+<div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 mb-4">
     <ul class="flex flex-wrap -mb-px">';
 foreach ($tabTexts as $tabText) {
   echo '
