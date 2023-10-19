@@ -320,7 +320,7 @@ if ($totalCount > 0) {// this may be 0
       const myChartCost = new Chart( document.getElementById("myChartCost"), configCost );
       </script>';
     }  else {
-      echo ' - <br>';    
+      echo ' - ';    
     }
   } else {
     echo '<br><br> - weniger als '.$GRAPH_LIMIT.' Einträge - <br><br><br>';

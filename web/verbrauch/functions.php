@@ -607,6 +607,7 @@ function printBeginOfPage_v2(string $site, string $title=''):void {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../verbrauch/strommesser.css" type="text/css">
   <script src="../verbrauch/script/flowbite.min.js"></script>
+  '.$scripts.'
   </head>
   <body>
   ';
