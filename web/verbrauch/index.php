@@ -32,7 +32,7 @@ $tabTexts = array (
 );
 $tabTexts[$timeSelected][2]  = 'border-blue-600 text-blue-600 active'; // highlight the selected one
 echo '
-<div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200">
+<div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 mb-2">
     <ul class="flex flex-wrap -mb-px">';
 foreach ($tabTexts as $tabText) {
   echo '
@@ -265,7 +265,7 @@ if ($totalCount > 0) {// this may be 0
       <div class="flex">
         <div class="flex-auto text-left"><b><span class="'.$costClass.'">'.$costText.' [CHF]</span></b></div>
         <div class="flex-auto text-center">&nbsp;</div>
-        <div class="flex-auto text-right"><b><span class="'.$costClass.'">'.$costTotal.'.-</span></b></div>
+        <div class="flex-auto text-right"><b><span class="'.$costClass.'">'. number_format((float)$costTotal, 2, '.', '').'.-</span></b></div>
       </div>
       <hr>
       <canvas id="myChartCost" width="600" height="200" class="mb-2"></canvas>

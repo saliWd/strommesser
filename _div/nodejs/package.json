@@ -6,6 +6,7 @@
     "tailwindcss": "^3.3.3"
   },
   "dependencies": {
+    "caniuse-lite": "^1.0.30001551",
     "chart.js": "^4.3.3",
     "chartjs-adapter-moment": "^1.0.1",
     "chartjs-plugin-annotation": "^3.0.1",
