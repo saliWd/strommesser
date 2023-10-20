@@ -20,7 +20,6 @@
    2. ~~getRaw.php~~
    3. index.php
       1. make it configurable, which graphs to show (in settings)
-      1. time ranges: remove 1h, add week / month / year. Different concept (get rid of the buttons)
    4. ~~login.php~~
    5. ~~rx.php~~
    6. settings.php:

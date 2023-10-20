@@ -8,4 +8,4 @@
 1. do a repair of nodejs installation (ugly work around, _npm install_ somewhat removes too much)
 1. runTailwindcss.bat (might result in a permission denied message for the copy command, do it manually if required)
    * should result in _rebuilding... Done_
-1. --> generated CSS is working fine (in the range of 32 kB)
+1. --> generated CSS is working fine (in the range of 30 kB)
