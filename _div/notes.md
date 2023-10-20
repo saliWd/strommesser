@@ -2,7 +2,7 @@
 
 ## power meter readout using pico_w and micropython
 1. project folder pico_w
-   1. install micropython version with included pimoroni support, version v1.20.6 (use Thonny to set it up)
+   1. install micropython version with included pimoroni support, version v1.21.0 (use Thonny to set it up)
    1. import mip
       1. mip.install('github:olivergregorius/micropython_ota/micropython_ota.py')
 
