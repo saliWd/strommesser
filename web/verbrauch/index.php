@@ -310,7 +310,7 @@ if ($totalCount > 0) {// this may be 0
               time: { '.$timeUnit.' },
               ticks: { display: false }
             },
-            yleftCost: { type: "logarithmic", position: "left", ticks: {color: "rgba(255, 255, 255, 0.01)"} },
+            yleftCost: { type: "logarithmic", position: "left", ticks: {color: "rgba(255, 255, 255, 0.01)"}, grid: {display: false } },
             yrightCost: { type: "linear",  position: "right", ticks: {color: "rgb(0, 0, 0)"} }
           }
         }
