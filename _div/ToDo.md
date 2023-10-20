@@ -35,7 +35,7 @@
    1. disp
       1. [case?][displayCase]
 4. div
-   1. fix node.js installation: install into program directory, nothing in repo
+
 
 
 Next: 3.1 / 
