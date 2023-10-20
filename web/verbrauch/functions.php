@@ -251,7 +251,7 @@ function printBarGraph (
   }
   echo '
   <div class="flex mt-4">
-    <div class="grow h-8 scroll-mt-16" id="anchor'.$chartId.'">
+    <div class="grow h-8 scroll-mt-14" id="anchor'.$chartId.'">
       <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowLeft, classString:'w-8 h-8').'</a>
       <span class="text-l inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
       '.$forwardLink.'
@@ -390,7 +390,7 @@ function printBarGraphCost ( // TODO: merge with other bar graph
   }
   echo '
   <div class="flex mt-4">
-    <div class="grow h-8 scroll-mt-16" id="anchor'.$chartId.'">
+    <div class="grow h-8 scroll-mt-14" id="anchor'.$chartId.'">
       <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowLeft, classString:'w-8 h-8').'</a>
       <span class="text-l inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
       '.$forwardLink.'
@@ -580,7 +580,7 @@ function getValues(
 }
 
 // prints header with css/js and body, container-div and h1 title
-function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title=''):void {
+function printBeginOfPage_v2(string $site, string $title=''):void {
   $SITE_TITLES = array(
     'index.php' => 'Übersicht',
     'settings.php' => 'Einstellungen',
@@ -607,7 +607,7 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../verbrauch/strommesser.css" type="text/css">
   <script src="../verbrauch/script/flowbite.min.js"></script>
-  '.$scripts.$refreshMeta.'
+  '.$scripts.'
   </head>
   <body>
   ';
@@ -616,7 +616,7 @@ function printBeginOfPage_v2(string $site, string $refreshMeta='', string $title
   
   printNavMenu_v2(site:$site, title:$title);
   echo '
-  <div class="container mx-auto px-4 py-2 lg text-center mt-16 scroll-mt-16" id="anchorTopOfPage">
+  <div class="container mx-auto px-4 py-2 lg text-center mt-14 scroll-mt-14" id="anchorTopOfPage">
   ';
   return;
 }

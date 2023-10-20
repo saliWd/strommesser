@@ -11,7 +11,7 @@
   </head>
   <body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>
   
-<nav class="border-gray-400 rounded bg-gray-50 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
+<nav class="border-gray-400 rounded bg-gray-100 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
   <ol class="inline-flex items-center mb-3 sm:mb-0">
     <li>
       <div class="flex items-center">
@@ -22,7 +22,7 @@
         <div id="dropdown-NavMain" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
           <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">
         <li>
-          <a href="static.index.6h.html" class="block px-4 py-2 hover:bg-gray-100">Übersicht</a>
+          <a href="static.index.1.html" class="block px-4 py-2 hover:bg-gray-100">Übersicht</a>
         </li>
         <li>
           <a href="static.statistic.html" class="block px-4 py-2 hover:bg-gray-100">Statistiken</a>
@@ -64,7 +64,7 @@
 
   </ol>
 </nav>
-  <div class="container mx-auto px-4 py-2 lg text-center mt-16 scroll-mt-16" id="anchorTopOfPage">
+  <div class="container mx-auto px-4 py-2 lg text-center mt-14 scroll-mt-14" id="anchorTopOfPage">
   
   <div id="anchorMiniDisplay" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Mini-Display</h3>
@@ -72,14 +72,48 @@
     <p>&nbsp;</p>
     <form id="settingsValues" action="static.settings.html" method="post">
       <p class="text-left"><b>Maximalwert Farbskala:</b><br>
-      LED und Minibildschirm zeigen den aktuellen Verbrauch mit einer Farbskala von blau über grün nach gelb und schlussendlich rot.<br>
-      0 Watt entspricht der Farbe blau, der Maximalwert (und alles darüber) wird rot angezeigt.</p>
-      <p class="mx-auto"><input id="ledMaxValue" name="ledMaxValue" type="range" min="100" max="2000" step="20" value="400" class="range" oninput="this.nextElementSibling.value=this.value"> <output>400</output>W</p>
+      LED und Minibildschirm zeigen die aktuelle Leistung mit einer Farbskala von rot über gelb nach grün schlussendlich blau. Blau ist "gut", rot ist "schlecht".<br>
+      Verbrauch (Leistung wird aus dem Netz gezogen) wird dementsprechend mit Rottönen angezeigt.<br>
+      Beim Einspeisen (Leistung geht ins Netz) pulsiert die LED und die Farben gehen von grün nach blau. Der Maximalwert (plus alles darüber) ist blau.</p>
+      <br><br>
+      <table>
+      <tr>
+        <td width="49%" align="right">Verbrauch&nbsp;&nbsp;</td>
+        <td width="2%" align="center">|</td>
+        <td width="49%">&nbsp;&nbsp;Einspeisung</td>
+      </tr>
+      <tr>
+        <td colspan="3" align="center"><img class="h-1" width="60%" src="img/redToBlue.png" alt="Farbskala Rot-nach-Blau"></td>
+      </tr>
+      <tr>
+        <td width="49%" align="right">
+          <input dir="rtl" id="ledMaxValue" name="ledMaxValue" type="range" min="50" max="2000" step="50" value="400" class="range w-36" oninput="getElementById('tooltip-ledMaxValue-value').value=this.value">           
+          <div id="tooltip-ledMaxValue" class="absolute z-20 inline-block px-3 py-2 my-8 -mx-24 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm">
+            -<output id="tooltip-ledMaxValue-value">400</output>W
+          </div>
+        </td>
+        <td width="2%"></td>
+        <td width="49%">
+          <input id="ledMaxValGen" name="ledMaxValGen" type="range" min="50" max="8000" step="50" value="3400" class="range w-36" oninput="getElementById('tooltip-ledMaxValGen-value').value=this.value">           
+          <div id="tooltip-ledMaxValGen" class="absolute z-10 inline-block px-3 py-2 my-8 -mx-24 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm">
+            <output id="tooltip-ledMaxValGen-value">3400</output>W
+          </div>
+        </td>
+      </tr>
+      </table>
+      <br>
+      <br>
       <hr>
       <p class="text-left"><b>LED Helligkeit:</b><br>
       Die Helligkeit der farbigen LED. Von 0 (ausgeschaltet) bis 255.<br>
-      In der Nacht (22 Uhr bis 6 Uhr) leuchtet sie übrigens 50% dunkler.</p>
-      <p class="mx-auto"><input id="ledBrightness" name="ledBrightness" type="range" min="0" max="255" step="5" value="80" class="range" oninput="this.nextElementSibling.value=this.value"> <output>80</output></p>
+      In der Nacht (21 Uhr bis 6 Uhr) leuchtet sie übrigens 75% dunkler.</p>
+      <p class="mx-auto">
+        <input id="ledBrightness" name="ledBrightness" type="range" min="0" max="255" step="5" value="140" class="range w-36" oninput="getElementById('tooltip-ledBrightness-value').value=this.value">
+        <div id="tooltip-ledBrightness" class="absolute z-20 inline-block px-3 py-2 -my-8 mx-48 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm">
+          <output id="tooltip-ledBrightness-value">140</output>
+        </div>    
+      </p>
+      <br>
       <p class="mx-auto"><input id="settingsFormSubmit" class="mt-8 input-text mx-auto" name="settingsFormSubmit" type="submit" value="speichern"></p>
     </form>
   </div>
@@ -95,6 +129,34 @@
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Benutzereinstellungen</h3>
     <form id="pwChangeForm" action="static.login.html" method="post">
       <p class="mx-auto"><input id="pwChangeFormSubmit" class="mt-8 input-text mx-auto" name="pwChangeFormSubmit" type="submit" value="Passwort ändern"></p>
+    </form>
+  </div>
+  
+  <div class="inline-flex items-center justify-center w-full">
+    <hr class="w-full h-px my-8 bg-gray-200 border-0">
+    <div class="absolute px-4 -translate-x-1/2 left-1/2">
+      <a href="#anchorTopOfPage"><img src="../verbrauch/img/messer_200.png" class="h-6 mr-3 sm:h-10" alt="StromMesser Logo"></a>
+    </div>
+  </div>
+  
+  <div id="anchorCost" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+    <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Strompreise</h3>
+    <form id="CostForm" action="static.settings.html" method="post">
+      <div class="flex flex-row mt-8">
+        <div class="basis-2/3 self-center">Verbrauch Hochtarif (HT), in CHF pro kWh</div>
+        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="priceConsHt" type="text" maxlength="6" value="0.2613" required></div>
+      </div>
+      <div class="flex flex-row mt-2">
+        <div class="basis-2/3 self-center">Verbrauch Niedertarif (NT), in CHF pro kWh</div>
+        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="priceConsNt" type="text" maxlength="6" value="0.2143" required></div>
+      </div>
+      <div class="flex flex-row mt-2">
+        <div class="basis-2/3 self-center">Einspeisung, in CHF pro kWh</div>
+        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="priceGen" type="text" maxlength="6" value="0.1200" required></div>
+      </div>    
+      <div class="flex flex-row justify-center mt-2">
+        <div><br><input id="CostFormSubmit" class="mt-8 input-text mx-auto" name="CostFormSubmit" type="submit" value="Strompreise speichern"></div>
+      </div>
     </form>
   </div>
   

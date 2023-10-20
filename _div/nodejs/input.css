@@ -3,23 +3,11 @@
 @tailwind utilities;
 
 @layer components {
-  .btn {    
-	  @apply text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1.5 text-center mr-2 mb-2;
-  } 
-  .btn-diff {
-	  @apply hover:text-diffColor-700 text-white border border-diffColor-700 bg-diffColor-700 hover:bg-white focus:ring-4 focus:outline-none focus:ring-diffColor-300 font-medium rounded-lg text-sm px-5 py-1.5 text-center mr-2 mb-2;
-  }  
   hr {
 	  @apply m-1
   }
   .input-text {
     @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-64 p-2.5
-  }
-  .chkbox-link {
-    @apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2
-  }
-  .chkbox-link-label {
-    @apply ml-2 text-sm font-medium text-gray-900
   }
 }
 

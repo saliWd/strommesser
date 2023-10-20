@@ -16,16 +16,15 @@ dict_replace = {
   'settings.php\?do=.?': 'static.settings.html',
   'statistic.php"': 'static.statistic.html"',
   'statistic.php\?weeksPast=1': 'static.statistic.html',
-  'index.php"': 'static.index.6h.html"',
-  'index.php\?range=1' : 'static.index.1h.html',
-  'index.php\?range=6' : 'static.index.6h.html',
-  'index.php\?range=24' : 'static.index.24h.html',
-  'index.php\?range=25' : 'static.index.25h.html',
-  '&amp;reload=1' : '',
+  'index.php"': 'static.index.1.html"',
+  'index.php\?range=1' : 'static.index.1.html',
+  'index.php\?range=7' : 'static.index.7.html',
+  'index.php\?range=30' : 'static.index.30.html',
+  'index.php\?range=365' : 'static.index.365.html',
   '<body>':'<body><div style="width: 80%; top:7rem; min-height:3rem; padding:0 20px; text-align:center; font-size:larger; line-height:3rem; border-radius:3rem; box-sizing:border-box; color: rgb(25, 99, 132);border:2px solid rgb(25, 99, 132);  position:relative; display:block; background-color:rgba(255, 255, 255, 0.8); z-index:2; transform:rotate(-10deg);"><b>Demo-Account:</b> Daten sind nicht aktuell und Einstellungen werden nicht gespeichert.</div>'
 }
 
-file_names = ('static.index.1h','static.index.6h','static.index.24h','static.index.25h',
+file_names = ('static.index.1','static.index.7','static.index.30','static.index.365',
 'static.settings',
 'static.statistic',
 'static.login')

@@ -1,4 +1,3 @@
-import time
 from selenium.webdriver.common.by import By
 
 # 1. does a login
@@ -26,14 +25,14 @@ def getStatic(driver, testNum):
   # end if
   subTest = subTest + 1
 
-  ranges = ('1','6','24','25')
+  ranges = ('1','7','30','365')
   
   for range in ranges:
     url = '?range='+range
     driver.get("view-source:https://strommesser.ch/verbrauch/index.php"+url)
     pageSource=driver.find_element(By.TAG_NAME, 'html').text
 
-    writeFile(fileName='staticHtml/static.index.'+range+'h', fileContent=pageSource)
+    writeFile(fileName='staticHtml/static.index.'+range, fileContent=pageSource)
     modDescription = [(str(testNum)+"."+str(subTest)), "getStatic_range_"+range] 
     printOkOrNot(ok=True, testNum=modDescription[0], text=modDescription[1])
 

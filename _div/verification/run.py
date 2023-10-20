@@ -19,7 +19,7 @@ def printUsage(ALL_TESTS):
 def callSingleTest(driver, testNum, ALL_TESTS, testsToRun):
   from loginLogout import doLoginLogout
   from index import doTimescales
-  from staticHtml import getStatic
+  from getStatic import getStatic
   from getImg import getImg
   
   if ALL_TESTS[testNum] in testsToRun:
