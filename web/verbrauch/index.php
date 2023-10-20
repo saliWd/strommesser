@@ -114,7 +114,6 @@ if ($totalCount > 0) {// this may be 0
     <div class="flex-auto text-center">'.$zeitString.'</div>
     <div class="flex-auto text-right">Ø: <b><span class="text-green-600">'.$aveGen.'W</span> / <span class="text-red-500">'.$aveCons.'W</span></b></div>
   </div>
-  <hr>
   ';
 
   if ($queryCount >= $GRAPH_LIMIT) {   
@@ -266,8 +265,7 @@ if ($totalCount > 0) {// this may be 0
         <div class="flex-auto text-left"><b><span class="'.$costClass.'">'.$costText.' [CHF]</span></b></div>
         <div class="flex-auto text-center">&nbsp;</div>
         <div class="flex-auto text-right"><b><span class="'.$costClass.'">'. number_format((float)$costTotal, 2, '.', '').'.-</span></b></div>
-      </div>
-      <hr>
+      </div>      
       <canvas id="myChartCost" width="600" height="200" class="mb-2"></canvas>
       <script>
       const ctxCost = document.getElementById("myChartCost");
@@ -329,7 +327,7 @@ if ($totalCount > 0) {// this may be 0
   echo '<br><br> - noch keine Einträge - <br><br><br>';
 }
 
-echo '<br><br>
+echo '
 <hr>
 <div class="flex items-center">
   <div class="text-sm font-light text-gray-500">
