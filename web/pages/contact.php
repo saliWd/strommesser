@@ -41,13 +41,13 @@ if ($procErr) {
   $mailBody .= 'Datenverarbeitung: '.$process."\n";
 
   $mailOk = mail(
-    to:'messer@strommesser.ch;'.$email,
+    to:'messer@strommesser.ch;',
     subject:'Strommesser Kontaktanfrage',
     message:$mailBody
   );
   if ($mailOk) {
     $okOrNot = 'Kontaktdaten wurden verschickt';
-    $output .= 'Email wurde verschickt (du erhältst eine Kopie). Ich werde mich in Kürze bei dir melden...<br>Folgende Angaben wurden gesendet:<br>';
+    $output .= 'Email wurde verschickt (du erhältst wegen Spamschutz keine Kopie). Ich werde mich aber in Kürze bei dir melden...<br>Folgende Angaben wurden gesendet:<br>';
   } else {
     $okOrNot = 'Fehler beim Mailversand';
     $output .= 'Das Kontaktformular wurde korrekt ausgefüllt aber Email konnte nicht verschickt werden...<br>Nochmals versuchen? <br><a href="https://strommesser.ch/#post-194" class="underline">zurück</a>';
