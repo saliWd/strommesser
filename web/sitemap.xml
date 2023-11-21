@@ -9,57 +9,57 @@
 
 <url>
   <loc>https://strommesser.ch/</loc>
-  <lastmod>2023-02-03T12:43:40+00:00</lastmod>
+  <lastmod>2023-11-21T09:22:45+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://strommesser.ch/verbrauch/static.index.6h.html</loc>
-  <lastmod>2023-02-03T12:39:50+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://strommesser.ch/datenschutzerklaerung/</loc>
-  <lastmod>2023-02-03T12:43:40+00:00</lastmod>
+  <loc>https://strommesser.ch/strommesser-abo/</loc>
+  <lastmod>2023-11-21T09:22:45+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://strommesser.ch/strommesser-geraete/</loc>
-  <lastmod>2023-02-03T12:43:40+00:00</lastmod>
+  <lastmod>2023-11-21T09:22:45+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://strommesser.ch/strommesser-abo/</loc>
-  <lastmod>2023-02-03T12:43:40+00:00</lastmod>
+  <loc>https://strommesser.ch/verbrauch/static.index.1.html</loc>
+  <lastmod>2023-10-20T11:33:36+00:00</lastmod>
   <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://strommesser.ch/datenschutzerklaerung/</loc>
+  <lastmod>2023-11-21T09:22:45+00:00</lastmod>
+  <priority>0.64</priority>
 </url>
 <url>
   <loc>https://strommesser.ch/verbrauch/static.statistic.html</loc>
-  <lastmod>2023-02-03T12:39:50+00:00</lastmod>
+  <lastmod>2023-10-20T11:33:35+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://strommesser.ch/verbrauch/static.settings.html</loc>
-  <lastmod>2023-02-03T12:39:50+00:00</lastmod>
+  <lastmod>2023-10-20T11:33:35+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://strommesser.ch/verbrauch/static.login.html</loc>
-  <lastmod>2023-02-03T12:39:49+00:00</lastmod>
+  <lastmod>2023-10-20T11:33:35+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://strommesser.ch/verbrauch/static.index.1h.html</loc>
-  <lastmod>2023-02-03T12:39:50+00:00</lastmod>
+  <loc>https://strommesser.ch/verbrauch/static.index.7.html</loc>
+  <lastmod>2023-10-20T11:33:36+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://strommesser.ch/verbrauch/static.index.24h.html</loc>
-  <lastmod>2023-02-03T12:39:49+00:00</lastmod>
+  <loc>https://strommesser.ch/verbrauch/static.index.30.html</loc>
+  <lastmod>2023-10-20T11:33:35+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://strommesser.ch/verbrauch/static.index.25h.html</loc>
-  <lastmod>2023-02-03T12:39:49+00:00</lastmod>
+  <loc>https://strommesser.ch/verbrauch/static.index.365.html</loc>
+  <lastmod>2023-10-20T11:33:35+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 
