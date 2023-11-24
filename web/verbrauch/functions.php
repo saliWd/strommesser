@@ -458,7 +458,32 @@ function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, str
   elseif ($param === Param::consNt){ $paramGen = Param::genNt;}
   elseif ($param === Param::consHt){ $paramGen = Param::genHt;}
   else { // cost param is handled differently
-    printPageAndDie('Invalid parameter at getWattSum', 'Please try again later and/or send me an email: web@strommesser.ch');
+    $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
+    if ($resultKunden->num_rows !== 1) {
+        printRawErrorAndDie('Error', 'no config data');
+    } 
+    $rowKunden = $resultKunden->fetch_assoc();
+
+    $sql = 'SELECT SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+    $sql.= ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
+  
+    $result = $dbConn->query($sql); // returns only one row
+    $row = $result->fetch_assoc();
+
+    if ($row['sumConsNtDiff'] + $row['sumConsHtDiff'] + $row['sumGenDiff'] < 0.001) { // don't have the info for old values
+      return [' ', ' ']; // not really nice, returning empty string
+    }
+
+    $costTotal = round( -1.0 * 
+                      ((($row['sumConsNtDiff'])*$rowKunden['priceConsNt']) +
+                        (($row['sumConsHtDiff'])*$rowKunden['priceConsHt']) -
+                        (($row['sumGenDiff']   )*$rowKunden['priceGen']   )), 2);
+    
+    $aveCost = 0.0; // average cost per day
+    if ($row['sumZeitDiff'] > 0) {
+      $aveCost = round(24*3600 / $row['sumZeitDiff'] * $costTotal,2);
+    }
+    return [$costTotal, $aveCost];
   }
 
   $sql[0] = 'SELECT SUM(`'.$param->name.   'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
@@ -476,35 +501,6 @@ function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, str
   }
 
   return $watt; 
-}
-function getWattSumCost(object $dbConn, int $userid, string $dayA, string $dayB) { // returns two values
-  $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
-  if ($resultKunden->num_rows !== 1) {
-      printRawErrorAndDie('Error', 'no config data');
-  } 
-  $rowKunden = $resultKunden->fetch_assoc();
-
-  $sql = 'SELECT SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-  $sql.= ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
- 
-  $result = $dbConn->query($sql); // returns only one row
-  $row = $result->fetch_assoc();
-
-  if ($row['sumConsNtDiff'] + $row['sumConsHtDiff'] + $row['sumGenDiff'] < 0.001) { // don't have the info for old values
-    return [' ', ' ']; // not really nice, returning string
-  }
-
-  $costTotal = round( -1.0 * 
-                    ((($row['sumConsNtDiff'])*$rowKunden['priceConsNt']) +
-                      (($row['sumConsHtDiff'])*$rowKunden['priceConsHt']) -
-                      (($row['sumGenDiff']   )*$rowKunden['priceGen']   )), 2);
-  
-  $aveCost = 0.0; // average cost per day
-  if ($row['sumZeitDiff'] > 0) {
-    $aveCost = round(24*3600 / $row['sumZeitDiff'] * $costTotal,2);
-  }
-
-  return [$costTotal, $aveCost];
 }
 
 function getValues(
@@ -524,20 +520,12 @@ function getValues(
 
   if ($timerange === Timerange::Year) { // generates one value per month
     $numOfEntries = 12;
-    if ($param === Param::cost) { // TODO: not so nice, special treatment
-      $ave = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$year.'-01-01', dayB:$year.'-12-31');
-    } else {
-      $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-01-01', dayB:$year.'-12-31');
-    }    
+    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-01-01', dayB:$year.'-12-31');
     for ($month = 1; $month <= 12; $month++) {
       $dayStrA = $year.'-'.$month.'-01';
       $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
       $dayStrB = $year.'-'.$month.'-'.$lastDay;
-      if ($param === Param::cost) { // TODO: not so nice, special treatment
-        $tmp_arr = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$dayStrA, dayB:$dayStrB);
-      } else {
-        $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStrA, dayB:$dayStrB);
-      }      
+      $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStrA, dayB:$dayStrB);
       $val_y[0] .= $tmp_arr[0].', ';
       $val_y[1] .= $tmp_arr[1].', ';
       $val_y_ave[0] .= $ave[0].', ';
@@ -548,18 +536,10 @@ function getValues(
     $startDay = date_create($year.'-'.$month.'-01');
     $weekDayOffset = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday). Colors are matching between week and month
     $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
-    if ($param === Param::cost) { // TODO: not so nice, special treatment
-      $ave = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
-    } else {
-      $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
-    }
+    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
     for ($day = 1; $day <= $lastDay; $day++) { // 1 to 28 (for February)
       $dayStr = $year.'-'.$month.'-'.$day;
-      if ($param === Param::cost) { // TODO: not so nice, special treatment
-        $tmp_arr = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr);
-      } else {
-        $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
-      }
+      $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
       $val_y[0] .= $tmp_arr[0].', ';
       $val_y[1] .= $tmp_arr[1].', ';
       $val_y_ave[0] .= $ave[0].', ';
@@ -571,18 +551,10 @@ function getValues(
     $numOfEntries = 7;
     $endDay = clone $startDate; // clone is needed here
     $endDay->modify('+6 days');
-    if ($param === Param::cost) { // TODO: not so nice, special treatment      
-      $ave = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$startDate->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
-    } else {
-      $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDate->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
-    }   
+    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDate->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
     for ($day = 1; $day <= $numOfEntries; $day++) {
       $dayStr = $startDate->format('Y-m-d');
-      if ($param === Param::cost) { // TODO: not so nice, special treatment
-        $tmp_arr = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr);
-      } else {
-        $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
-      }
+      $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
       $val_y[0] .= $tmp_arr[0].', ';
       $val_y[1] .= $tmp_arr[1].', ';
       $val_y_ave[0] .= $ave[0].', ';
