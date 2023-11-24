@@ -243,65 +243,98 @@ function printBarGraph (
   
   //        [$numOfEntries, $val_x, $val_y_cons, $val_y_gen, $val_y_cons_ave, $val_y_gen_ave, $ave_cons, $ave_gen, $weekDayOffset];
   $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, startDate:$startDate);  
-  $title .= ' (Ø: <span class="text-green-600">'.$values[7].'</span>/<span class="text-red-500">'.$values[6].'</span>W)';
+  if ($param === Param::cost) {
+    $title .= ' (Ø: <span >'.number_format((float)$values[7], 2, '.', '').'</span>.-)';    
+  } else {
+    $title .= ' (Ø: <span class="text-green-600">'.$values[7].'</span>/<span class="text-red-500">'.$values[6].'</span>W)';
+  }
   if ($goBack > 0) {
     $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-8 h-8').'</a>';
   } else {
     $forwardLink = '<span class="inline-flex">&nbsp;</span>';
   }
+  
   echo '
-  <div class="flex mt-4">
-    <div class="grow h-8 scroll-mt-14" id="anchor'.$chartId.'">
-      <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowLeft, classString:'w-8 h-8').'</a>
-      <span class="text-l inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
-      '.$forwardLink.'
+    <div class="flex mt-4">
+      <div class="grow h-8 scroll-mt-14" id="anchor'.$chartId.'">
+        <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowLeft, classString:'w-8 h-8').'</a>
+        <span class="text-l inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
+        '.$forwardLink.'
+      </div>
     </div>
-  </div>
-  <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
-  <script>
-  const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
-  const labels'.$chartId.' = '.$values[1].';
-  const data'.$chartId.' = {
-    labels: labels'.$chartId.',
-    datasets: [{
-      label: "Verbrauch [W]",
-      data: '.$values[2].',';
-      printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
+    <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
+    <script>
+    const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
+    const labels'.$chartId.' = '.$values[1].';
+    const data'.$chartId.' = {
+      labels: labels'.$chartId.', ';
+  if ($param === Param::cost) {    
       echo '
-      borderWidth: 2,
-      order: 0
-    },
-    {
-      label: "Einspeisung [W]",
-      data: '.$values[3].',';
-      printColors(limit:$values[0], offset:$values[8], isGen:TRUE);
-      echo '
-      borderWidth: 2,
-      order: 1
-    },
-        {      
-      label: "Durchschnittsverbrauch [W]",
-      data: '.$values[4].',
-      borderColor: "rgba(239, 68, 68, 0.8)",
-      backgroundColor: "rgb(255,255,255)",
-      borderWidth: 2,
-      borderDash: [10, 5],
-      pointStyle: false,
-      type: "line",
-      order: 2
-    },
-    {
-      label: "Durchschnitt Einspeisung [W]",      
-      data: '.$values[5].',
-      borderColor: "rgba(22, 163, 74, 0.8)",
-      backgroundColor: "rgb(255,255,255)",
-      borderWidth: 2,
-      borderDash: [10, 5],
-      pointStyle: false,
-      type: "line",
-      order: 3
-    }]
-  };
+        datasets: [{
+        label: "Kosten [CHF]",
+        data: '.$values[2].',';
+        printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
+        echo '
+        borderWidth: 2,
+        order: 0
+      },
+      {      
+        label: "Durchschnittskosten [CHF]",
+        data: '.$values[5].',
+        borderColor: "rgba(239, 68, 68, 0.8)",
+        backgroundColor: "rgb(255,255,255)",
+        borderWidth: 2,
+        borderDash: [10, 5],
+        pointStyle: false,
+        type: "line",
+        order: 2
+      }]
+    };
+    ';    
+  } else { // param is not cost     
+    echo '
+        datasets: [{
+        label: "Verbrauch [W]",
+        data: '.$values[2].',';
+        printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
+        echo '
+        borderWidth: 2,
+        order: 0
+      },
+      {
+        label: "Einspeisung [W]",
+        data: '.$values[3].',';
+        printColors(limit:$values[0], offset:$values[8], isGen:TRUE);
+        echo '
+        borderWidth: 2,
+        order: 1
+      },
+          {      
+        label: "Durchschnittsverbrauch [W]",
+        data: '.$values[4].',
+        borderColor: "rgba(239, 68, 68, 0.8)",
+        backgroundColor: "rgb(255,255,255)",
+        borderWidth: 2,
+        borderDash: [10, 5],
+        pointStyle: false,
+        type: "line",
+        order: 2
+      },
+      {
+        label: "Durchschnitt Einspeisung [W]",      
+        data: '.$values[5].',
+        borderColor: "rgba(22, 163, 74, 0.8)",
+        backgroundColor: "rgb(255,255,255)",
+        borderWidth: 2,
+        borderDash: [10, 5],
+        pointStyle: false,
+        type: "line",
+        order: 3
+      }]
+    };
+    ';
+  } // end of param == cost or not
+  echo '
   const config'.$chartId.' = {
     type: "bar",
     data: data'.$chartId.',
@@ -310,6 +343,7 @@ function printBarGraph (
   const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
   </script>';  
   printPopOverLnk(chartId:$chartId);
+  // TODO: different text for cost
   echo '
       <h3 class="font-semibold text-gray-900">Leistung in Watt</h3>
       <p>Verbrauch (rot umrandete Balken) und Einspeisung (grün umrandete Balken) in Watt.<br>
@@ -325,131 +359,8 @@ function printBarGraph (
     echo '
       </div>
   <div data-popper-arrow></div>
-</div>';
-  
-  echo getHr().'
-  <br>
-  ';
-}
-
-function printBarGraphCost ( // TODO: merge with other bar graph
-  object $dbConn, int $userid, 
-  Timerange $timerange, Param $param, 
-  int $goBack, bool $isIndexPage=FALSE
-):void {
-  $startDate = date_create();
-  $year = (int)$startDate->format('Y'); // current year
-  $month = (int)$startDate->format('m'); // current month
-  if ($timerange === Timerange::Year) { 
-    $year = $year - $goBack;
-    $startDate = date_create($year.'-01-01');
-
-    if ($goBack === 0)     { $title = 'dieses Jahr'; }
-    elseif ($goBack === 1) { $title = 'letztes Jahr'; }
-    else                   { $title = 'Jahr '.$year; }
-    $chartId = 'Y';
-  } elseif ($timerange === Timerange::Month) {
-    $month = $month - $goBack;
-    while ($month < 1) {
-      $year--;
-      $month += 12;
-    }
-    $startDate = date_create($year.'-'.$month.'-01');
-
-    $monthNames = array('Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'); // need german naming, not using format('M')
-    $title = $monthNames[$month-1];
-    $chartId = 'M';
-  } elseif ($timerange === Timerange::Week) {    
-    $startDate->modify('-'.$goBack.' weeks');
-    $weekday = (int)$startDate->format('N') - 1; // 0 (for Monday) through 6 (for Sunday)
-    $startDate->modify('-'.$weekday.' days'); // that gets me Monday in this week
-  
-    if ($goBack === 0)     { $title = 'diese Woche'; }
-    elseif ($goBack === 1) { $title = 'letzte Woche'; }
-    else {                   $title = 'Woche '.$startDate->format("W");    
-    }
-    $chartId = 'W';
-  }  
-  
-  $chartId .= $param->name;
-  if ($param === Param::cons)       { $paramText = 'Leistung';}
-  elseif ($param === Param::consNt) { $paramText = 'Leistung NT';}
-  elseif ($param === Param::consHt) { $paramText = 'Leistung HT';}
-  elseif ($param === Param::cost)   { $paramText = 'Kosten/Ertrag';}
-  else {
-    $paramText = 'ungültiger Param';
-  }
-  
-  //        [$numOfEntries, $val_x, $val_y_cons, $val_y_gen, $val_y_cons_ave, $val_y_gen_ave, $ave_cons, $ave_gen, $weekDayOffset];
-  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, startDate:$startDate);  
-  $title .= ' (Ø: <span >'.number_format((float)$values[7], 2, '.', '').'</span>.-)';
-  if ($goBack > 0) {
-    $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-8 h-8').'</a>';
-  } else {
-    $forwardLink = '<span class="inline-flex">&nbsp;</span>';
-  }
-  echo '
-  <div class="flex mt-4">
-    <div class="grow h-8 scroll-mt-14" id="anchor'.$chartId.'">
-      <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowLeft, classString:'w-8 h-8').'</a>
-      <span class="text-l inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
-      '.$forwardLink.'
-    </div>
-  </div>
-  <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
-  <script>
-  const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
-  const labels'.$chartId.' = '.$values[1].';
-  const data'.$chartId.' = {
-    labels: labels'.$chartId.',
-    datasets: [{
-      label: "Kosten [CHF]",
-      data: '.$values[2].',';
-      printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
-      echo '
-      borderWidth: 2,
-      order: 0
-    },
-    {      
-      label: "Durchschnittskosten [CHF]",
-      data: '.$values[5].',
-      borderColor: "rgba(239, 68, 68, 0.8)",
-      backgroundColor: "rgb(255,255,255)",
-      borderWidth: 2,
-      borderDash: [10, 5],
-      pointStyle: false,
-      type: "line",
-      order: 2
-    }]
-  };
-  const config'.$chartId.' = {
-    type: "bar",
-    data: data'.$chartId.',
-    options: { plugins : { legend: { display: false } } },
-  };
-  const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
-  </script>';  
-  printPopOverLnk(chartId:$chartId);
-  echo '
-      <h3 class="font-semibold text-gray-900">TODO</h3>
-      <p>Verbrauch (rot umrandete Balken) und Einspeisung (grün umrandete Balken) in Watt.<br>
-      Gestrichelt dargestellt werden der Durchschnittsverbrauch bzw. die durschnittliche Einspeisung.</p>
-      <p>Mit den blauen Pfeilen kann man zwischen den Wochen (bzw. Monate / Jahre) wechseln.</p>';
-  if ($isIndexPage) {
-      echo '
-      <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-      <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-      <a href="../verbrauch/statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
-    ';
-    }
-    echo '
-      </div>
-  <div data-popper-arrow></div>
-</div>';
-  
-  echo getHr().'
-  <br>
-  ';
+</div>';  
+  echo getHr().'<br>';
 }
 
 
