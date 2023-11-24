@@ -144,7 +144,7 @@ function checkInputs(object $dbConn): int {
 }
 
 // prints color according to the weekday
-function printColors(int $limit, int $offset, bool $isGen):void {
+function printColors(int $limit, int $offset, string $borderCol):void {
   $COLORS = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
   echo "\n      backgroundColor: [\n";
   for($i = 0; $i < $limit; $i++) {
@@ -153,11 +153,7 @@ function printColors(int $limit, int $offset, bool $isGen):void {
   }
   echo "],\n      borderColor: [\n";
   for($i = 0; $i < $limit; $i++) {
-    if ($isGen) {
-      echo '      "rgba(22, 163, 74, 0.4)"';
-    } else {
-      echo '      "rgba(239, 68, 68, 0.4)"';
-    }    
+    echo '      "rgba('.$borderCol.' 0.4)"';    
     if($i != ($limit-1)) { echo ",\n"; }
   }
   echo '],';
@@ -268,20 +264,22 @@ function printBarGraph (
     const labels'.$chartId.' = '.$values[1].';
     const data'.$chartId.' = {
       labels: labels'.$chartId.', ';
-  if ($param === Param::cost) {    
+  if ($param === Param::cost) {
+      $aveColor = '239, 68, 68,'; // red
+      if ($values[7] > 0) {$aveColor = '22, 163, 74,';} // green
       echo '
         datasets: [{
-        label: "Kosten [CHF]",
+        label: "Kosten/Ertrag [CHF]",
         data: '.$values[2].',';
-        printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
+        printColors(limit:$values[0], offset:$values[8], borderCol:'0, 0, 0,');
         echo '
         borderWidth: 2,
         order: 0
       },
       {      
-        label: "Durchschnittskosten [CHF]",
+        label: "Durchschnitt [CHF]",
         data: '.$values[5].',
-        borderColor: "rgba(239, 68, 68, 0.8)",
+        borderColor: "rgba('.$aveColor.' 0.8)",
         backgroundColor: "rgb(255,255,255)",
         borderWidth: 2,
         borderDash: [10, 5],
@@ -296,7 +294,7 @@ function printBarGraph (
         datasets: [{
         label: "Verbrauch [W]",
         data: '.$values[2].',';
-        printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
+        printColors(limit:$values[0], offset:$values[8], borderCol:'239, 68, 68,');
         echo '
         borderWidth: 2,
         order: 0
@@ -304,7 +302,7 @@ function printBarGraph (
       {
         label: "Einspeisung [W]",
         data: '.$values[3].',';
-        printColors(limit:$values[0], offset:$values[8], isGen:TRUE);
+        printColors(limit:$values[0], offset:$values[8], borderCol:'22, 163, 74,');
         echo '
         borderWidth: 2,
         order: 1
