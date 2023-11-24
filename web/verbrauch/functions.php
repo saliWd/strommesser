@@ -382,7 +382,7 @@ function printBarGraphCost ( // TODO: merge with other bar graph
   
   //        [$numOfEntries, $val_x, $val_y_cons, $val_y_gen, $val_y_cons_ave, $val_y_gen_ave, $ave_cons, $ave_gen, $weekDayOffset];
   $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, startDate:$startDate);  
-  $title .= ' (Ø: <span >'.$values[6].'</span>.-)';
+  $title .= ' (Ø: <span >'.number_format((float)$values[7], 2, '.', '').'</span>.-)';
   if ($goBack > 0) {
     $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-8 h-8').'</a>';
   } else {
@@ -412,7 +412,7 @@ function printBarGraphCost ( // TODO: merge with other bar graph
     },
     {      
       label: "Durchschnittskosten [CHF]",
-      data: '.$values[4].',
+      data: '.$values[5].',
       borderColor: "rgba(239, 68, 68, 0.8)",
       backgroundColor: "rgb(255,255,255)",
       borderWidth: 2,
@@ -484,7 +484,7 @@ function getWattSumCost(object $dbConn, int $userid, string $dayA, string $dayB)
   } 
   $rowKunden = $resultKunden->fetch_assoc();
 
-  $sql = 'SELECT SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff` FROM `verbrauch`';
+  $sql = 'SELECT SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
   $sql.= ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
  
   $result = $dbConn->query($sql); // returns only one row
@@ -499,7 +499,12 @@ function getWattSumCost(object $dbConn, int $userid, string $dayA, string $dayB)
                       (($row['sumConsHtDiff'])*$rowKunden['priceConsHt']) -
                       (($row['sumGenDiff']   )*$rowKunden['priceGen']   )), 2);
   
-  return [$costTotal, $costTotal];
+  $aveCost = 0.0; // average cost per day
+  if ($row['sumZeitDiff'] > 0) {
+    $aveCost = round(24*3600 / $row['sumZeitDiff'] * $costTotal,2);
+  }
+
+  return [$costTotal, $aveCost];
 }
 
 function getValues(
@@ -518,13 +523,21 @@ function getValues(
   $month = (int)$startDate->format('m');  
 
   if ($timerange === Timerange::Year) { // generates one value per month
-    $numOfEntries = 12;    
-    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-01-01', dayB:$year.'-12-31');
+    $numOfEntries = 12;
+    if ($param === Param::cost) { // TODO: not so nice, special treatment
+      $ave = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$year.'-01-01', dayB:$year.'-12-31');
+    } else {
+      $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-01-01', dayB:$year.'-12-31');
+    }    
     for ($month = 1; $month <= 12; $month++) {
       $dayStrA = $year.'-'.$month.'-01';
       $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
       $dayStrB = $year.'-'.$month.'-'.$lastDay;
-      $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStrA, dayB:$dayStrB);
+      if ($param === Param::cost) { // TODO: not so nice, special treatment
+        $tmp_arr = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$dayStrA, dayB:$dayStrB);
+      } else {
+        $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStrA, dayB:$dayStrB);
+      }      
       $val_y[0] .= $tmp_arr[0].', ';
       $val_y[1] .= $tmp_arr[1].', ';
       $val_y_ave[0] .= $ave[0].', ';
@@ -558,10 +571,18 @@ function getValues(
     $numOfEntries = 7;
     $endDay = clone $startDate; // clone is needed here
     $endDay->modify('+6 days');
-    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDate->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));    
+    if ($param === Param::cost) { // TODO: not so nice, special treatment      
+      $ave = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$startDate->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
+    } else {
+      $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDate->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
+    }   
     for ($day = 1; $day <= $numOfEntries; $day++) {
       $dayStr = $startDate->format('Y-m-d');
-      $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
+      if ($param === Param::cost) { // TODO: not so nice, special treatment
+        $tmp_arr = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr);
+      } else {
+        $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
+      }
       $val_y[0] .= $tmp_arr[0].', ';
       $val_y[1] .= $tmp_arr[1].', ';
       $val_y_ave[0] .= $ave[0].', ';
