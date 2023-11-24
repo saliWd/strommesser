@@ -454,10 +454,8 @@ function printBarGraphCost ( // TODO: merge with other bar graph
 
 
 function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, string $dayB) { // returns two values
-  if ($param === Param::cons)      { $paramGen = Param::gen;}
-  elseif ($param === Param::consNt){ $paramGen = Param::genNt;}
-  elseif ($param === Param::consHt){ $paramGen = Param::genHt;}
-  else { // cost param is handled differently
+  $sql_where = ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
+  if ($param === Param::cost) { // cost param is handled differently
     $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
     if ($resultKunden->num_rows !== 1) {
         printRawErrorAndDie('Error', 'no config data');
@@ -465,9 +463,7 @@ function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, str
     $rowKunden = $resultKunden->fetch_assoc();
 
     $sql = 'SELECT SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-    $sql.= ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
-  
-    $result = $dbConn->query($sql); // returns only one row
+    $result = $dbConn->query($sql.$sql_where); // returns only one row
     $row = $result->fetch_assoc();
 
     if ($row['sumConsNtDiff'] + $row['sumConsHtDiff'] + $row['sumGenDiff'] < 0.001) { // don't have the info for old values
@@ -485,10 +481,12 @@ function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, str
     }
     return [$costTotal, $aveCost];
   }
-
+  elseif ($param === Param::cons)  { $paramGen = Param::gen;}
+  elseif ($param === Param::consNt){ $paramGen = Param::genNt;}
+  elseif ($param === Param::consHt){ $paramGen = Param::genHt;}  
+  
   $sql[0] = 'SELECT SUM(`'.$param->name.   'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
   $sql[1] = 'SELECT SUM(`'.$paramGen->name.'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-  $sql_where = ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
   
   $watt = [0, 0];
   for ($i = 0; $i < 2; $i++) {
