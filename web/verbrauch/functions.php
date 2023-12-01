@@ -189,6 +189,7 @@ function printPopOverLnk(string $chartId):void {
 ';
 }
 
+// displays a bar graph with either two values (generated and consumed watt values) per x-point or one value (cost) per x-point
 function printBarGraph (
   object $dbConn, int $userid, 
   Timerange $timerange, Param $param, 
@@ -227,23 +228,27 @@ function printBarGraph (
     $chartId = 'W';
   }
   
+  // returns: [$numOfEntries, $val_x, $val_y_cons, $val_y_gen, $val_y_cons_ave, $val_y_gen_ave, $ave_cons, $ave_gen, $weekDayOffset]
+  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, startDate:$startDate);  
+
   $statisticLink = 'statistic.php#anchor'.$chartId;
   $chartId .= $param->name;
+  $numbersText = ' (Ø: <span class="text-green-600">'.$values[7].'</span>/<span class="text-red-500">'.$values[6].'</span>W)';
   if ($param === Param::cons)       { $paramText = 'Leistung';}
   elseif ($param === Param::consNt) { $paramText = 'Leistung NT';}
   elseif ($param === Param::consHt) { $paramText = 'Leistung HT';}
-  elseif ($param === Param::cost)   { $paramText = 'Kosten/Ertrag';}
-  else {
-    $paramText = 'ungültiger Param';
+  elseif ($param === Param::cost)   { 
+    if ($values[7] < 0) {
+      $paramText = 'Kosten'; 
+      $textColor = 'text-red-500'; 
+    } else {
+      $paramText = 'Ertrag'; 
+      $textColor = 'text-green-600';
+    }
+    $numbersText = ' (<span class="'.$textColor.'">Ø: '.number_format((float)$values[7], 2, '.', '').'.-</span>)';
   }
+  $title .= $numbersText;
   
-  //        [$numOfEntries, $val_x, $val_y_cons, $val_y_gen, $val_y_cons_ave, $val_y_gen_ave, $ave_cons, $ave_gen, $weekDayOffset];
-  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, startDate:$startDate);  
-  if ($param === Param::cost) {
-    $title .= ' (Ø: <span >'.number_format((float)$values[7], 2, '.', '').'</span>.-)';    
-  } else {
-    $title .= ' (Ø: <span class="text-green-600">'.$values[7].'</span>/<span class="text-red-500">'.$values[6].'</span>W)';
-  }
   if ($goBack > 0) {
     $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-8 h-8').'</a>';
   } else {
