@@ -20,13 +20,15 @@
    2. ~~getRaw.php~~
    3. index.php
       1. make it configurable, which graphs to show (in settings)
-      1. on non-mobile, limit the height/size of the first graph
+      1. on non-mobile, limit the height/size of the first graph, have them one next to the other?
    4. ~~login.php~~
    5. ~~rx.php~~
    6. settings.php:
       1. which graphs to show on index -> makes it more complicated and difficult to test. Maybe not worth the work?
+         * rather have links to the corresponding graph on the statistic site
       1. change email
    7. statistic.php
+      1. explanation for cost graph different
       1. add table layout with numbers additional to graphs
 3. pico devices
    1. print my own case for measurement
@@ -38,7 +40,7 @@
 
 
 
-Next: 1.3.1 / 
+Next: 2.6.1 / 1.3.1
 
 
 [displayCase]: https://www.thingiverse.com/thing:4767008

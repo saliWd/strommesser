@@ -204,7 +204,7 @@ function printBarGraph (
     if ($goBack === 0)     { $title = 'dieses Jahr'; }
     elseif ($goBack === 1) { $title = 'letztes Jahr'; }
     else                   { $title = 'Jahr '.$year; }
-    $chartId = 'Y';
+    $chartId = 'Y';    
   } elseif ($timerange === Timerange::Month) {
     $month = $month - $goBack;
     while ($month < 1) {
@@ -223,11 +223,11 @@ function printBarGraph (
   
     if ($goBack === 0)     { $title = 'diese Woche'; }
     elseif ($goBack === 1) { $title = 'letzte Woche'; }
-    else {                   $title = 'Woche '.$startDate->format("W");    
-    }
+    else {                   $title = 'Woche '.$startDate->format("W");}
     $chartId = 'W';
-  }  
+  }
   
+  $statisticLink = 'statistic.php#anchor'.$chartId;
   $chartId .= $param->name;
   if ($param === Param::cons)       { $paramText = 'Leistung';}
   elseif ($param === Param::consNt) { $paramText = 'Leistung NT';}
@@ -347,11 +347,11 @@ function printBarGraph (
       <p>Verbrauch (rot umrandete Balken) und Einspeisung (grün umrandete Balken) in Watt.<br>
       Gestrichelt dargestellt werden der Durchschnittsverbrauch bzw. die durschnittliche Einspeisung.</p>
       <p>Mit den blauen Pfeilen kann man zwischen den Wochen (bzw. Monate / Jahre) wechseln.</p>';
-  if ($isIndexPage) {
+  if ($isIndexPage) {      
       echo '
       <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
       <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-      <a href="../verbrauch/statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
+      <a href="../verbrauch/'.$statisticLink.'" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
     ';
     }
     echo '
