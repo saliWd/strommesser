@@ -245,7 +245,7 @@ function printBarGraph (
       $paramText = 'Ertrag'; 
       $textColor = 'text-green-600';
     }
-    $numbersText = ' (<span class="'.$textColor.'">Ø: '.number_format((float)$values[7], 2, '.', '').'.-</span>)';
+    $numbersText = ' (<span class="'.$textColor.'">Ø: '.number_format((float)$values[7], 2, '.', '').'</span>)';
   }
   $title .= $numbersText;
   
