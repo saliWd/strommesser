@@ -19,8 +19,11 @@
    1. ~~general~~
    2. ~~getRaw.php~~
    3. index.php
-      1. make it configurable, which graphs to show (in settings)
+      1. make it configurable, which graphs to show (in settings)?
       1. on non-mobile, limit the height/size of the first graph, have them one next to the other?
+      1. rethink the 'legend / more info' concept: 
+         have 2 links at every graph, one to the bottom of the index/statistic page with general explanations (which is always visible, no js-hidden stuff). The other one with a link from index to corresponding statistic site (month/year etc.)
+
    4. ~~login.php~~
    5. ~~rx.php~~
    6. settings.php:
@@ -40,7 +43,7 @@
 
 
 
-Next: 2.6.1 / 1.3.1
+Next: 2.3.3 / 1.3.1 /
 
 
 [displayCase]: https://www.thingiverse.com/thing:4767008

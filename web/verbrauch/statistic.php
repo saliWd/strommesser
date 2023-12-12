@@ -42,5 +42,6 @@ printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:P
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::consNt, goBack:safeIntFromExt('GET','goBackYconsNt', 2), isIndexPage:FALSE);
 printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year, param:Param::consHt, goBack:safeIntFromExt('GET','goBackYconsHt', 2), isIndexPage:FALSE);
 
+printGraphExplanation(isIndexPage:FALSE);
 ?>
 </div></body></html>
