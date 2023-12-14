@@ -1,9 +1,11 @@
 <?php
 require_once('../verbrauch/functions.php');
 printBeginOfPage_v2(site:'contact.php', title:'Kontaktformular');
+$SPAM_SCHUTZ_TRUTH = 28;
 
 $name = safeStrFromExt(source:'POST', varName:'contactForm_name', length:63);
 $email = safeStrFromExt(source:'POST', varName:'contactForm_email', length:63);
+$schutz = safeIntFromExt(source:'POST', varName:'contactForm_schutz', length:3);
 $type = safeIntFromExt(source:'POST', varName:'contactForm_radio', length:1); // 1: E350, 2: anders, 3: unbekannt
 $div = safeStrFromExt(source:'POST', varName:'contactForm_div', length:1023);
 $process = safeIntFromExt(source:'POST', varName:'contactForm_process', length:1);
@@ -16,6 +18,10 @@ $output = ''; // success message
 if ($process !== 1) {
   $procErr = TRUE;
   $procErrDet .= 'Du musst der Datenverarbeitung zustimmen...<br>';
+}
+if ($schutz !== $SPAM_SCHUTZ_TRUTH) {
+  $procErr = TRUE;
+  $procErrDet .= 'Spamschutzrechnung ist nicht korrekt...<br>';
 }
 if (($type < 1) or ($type > 3)) {
   $procErr = TRUE;

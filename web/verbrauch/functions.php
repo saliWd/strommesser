@@ -144,7 +144,7 @@ function checkInputs(object $dbConn): int {
 }
 
 // prints color according to the weekday
-function printColors(int $limit, int $offset, bool $isGen):void {
+function printColors(int $limit, int $offset, string $borderCol):void {
   $COLORS = ['255,99,132','255,159,64','255,205,86','75,192,192','54,162,235','153,102,255','201,203,207'];
   echo "\n      backgroundColor: [\n";
   for($i = 0; $i < $limit; $i++) {
@@ -153,11 +153,7 @@ function printColors(int $limit, int $offset, bool $isGen):void {
   }
   echo "],\n      borderColor: [\n";
   for($i = 0; $i < $limit; $i++) {
-    if ($isGen) {
-      echo '      "rgba(22, 163, 74, 0.4)"';
-    } else {
-      echo '      "rgba(239, 68, 68, 0.4)"';
-    }    
+    echo '      "rgba('.$borderCol.' 0.4)"';    
     if($i != ($limit-1)) { echo ",\n"; }
   }
   echo '],';
@@ -193,6 +189,96 @@ function printPopOverLnk(string $chartId):void {
 ';
 }
 
+// prints legend and explanation for all the different graphs. Displayed graphs differ partly between index page and statistics page
+function printGraphExplanation(bool $isIndexPage):void {
+  // use this as an example: https://flowbite.com/docs/components/card/#horizontal-card
+  echo '
+  <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
+    <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900" id="explanation">Erklärungen zu den Grafiken<span></div>
+  </div>
+    ';
+  
+  echo '
+  <div class="flex flex-col items-center border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl bg-gray-100 mt-4">
+    <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-s-lg" src="img/expl_00.png" alt="">
+    <div class="flex flex-col justify-between p-4 leading-normal">
+      <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Ausgelesene Einzelwerte</h3>
+      <p class="mb-3 font-normal text-gray-700 text-left">
+        Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 1 Wh (3600 W) über einen Zeitraum von ca. zwei Minuten (120 Sekunden). Für die einzelne Messung entspricht das einer Auflösung von ca. 30 W. Es wird sowohl der Verbrauch als auch die Einspeisung ausgelesen, für den Verbrauch aufgesplittet auf Niedertarif (NT) und Hochtarif (HT).
+      </p>
+    </div>
+  </div>
+  <div class="flex flex-col items-center border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl bg-gray-200 mt-4">
+    <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-s-lg" src="img/expl_01.png" alt="">  
+    <div class="flex flex-col justify-between p-4 leading-normal">
+      <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Leistungsmessungen und Kostenmessungen</h3>
+      <p class="mb-3 font-normal text-gray-700 text-left">
+        Bei Leistungsmessungen wird jeweils der Durchschnittsverbrauch/Einspeisung angezeigt. Ein Verbrauch von z.B. 1000 Watt entspricht dann einem Tagesverbrauch von 24 kWh.<br>
+        Bei den Kosten werden hingegen die total aufgelaufenen Kosten angezeigt.
+      </p>
+    </div>
+  </div>
+  ';
+
+/*
+  echo '
+
+        <p class="mb-3 font-normal text-gray-700">
+        Zeitliche Auflösung: Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 1 Woche), bzw. mit einem Punkt pro Tag (älter).
+      </p>
+
+
+  <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
+    <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900" id="explanation">Erklärungen zu den Grafiken<span></div>
+    <div class="p-3 space-y-2">
+      <h2 class="font-semibold text-gray-900">Grundlagen</h2>
+      <h3 class="font-semibold text-gray-900">Ausgelesene Einzelwerte</h3>
+      <p>Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 0.001 kWh, d.h. 1 Wh = 3600 W über einen Zeitraum von ca. zwei Minuten = 120 Sekunden. Für die <b>einzelne Messung</b> entspricht das einer Auflösung von ca. <b>30 W</b>. Es wird sowohl der Verbrauch als auch die Einspeisung ausgelesen, für den Verbrauch aufgesplittet auf Niedertarif (NT) und Hochtarif (HT).</p>
+      <h3 class="font-semibold text-gray-900">Zeitliche Auflösung</h3>
+      <p>Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 1 Woche), bzw. mit einem Punkt pro Tag (älter).</p>
+      <h3 class="font-semibold text-gray-900">Leistungsmessungen und Kostenmessungen</h3>
+      <p>
+        Bei Leistungsmessungen wird jeweils der Durchschnittsverbrauch/Einspeisung angezeigt. <TODO: insert weekly bar graph> Ein Verbrauch von z.B. 1000 Watt entspricht dann einem Tagesverbrauch von 24 kWh.<br>
+        Bei den Kosten werden hingegen die total aufgelaufenen Kosten angezeigt.
+      </p>
+      <h2 class="font-semibold text-gray-900">Balkendiagramme</h2>
+      <h3 class="font-semibold text-gray-900">Verbrauch/Einspeisung und Kosten/Ertrag</h3>
+      <p>
+        Rot umrandete Balken zeigen den Verbrauch an (bezogene Energie), grün umrandete Balken zeigen die Einspeisung an, beide Balken werden pro Tag angezeigt.<br>
+        Kosten/Ertrag werden allgemein schwarz umrandet mit nur einem Balken pro Tag angezeigt.
+      </p>
+    </div>
+  </div>
+  ';
+
+  echo '
+    <div class="p-3 space-y-2">
+        <h3 class="font-semibold text-gray-900">Leistungsmessung</h3>
+        <p>
+          Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 0.001 kWh, d.h. 1 Wh = 3600 W über einen Zeitraum von ca. zwei Minuten = 120 Sekunden. Für die einzelne Messung entspricht das einer Auflösung von ca. 30 W. Es wird sowohl der Verbrauch als auch die Einspeisung ausgelesen. In dieser Grafik sieht man den totalen Verbrauch / Einspeisung. Also Niedertarif (NT) und Hochtarif (HT) zusammen. <br>
+          Auf der linken Skala werden die aktuellen Werte logarithmisch in Watt aufgetragen, auf der rechten Skala die summierten Werte linear in kWh.
+        </p>
+        <h3 class="font-semibold text-gray-900">Aktueller Verbrauch (rot, linke Skala)</h3>
+        <p>Der aktuelle Verbrauch (in W-Auflösung) wird rot und auf der linken Skala aufgetragen. Diese Skala ist logarithmisch.</p>
+        <h3 class="font-semibold text-gray-900">Verbrauch Total (blass-rot, rechte Skala)</h3>
+        <p>Der Totalverbrauch (in Wh-Auflösung) wird blass-rot und linear auf der rechten Skala aufgetragen. Diese Skala beginnt über den gewählten Zeitraum immer bei 0 kWh.</p>
+        
+        <h3 class="font-semibold text-gray-900">Aktuelle Einspeisung (grün, linke Skala)</h3>
+        <p>Die aktuelle Einspeisung (in W-Auflösung) wird grün und auf der linken Skala aufgetragen. Diese Skala ist logarithmisch.</p>
+        <h3 class="font-semibold text-gray-900">Einspeisung Gesamt (blass-grün, rechte Skala)</h3>
+        <p>Die gesamte Einspeisung (in Wh-Auflösung) wird blass-grün und linear auf der rechten Skala aufgetragen. Diese Skala beginnt über den gewählten Zeitraum immer bei 0 kWh.</p>
+
+        <h3 class="font-semibold text-gray-900">Zeitliche Auflösung (x-Achse)</h3>
+        <p>Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 72 Stunden), bzw. mit einem Punkt pro Tag (älter).</p>
+        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
+        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
+        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
+    </div>
+  ';
+*/
+}
+
+// displays a bar graph with either two values (generated and consumed watt values) per x-point or one value (cost) per x-point
 function printBarGraph (
   object $dbConn, int $userid, 
   Timerange $timerange, Param $param, 
@@ -208,7 +294,7 @@ function printBarGraph (
     if ($goBack === 0)     { $title = 'dieses Jahr'; }
     elseif ($goBack === 1) { $title = 'letztes Jahr'; }
     else                   { $title = 'Jahr '.$year; }
-    $chartId = 'Y';
+    $chartId = 'Y';    
   } elseif ($timerange === Timerange::Month) {
     $month = $month - $goBack;
     while ($month < 1) {
@@ -227,81 +313,120 @@ function printBarGraph (
   
     if ($goBack === 0)     { $title = 'diese Woche'; }
     elseif ($goBack === 1) { $title = 'letzte Woche'; }
-    else {                   $title = 'Woche '.$startDate->format("W");    
-    }
+    else {                   $title = 'Woche '.$startDate->format("W");}
     $chartId = 'W';
-  }  
+  }
   
+  // returns: [$numOfEntries, $val_x, $val_y_cons, $val_y_gen, $val_y_cons_ave, $val_y_gen_ave, $ave_cons, $ave_gen, $weekDayOffset]
+  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, startDate:$startDate);  
+
+  $statisticLink = 'statistic.php#anchor'.$chartId;
   $chartId .= $param->name;
+  $numbersText = ' (Ø: <span class="text-green-600">'.$values[7].'</span>/<span class="text-red-500">'.$values[6].'</span>W)';
   if ($param === Param::cons)       { $paramText = 'Leistung';}
   elseif ($param === Param::consNt) { $paramText = 'Leistung NT';}
   elseif ($param === Param::consHt) { $paramText = 'Leistung HT';}
-  elseif ($param === Param::cost)   { $paramText = 'Kosten/Ertrag';}
-  else {
-    $paramText = 'ungültiger Param';
+  elseif ($param === Param::cost)   { 
+    if ($values[7] < 0) {
+      $paramText = 'Kosten'; 
+      $textColor = 'text-red-500'; 
+    } else {
+      $paramText = 'Ertrag'; 
+      $textColor = 'text-green-600';
+    }
+    $numbersText = ' (<span class="'.$textColor.'">Ø: '.number_format((float)$values[7], 2, '.', '').'</span>)';
   }
+  $title .= $numbersText;
   
-  //        [$numOfEntries, $val_x, $val_y_cons, $val_y_gen, $val_y_cons_ave, $val_y_gen_ave, $ave_cons, $ave_gen, $weekDayOffset];
-  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, startDate:$startDate);  
-  $title .= ' (Ø: <span class="text-green-600">'.$values[7].'</span>/<span class="text-red-500">'.$values[6].'</span>W)';
   if ($goBack > 0) {
     $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-8 h-8').'</a>';
   } else {
     $forwardLink = '<span class="inline-flex">&nbsp;</span>';
   }
+  
   echo '
-  <div class="flex mt-4">
-    <div class="grow h-8 scroll-mt-14" id="anchor'.$chartId.'">
-      <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowLeft, classString:'w-8 h-8').'</a>
-      <span class="text-l inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
-      '.$forwardLink.'
+    <div class="flex mt-4">
+      <div class="grow h-8 scroll-mt-14" id="anchor'.$chartId.'">
+        <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowLeft, classString:'w-8 h-8').'</a>
+        <span class="text-l inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
+        '.$forwardLink.'
+      </div>
     </div>
-  </div>
-  <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
-  <script>
-  const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
-  const labels'.$chartId.' = '.$values[1].';
-  const data'.$chartId.' = {
-    labels: labels'.$chartId.',
-    datasets: [{
-      label: "Verbrauch [W]",
-      data: '.$values[2].',';
-      printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
+    <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
+    <script>
+    const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
+    const labels'.$chartId.' = '.$values[1].';
+    const data'.$chartId.' = {
+      labels: labels'.$chartId.', ';
+  if ($param === Param::cost) {
+      $aveColor = '239, 68, 68,'; // red
+      if ($values[7] > 0) {$aveColor = '22, 163, 74,';} // green
       echo '
-      borderWidth: 2,
-      order: 0
-    },
-    {
-      label: "Einspeisung [W]",
-      data: '.$values[3].',';
-      printColors(limit:$values[0], offset:$values[8], isGen:TRUE);
-      echo '
-      borderWidth: 2,
-      order: 1
-    },
-        {      
-      label: "Durchschnittsverbrauch [W]",
-      data: '.$values[4].',
-      borderColor: "rgba(239, 68, 68, 0.8)",
-      backgroundColor: "rgb(255,255,255)",
-      borderWidth: 2,
-      borderDash: [10, 5],
-      pointStyle: false,
-      type: "line",
-      order: 2
-    },
-    {
-      label: "Durchschnitt Einspeisung [W]",      
-      data: '.$values[5].',
-      borderColor: "rgba(22, 163, 74, 0.8)",
-      backgroundColor: "rgb(255,255,255)",
-      borderWidth: 2,
-      borderDash: [10, 5],
-      pointStyle: false,
-      type: "line",
-      order: 3
-    }]
-  };
+        datasets: [{
+        label: "Kosten/Ertrag [CHF]",
+        data: '.$values[2].',';
+        printColors(limit:$values[0], offset:$values[8], borderCol:'0, 0, 0,');
+        echo '
+        borderWidth: 2,
+        order: 0
+      },
+      {      
+        label: "Durchschnitt [CHF]",
+        data: '.$values[5].',
+        borderColor: "rgba('.$aveColor.' 0.8)",
+        backgroundColor: "rgb(255,255,255)",
+        borderWidth: 2,
+        borderDash: [10, 5],
+        pointStyle: false,
+        type: "line",
+        order: 2
+      }]
+    };
+    ';    
+  } else { // param is not cost     
+    echo '
+        datasets: [{
+        label: "Verbrauch [W]",
+        data: '.$values[2].',';
+        printColors(limit:$values[0], offset:$values[8], borderCol:'239, 68, 68,');
+        echo '
+        borderWidth: 2,
+        order: 0
+      },
+      {
+        label: "Einspeisung [W]",
+        data: '.$values[3].',';
+        printColors(limit:$values[0], offset:$values[8], borderCol:'22, 163, 74,');
+        echo '
+        borderWidth: 2,
+        order: 1
+      },
+          {      
+        label: "Durchschnittsverbrauch [W]",
+        data: '.$values[4].',
+        borderColor: "rgba(239, 68, 68, 0.8)",
+        backgroundColor: "rgb(255,255,255)",
+        borderWidth: 2,
+        borderDash: [10, 5],
+        pointStyle: false,
+        type: "line",
+        order: 2
+      },
+      {
+        label: "Durchschnitt Einspeisung [W]",      
+        data: '.$values[5].',
+        borderColor: "rgba(22, 163, 74, 0.8)",
+        backgroundColor: "rgb(255,255,255)",
+        borderWidth: 2,
+        borderDash: [10, 5],
+        pointStyle: false,
+        type: "line",
+        order: 3
+      }]
+    };
+    ';
+  } // end of param == cost or not
+  echo '
   const config'.$chartId.' = {
     type: "bar",
     data: data'.$chartId.',
@@ -310,160 +435,61 @@ function printBarGraph (
   const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
   </script>';  
   printPopOverLnk(chartId:$chartId);
+  // TODO: different text for cost
   echo '
       <h3 class="font-semibold text-gray-900">Leistung in Watt</h3>
       <p>Verbrauch (rot umrandete Balken) und Einspeisung (grün umrandete Balken) in Watt.<br>
       Gestrichelt dargestellt werden der Durchschnittsverbrauch bzw. die durschnittliche Einspeisung.</p>
       <p>Mit den blauen Pfeilen kann man zwischen den Wochen (bzw. Monate / Jahre) wechseln.</p>';
-  if ($isIndexPage) {
+  if ($isIndexPage) {      
       echo '
       <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
       <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-      <a href="../verbrauch/statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
+      <a href="../verbrauch/'.$statisticLink.'" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
     ';
     }
     echo '
       </div>
   <div data-popper-arrow></div>
-</div>';
-  
-  echo getHr().'
-  <br>
-  ';
-}
-
-function printBarGraphCost ( // TODO: merge with other bar graph
-  object $dbConn, int $userid, 
-  Timerange $timerange, Param $param, 
-  int $goBack, bool $isIndexPage=FALSE
-):void {
-  $startDate = date_create();
-  $year = (int)$startDate->format('Y'); // current year
-  $month = (int)$startDate->format('m'); // current month
-  if ($timerange === Timerange::Year) { 
-    $year = $year - $goBack;
-    $startDate = date_create($year.'-01-01');
-
-    if ($goBack === 0)     { $title = 'dieses Jahr'; }
-    elseif ($goBack === 1) { $title = 'letztes Jahr'; }
-    else                   { $title = 'Jahr '.$year; }
-    $chartId = 'Y';
-  } elseif ($timerange === Timerange::Month) {
-    $month = $month - $goBack;
-    while ($month < 1) {
-      $year--;
-      $month += 12;
-    }
-    $startDate = date_create($year.'-'.$month.'-01');
-
-    $monthNames = array('Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'); // need german naming, not using format('M')
-    $title = $monthNames[$month-1];
-    $chartId = 'M';
-  } elseif ($timerange === Timerange::Week) {    
-    $startDate->modify('-'.$goBack.' weeks');
-    $weekday = (int)$startDate->format('N') - 1; // 0 (for Monday) through 6 (for Sunday)
-    $startDate->modify('-'.$weekday.' days'); // that gets me Monday in this week
-  
-    if ($goBack === 0)     { $title = 'diese Woche'; }
-    elseif ($goBack === 1) { $title = 'letzte Woche'; }
-    else {                   $title = 'Woche '.$startDate->format("W");    
-    }
-    $chartId = 'W';
-  }  
-  
-  $chartId .= $param->name;
-  if ($param === Param::cons)       { $paramText = 'Leistung';}
-  elseif ($param === Param::consNt) { $paramText = 'Leistung NT';}
-  elseif ($param === Param::consHt) { $paramText = 'Leistung HT';}
-  elseif ($param === Param::cost)   { $paramText = 'Kosten/Ertrag';}
-  else {
-    $paramText = 'ungültiger Param';
-  }
-  
-  //        [$numOfEntries, $val_x, $val_y_cons, $val_y_gen, $val_y_cons_ave, $val_y_gen_ave, $ave_cons, $ave_gen, $weekDayOffset];
-  $values = getValues(dbConn:$dbConn, userid:$userid, timerange:$timerange, param:$param, startDate:$startDate);  
-  $title .= ' (Ø: <span >'.$values[6].'</span>.-)';
-  if ($goBack > 0) {
-    $forwardLink = '<a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack-1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-8 h-8').'</a>';
-  } else {
-    $forwardLink = '<span class="inline-flex">&nbsp;</span>';
-  }
-  echo '
-  <div class="flex mt-4">
-    <div class="grow h-8 scroll-mt-14" id="anchor'.$chartId.'">
-      <a class="text-blue-600 hover:text-blue-700 inline-flex" href="?goBack'.$chartId.'='.($goBack+1).'#anchor'.$chartId.'">'.getSvg(whichSvg:Svg::ArrowLeft, classString:'w-8 h-8').'</a>
-      <span class="text-l inline-flex h-8 align-middle mb-4">'.$paramText.' '.$title.'</span>
-      '.$forwardLink.'
-    </div>
-  </div>
-  <canvas id="'.$chartId.'" width="600" height="300" class="mb-2"></canvas>
-  <script>
-  const ctx'.$chartId.' = document.getElementById("'.$chartId.'");
-  const labels'.$chartId.' = '.$values[1].';
-  const data'.$chartId.' = {
-    labels: labels'.$chartId.',
-    datasets: [{
-      label: "Kosten [CHF]",
-      data: '.$values[2].',';
-      printColors(limit:$values[0], offset:$values[8], isGen:FALSE);
-      echo '
-      borderWidth: 2,
-      order: 0
-    },
-    {      
-      label: "Durchschnittskosten [CHF]",
-      data: '.$values[4].',
-      borderColor: "rgba(239, 68, 68, 0.8)",
-      backgroundColor: "rgb(255,255,255)",
-      borderWidth: 2,
-      borderDash: [10, 5],
-      pointStyle: false,
-      type: "line",
-      order: 2
-    }]
-  };
-  const config'.$chartId.' = {
-    type: "bar",
-    data: data'.$chartId.',
-    options: { plugins : { legend: { display: false } } },
-  };
-  const '.$chartId.' = new Chart( document.getElementById("'.$chartId.'"), config'.$chartId.' );
-  </script>';  
-  printPopOverLnk(chartId:$chartId);
-  echo '
-      <h3 class="font-semibold text-gray-900">TODO</h3>
-      <p>Verbrauch (rot umrandete Balken) und Einspeisung (grün umrandete Balken) in Watt.<br>
-      Gestrichelt dargestellt werden der Durchschnittsverbrauch bzw. die durschnittliche Einspeisung.</p>
-      <p>Mit den blauen Pfeilen kann man zwischen den Wochen (bzw. Monate / Jahre) wechseln.</p>';
-  if ($isIndexPage) {
-      echo '
-      <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-      <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-      <a href="../verbrauch/statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
-    ';
-    }
-    echo '
-      </div>
-  <div data-popper-arrow></div>
-</div>';
-  
-  echo getHr().'
-  <br>
-  ';
+</div>';  
+  echo getHr().'<br>';
 }
 
 
 function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, string $dayB) { // returns two values
-  if ($param === Param::cons)      { $paramGen = Param::gen;}
-  elseif ($param === Param::consNt){ $paramGen = Param::genNt;}
-  elseif ($param === Param::consHt){ $paramGen = Param::genHt;}
-  else { // cost param is handled differently
-    printPageAndDie('Invalid parameter at getWattSum', 'Please try again later and/or send me an email: web@strommesser.ch');
-  }
+  $sql_where = ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
+  if ($param === Param::cost) { // cost param is handled differently
+    $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
+    if ($resultKunden->num_rows !== 1) {
+        printRawErrorAndDie('Error', 'no config data');
+    } 
+    $rowKunden = $resultKunden->fetch_assoc();
 
+    $sql = 'SELECT SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+    $result = $dbConn->query($sql.$sql_where); // returns only one row
+    $row = $result->fetch_assoc();
+
+    if ($row['sumConsNtDiff'] + $row['sumConsHtDiff'] + $row['sumGenDiff'] < 0.001) { // don't have the info for old values
+      return [' ', ' ']; // not really nice, returning empty string
+    }
+
+    $costTotal = round( -1.0 * 
+                      ((($row['sumConsNtDiff'])*$rowKunden['priceConsNt']) +
+                        (($row['sumConsHtDiff'])*$rowKunden['priceConsHt']) -
+                        (($row['sumGenDiff']   )*$rowKunden['priceGen']   )), 2);
+    
+    $aveCost = 0.0; // average cost per day
+    if ($row['sumZeitDiff'] > 0) {
+      $aveCost = round(24*3600 / $row['sumZeitDiff'] * $costTotal,2);
+    }
+    return [$costTotal, $aveCost];
+  }
+  elseif ($param === Param::cons)  { $paramGen = Param::gen;}
+  elseif ($param === Param::consNt){ $paramGen = Param::genNt;}
+  elseif ($param === Param::consHt){ $paramGen = Param::genHt;}  
+  
   $sql[0] = 'SELECT SUM(`'.$param->name.   'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
   $sql[1] = 'SELECT SUM(`'.$paramGen->name.'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-  $sql_where = ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
   
   $watt = [0, 0];
   for ($i = 0; $i < 2; $i++) {
@@ -476,30 +502,6 @@ function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, str
   }
 
   return $watt; 
-}
-function getWattSumCost(object $dbConn, int $userid, string $dayA, string $dayB) { // returns two values
-  $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
-  if ($resultKunden->num_rows !== 1) {
-      printRawErrorAndDie('Error', 'no config data');
-  } 
-  $rowKunden = $resultKunden->fetch_assoc();
-
-  $sql = 'SELECT SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff` FROM `verbrauch`';
-  $sql.= ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
- 
-  $result = $dbConn->query($sql); // returns only one row
-  $row = $result->fetch_assoc();
-
-  if ($row['sumConsNtDiff'] + $row['sumConsHtDiff'] + $row['sumGenDiff'] < 0.001) { // don't have the info for old values
-    return [' ', ' ']; // not really nice, returning string
-  }
-
-  $costTotal = round( -1.0 * 
-                    ((($row['sumConsNtDiff'])*$rowKunden['priceConsNt']) +
-                      (($row['sumConsHtDiff'])*$rowKunden['priceConsHt']) -
-                      (($row['sumGenDiff']   )*$rowKunden['priceGen']   )), 2);
-  
-  return [$costTotal, $costTotal];
 }
 
 function getValues(
@@ -518,7 +520,7 @@ function getValues(
   $month = (int)$startDate->format('m');  
 
   if ($timerange === Timerange::Year) { // generates one value per month
-    $numOfEntries = 12;    
+    $numOfEntries = 12;
     $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-01-01', dayB:$year.'-12-31');
     for ($month = 1; $month <= 12; $month++) {
       $dayStrA = $year.'-'.$month.'-01';
@@ -535,18 +537,10 @@ function getValues(
     $startDay = date_create($year.'-'.$month.'-01');
     $weekDayOffset = (int)$startDay->format('N') - 1; // 0 (for Monday) through 6 (for Sunday). Colors are matching between week and month
     $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
-    if ($param === Param::cost) { // TODO: not so nice, special treatment
-      $ave = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
-    } else {
-      $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
-    }
+    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$year.'-'.$month.'-01', dayB:$year.'-'.$month.'-'.$lastDay);
     for ($day = 1; $day <= $lastDay; $day++) { // 1 to 28 (for February)
       $dayStr = $year.'-'.$month.'-'.$day;
-      if ($param === Param::cost) { // TODO: not so nice, special treatment
-        $tmp_arr = getWattSumCost(dbConn:$dbConn, userid:$userid, dayA:$dayStr, dayB:$dayStr);
-      } else {
-        $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
-      }
+      $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);
       $val_y[0] .= $tmp_arr[0].', ';
       $val_y[1] .= $tmp_arr[1].', ';
       $val_y_ave[0] .= $ave[0].', ';
@@ -558,7 +552,7 @@ function getValues(
     $numOfEntries = 7;
     $endDay = clone $startDate; // clone is needed here
     $endDay->modify('+6 days');
-    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDate->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));    
+    $ave = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$startDate->format('Y-m-d'), dayB:$endDay->format('Y-m-d'));
     for ($day = 1; $day <= $numOfEntries; $day++) {
       $dayStr = $startDate->format('Y-m-d');
       $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStr, dayB:$dayStr);

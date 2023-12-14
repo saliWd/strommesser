@@ -264,7 +264,7 @@ if ($totalCount > 0) {// this may be 0
       <div class="flex">
         <div class="flex-auto text-left"><b><span class="'.$costClass.'">'.$costText.' [CHF]</span></b></div>
         <div class="flex-auto text-center">&nbsp;</div>
-        <div class="flex-auto text-right"><b><span class="'.$costClass.'">'. number_format((float)$costTotal, 2, '.', '').'.-</span></b></div>
+        <div class="flex-auto text-right"><b><span class="'.$costClass.'">'. number_format((float)$costTotal, 2, '.', '').'</span></b></div>
       </div>      
       <canvas id="myChartCost" width="600" height="200" class="mb-2"></canvas>
       <script>
