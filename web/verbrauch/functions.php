@@ -191,7 +191,56 @@ function printPopOverLnk(string $chartId):void {
 
 // prints legend and explanation for all the different graphs. Displayed graphs differ partly between index page and statistics page
 function printGraphExplanation(bool $isIndexPage):void {
-  // use this as an example: https://flowbite.com/docs/components/card/#horizontal-card
+  // https://flowbite.com/docs/components/tables/#table-with-products
+  echo '
+  <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+  <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+            <th scope="col" class="px-16 py-3"><span class="sr-only">Beispiel</span></th>
+            <th scope="col" class="px-6 py-3">Erklärung</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            <td class="p-4">
+                <img src="img/expl_00.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Ausgelesene Einzelwerte">
+            </td>
+            <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Ausgelesene Einzelwerte</h3>
+                <p class="mb-3 font-normal text-gray-700 text-left">
+                  Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 1 Wh (3600 W) über einen Zeitraum von ca. zwei Minuten (120 Sekunden). Für die einzelne Messung entspricht das einer Auflösung von ca. 30 W. Es wird sowohl der Verbrauch als auch die Einspeisung ausgelesen, für den Verbrauch aufgesplittet auf Niedertarif (NT) und Hochtarif (HT).
+                </p>
+            </td>            
+        </tr>
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            <td class="p-4">
+                <img src="img/expl_01.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Leistungsmessungen und Kostenmessungen">
+            </td>
+            <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Leistungsmessungen und Kostenmessungen</h3>
+                <p class="mb-3 font-normal text-gray-700 text-left">
+                  Bei Leistungsmessungen wird jeweils der Durchschnittsverbrauch/Einspeisung angezeigt. Ein Verbrauch von z.B. 1000 Watt entspricht dann einem Tagesverbrauch von 24 kWh.<br>
+                  Bei den Kosten werden hingegen die total aufgelaufenen Kosten angezeigt.
+                </p>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</div>';
+  
+
+  // images in general: https://flowbite.com/docs/typography/images/#image-card
+  // images with a non-white background work better (in cards but also elsewhere)
+  
+  // not really: https://flowbite.com/docs/components/accordion/ . Accordion work on the principle of: one-open-at-the-time,rest-hidden. rather want everything visible
+  // could also use an image with several clickable points (with explanations to those points). drawback: image has to be big enough on mobile and again only one visible at the time
+  
+  
+  /*
+  // trial using this example: https://flowbite.com/docs/components/card/#horizontal-card
+  // -> not suited, just for headlines and does not work with lots of text on mobile
+
   echo '
   <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
     <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900" id="explanation">Erklärungen zu den Grafiken<span></div>
@@ -219,7 +268,7 @@ function printGraphExplanation(bool $isIndexPage):void {
     </div>
   </div>
   ';
-
+*/
 /*
   echo '
 
@@ -634,7 +683,7 @@ function printNavMenu_v2 (string $site, string $title): void {
         </button>
         <div id="dropdown-NavMain" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
           <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
-  printListItems($topLevelSites);          
+  printListItems($topLevelSites);
   echo '
           </ul>
         </div> 
@@ -670,8 +719,7 @@ function printNavMenu_v2 (string $site, string $title): void {
   }
   if ($title) { $siteName = $title; }
   printInPageNav(inPageTargets:$inPageTargets, siteName:$siteName);
-  echo '
-  </ol>
+  echo '</ol>
 </nav>';
 }
 
