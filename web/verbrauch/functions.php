@@ -194,30 +194,30 @@ function printGraphExplanation(bool $isIndexPage):void {
   // https://flowbite.com/docs/components/tables/#table-with-products
   echo '
   <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-  <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+  <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
         <tr>
             <th scope="col" class="px-16 py-3"><span class="sr-only">Beispiel</span></th>
             <th scope="col" class="px-6 py-3">Erklärung</th>
         </tr>
     </thead>
     <tbody>
-        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+        <tr class="bg-white border-b hover:bg-gray-50">
             <td class="p-4">
                 <img src="img/expl_00.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Ausgelesene Einzelwerte">
             </td>
-            <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+            <td class="px-6 py-4 font-semibold text-gray-900">
                 <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Ausgelesene Einzelwerte</h3>
                 <p class="mb-3 font-normal text-gray-700 text-left">
                   Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 1 Wh (3600 W) über einen Zeitraum von ca. zwei Minuten (120 Sekunden). Für die einzelne Messung entspricht das einer Auflösung von ca. 30 W. Es wird sowohl der Verbrauch als auch die Einspeisung ausgelesen, für den Verbrauch aufgesplittet auf Niedertarif (NT) und Hochtarif (HT).
                 </p>
             </td>            
         </tr>
-        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+        <tr class="bg-white border-b hover:bg-gray-50">
             <td class="p-4">
                 <img src="img/expl_01.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Leistungsmessungen und Kostenmessungen">
             </td>
-            <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+            <td class="px-6 py-4 font-semibold text-gray-900">
                 <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Leistungsmessungen und Kostenmessungen</h3>
                 <p class="mb-3 font-normal text-gray-700 text-left">
                   Bei Leistungsmessungen wird jeweils der Durchschnittsverbrauch/Einspeisung angezeigt. Ein Verbrauch von z.B. 1000 Watt entspricht dann einem Tagesverbrauch von 24 kWh.<br>
