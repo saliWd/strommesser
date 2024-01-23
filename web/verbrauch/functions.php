@@ -630,7 +630,8 @@ function printBeginOfPage_v2(string $site, string $title=''):void {
     'login.php' => 'Login, Logout',
     'statistic.php' => 'Statistiken',
     'status.php' => 'Status',
-    'contact.php' => 'Kontaktformular'
+    'contact.php' => 'Kontaktformular',
+    'now.php' => 'Aktuelle Werte'
   );
   echo '<!DOCTYPE html>
   <html>
@@ -646,6 +647,10 @@ function printBeginOfPage_v2(string $site, string $title=''):void {
   
   echo '<title>StromMesser '.$SITE_TITLES[$site].'</title>
   ';
+  if ($site === 'now.php') {
+    echo '<meta http-equiv="refresh" content="90">
+    ';
+  }
   echo '<meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../verbrauch/strommesser.css" type="text/css">
@@ -669,8 +674,9 @@ function printNavMenu_v2 (string $site, string $title): void {
     ['index.php', 'Übersicht'],
     ['statistic.php', 'Statistiken'],
     ['settings.php', 'Einstellungen'],
+    ['now.php', 'Aktuelle Werte'],
     ['#', '&nbsp;'],
-    ['login.php?do=2', 'LogOut']
+    ['login.php?do=2', 'LogOut']    
   );  
   echo '
 <nav class="border-gray-400 rounded bg-gray-100 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">

@@ -26,13 +26,15 @@
 
    4. ~~login.php~~
    5. ~~rx.php~~
-   6. settings.php:
+   6. settings.php
       1. which graphs to show on index -> makes it more complicated and difficult to test. Maybe not worth the work?
          * rather have links to the corresponding graph on the statistic site
       1. change email
    7. statistic.php
       1. explanation for cost graph different
       1. add table layout with numbers additional to graphs
+   8. now.php
+      1. implement
 3. pico devices
    1. print my own case for measurement
       * [ir head case][irHeadCase]
