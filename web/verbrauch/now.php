@@ -22,12 +22,18 @@ if ($rowNewest['zeitDiff'] > 0) { // divide by 0 exception
 
 $zeitNewest = date_create($rowNewest['zeit']);
 $zeitString = $zeitNewest->format('Y-m-d H:i');
-if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
-  $zeitString = $zeitNewest->format('H:i');
-}
-echo '<div class="flex">
-  <div class="flex-auto text-left"><b><span class="text-green-600">'.$newestGen.'W</span> / <span class="text-red-500">'.$newestCons.'W</span></b></div>
-  <div class="flex-auto text-center">'.$zeitString.'</div>
+
+echo '
+<div class="text-left">
+<table>
+  <tr><td>Messzeit: </td><td>'.$zeitString.'</td></tr>
+  <tr><td><b>Aktuelle Einspeisung [W]: </b></td><td><b><span class="text-green-600">'.$newestGen.'</span></b></td></tr>
+  <tr><td><b>Aktueller Verbrauch [W]: </b></td><td><b><span class="text-red-500">'.$newestCons.'</span></b></td></tr>
+  <tr><td>Einspeisung total [kWh]: </td><td>'.$rowNewest['gen'].'</td></tr>
+  <tr><td>Verbrauch total [kWh]: </td><td>'.$rowNewest['consumption'].'</td></tr>
+  <tr><td>Verbrauch total Niedertarif [kWh]: </td><td>'.$rowNewest['consNt'].'</td></tr>
+  <tr><td>Verbrauch total Hochtarif [kWh]: </td><td>'.$rowNewest['consHt'].'</td></tr>
+</table>
 </div>
 ';
 

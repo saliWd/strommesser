@@ -645,13 +645,13 @@ function printBeginOfPage_v2(string $site, string $title=''):void {
   <script src="../verbrauch/script/chartjs-adapter-moment.mine.js"></script>';
   } 
   
-  echo '<title>StromMesser '.$SITE_TITLES[$site].'</title>
-  ';
+  echo '<title>StromMesser '.$SITE_TITLES[$site].'</title>';
   if ($site === 'now.php') {
-    echo '<meta http-equiv="refresh" content="90">
-    ';
+    echo '
+  <meta http-equiv="refresh" content="90">';
   }
-  echo '<meta name="description" content="zeigt deinen Energieverbrauch">  
+  echo '
+  <meta name="description" content="zeigt deinen Energieverbrauch">  
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../verbrauch/strommesser.css" type="text/css">
   <script src="../verbrauch/script/flowbite.min.js"></script>
