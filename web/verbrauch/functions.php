@@ -720,7 +720,9 @@ function printNavMenu_v2 (string $site, string $title): void {
       ['#anchorDataExport', 'Daten exportieren']
     );
     $siteName = 'Einstellungen';
-  } elseif ($site === 'login.php') {    
+  } elseif ($site === 'now.php') {
+    $siteName = 'Aktuelle Werte';
+  } elseif ($site === 'login.php') {
     $siteName = 'Login';
   }
   if ($title) { $siteName = $title; }
