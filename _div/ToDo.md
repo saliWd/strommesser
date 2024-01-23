@@ -34,7 +34,6 @@
       1. explanation for cost graph different
       1. add table layout with numbers additional to graphs
    8. now.php
-      1. implement
 3. pico devices
    1. print my own case for measurement
       * [ir head case][irHeadCase]

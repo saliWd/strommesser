@@ -27,12 +27,12 @@ echo '
 <div class="text-left mt-8">
 <table>
   <tr><td>Messzeit: </td><td>'.$zeitString.'</td></tr>
-  <tr><td><b>Aktuelle Einspeisung [W]: </b></td><td><b><span class="text-green-600">'.$newestGen.'</span></b></td></tr>
-  <tr><td><b>Aktueller Verbrauch [W]: </b></td><td><b><span class="text-red-500">'.$newestCons.'</span></b></td></tr>
-  <tr><td>Einspeisung total [kWh]: </td><td>'.$rowNewest['gen'].'</td></tr>
-  <tr><td>Verbrauch total [kWh]: </td><td>'.$rowNewest['consumption'].'</td></tr>
-  <tr><td>Verbrauch total Niedertarif [kWh]: </td><td>'.$rowNewest['consNt'].'</td></tr>
-  <tr><td>Verbrauch total Hochtarif [kWh]: </td><td>'.$rowNewest['consHt'].'</td></tr>
+  <tr><td><b>Aktuelle Einspeisung:&nbsp;</b></td><td><b><span class="text-green-600">'.$newestGen.' W</span></b></td></tr>
+  <tr><td><b>Aktueller Verbrauch: </b></td><td><b><span class="text-red-500">'.$newestCons.' W</span></b></td></tr>
+  <tr><td>Einspeisung: </td><td>'.$rowNewest['gen'].' kWh</td></tr>
+  <tr><td>Verbrauch: </td><td>'.$rowNewest['consumption'].' kWh</td></tr>
+  <tr><td>Verbrauch NT: </td><td>'.$rowNewest['consNt'].' kWh</td></tr>
+  <tr><td>Verbrauch HT: </td><td>'.$rowNewest['consHt'].' kWh</td></tr>
 </table>
 <p>&nbsp;</p>
 <p>Diese Seite aktualisiert sich alle 90 Sekunden.</p>
