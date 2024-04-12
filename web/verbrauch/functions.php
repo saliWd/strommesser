@@ -505,7 +505,7 @@ function printBarGraph (
 }
 
 
-function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, string $dayB) { // returns two values
+function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, string $dayB, bool $kWh=false) { // returns two values
   $sql_where = ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
   if ($param === Param::cost) { // cost param is handled differently
     $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
@@ -544,14 +544,27 @@ function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, str
   for ($i = 0; $i < 2; $i++) {
     $result = $dbConn->query($sql[$i].$sql_where); // returns only one row
     $row = $result->fetch_assoc();
-    if ($row['sumZeitDiff'] <= 0) { // divide by 0 exception
-      return [' ', ' ']; // not really nice, returning strings
+    if($kWh) {
+      $watt[$i] = $row['sumDiff']; // returning the absolute value instead of the averaged one (in kWh)
+    } else {
+      if ($row['sumZeitDiff'] <= 0) { // divide by 0 exception
+        return [' ', ' ']; // not really nice, returning strings
+      }
+      $watt[$i] = round($row['sumDiff']*3600*1000 / $row['sumZeitDiff']);
     }
-    $watt[$i] = round($row['sumDiff']*3600*1000 / $row['sumZeitDiff']);
   }
 
   return $watt; 
 }
+
+/*  
+  $kWh = [0, 0];
+  for ($i = 0; $i < 2; $i++) {
+    $result = $dbConn->query($sql[$i].$sql_where); // returns only one row
+    $row = $result->fetch_assoc();    
+    $kWh[$i] = $row['sumDiff']*3600*1000;
+  }
+*/
 
 function getValues(
   object $dbConn, int $userid, 
@@ -576,6 +589,7 @@ function getValues(
       $lastDay = (int)date_create('last day of '.$year.'-'.$month)->format('d');
       $dayStrB = $year.'-'.$month.'-'.$lastDay;
       $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStrA, dayB:$dayStrB);
+      // $tmp_arr = getWattSum(dbConn:$dbConn, userid:$userid, param:$param, dayA:$dayStrA, dayB:$dayStrB, kWh:true);
       $val_y[0] .= $tmp_arr[0].', ';
       $val_y[1] .= $tmp_arr[1].', ';
       $val_y_ave[0] .= $ave[0].', ';
