@@ -50,9 +50,9 @@
         <p>';
         $result = $dbConn->query('SELECT `zeit`, `ok` FROM `status` WHERE 1 ORDER BY `id` DESC LIMIT 24'); // last 24 entries
         while ($row = $result->fetch_assoc()) {
-            $statusTxt = $row['ok'] == 1 ? 'ok' : 'nicht ok';
-            $zeitTxt = date_create($row['zeit'])->format('h:i d.m.Y');
-            $dbHistTxt .= "Status: $statusTxt, Zeit: $zeitTxt<br>";
+            $statusTxt = $row['ok'] == 1 ? '<span class="text-green-600">ok</span>' : '<span class="text-red-500">nicht ok</span>';
+            $zeitTxt = date_create($row['zeit'])->format(format: 'H:i d.m.Y');
+            $dbHistTxt .= "Status ist $statusTxt ($zeitTxt)<br>";
         }
         $dbHistTxt .= '</p>';
 
