@@ -21,7 +21,8 @@ CREATE TABLE `kunden` (
   `ledBrightness` tinyint(3) UNSIGNED NOT NULL DEFAULT 160,
   `priceConsHt` decimal(5,4) NOT NULL,
   `priceConsNt` decimal(5,4) NOT NULL,
-  `priceGen` decimal(5,4) NOT NULL
+  `priceGen` decimal(5,4) NOT NULL,
+  `paidUntil` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE `pwForgot` (
@@ -29,6 +30,12 @@ CREATE TABLE `pwForgot` (
   `userid` int(11) NOT NULL,
   `hexval` char(64) NOT NULL,
   `validUntil` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+CREATE TABLE `status` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
+  `ok` tinyint(3) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE `verbrauch` (
@@ -77,6 +84,9 @@ ALTER TABLE `kunden`
 ALTER TABLE `pwForgot`
   ADD PRIMARY KEY (`id`);
 
+ALTER TABLE `status`
+  ADD PRIMARY KEY (`id`);
+
 ALTER TABLE `verbrauch`
   ADD PRIMARY KEY (`id`);
 
@@ -89,6 +99,9 @@ ALTER TABLE `kunden`
 
 ALTER TABLE `pwForgot`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `status`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `verbrauch`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;

@@ -26,6 +26,11 @@
     
     $cronjob = safeIntFromExt(source:'GET',varName:'cronjob',length:1);
     if ($cronjob === 1) {
+        $okOrNotInteger = $okOrNot ? 1 : 0;
+        if (!($dbConn->query(query: "INSERT INTO `status` (`ok`) VALUES ($okOrNotInteger)"))) { // other fields are auto generated
+            echo 'db insert hat leider nicht funktioniert...';
+          }
+
         if (!$okOrNot) {
             $mailSendOk = mail(
                 to:'messer@strommesser.ch;',
