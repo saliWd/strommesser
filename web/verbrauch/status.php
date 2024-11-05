@@ -30,7 +30,6 @@
         if (!($dbConn->query(query: "INSERT INTO `status` (`ok`) VALUES ($okOrNotInteger)"))) { // other fields are auto generated
             echo 'db insert hat leider nicht funktioniert...';
           }
-
         if (!$okOrNot) {
             $mailSendOk = mail(
                 to:'messer@strommesser.ch;',
@@ -46,10 +45,22 @@
     } else {
         printBeginOfPage_v2(site:'status.php', title:'Status');
         $okOrNotTxt = $okOrNot ? 'ok' : '<span class="text-xl text-red-600">nicht ok</span>';
+
+        $dbHistTxt = '<br><h4 class="mb-2 text-l font-bold tracking-tight text-gray-900">Status in den letzten 24 Stunden</h4>
+        <p>';
+        $result = $dbConn->query('SELECT `zeit`, `ok` FROM `status` WHERE 1 ORDER BY `id` DESC LIMIT 24'); // last 24 entries
+        while ($row = $result->fetch_assoc()) {
+            $statusTxt = $row['ok'] == 1 ? 'ok' : 'nicht ok';
+            $zeitTxt = date_create($row['zeit'])->format('h:i d.m.Y');
+            $dbHistTxt .= "Status: $statusTxt, Zeit: $zeitTxt<br>";
+        }
+        $dbHistTxt .= '</p>';
+
         echo '
     <div class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Status ist '.$okOrNotTxt.'</h3>
     <p class="font-normal text-gray-700">'.$output.'</p>
+    '.$dbHistTxt.'
     </div>
     </div></body></html>';
     }
