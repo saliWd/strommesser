@@ -229,102 +229,15 @@ function printGraphExplanation(bool $isIndexPage):void {
 </table>
 </div>';
   
-
   // images in general: https://flowbite.com/docs/typography/images/#image-card
   // images with a non-white background work better (in cards but also elsewhere)
   
   // not really: https://flowbite.com/docs/components/accordion/ . Accordion work on the principle of: one-open-at-the-time,rest-hidden. rather want everything visible
   // could also use an image with several clickable points (with explanations to those points). drawback: image has to be big enough on mobile and again only one visible at the time
-  
-  
-  /*
+   
   // trial using this example: https://flowbite.com/docs/components/card/#horizontal-card
   // -> not suited, just for headlines and does not work with lots of text on mobile
 
-  echo '
-  <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
-    <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900" id="explanation">Erklärungen zu den Grafiken<span></div>
-  </div>
-    ';
-  
-  echo '
-  <div class="flex flex-col items-center border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl bg-gray-100 mt-4">
-    <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-s-lg" src="img/expl_00.png" alt="">
-    <div class="flex flex-col justify-between p-4 leading-normal">
-      <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Ausgelesene Einzelwerte</h3>
-      <p class="mb-3 font-normal text-gray-700 text-left">
-        Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 1 Wh (3600 W) über einen Zeitraum von ca. zwei Minuten (120 Sekunden). Für die einzelne Messung entspricht das einer Auflösung von ca. 30 W. Es wird sowohl der Verbrauch als auch die Einspeisung ausgelesen, für den Verbrauch aufgesplittet auf Niedertarif (NT) und Hochtarif (HT).
-      </p>
-    </div>
-  </div>
-  <div class="flex flex-col items-center border border-gray-200 rounded-lg shadow md:flex-row md:max-w-xl bg-gray-200 mt-4">
-    <img class="object-cover w-full rounded-t-lg h-96 md:h-auto md:w-48 md:rounded-none md:rounded-s-lg" src="img/expl_01.png" alt="">  
-    <div class="flex flex-col justify-between p-4 leading-normal">
-      <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Leistungsmessungen und Kostenmessungen</h3>
-      <p class="mb-3 font-normal text-gray-700 text-left">
-        Bei Leistungsmessungen wird jeweils der Durchschnittsverbrauch/Einspeisung angezeigt. Ein Verbrauch von z.B. 1000 Watt entspricht dann einem Tagesverbrauch von 24 kWh.<br>
-        Bei den Kosten werden hingegen die total aufgelaufenen Kosten angezeigt.
-      </p>
-    </div>
-  </div>
-  ';
-*/
-/*
-  echo '
-
-        <p class="mb-3 font-normal text-gray-700">
-        Zeitliche Auflösung: Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 1 Woche), bzw. mit einem Punkt pro Tag (älter).
-      </p>
-
-
-  <div class="text-left mt-4 block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 flex"> 
-    <div class="flex-auto"><span class="mb-2 text-xl font-bold tracking-tight text-gray-900" id="explanation">Erklärungen zu den Grafiken<span></div>
-    <div class="p-3 space-y-2">
-      <h2 class="font-semibold text-gray-900">Grundlagen</h2>
-      <h3 class="font-semibold text-gray-900">Ausgelesene Einzelwerte</h3>
-      <p>Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 0.001 kWh, d.h. 1 Wh = 3600 W über einen Zeitraum von ca. zwei Minuten = 120 Sekunden. Für die <b>einzelne Messung</b> entspricht das einer Auflösung von ca. <b>30 W</b>. Es wird sowohl der Verbrauch als auch die Einspeisung ausgelesen, für den Verbrauch aufgesplittet auf Niedertarif (NT) und Hochtarif (HT).</p>
-      <h3 class="font-semibold text-gray-900">Zeitliche Auflösung</h3>
-      <p>Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 1 Woche), bzw. mit einem Punkt pro Tag (älter).</p>
-      <h3 class="font-semibold text-gray-900">Leistungsmessungen und Kostenmessungen</h3>
-      <p>
-        Bei Leistungsmessungen wird jeweils der Durchschnittsverbrauch/Einspeisung angezeigt. <TODO: insert weekly bar graph> Ein Verbrauch von z.B. 1000 Watt entspricht dann einem Tagesverbrauch von 24 kWh.<br>
-        Bei den Kosten werden hingegen die total aufgelaufenen Kosten angezeigt.
-      </p>
-      <h2 class="font-semibold text-gray-900">Balkendiagramme</h2>
-      <h3 class="font-semibold text-gray-900">Verbrauch/Einspeisung und Kosten/Ertrag</h3>
-      <p>
-        Rot umrandete Balken zeigen den Verbrauch an (bezogene Energie), grün umrandete Balken zeigen die Einspeisung an, beide Balken werden pro Tag angezeigt.<br>
-        Kosten/Ertrag werden allgemein schwarz umrandet mit nur einem Balken pro Tag angezeigt.
-      </p>
-    </div>
-  </div>
-  ';
-
-  echo '
-    <div class="p-3 space-y-2">
-        <h3 class="font-semibold text-gray-900">Leistungsmessung</h3>
-        <p>
-          Alle zwei Minuten wird der Energiezähler ausgelesen. Dies erfolgt mit einer Genauigkeit von 0.001 kWh, d.h. 1 Wh = 3600 W über einen Zeitraum von ca. zwei Minuten = 120 Sekunden. Für die einzelne Messung entspricht das einer Auflösung von ca. 30 W. Es wird sowohl der Verbrauch als auch die Einspeisung ausgelesen. In dieser Grafik sieht man den totalen Verbrauch / Einspeisung. Also Niedertarif (NT) und Hochtarif (HT) zusammen. <br>
-          Auf der linken Skala werden die aktuellen Werte logarithmisch in Watt aufgetragen, auf der rechten Skala die summierten Werte linear in kWh.
-        </p>
-        <h3 class="font-semibold text-gray-900">Aktueller Verbrauch (rot, linke Skala)</h3>
-        <p>Der aktuelle Verbrauch (in W-Auflösung) wird rot und auf der linken Skala aufgetragen. Diese Skala ist logarithmisch.</p>
-        <h3 class="font-semibold text-gray-900">Verbrauch Total (blass-rot, rechte Skala)</h3>
-        <p>Der Totalverbrauch (in Wh-Auflösung) wird blass-rot und linear auf der rechten Skala aufgetragen. Diese Skala beginnt über den gewählten Zeitraum immer bei 0 kWh.</p>
-        
-        <h3 class="font-semibold text-gray-900">Aktuelle Einspeisung (grün, linke Skala)</h3>
-        <p>Die aktuelle Einspeisung (in W-Auflösung) wird grün und auf der linken Skala aufgetragen. Diese Skala ist logarithmisch.</p>
-        <h3 class="font-semibold text-gray-900">Einspeisung Gesamt (blass-grün, rechte Skala)</h3>
-        <p>Die gesamte Einspeisung (in Wh-Auflösung) wird blass-grün und linear auf der rechten Skala aufgetragen. Diese Skala beginnt über den gewählten Zeitraum immer bei 0 kWh.</p>
-
-        <h3 class="font-semibold text-gray-900">Zeitliche Auflösung (x-Achse)</h3>
-        <p>Innerhalb der letzten 24 Stunden wird jede Messung dargestellt. Ältere Messungen nur noch mit einem Punkt pro Stunde (Zeitraum 24 Stunden bis 72 Stunden), bzw. mit einem Punkt pro Tag (älter).</p>
-        <h3 class="font-semibold text-gray-900">Mehr Infos</h3>
-        <p>Weitere Infos und Verbrauchsstatistiken findest du auf der Statistikseite</p>
-        <a href="statistic.php" class="flex items-center font-medium text-blue-600 hover:text-blue-700">Statistik '.getSvg(whichSvg:Svg::ArrowRight).'</a>
-    </div>
-  ';
-*/
 }
 
 // displays a bar graph with either two values (generated and consumed watt values) per x-point or one value (cost) per x-point

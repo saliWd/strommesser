@@ -1,28 +1,35 @@
 <?php declare(strict_types=1); 
     require_once 'functions.php';
-    $dbConn = get_dbConn(); // do not use initialize as I don't use sessions
+
     
-    $zeitNow = date_create("now");
-    $zeitNow->modify('- 5 minutes'); // latest entry must be newer than '5 minutes ago'
-    $valid = 0;
+    // checks wether the last measurement for each id is less than 5mins old
+    function checkStatus($dbConn): array {
+        $userids_to_check = [1, 2]; // might get that from DB as well. Need to exclude test account and non-active ones though
+        $zeitNow = date_create("now");
+        $zeitNow->modify('- 5 minutes'); // latest entry must be newer than '5 minutes ago'
+        $validIds = 0;
 
-    $userids_to_check = [1, 2]; // might get that from DB as well. Need to exclude test account and non-active ones though
-    $output = '';
-    foreach ($userids_to_check as $userid) {
-        $result = $dbConn->query('SELECT `zeit` FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 1');
-        if ($result->num_rows !== 1) {
-            break;
-        } 
-        $row = $result->fetch_assoc();
-        $zeitNewest = date_create($row['zeit']);   
-        if ($zeitNewest > $zeitNow) {
-            $valid++;
-        } else {
-            $output .= "userid: $userid is invalid<br>\n";
+        $output = '';
+        foreach ($userids_to_check as $userid) {
+            $result = $dbConn->query('SELECT `zeit` FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 1');
+            if ($result->num_rows !== 1) {
+                break;
+            } 
+            $row = $result->fetch_assoc();
+            $zeitNewest = date_create($row['zeit']);   
+            if ($zeitNewest > $zeitNow) {
+                $validIds++;
+            } else {
+                $output .= "userid: $userid is invalid<br>\n";
+            }
         }
+        $okOrNot = $validIds === count($userids_to_check);
+        return [$okOrNot, $output];
     }
-
-    $okOrNot = $valid === count($userids_to_check);
+  
+    $dbConn = get_dbConn(); // do not use initialize as I don't use sessions        
+    [$okOrNot, $output] = checkStatus(dbConn: $dbConn);
+        
     
     $cronjob = safeIntFromExt(source:'GET',varName:'cronjob',length:1);
     if ($cronjob === 1) {
