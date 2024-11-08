@@ -34,7 +34,7 @@
             $mailSendOk = mail(
                 to:'messer@strommesser.ch;',
                 subject:'Status Strommesser cronjob: nicht ok',
-                message:'Statusemail: Status ist nicht ok. Schau direkt nach: <a href=\"https://strommesser.ch/verbrauch/status.php\">Statuspage</a>'
+                message:'Statusemail: Status ist nicht ok. Schau direkt nach: https://strommesser.ch/verbrauch/status.php'
             );
             if (!$mailSendOk) {
                 echo 'Es ist ein Fehler passiert beim Versenden der Email'; // nobody sees this when running the cronjob automatically
@@ -50,7 +50,7 @@
         <p>';
         $result = $dbConn->query('SELECT `zeit`, `ok` FROM `status` WHERE 1 ORDER BY `id` DESC LIMIT 24'); // last 24 entries
         while ($row = $result->fetch_assoc()) {
-            $statusTxt = $row['ok'] == 1 ? '<span class="text-green-600">ok</span>' : '<span class="text-red-500">nicht ok</span>';
+            $statusTxt = $row['ok'] == 1 ? '<span class="text-green-600">ok</span>' : '<span class="text-red-500 font-bold">nicht ok</span>';
             $zeitTxt = date_create($row['zeit'])->format(format: 'H:i d.m.Y');
             $dbHistTxt .= "Status ist $statusTxt ($zeitTxt)<br>";
         }
