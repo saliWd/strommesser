@@ -51,7 +51,7 @@
         }
     } else {
         printBeginOfPage_v2(site:'status.php', title:'Status');
-        $okOrNotTxt = $okOrNot ? 'ok' : '<span class="text-xl text-red-600">nicht ok</span>';
+        $okOrNotTxt = $okOrNot ? '<span class="text-green-600">ok</span>' : '<span class="text-red-500">nicht ok</span>';
 
         $dbHistTxt = '';
         $result = $dbConn->query(query:'SELECT `zeit`, `ok` FROM `status` WHERE 1 ORDER BY `id` DESC LIMIT 24'); // last 24 entries
