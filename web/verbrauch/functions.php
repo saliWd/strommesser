@@ -721,25 +721,23 @@ function makeSafeInt($unsafe, int $length):int {
   }  
 }
 function makeSafeFloat($unsafe, int $length):float {  
-  $unsafe = filter_var(substr($unsafe, 0, $length), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION); // sanitize a length-limited variable
-  if (filter_var($unsafe, FILTER_VALIDATE_FLOAT)) { 
+  $unsafe = filter_var(value:substr(string:$unsafe, offset:0, length:$length), filter:FILTER_SANITIZE_NUMBER_FLOAT, options:FILTER_FLAG_ALLOW_FRACTION); // sanitize a length-limited variable
+  if (filter_var(value:$unsafe, filter:FILTER_VALIDATE_FLOAT)) { 
     return (float)$unsafe;
   } else { 
     return 0.0;
   }  
 }
 
-// (filter_var($number, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION)
-
 // returns a 'safe' string. Not that much to do though for a string
 function makeSafeStr($unsafe, int $length):string {
-  return (htmlentities(substr($unsafe, 0, $length))); // length-limited variable, HTML encoded
+  return htmlentities(string: substr(string:$unsafe, offset:0, length:$length)); // length-limited variable, HTML encoded
 }
 
 // returns a 'safe' character-as-hex value
 function makeSafeHex($unsafe, int $length):string {  
-  $unsafe = substr($unsafe, 0, $length); // length-limited variable  
-  if (ctype_xdigit($unsafe)) {
+  $unsafe = substr(string:$unsafe, offset:0, length:$length); // length-limited variable  
+  if (ctype_xdigit(text:$unsafe)) {
     return (string)$unsafe;
   } else {
     return '0';
@@ -748,55 +746,55 @@ function makeSafeHex($unsafe, int $length):string {
 
 // checks whether a get/post/cookie variable exists and makes it safe if it does. If not, returns 0
 function safeIntFromExt(string $source, string $varName, int $length):int {
-  if (($source === 'GET') and (isset($_GET[$varName]))) {
-    return makeSafeInt($_GET[$varName], $length);    
-  } elseif (($source === 'POST') and (isset($_POST[$varName]))) {
-    return makeSafeInt($_POST[$varName], $length);    
-  } elseif (($source === 'COOKIE') and (isset($_COOKIE[$varName]))) {
-    return makeSafeInt($_COOKIE[$varName], $length);  
+  if (($source === 'GET') and isset($_GET[$varName])) {
+    return makeSafeInt(unsafe:$_GET[$varName], length:$length);    
+  } elseif (($source === 'POST') and isset($_POST[$varName])) {
+    return makeSafeInt(unsafe:$_POST[$varName], length:$length);    
+  } elseif (($source === 'COOKIE') and isset($_COOKIE[$varName])) {
+    return makeSafeInt(unsafe:$_COOKIE[$varName], length:$length);  
   } else {
     return 0;
   }
 }
 
 function safeFloatFromExt(string $source, string $varName, int $length):float {
-  if (($source === 'GET') and (isset($_GET[$varName]))) {
-    return makeSafeFloat($_GET[$varName], $length);    
-  } elseif (($source === 'POST') and (isset($_POST[$varName]))) {
-    return makeSafeFloat($_POST[$varName], $length);    
-  } elseif (($source === 'COOKIE') and (isset($_COOKIE[$varName]))) {
-    return makeSafeFloat($_COOKIE[$varName], $length);  
+  if (($source === 'GET') and isset($_GET[$varName])) {
+    return makeSafeFloat(unsafe:$_GET[$varName], length:$length);    
+  } elseif (($source === 'POST') and isset($_POST[$varName])) {
+    return makeSafeFloat(unsafe:$_POST[$varName], length:$length);    
+  } elseif (($source === 'COOKIE') and isset($_COOKIE[$varName])) {
+    return makeSafeFloat(unsafe:$_COOKIE[$varName], length:$length);  
   } else {
     return 0.0;
   }
 }
 
 function safeHexFromExt(string $source, string $varName, int $length):string {
-  if (($source === 'GET') and (isset($_GET[$varName]))) {
-     return makeSafeHex($_GET[$varName], $length);
-   } elseif (($source === 'POST') and (isset($_POST[$varName]))) {
-     return makeSafeHex($_POST[$varName], $length);
-   } elseif (($source === 'COOKIE') and (isset($_COOKIE[$varName]))) {
-     return makeSafeHex($_COOKIE[$varName], $length);
+  if (($source === 'GET') and isset($_GET[$varName])) {
+     return makeSafeHex(unsafe:$_GET[$varName], length:$length);
+   } elseif (($source === 'POST') and isset($_POST[$varName])) {
+     return makeSafeHex(unsafe:$_POST[$varName], length:$length);
+   } elseif (($source === 'COOKIE') and isset($_COOKIE[$varName])) {
+     return makeSafeHex(unsafe:$_COOKIE[$varName], length:$length);
    } else {
      return '0';
    }
 }
 
 function safeStrFromExt(string $source, string $varName, int $length):string {
-  if (($source === 'GET') and (isset($_GET[$varName]))) {
-     return makeSafeStr($_GET[$varName], $length);
-   } elseif (($source === 'POST') and (isset($_POST[$varName]))) {
-     return makeSafeStr($_POST[$varName], $length);
-   } elseif (($source === 'COOKIE') and (isset($_COOKIE[$varName]))) {
-     return makeSafeStr($_COOKIE[$varName], $length);
+  if (($source === 'GET') and isset($_GET[$varName])) {
+     return makeSafeStr(unsafe:$_GET[$varName], length:$length);
+   } elseif (($source === 'POST') and isset($_POST[$varName])) {
+     return makeSafeStr(unsafe:$_POST[$varName], length:$length);
+   } elseif (($source === 'COOKIE') and isset($_COOKIE[$varName])) {
+     return makeSafeStr(unsafe:$_COOKIE[$varName], length:$length);
    } else {
      return '';
    }
 }
 
 function limitInt(int $input, int $lower, int $upper):int {
-  return min(max($input,$lower),$upper);  
+  return min(value: max(value:$input, values:$lower), values:$upper);  
 }
 
  
