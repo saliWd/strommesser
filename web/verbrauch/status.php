@@ -3,27 +3,27 @@
 
     
     // checks wether the last measurement for each id is less than 5mins old
-    function checkStatus($dbConn): array {
+    function checkStatus(mysqli $dbConn): array {
         $userids_to_check = [1, 2]; // might get that from DB as well. Need to exclude test account and non-active ones though
-        $zeitNow = date_create("now");
-        $zeitNow->modify('- 5 minutes'); // latest entry must be newer than '5 minutes ago'
+        $zeitNow = date_create(datetime:"now");
+        $zeitNow->modify(modifier:'- 5 minutes'); // latest entry must be newer than '5 minutes ago'
         $validIds = 0;
 
         $output = '';
         foreach ($userids_to_check as $userid) {
-            $result = $dbConn->query('SELECT `zeit` FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 1');
+            $result = $dbConn->query(query:"SELECT `zeit` FROM `verbrauch` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 1");
             if ($result->num_rows !== 1) {
                 break;
             } 
             $row = $result->fetch_assoc();
-            $zeitNewest = date_create($row['zeit']);   
+            $zeitNewest = date_create(datetime:$row['zeit']);
             if ($zeitNewest > $zeitNow) {
                 $validIds++;
             } else {
                 $output .= "userid: $userid is invalid<br>\n";
             }
         }
-        $okOrNot = $validIds === count($userids_to_check);
+        $okOrNot = $validIds === count(value:$userids_to_check);
         return [$okOrNot, $output];
     }
   
@@ -53,21 +53,27 @@
         printBeginOfPage_v2(site:'status.php', title:'Status');
         $okOrNotTxt = $okOrNot ? 'ok' : '<span class="text-xl text-red-600">nicht ok</span>';
 
-        $dbHistTxt = '<br><h4 class="mb-2 text-l font-bold tracking-tight text-gray-900">Status in den letzten 24 Stunden</h4>
-        <p>';
-        $result = $dbConn->query('SELECT `zeit`, `ok` FROM `status` WHERE 1 ORDER BY `id` DESC LIMIT 24'); // last 24 entries
+        $dbHistTxt = '';
+        $result = $dbConn->query(query:'SELECT `zeit`, `ok` FROM `status` WHERE 1 ORDER BY `id` DESC LIMIT 24'); // last 24 entries
         while ($row = $result->fetch_assoc()) {
             $statusTxt = $row['ok'] == 1 ? '<span class="text-green-600">ok</span>' : '<span class="text-red-500 font-bold">nicht ok</span>';
-            $zeitTxt = date_create($row['zeit'])->format(format: 'H:i d.m.Y');
+            $zeitTxt = date_create(datetime:$row['zeit'])->format(format: 'H:i, d.m.Y');
             $dbHistTxt .= "Status ist $statusTxt ($zeitTxt)<br>";
         }
-        $dbHistTxt .= '</p>';
-
-        echo '
-    <div class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
-    <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Status ist '.$okOrNotTxt.'</h3>
-    <p class="font-normal text-gray-700">'.$output.'</p>
-    '.$dbHistTxt.'
+        
+        echo "
+    <div class=\"text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100\">
+    <h3 class=\"mb-2 text-xl font-bold tracking-tight text-gray-900\">Status ist $okOrNotTxt</h3>
+    <p class=\"font-normal text-gray-700\">$output</p>
+    <br>
+    <p>
+    <i>Status ok</i> bedeutet, dass die letzte Messung für alle User nicht älter als 5 Minuten alt ist.<br>
+    Der Status wird stündlich überprüft und gespeichert. Unten werden die Resultate für die letzten 24 Stunden angezeigt.<br>
+    </p>".getHr()."<br>
+    <h4 class=\"mb-2 text-l font-bold tracking-tight text-gray-900\">Status in den letzten 24 Stunden</h4>
+    <p>
+    $dbHistTxt
+    </p>
     </div>
-    </div></body></html>';
+    </div></body></html>";
     }
