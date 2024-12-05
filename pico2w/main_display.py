@@ -1,4 +1,7 @@
 ## xx_version_placeholder_xx
+# using micropython version Raspberry Pi, Pico 2 W with Pimoroni libraries 0.0.11 --> does not connect to WLAN
+# install the ota library: Thonny, tools, install micropython_ota 2.1.0
+# install the pimoroni library
 import network # type: ignore (this is a pylance ignore warning directive)
 from time import sleep
 import micropython_ota # type: ignore

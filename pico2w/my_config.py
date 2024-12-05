@@ -1,7 +1,7 @@
 def get_wlan_config():
     config_wlan = dict([
-        ("ssid","strommesser"),
-        ("pw","publicPW")
+        ("ssid","strommesser.ch"),
+        ("pw","messerPW")
     ])
     return(config_wlan)
 
