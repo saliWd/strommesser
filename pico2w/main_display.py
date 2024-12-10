@@ -1,9 +1,7 @@
 ## xx_version_placeholder_xx
-# using micropython version Raspberry Pi, Pico 2 W with Pimoroni libraries 0.0.11 --> does not connect to WLAN
-# install the ota library: Thonny, tools, install micropython_ota 2.1.0
-# install the pimoroni library
-import network # type: ignore (this is a pylance ignore warning directive)
-from time import sleep
+# using micropython version Raspberry Pi, Pico 2 W with Pimoroni libraries 0.0.11
+# pimoroni libraries included in uf2 file
+
 import micropython_ota # type: ignore
 from machine import Timer # type: ignore
 from pimoroni import RGBLED  # type: ignore
@@ -142,9 +140,6 @@ def getDispYrange(values:list) -> list:
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
 LOOP_WAIT_TIME = 80
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True) # activate it. NB: disabling does not work correctly
-sleep(1)
 
 device_config = my_config.get_device_config()
 
@@ -176,7 +171,7 @@ while True:
         ('hash', randNum_hash['hash'])
         ])
         
-    wlan_connect(wlan=wlan, led_onboard=False, meas=False) # try to connect to the WLAN. Hangs there if no connection can be made
+    wlan_connect() # try to connect to the WLAN. Hangs there if no connection can be made
     meas = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
     
     ## OTA stuff. Do it before the display calculation etc
