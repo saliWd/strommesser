@@ -1,10 +1,11 @@
-# using micropython version Raspberry Pi, Pico 2 W with Pimoroni libraries 0.0.11
-# pimoroni libraries included in uf2 file
+# using Micropython version v1.23.0-1 with Pimoroni libraries on Pico W
+# not yet using Micropython version Raspberry Pico 2 W with Pimoroni libraries 0.0.11
 
 from machine import Timer # type: ignore
-from pimoroni import RGBLED  # type: ignore
+from pimoroni import RGBLED  # type: ignore (included in special uf2 file)
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
 from math import sin
+import gc
 
 # my own files
 import my_config
@@ -238,5 +239,10 @@ while True:
                                          minValCons=minValCons, 
                                          maxValGen=maxValGen, 
                                          led_brightness=brightness))
+
+
+    del brightness, color_pen, disp_y_range, expand, minValCons, maxValGen, message, meas, randNum_hash, t
+    del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x, zeroLine_y  # to combat memAlloc issues
+    gc.collect() # garbage collection
     
     debug_sleep(DBGCFG=DBGCFG,time=LOOP_WAIT_TIME)
