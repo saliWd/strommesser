@@ -1,4 +1,3 @@
-## xx_version_placeholder_xx
 from time import sleep
 from hashlib import sha256
 from binascii import hexlify
@@ -21,41 +20,42 @@ def debug_sleep(DBGCFG:dict, time:int):
     sleep(time)
     return
 
+# function might be called once or repeatedly (in while-true loop)
 def wlan_connect():
     DBGCFG = my_config.get_debug_settings() # debug stuff
     if(DBGCFG["wlan_sim"]):
         return() # nothing to do
     wlan = network.WLAN(network.STA_IF)
-    wlan.active(False) # maybe to do: not sure whether it's really necessary
-    sleep(1)
+    if(wlan.isconnected()):
+        return() # nothing to do
+    
     wlan.active(True) # activate it. NB: disabling does not work correctly
     sleep(1)
 
-    if(wlan.isconnected()):
-        return() # nothing to do
-    else: # wlan is not connected
-        config_wlan = my_config.get_wlan_config() # stored in external file
-        wlan.connect(config_wlan['ssid'], config_wlan['pw'])
+    # wlan is not connected
+    config_wlan = my_config.get_wlan_config() # stored in external file
+    wlan.connect(config_wlan['ssid'], config_wlan['pw'])
 
-        waitCounter = 20 # Wait for connect or fail
-        while waitCounter > 0:
-            if wlan.status() < 0 or wlan.status() >= 3:
-                break
-            waitCounter -= 1
-            print('waiting for connection... counter: '+str(waitCounter))
-            sleep(1)
+    waitCounter = 20 # Wait for connect or fail
+    while waitCounter > 0:
+        if wlan.status() < 0 or wlan.status() >= 3:
+            break
+        waitCounter -= 1
+        print('waiting for connection... counter: '+str(waitCounter))
+        sleep(1)
 
-        # Handle connection error
-        if wlan.status() != 3:
-            print('WLAN Status: ')
-            print(wlan.status())
-            # timeout or wrong status, did not manage to get a working WLAN
-            reset() # NB: connection to whatever device is getting lost; complicates debugging
-        else:
-            print('connected')
-            status = wlan.ifconfig()
-            print( 'ip = ' + status[0])
-            return
+    # Handle connection error
+    if wlan.status() != 3:
+        print('WLAN Status: ')
+        print(wlan.status())
+        sleep(3) # some time to have output printed
+        # timeout or wrong status, did not manage to get a working WLAN
+        reset() # NB: connection to whatever device is getting lost; complicates debugging
+    else:
+        print('connected')
+        status = wlan.ifconfig()
+        print( 'ip = ' + status[0])
+        return
 
 def urlencode(dictionary:dict):
     urlenc = ""
