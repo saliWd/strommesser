@@ -27,34 +27,27 @@ def wlan_init(DBGCFG:dict):
         print('WLAN connection is simulated...')
         return() # no meaningful return value
 
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True) # activate it. NB: disabling does not work correctly
-    sleep(1)
-
-    config_wlan = my_config.get_wlan_config() # stored in external file
-    wlan.connect(config_wlan['ssid'], config_wlan['pw'])
-
-    waitCounter = 30 # Wait about a minute for connect or fail
-    while waitCounter > 0:
-        if wlan.status() == 3:
-            break
-        waitCounter -= 1
-        print('waiting for connection... counter: '+str(waitCounter))
+    config_wlan = my_config.get_wlan_config() # stored in external file            
+    wlanStatus = 0
+    waitCounter = 0
+    while wlanStatus != 3:
+        print('waiting for connection...WLAN Status: '+str(wlanStatus)+'. Counter: '+str(waitCounter))
+        wlan = network.WLAN(network.STA_IF)
+        wlan.active(True) # activate it. NB: disabling does not work correctly
+        sleep(2)
+        wlan.connect(config_wlan['ssid'], config_wlan['pw'])
+        wlanStatus = wlan.status()
+        # need to restart all, otherwise the status is always constant
+        if wlanStatus != 3:
+            wlan.active(False)
+            del wlan
+            gc.collect()
+        
+        waitCounter += 1
         sleep(2)
 
-    # Handle connection error
-    if wlan.status() != 3:
-        print('WLAN Status: ')
-        print(wlan.status())
-        sleep(3) # some time to have output printed
-        # timeout or wrong status, did not manage to get a working WLAN. Try again
-        del wlan, config_wlan, waitCounter
-        gc.collect() # garbage collection
-        wlan = wlan_init(DBGCFG=DBGCFG) # call yourself again
-    else:
-        status = wlan.ifconfig()
-        print('connected, ip = ' + status[0])
-
+    wlanIfconfig = wlan.ifconfig()
+    print('connected. IP: ' + wlanIfconfig[0])
     return(wlan)
 
 # is called in every while loop
@@ -64,6 +57,7 @@ def wlan_conn_check(DBGCFG:dict, wlan):
     if(wlan.isconnected()):
         return(wlan) # nothing to do
     else:
+        wlan.active(False)
         del wlan
         gc.collect() # garbage collection
         wlanNew = wlan_init(DBGCFG=DBGCFG) # call the init

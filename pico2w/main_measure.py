@@ -4,7 +4,7 @@ from machine import Pin, UART # type: ignore
 
 # my own files
 import my_config
-from my_functions import debug_print, debug_sleep, wlan_connect, get_randNum_hash, transmit_message
+from my_functions import debug_print, debug_sleep, wlan_init, wlan_conn_check, get_randNum_hash, transmit_message
 
 
 def uart_ir_e350(DBGCFG:dict, uart_ir):
@@ -59,9 +59,7 @@ uart_ir = UART(0, baudrate=300, bits=7, parity=0, stop=1, tx=Pin(0), rx=Pin(1))
 ## program starts here
 led_onboard.on()
 
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-sleep(3)
+wlan = wlan_init(DBGCFG=DBGCFG)
 
 device_config = my_config.get_device_config()
 
@@ -85,6 +83,6 @@ while True:
         ('hash', randNum_hash['hash'])
         ])
     debug_print(DBGCFG=DBGCFG, text=str(message))
-    wlan_connect(wlan=wlan, led_onboard=led_onboard, meas=True) # try to connect to the WLAN. Hangs there if no connection can be made
+    wlan = wlan_conn_check(DBGCFG=DBGCFG, wlan=wlan) # check whether connection is still valid
     send_message_and_wait_post(DBGCFG=DBGCFG, message=message, wait_time=LOOP_WAIT_TIME, led_onboard=led_onboard) # does not send anything when in simulation 
 # end while
