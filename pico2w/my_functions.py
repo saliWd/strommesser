@@ -5,6 +5,7 @@ from random import randint
 import urequests # type: ignore
 from machine import reset # type: ignore
 import network # type: ignore (this is a pylance ignore warning directive)
+import gc
 
 import my_config
 
@@ -20,42 +21,54 @@ def debug_sleep(DBGCFG:dict, time:int):
     sleep(time)
     return
 
-# function might be called once or repeatedly (in while-true loop)
-def wlan_connect():
-    DBGCFG = my_config.get_debug_settings() # debug stuff
+# is called once before while loop
+def wlan_init(DBGCFG:dict):
     if(DBGCFG["wlan_sim"]):
-        return() # nothing to do
+        print('WLAN connection is simulated...')
+        return() # no meaningful return value
+
     wlan = network.WLAN(network.STA_IF)
-    if(wlan.isconnected()):
-        return() # nothing to do
-    
     wlan.active(True) # activate it. NB: disabling does not work correctly
     sleep(1)
 
-    # wlan is not connected
     config_wlan = my_config.get_wlan_config() # stored in external file
     wlan.connect(config_wlan['ssid'], config_wlan['pw'])
 
-    waitCounter = 20 # Wait for connect or fail
+    waitCounter = 30 # Wait about a minute for connect or fail
     while waitCounter > 0:
-        if wlan.status() < 0 or wlan.status() >= 3:
+        if wlan.status() == 3:
             break
         waitCounter -= 1
         print('waiting for connection... counter: '+str(waitCounter))
-        sleep(1)
+        sleep(2)
 
     # Handle connection error
     if wlan.status() != 3:
         print('WLAN Status: ')
         print(wlan.status())
         sleep(3) # some time to have output printed
-        # timeout or wrong status, did not manage to get a working WLAN
-        reset() # NB: connection to whatever device is getting lost; complicates debugging
+        # timeout or wrong status, did not manage to get a working WLAN. Try again
+        del wlan, config_wlan, waitCounter
+        gc.collect() # garbage collection
+        wlan = wlan_init(DBGCFG=DBGCFG) # call yourself again
     else:
-        print('connected')
         status = wlan.ifconfig()
-        print( 'ip = ' + status[0])
-        return
+        print('connected, ip = ' + status[0])
+
+    return(wlan)
+
+# is called in every while loop
+def wlan_conn_check(DBGCFG:dict, wlan):
+    if (DBGCFG["wlan_sim"]):
+        return() # no meaningful return value
+    if(wlan.isconnected()):
+        return(wlan) # nothing to do
+    else:
+        del wlan
+        gc.collect() # garbage collection
+        wlanNew = wlan_init(DBGCFG=DBGCFG) # call the init
+        return(wlanNew)
+
 
 def urlencode(dictionary:dict):
     urlenc = ""

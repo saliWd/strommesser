@@ -9,7 +9,7 @@ import gc
 
 # my own files
 import my_config
-from my_functions import debug_print, debug_sleep, wlan_connect, get_randNum_hash, transmit_message
+from my_functions import debug_print, debug_sleep, wlan_init, wlan_conn_check, get_randNum_hash, transmit_message
 
 def send_message_get_response(DBGCFG:dict, message:dict):
     URL = "https://strommesser.ch/verbrauch/getRaw.php?TX=pico&TXVER=2"
@@ -158,6 +158,9 @@ display.update()
 rgb_led = RgbLed()
 rgb_led.control(valid=False, pulsating=False, color=(255,0,0))
 
+DBGCFG = my_config.get_debug_settings() # debug stuff
+wlan = wlan_init(DBGCFG=DBGCFG)
+
 while True:
     randNum_hash = get_randNum_hash(device_config)
     
@@ -167,7 +170,7 @@ while True:
         ('hash', randNum_hash['hash'])
         ])
         
-    wlan_connect() # try to connect to the WLAN. Hangs there if no connection can be made
+    wlan = wlan_conn_check(DBGCFG=DBGCFG, wlan=wlan) # check whether connection is still valid
     meas = send_message_get_response(DBGCFG=DBGCFG, message=message) # does not send anything when in simulation
     
     wattVal = (-1 * meas["wattCons"]) + meas["wattGen"] # cons is negative, gen positive. 0 is treated as gen
@@ -241,6 +244,7 @@ while True:
                                          led_brightness=brightness))
 
 
+    # do not delete wlan variable
     del brightness, color_pen, disp_y_range, expand, minValCons, maxValGen, message, meas, randNum_hash, t
     del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x, zeroLine_y  # to combat memAlloc issues
     gc.collect() # garbage collection
