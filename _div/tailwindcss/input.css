@@ -1,9 +1,5 @@
 @import "tailwindcss" source("../../web/verbrauch/");
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @layer components {
   hr {
 	  @apply m-1
@@ -13,58 +9,66 @@
   }
 }
 
+@tailwind base;
+@layer base {
+  html {
+    @apply font-serif {
+      'sans': ['Raleway', 'Helvetica', 'Arial', 'sans-serif'],  
+    }
+  }
+}
 
 @font-face {
   font-family: 'Raleway';
   font-style: normal;
   font-weight: 100;
-  src: local(''), url('fonts/raleway-v28-latin-100.woff2') format('woff2');
+  src: url('fonts/raleway-v28-latin-100.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Raleway';
   font-style: normal;
   font-weight: 200;
-  src: local(''), url('fonts/raleway-v28-latin-200.woff2') format('woff2');
+  src: url('fonts/raleway-v28-latin-200.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Raleway';
   font-style: normal;
   font-weight: 300;
-  src: local(''), url('fonts/raleway-v28-latin-300.woff2') format('woff2');
+  src: url('fonts/raleway-v28-latin-300.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Raleway';
   font-style: normal;
   font-weight: 400;
-  src: local(''), url('fonts/raleway-v28-latin-regular.woff2') format('woff2');
+  src: url('fonts/raleway-v28-latin-regular.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Raleway';
   font-style: normal;
   font-weight: 500;
-  src: local(''), url('fonts/raleway-v28-latin-500.woff2') format('woff2');
+  src: url('fonts/raleway-v28-latin-500.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Raleway';
   font-style: normal;
   font-weight: 600;
-  src: local(''), url('fonts/raleway-v28-latin-600.woff2') format('woff2');
+  src: url('fonts/raleway-v28-latin-600.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Raleway';
   font-style: normal;
   font-weight: 800;
-  src: local(''), url('fonts/raleway-v28-latin-800.woff2') format('woff2');
+  src: url('fonts/raleway-v28-latin-800.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Raleway';
   font-style: normal;
   font-weight: 700;
-  src: local(''), url('fonts/raleway-v28-latin-700.woff2') format('woff2');
+  src: url('fonts/raleway-v28-latin-700.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Raleway';
   font-style: normal;
   font-weight: 900;
-  src: local(''), url('fonts/raleway-v28-latin-900.woff2') format('woff2');
+  src: url('fonts/raleway-v28-latin-900.woff2') format('woff2');
 }
