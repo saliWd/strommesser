@@ -9,15 +9,6 @@
   }
 }
 
-@tailwind base;
-@layer base {
-  html {
-    @apply font-serif {
-      'sans': ['Raleway', 'Helvetica', 'Arial', 'sans-serif'],  
-    }
-  }
-}
-
 @font-face {
   font-family: 'Raleway';
   font-style: normal;
@@ -71,4 +62,8 @@
   font-style: normal;
   font-weight: 900;
   src: url('fonts/raleway-v28-latin-900.woff2') format('woff2');
+}
+
+@theme {
+  --font-sans: Raleway, sans-serif;  
 }
