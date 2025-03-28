@@ -1,6 +1,43 @@
 # StromMesser project documentation
 
-## power meter readout using pico_w and micropython
+## power meter readout using gplugm and mqtt
+1. still ongoing, setup issues
+
+## consumption display on Pico and Pimoroni display
+see folder _pico2w_
+
+## MQTT setup
+1. with raspberry pi (currently model 3 or 4?, Pi Zero 2 W should be sufficient as well)
+install it:
+* sudo apt update && sudo apt upgrade
+* sudo apt install -y mosquitto mosquitto-clients
+* sudo systemctl enable mosquitto.service
+* mosquitto -v
+
+configuring the tool:
+* sudo nano /etc/mosquitto/mosquitto.conf
+add those 2 lines:
+* listener 1883
+* allow_anonymous true
+
+restart it:
+* sudo systemctl restart mosquitto
+
+
+## Website
+### strommesser.ch/verbrauch: Design
+see folder _web_
+
+#### Tailwindcss
+* using version 4.0.12, standalone file, stored in _div/tailwindcss/
+* older nodejs installation is legacy, will be removed later
+
+### sitemap
+from [xml-sitemaps.com](https://www.xml-sitemaps.com/)
+
+
+
+## (legacy) power meter readout using pico_w and micropython
 1. project folder pico_w
    1. install micropython version with included pimoroni support, version v1.21.0 (use Thonny to set it up)
    1. import mip
@@ -70,15 +107,6 @@ C.5.0(0400)
 Have 2 x 33 Ohm connectors on GPIOs to increase power for waveshare solar power manager.
 
 
-## Website
-
-### strommesser.ch/verbrauch: Design
-
-#### Tailwindcss
-* using version 3.2.4, standalone file, stored in _div/tailwindcss/
-
-### sitemap
-from [xml-sitemaps.com](https://www.xml-sitemaps.com/)
 
 ## Sources
 
