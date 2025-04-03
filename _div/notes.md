@@ -1,13 +1,21 @@
 # StromMesser project documentation
 
-## power meter readout using gplugm and mqtt
-1. still ongoing, setup issues
+## power meter readout 
+### gplugm and mqtt
+* still ongoing, setup issues
+
+### alternatives
+* whatwatt: https://whatwatt.ch/de/shop 90.-
+   * should work on the egs network as is, no issues found
+* more information about interface: https://www.smart-metering-interface.ch
+
+
 
 ## consumption display on Pico and Pimoroni display
 see folder _pico2w_
 
 ## MQTT setup
-1. with raspberry pi (currently model 3 or 4?, Pi Zero 2 W should be sufficient as well)
+1. with raspberry pi (currently model 3B, Pi Zero 2 W should be sufficient as well)
 install it:
 * sudo apt update && sudo apt upgrade
 * sudo apt install -y mosquitto mosquitto-clients
@@ -30,7 +38,6 @@ see folder _web_
 
 #### Tailwindcss
 * using version 4.0.12, standalone file, stored in _div/tailwindcss/
-* older nodejs installation is legacy, will be removed later
 
 ### sitemap
 from [xml-sitemaps.com](https://www.xml-sitemaps.com/)
