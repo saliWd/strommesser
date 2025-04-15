@@ -18,31 +18,41 @@ wlan = wlan_init(DBGCFG=DBGCFG)
 # wlan = wlan_conn_check(DBGCFG=DBGCFG, wlan=wlan) # check whether connection is still valid
 
 URL = "http://192.168.178.47/api/v1/report" # tbd
-URL = "https://strommesser.ch/json.php"     # works sometimes, sometimes getting EHOSTUNREACH, sometimes hangs
-URL = "https://widmedia.ch" # works
+URL = "https://strommesser.ch/json.php"
+# URL = "https://widmedia.ch" # works
 # URL = "https://strommesser.ch/trial.json" # works
 
-print('a: starting get request')
-try:
-    response = urequests.get(URL, timeout=9)
-    print('b: get request done')
+# get request is very unstable
+def json_get_request(URL:str):
+    try:
+        response = urequests.get(URL, timeout=9)
+        if (response.status_code != 200):
+            return(False)
+        text = response.content
+        response.close()
+        del response
+        return(text)
+    except:
+        print('did get an exception')
+        return(False)
 
-    print('c: printing status code')
-    print('Response code: ', response.status_code)
+trialCount = 0
+MAX_TRIAL = 5
 
-    print('d: printing encoding')
-    print('Response encoding: ', response.encoding)
+while trialCount < MAX_TRIAL:
+    content = json_get_request(URL=URL)
+    if content:
+        break
+    else:
+        trialCount = trialCount + 1
+        print('get trial: ', trialCount)
+        sleep(1)
 
-    print('e: printing content')
-    print('Response content:', response.content)
-    response.close()
-    del response
-except:
-    print('did get an exception')
-    
+if trialCount < MAX_TRIAL:
+    print('Content: ', content)
+else:
+    print('get request did not work')
 
-# response_content = response.json()
-# print('Response content:', json.loads(response_content))
 
 
 del URL
