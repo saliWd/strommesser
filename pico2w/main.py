@@ -16,20 +16,8 @@ DBGCFG = my_config.get_debug_settings() # debug stuff
 device_config = my_config.get_device_config()
 wlan = wlan_init(DBGCFG=DBGCFG)
 
-URL = "http://192.168.178.47/api/v1/report" # too much data
-# URL = "http://192.168.178.47/api/v1/live" # does not work. does not exit although timeout is specified
-# URL = "https://strommesser.ch/json.php"
+URL = "http://192.168.178.47/api/v1/report" 
 # URL = "https://strommesser.ch/json_long.php"
-
-# URL = "https://widmedia.ch" # works
-# URL = "https://strommesser.ch/trial.json" # works
-
-
-# does not work
-#    with urequests.get(URL, timeout=9) as response:
-#        for chunk in response.iter_content():
-#            print(chunk.decode(response.encoding))
-
 
 # get request is very unstable
 def json_get_request(URL:str):
@@ -38,13 +26,10 @@ def json_get_request(URL:str):
         if (response.status_code != 200):
             print('status wrong: ',response.status_code)
             return(False)
-        length = len(response.content)
-        print('response length:',length)
         jdata = json.loads(response.content)
         response.close()
         return(jdata)
     except Exception as error:
-        # handle the exception
         print("An exception occurred:", error)
         return(False)
 
@@ -61,7 +46,7 @@ while trialCount < MAX_TRIAL:
         sleep(1)
 
 if trialCount < MAX_TRIAL:
-    print('Content: ', content)
+    print("Content:\n", content)
 else:
     print('get request did not work')
 
