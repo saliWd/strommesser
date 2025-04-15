@@ -2,38 +2,50 @@
 # REST API trial for display
 
 from time import sleep
-import urequests # type: ignore
-# import json
+import requests_1 as request # from https://github.com/shariltumin/bit-and-pieces/tree/main/web-client
+# see also https://github.com/orgs/micropython/discussions/14105
+import json
 import gc
 
 # my own files
 import my_config
-from my_functions import wlan_init, wlan_conn_check
+from my_functions import wlan_init
 
 DBGCFG = my_config.get_debug_settings() # debug stuff
 
 device_config = my_config.get_device_config()
 wlan = wlan_init(DBGCFG=DBGCFG)
 
-# wlan = wlan_conn_check(DBGCFG=DBGCFG, wlan=wlan) # check whether connection is still valid
+URL = "http://192.168.178.47/api/v1/report" # too much data
+# URL = "http://192.168.178.47/api/v1/live" # does not work. does not exit although timeout is specified
+# URL = "https://strommesser.ch/json.php"
+# URL = "https://strommesser.ch/json_long.php"
 
-URL = "http://192.168.178.47/api/v1/report" # tbd
-URL = "https://strommesser.ch/json.php"
 # URL = "https://widmedia.ch" # works
 # URL = "https://strommesser.ch/trial.json" # works
+
+
+# does not work
+#    with urequests.get(URL, timeout=9) as response:
+#        for chunk in response.iter_content():
+#            print(chunk.decode(response.encoding))
+
 
 # get request is very unstable
 def json_get_request(URL:str):
     try:
-        response = urequests.get(URL, timeout=9)
+        response = request.get(url=URL, timeout=9)
         if (response.status_code != 200):
+            print('status wrong: ',response.status_code)
             return(False)
-        text = response.content
+        length = len(response.content)
+        print('response length:',length)
+        jdata = json.loads(response.content)
         response.close()
-        del response
-        return(text)
-    except:
-        print('did get an exception')
+        return(jdata)
+    except Exception as error:
+        # handle the exception
+        print("An exception occurred:", error)
         return(False)
 
 trialCount = 0
@@ -58,5 +70,6 @@ else:
 del URL
 del wlan, device_config, DBGCFG
 gc.collect() # garbage collection
-sleep(3)
+sleep(1)
 print('done')
+
