@@ -19,6 +19,10 @@ wlan = wlan_init(DBGCFG=DBGCFG)
 URL = "http://192.168.178.47/api/v1/report" 
 # URL = "https://strommesser.ch/json_long.php"
 
+LOOP_COUNT_MAX = 5 # program runs for this long
+LOOP_SLEEP_SEC = 5
+
+
 # get request is very unstable
 def json_get_request(URL:str):
     try:
@@ -28,27 +32,37 @@ def json_get_request(URL:str):
             return(False)
         jdata = json.loads(response.content)
         response.close()
-        return(jdata)
+        get_interesting_values(jdata=jdata)
+        return(True)
     except Exception as error:
         print("An exception occurred:", error)
         return(False)
 
-trialCount = 0
-MAX_TRIAL = 5
+def get_interesting_values(jdata):
+    # print("Content:\n", jdata)
+    print('time since boot:', jdata['system']['time_since_boot'])
+    print('date time:', jdata['system']['date_time'])
+    print('current power +:', jdata['report']['instantaneous_power']['active']['positive']['total'])
+    print('current power -:', jdata['report']['instantaneous_power']['active']['negative']['total'])
 
-while trialCount < MAX_TRIAL:
-    content = json_get_request(URL=URL)
-    if content:
+    print('energy +:', jdata['report']['energy']['active']['positive']['total'])
+    print('energy -:', jdata['report']['energy']['active']['negative']['total'])
+    
+    print('energy + T1:', jdata['report']['energy']['active']['positive']['t1'])
+    print('energy + T2:', jdata['report']['energy']['active']['positive']['t2'])
+    
+
+loopCount = 0
+while True:
+    print('loop: ',loopCount)
+    if not json_get_request(URL=URL):
+        print('get request did not work')
+    sleep(LOOP_SLEEP_SEC)
+    loopCount += 1
+    if loopCount > LOOP_COUNT_MAX:
         break
-    else:
-        trialCount = trialCount + 1
-        print('get trial: ', trialCount)
-        sleep(1)
-
-if trialCount < MAX_TRIAL:
-    print("Content:\n", content)
-else:
-    print('get request did not work')
+    
+    
 
 
 
