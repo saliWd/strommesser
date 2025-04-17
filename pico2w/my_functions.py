@@ -10,7 +10,7 @@ import gc
 import my_config
 
 def debug_print(DEBUG_CFG:dict, text:str):
-    if(DEBUG_CFG["print"]):
+    if(DEBUG_CFG['print']):
         print(text)
     return # otherwise just return
 
@@ -50,8 +50,8 @@ def wlan_init(DEBUG_CFG:dict):
     return(wlan)
 
 # is called in every while loop
-def wlan_conn_check(DBGCFG:dict, wlan):
-    if (DBGCFG["wlan_sim"]):
+def wlan_conn_check(DEBUG_CFG:dict, wlan):
+    if (DEBUG_CFG['wlan'] == 'simulated'):
         return() # no meaningful return value
     if(wlan.isconnected()):
         return(wlan) # nothing to do
@@ -59,7 +59,7 @@ def wlan_conn_check(DBGCFG:dict, wlan):
         wlan.active(False)
         del wlan
         gc.collect() # garbage collection
-        wlanNew = wlan_init(DBGCFG=DBGCFG) # call the init
+        wlanNew = wlan_init(DEBUG_CFG=DEBUG_CFG) # call the init
         return(wlanNew)
 
 

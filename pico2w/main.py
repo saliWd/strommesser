@@ -6,12 +6,13 @@ from math import sin
 from machine import Timer # type: ignore
 import requests_1 as request # from https://github.com/shariltumin/bit-and-pieces/tree/main/web-client, see also https://github.com/orgs/micropython/discussions/14105
 import json
+import gc
 from pimoroni import RGBLED  # type: ignore (included in uf2 file)
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
 
 # my own files
 import my_config
-from my_functions import wlan_init,debug_sleep,debug_print
+from my_functions import wlan_init,wlan_conn_check,debug_sleep,debug_print
 
 
 class RgbLed(object):
@@ -96,34 +97,6 @@ def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting i
     display.text(text, x, y, scale=1.1)
     display.text(text, x+1, y, scale=1.1)
 
-def sepStrToArr(separatedString:str):
-    valueArray = separatedString.split("|") # Format: valid|newestCons|Y|m|d|H|i|s|newestGen|ledMaxValGen
-    retVal = dict([
-            ('valid', 0),
-            ('wattCons', 999),
-            ('hour', 99),
-            ('max', 405),
-            ('brightness', 80),
-            ('wattGen', 987),
-            ('maxGen', 1050)
-    ])
-    if (len(valueArray) > 11 ):
-            retVal["valid"] = int(valueArray[0])
-            retVal["wattCons"] = int(valueArray[1])
-            retVal["hour"] = int(valueArray[5])
-            retVal["max"] = int(valueArray[8])
-            retVal["brightness"] = int(valueArray[9])
-            retVal["wattGen"] = int(valueArray[10])
-            retVal["maxGen"] = int(valueArray[11])
-    return retVal
-
-def getBrightness(meas:list)->int:
-    """reads the brightness (from the server) and adjusts it during the night"""
-    brightness = meas["brightness"]
-    if (meas["hour"] > 20) or (meas["hour"] < 6):
-        brightness = int(0.25 * meas["brightness"]) # darker from 21:00 to 05:59. rounded down
-    return brightness
-
 def getDispYrange(values:list) -> list:
     """returns the range of the given values. extends the range to at least -50 to +50 if the min/max are smaller. returns 2 positive values"""
     minimum = abs(min(min(values),-50))
@@ -138,7 +111,7 @@ def json_get_request(DEBUG_CFG:dict) -> dict:
     if DEBUG_CFG['json_data'] == 'web': # can be 'local_net'|'web'|'file'
         URL = "https://strommesser.ch/json_long.php"
     elif DEBUG_CFG['json_data'] == 'file':         
-        return(get_interesting_values(jdata=my_config.debug_jdata()))
+        return(get_interesting_values(DEBUG_CFG=DEBUG_CFG, jdata=my_config.debug_jdata()))
     try:
         response = request.get(url=URL, timeout=9)
         if (response.status_code != 200):
@@ -146,12 +119,12 @@ def json_get_request(DEBUG_CFG:dict) -> dict:
             return(returnVal)
         jdata = json.loads(response.content)
         response.close()        
-        return(get_interesting_values(jdata=jdata))
+        return(get_interesting_values(DEBUG_CFG=DEBUG_CFG, jdata=jdata))
     except Exception as error:
         print("An exception occurred:", error)
         return(returnVal)
 
-def get_interesting_values(jdata) -> dict:
+def get_interesting_values(DEBUG_CFG:dict, jdata) -> dict:
     meas = dict([
         ('valid',True),
         ('date_time',jdata['system']['date_time']),
@@ -161,8 +134,10 @@ def get_interesting_values(jdata) -> dict:
         ('energy_neg',jdata['report']['energy']['active']['negative']['total']),
         ('energy_pos_t1',jdata['report']['energy']['active']['positive']['t1']),
         ('energy_pos_t2',jdata['report']['energy']['active']['positive']['t2'])])
-    # print("Content:\n", jdata)
-    print_values(meas=meas)
+    
+    if(DEBUG_CFG['print']):
+        print_values(meas=meas)
+        print("Content:\n", jdata)
     return(meas)
 
 def print_values(meas:dict):
@@ -180,11 +155,10 @@ def print_values(meas:dict):
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
 DEVICE_CFG = my_config.get_device_config()
-wlan = wlan_init(DEBUG_CFG=DEBUG_CFG)
-
-LOOP_COUNT_MAX = 3 # program runs for this many loops
 LOOP_SLEEP_SEC = 5 # pause between loops
+WATT_NOISE_LIMIT = 15 # everything below 15 W will be set to 0
 
+wlan = wlan_init(DEBUG_CFG=DEBUG_CFG)
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, rotate=0)
 display.set_backlight(0.5)
@@ -203,25 +177,91 @@ rgb_led = RgbLed()
 rgb_led.control(valid=False, pulsating=False, color=(255,0,0))
 
 
-
-loopCount = 0
 while True:
-    debug_print(DEBUG_CFG=DEBUG_CFG, text='loop: '+str(loopCount))
+    wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, wlan=wlan) # check whether connection is still valid
     meas = json_get_request(DEBUG_CFG=DEBUG_CFG)
     if not meas['valid']:
         print('get request did not work')
 
-    
-    wattVal = (-1 * meas['power_pos']) + meas['power_neg'] # cons is negative, gen positive. 0 is treated as gen   
+    wattVal = int(1000 * (-1 * meas['power_pos']) + meas['power_neg']) # cons is negative, gen positive. 0 is treated as gen
+    if (abs(wattVal) < WATT_NOISE_LIMIT): # everything below this is just noise...
+        wattVal = 0
     debug_print(DEBUG_CFG=DEBUG_CFG, text='wattValue: '+str(wattVal))
 
+    minValCons = 400 # meas["max"] # this is a positive value but needs to be treated negative in some cases
+    maxValGen = 3400 # meas["maxGen"]
 
+    # normalize the value between -ledMinValCons and ledMaxValGen (e.g. -400 to 3000)
+    wattValMinMax = min(max(wattVal, (-1 * minValCons)),maxValGen)
+
+    debug_print(DEBUG_CFG, "normalized watt value: "+str(wattValMinMax)+
+                ", min/max: "+str(minValCons)+"/"+str(maxValGen))
+
+    # fills the screen with black
+    display.set_pen(BLACK)
+    display.clear()
+
+    wattVals.append(wattValMinMax)
+    if len(wattVals) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
+        wattVals.pop(0)
+    valColor = val_to_rgb(val=wattValMinMax, minValCons=minValCons, maxValGen=maxValGen, led_brightness=255)
+    # draw the zero line in the current color (1 pix)
+    display.set_pen(display.create_pen(*valColor))
+    disp_y_range = getDispYrange(wattVals)
+    zeroLine_y = HEIGHT - int(float(HEIGHT) * float(disp_y_range[0]) / float(disp_y_range[2]))
+    display.rectangle(0, zeroLine_y, WIDTH, 1)
+
+    # Debug code, to get both cons and gen
+    # if len(wattVals) == 12: wattVals[7] = wattVals[7]*-1
+
+    x = 0
+    for t in wattVals:
+        # cons grow down (so plus direction in pixels), gen grow up (so need to 'invert' everything). Full range is (min+max Vals)
+        color_pen = display.create_pen(*val_to_rgb(val=t, minValCons=minValCons, maxValGen=maxValGen, led_brightness=255))        
+        display.set_pen(color_pen)
+        
+        valHeight = int(float(HEIGHT) * float(abs(t)) / float(disp_y_range[2])) # between 0 and HEIGHT. E.g. 135*2827/3400
+        if t < 0: 
+            display.rectangle(x, zeroLine_y, BAR_WIDTH, valHeight)
+        else: # direction goes up
+            display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)        
+        x += BAR_WIDTH
+
+    if wattVal < 0: display.set_pen(TEXT_BG_CONS)
+    else:           display.set_pen(TEXT_BG_GEN)
+    display.rectangle(1, 1, 137, 41) # draws a background for the black text
+    wattVal4digits = min(abs(wattVal), 9999) # limit it to 4 digits, range 0...9999. Sign is lost
+    expand = right_align(value4digits=wattVal4digits) # string formatting does not work correctly. Do it myself
+
+    # writes the reading as text in the rectangle
+    display.set_pen(BLACK)
+    make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
+    make_bold(display, "W", 104, 23)
+    
+    display.update()
+
+    # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
+    brightness = 33 #getBrightness(meas=meas)
+    if (wattVal == 0): brightness = 0 # disable LED when 0 consumption
+    if (wattVal < 0):
+        rgb_led.control(valid=meas['valid'], pulsating=False,
+                        color=val_to_rgb(val=wattValMinMax,
+                                         minValCons=minValCons, 
+                                         maxValGen=maxValGen, 
+                                         led_brightness=int(brightness/2))) # led is quite bright when shining constantly
+    else:
+        rgb_led.control(valid=meas['valid'], pulsating=True,
+                        color=val_to_rgb(val=wattValMinMax, 
+                                         minValCons=minValCons, 
+                                         maxValGen=maxValGen, 
+                                         led_brightness=brightness))
+
+
+    # do not delete wlan variable
+    del brightness, color_pen, disp_y_range, expand, minValCons, maxValGen, meas, t
+    del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x, zeroLine_y  # to combat memAlloc issues
+    gc.collect() # garbage collection
+    
     debug_sleep(DEBUG_CFG=DEBUG_CFG,time=LOOP_SLEEP_SEC)
-    loopCount += 1
-    if loopCount > LOOP_COUNT_MAX:
-        break
     
-    
-
-print('done')
 
