@@ -9,21 +9,20 @@ import gc
 
 import my_config
 
-def debug_print(DBGCFG:dict, text:str):
-    if(DBGCFG["print"]):
+def debug_print(DEBUG_CFG:dict, text:str):
+    if(DEBUG_CFG["print"]):
         print(text)
     return # otherwise just return
 
-def debug_sleep(DBGCFG:dict, time:int):
-    if(DBGCFG["sleep"]): # minimize wait times by sleeping only one second instead of the normal amount
-        sleep(1)
-        return
+def debug_sleep(DEBUG_CFG:dict, time:int):
+    if(DEBUG_CFG['sleep'] == 'short'): # minimize wait times by sleeping only one second instead of the normal amount
+        time = 1
     sleep(time)
     return
 
 # is called once before while loop
-def wlan_init(DBGCFG:dict):
-    if(DBGCFG["wlan_sim"]):
+def wlan_init(DEBUG_CFG:dict):
+    if(DEBUG_CFG['wlan'] == 'simulated'):
         print('WLAN connection is simulated...')
         return() # no meaningful return value
 
@@ -82,7 +81,7 @@ def transmit_message(DBGCFG:dict, URL:str, message:dict):
             sleep(20)             
             reset() # NB: connection to whatever device is getting lost; complicates debugging
         returnText = response.text
-        debug_print(DBGCFG=DBGCFG, text="Text:"+returnText)
+        debug_print(DEBUG_CFG=DBGCFG, text="Text:"+returnText)
         response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
         return(returnText)
     except:
