@@ -1,1 +1,1 @@
-https://github.com/pimoroni/pimoroni-pico/releases/latest/
+https://github.com/pimoroni/pimoroni-pico-rp2350/releases
