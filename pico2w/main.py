@@ -165,6 +165,7 @@ display.set_backlight(0.5)
 display.set_font("sans")
 WIDTH, HEIGHT = display.get_bounds() # 240x135
 BLACK = display.create_pen(0, 0, 0)
+WHITE = display.create_pen(255, 255, 255)
 TEXT_BG_GEN = display.create_pen(170, 255, 170)
 TEXT_BG_CONS = display.create_pen(255, 170, 170)
 BAR_WIDTH = 5
@@ -176,8 +177,9 @@ display.update()
 rgb_led = RgbLed()
 rgb_led.control(valid=False, pulsating=False, color=(255,0,0))
 
-
+loopCount:int = 0
 while True:
+    loopCount += 1 # just let it overflow
     wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, wlan=wlan) # check whether connection is still valid
     meas = json_get_request(DEBUG_CFG=DEBUG_CFG)
     if not meas['valid']:
@@ -238,6 +240,10 @@ while True:
     make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
     make_bold(display, "W", 104, 23)
     
+    # debug output
+    display.set_pen(WHITE)
+    display.text(str(loopCount), 10, 120, scale=1.0)
+
     display.update()
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
