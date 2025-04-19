@@ -107,18 +107,32 @@ def getDispYrange(values:list) -> list:
 def json_get_request(DEBUG_CFG:dict) -> dict:
     returnVal = dict([('valid',False)]) # minimal return value. Will be overwritten in more meaningful cases
     
-    URL = 'http://192.168.178.47/api/v1/report' # on the local net
+    URL = 'http://192.168.178.47/api/v1/live' # prints data like: 
+    # event: live
+    # data: {"P_In":0.004,"P_Out":0,"E_In":166.748,"E_In_T1":129.634,"E_In_T2":37.105,"E_Out":531.081,"E_Out_T1":95.986,"E_Out_T2":435.087,"Date":"2025-04-19","Time":"22:54:25","Uptime":62.26}
+    # event: live
+    # data: {"P_In":0.003,"P_Out":0,"E_In":166.748,"E_In_T1":129.634,"E_In_T2":37.105,"E_Out":531.081,"E_Out_T1":95.986,"E_Out_T2":435.087,"Date":"2025-04-19","Time":"22:54:30","Uptime":62.26}
+    # in a continous stream...
+
 
     if DEBUG_CFG['json_data'] == 'web': # can be 'local_net'|'web'|'file'
         URL = "https://strommesser.ch/json_long.php"
     elif DEBUG_CFG['json_data'] == 'file':         
         return(get_interesting_values(DEBUG_CFG=DEBUG_CFG, jdata=my_config.debug_jdata()))
     try:
-        response = request.get(url=URL, timeout=9)
+        response = request.get(url=URL, timeout=5, stream=True)
         if (response.status_code != 200):
             print('status wrong: ',response.status_code)
             return(returnVal)
-        jdata = json.loads(response.content)
+        strConv = str(response.content)
+        processed = strConv.replace('event: ', '')
+        processed = processed.replace('live','')
+        processed = processed.replace('data: ','')
+        processed = processed.replace('\\n','')
+        processed = processed.replace("b'","")
+        processed = processed.replace("'","")
+        print(processed)
+        jdata = json.loads(processed)
         response.close()        
         return(get_interesting_values(DEBUG_CFG=DEBUG_CFG, jdata=jdata))
     except Exception as error:
@@ -126,16 +140,18 @@ def json_get_request(DEBUG_CFG:dict) -> dict:
         return(returnVal)
 
 def get_interesting_values(DEBUG_CFG:dict, jdata) -> dict:
+    print("json:\n", jdata)
     try:
         meas = dict([
             ('valid',True),
-            ('date_time',jdata['system']['date_time']),
-            ('power_pos',jdata['report']['instantaneous_power']['active']['positive']['total']),
-            ('power_neg',jdata['report']['instantaneous_power']['active']['negative']['total']),
-            ('energy_pos',jdata['report']['energy']['active']['positive']['total']),
-            ('energy_neg',jdata['report']['energy']['active']['negative']['total']),
-            ('energy_pos_t1',jdata['report']['energy']['active']['positive']['t1']),
-            ('energy_pos_t2',jdata['report']['energy']['active']['positive']['t2'])])
+            ('date',jdata['Date']),
+            ('time',jdata['Time']),
+            ('power_pos',jdata['P_In']),
+            ('power_neg',jdata['P_Out']),
+            ('energy_pos',jdata['E_In']),
+            ('energy_neg',jdata['E_Out']),
+            ('energy_pos_t1',jdata['E_In_T1']),
+            ('energy_pos_t2',jdata['E_In_T2'])])
         if(DEBUG_CFG['print']):
             print_values(meas=meas)
             print("Content:\n", jdata)
@@ -148,7 +164,7 @@ def get_interesting_values(DEBUG_CFG:dict, jdata) -> dict:
     return(meas)
 
 def print_values(meas:dict):
-    print('date time:',meas['date_time'])
+    print('date_time:',meas['date'],' ',meas['time'])
     print('current power +:',meas['power_pos'])
     print('current power -:',meas['power_neg'])
 

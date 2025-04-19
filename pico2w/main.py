@@ -108,13 +108,6 @@ def json_get_request(DEBUG_CFG:dict) -> dict:
     returnVal = dict([('valid',False)]) # minimal return value. Will be overwritten in more meaningful cases
     
     URL = 'http://192.168.178.47/api/v1/report' # on the local net
-    URL = 'http://192.168.178.47/api/v1/live' # prints data like: 
-    # event: live
-    # data: {"P_In":0.004,"P_Out":0,"E_In":166.748,"E_In_T1":129.634,"E_In_T2":37.105,"E_Out":531.081,"E_Out_T1":95.986,"E_Out_T2":435.087,"Date":"2025-04-19","Time":"22:54:25","Uptime":62.26}
-    # event: live
-    # data: {"P_In":0.003,"P_Out":0,"E_In":166.748,"E_In_T1":129.634,"E_In_T2":37.105,"E_Out":531.081,"E_Out_T1":95.986,"E_Out_T2":435.087,"Date":"2025-04-19","Time":"22:54:30","Uptime":62.26}
-    # in a continous stream...
-
 
     if DEBUG_CFG['json_data'] == 'web': # can be 'local_net'|'web'|'file'
         URL = "https://strommesser.ch/json_long.php"
@@ -148,9 +141,7 @@ def get_interesting_values(DEBUG_CFG:dict, jdata) -> dict:
             print("Content:\n", jdata)
     except Exception as error:
         print("Error: json values not as expected:", error)
-        meas = dict([
-            ('valid',False),
-        ])
+        meas = dict([('valid',False)])
     
     return(meas)
 
