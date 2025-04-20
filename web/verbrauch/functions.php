@@ -696,7 +696,7 @@ function verifyGetParams():bool {
   if (safeStrFromExt('GET','TX', 4) !== 'pico') {                
       return FALSE;
   }
-  if (safeIntFromExt('GET','TXVER', 1) !== 2) { // don't accept other interface version numbers
+  if (safeIntFromExt('GET','TXVER', 1) !== 3) { // don't accept other interface version numbers
       return FALSE;
   }
   return TRUE;
