@@ -2,7 +2,7 @@ from time import sleep
 from hashlib import sha256
 from binascii import hexlify
 from random import randint
-import urequests # type: ignore
+import requests_1 as request
 from machine import reset # type: ignore
 import network # type: ignore (this is a pylance ignore warning directive)
 import gc
@@ -70,18 +70,18 @@ def urlencode(dictionary:dict):
     urlenc = urlenc[:-1] # gets me something like 'val0=23&val1=bla space'
     return(urlenc)
 
-def transmit_message(DBGCFG:dict, URL:str, message:dict):
+def transmit_message(DEBUG_CFG:dict, URL:str, message:dict):
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     try:
         urlenc = urlencode(message)
         # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue 
-        response = urequests.post(URL, data=urlenc, headers=HEADERS)
+        response = request.post(URL, data=urlenc, headers=HEADERS)
         if (response.status_code != 200):
             print("invalid status code. Resetting in 20 seconds...")
             sleep(20)             
             reset() # NB: connection to whatever device is getting lost; complicates debugging
         returnText = response.text
-        debug_print(DEBUG_CFG=DBGCFG, text="Text:"+returnText)
+        debug_print(DEBUG_CFG=DEBUG_CFG, text="Text:"+returnText)
         response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
         return(returnText)
     except:

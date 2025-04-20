@@ -12,7 +12,7 @@ from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
 
 # my own files
 import my_config
-from my_functions import wlan_init,wlan_conn_check,debug_sleep,debug_print
+from my_functions import wlan_init,wlan_conn_check,debug_sleep,debug_print,get_randNum_hash,transmit_message
 
 
 class RgbLed(object):
@@ -157,11 +157,21 @@ def print_values(meas:dict):
     print('energy + T2:',meas['energy_pos_t2'])
     return
     
+def send_message_and_wait_post(DEBUG_CFG:dict, message:dict):
+    # about TXVER: integer (range 0 to 9), increases when there is a change on the transmitted value format 
+    # 0 is doing GET-communication, 1 uses post to transmit an identifier, values as blob
+    # 2 uses authentification with a hash when sending
+    if(DEBUG_CFG['wlan'] == 'real'): # not sending anything in simulation
+        URL = "https://strommesser.ch/verbrauch/rx_v3.php?TX=pico&TXVER=3"
+        transmit_message(DEBUG_CFG=DEBUG_CFG, URL=URL, message=message)
+
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
 DEVICE_CFG = my_config.get_device_config()
 LOOP_SLEEP_SEC = 5 # pause between loops
 WATT_NOISE_LIMIT = 15 # everything below 15 W will be set to 0
+TRANSMIT_EVERY_X_LOOP = 20
+
 
 wlan = wlan_init(DEBUG_CFG=DEBUG_CFG)
 
@@ -267,6 +277,27 @@ while True:
                                          minValCons=minValCons, 
                                          maxValGen=maxValGen, 
                                          led_brightness=brightness))
+
+    if (loopCount%TRANSMIT_EVERY_X_LOOP == 0): # TODO: increase to about 2 minutes in between
+        # now transmit the stuff to the server
+        randNum_hash = get_randNum_hash(DEVICE_CFG)
+        meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])
+
+        message = dict([
+            ('userid', DEVICE_CFG['userid']),
+            ('values', meas_string),
+            ('randNum', randNum_hash['randNum']),
+            ('hash', randNum_hash['hash'])
+            ])
+        debug_print(DEBUG_CFG=DEBUG_CFG, text=str(message))
+        send_message_and_wait_post(DEBUG_CFG=DEBUG_CFG, message=message)
+
+
+
+
+
+
+
 
 
     # do not delete wlan variable
