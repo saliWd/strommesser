@@ -55,7 +55,7 @@ if ($totalCount > 0) {// this may be 0
   $QUERY_LIMIT = 10000; // have some upper limit, both for js and db-performance
   $GRAPH_LIMIT = 3; // does not make sense to display a graph otherwise
 
-  $sql = 'SELECT `consumption`, `gen`, `zeit`, `consDiff`, `zeitDiff`, `genDiff`, `consNt`, `consHt` ';
+  $sql = 'SELECT `cons`, `gen`, `zeit`, `consDiff`, `zeitDiff`, `genDiff`, `consNt`, `consHt` ';
   $sql .= 'from `verbrauch` WHERE `userid` = "'.$userid.'" AND `zeit` > "'.$zeitOldestString.'" ';
   $sql .= 'ORDER BY `zeit` DESC LIMIT '.$QUERY_LIMIT.';';
 
@@ -97,7 +97,7 @@ if ($totalCount > 0) {// this may be 0
 
   $zeitDiff = strtotime($rowNewest['zeit']) - strtotime($rowOldest['zeit']); // difference in seconds
   if ($zeitDiff > 0) { // divide by 0 exception
-    $aveCons = round(($rowNewest['consumption'] - $rowOldest['consumption'])*3600*1000 / $zeitDiff); // kWh compared to seconds
+    $aveCons = round(($rowNewest['cons'] - $rowOldest['cons'])*3600*1000 / $zeitDiff); // kWh compared to seconds
     $aveGen = round(($rowNewest['gen'] - $rowOldest['gen'])*3600*1000 / $zeitDiff);
   } else { 
     $aveCons = 0.0;
@@ -108,7 +108,7 @@ if ($totalCount > 0) {// this may be 0
   if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
     $zeitString = $zeitNewest->format('H:i');
   }
-  // COLORS: consumption: red "text-red-500" = rgb(239 68 68); generation: green "text-green-600" = rgb(22 163 74);
+  // COLORS: cons: red "text-red-500" = rgb(239 68 68); generation: green "text-green-600" = rgb(22 163 74);
   echo '<div class="flex">
     <div class="flex-auto text-left"><b><span class="text-green-600">'.$newestGen.'W</span> / <span class="text-red-500">'.$newestCons.'W</span></b></div>
     <div class="flex-auto text-center">'.$zeitString.'</div>
@@ -140,7 +140,7 @@ if ($totalCount > 0) {// this may be 0
       
       // revert the ordering
       $axis_x = 'new Date("'.$row['zeit'].'"), '.$axis_x; // new Date("2020-03-01 12:00:12")
-      $val_yr_cons_kwh = ($row['consumption'] - $rowOldest['consumption']) .', '.$val_yr_cons_kwh; // to get a relative value (and not some huge numbers)
+      $val_yr_cons_kwh = ($row['cons'] - $rowOldest['cons']) .', '.$val_yr_cons_kwh; // to get a relative value (and not some huge numbers)
       $val_yr_gen_kwh = ($row['gen'] - $rowOldest['gen']) .', '.$val_yr_gen_kwh;
       if($costValid) {
         $val_yr_cost = -1.0 * 

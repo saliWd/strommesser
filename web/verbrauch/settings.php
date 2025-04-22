@@ -154,7 +154,7 @@ if ($doSafe === 0) { // entry point of this site
   /*
   `id` bigint(20) UNSIGNED NOT NULL,
   `userid` int(10) UNSIGNED NOT NULL,
-  `consumption` decimal(10,3) NOT NULL,
+  `cons` decimal(10,3) NOT NULL,
   `consDiff` decimal(10,3) NOT NULL,
   `consNt` decimal(10,3) NOT NULL,
   `consNtDiff` decimal(10,3) NOT NULL,
@@ -170,7 +170,7 @@ if ($doSafe === 0) { // entry point of this site
   `zeitDiff` int(11) NOT NULL,
   */
   $outFile = fopen("php://output", "w");
-  fputcsv($outFile, array('id','userid','consumption','consDiff','consNt','consNtDiff','consHt','consHtDiff','gen','genDiff','genNt','genNtDiff','genHt','genHtDiff','zeit','zeitDiff'));
+  fputcsv($outFile, array('id','userid','cons','consDiff','consNt','consNtDiff','consHt','consHtDiff','gen','genDiff','genNt','genNtDiff','genHt','genHtDiff','zeit','zeitDiff'));
   $result = $dbConn->query('SELECT * FROM `verbrauchArchive` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 24000;'); // limit 24k = bit more than one month. To limit file size
   $exportedLines = $result->num_rows;
   while ($row = $result->fetch_row()) { 
