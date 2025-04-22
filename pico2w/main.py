@@ -9,6 +9,7 @@ import json
 import gc
 from pimoroni import RGBLED  # type: ignore (included in uf2 file)
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
+from time import time
 
 # my own files
 import my_config
@@ -170,7 +171,7 @@ DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
 DEVICE_CFG = my_config.get_device_config()
 LOOP_SLEEP_SEC = 5 # pause between loops
 WATT_NOISE_LIMIT = 15 # everything below 15 W will be set to 0
-TRANSMIT_EVERY_X_LOOP = 20
+TRANSMIT_EVERY_X_SECONDS = 120
 
 
 wlan = wlan_init(DEBUG_CFG=DEBUG_CFG)
@@ -193,6 +194,8 @@ rgb_led = RgbLed()
 rgb_led.control(valid=False, pulsating=False, color=(255,0,0))
 
 loopCount:int = 0
+timeSinceLastTransmit = time() # returns seconds
+
 while True:
     loopCount += 1 # just let it overflow
     wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, wlan=wlan) # check whether connection is still valid
@@ -278,7 +281,8 @@ while True:
                                          maxValGen=maxValGen, 
                                          led_brightness=brightness))
 
-    if (loopCount%TRANSMIT_EVERY_X_LOOP == 0):
+    if ((time() - timeSinceLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
+        timeSinceLastTransmit = time() # reset the counter
         # now transmit the stuff to the server
         randNum_hash = get_randNum_hash(DEVICE_CFG)
         meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])
