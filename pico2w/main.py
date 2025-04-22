@@ -3,18 +3,21 @@
 # working pimoroni libraries: MicroPython pico2_w_2025_04_09,   on 2025-04-15; Raspberry Pi Pico 2 W with RP2350 from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
 
 from math import sin
-from machine import Timer # type: ignore
+from machine import Timer, reset # type: ignore
 import requests_1 as request # from https://github.com/shariltumin/bit-and-pieces/tree/main/web-client, see also https://github.com/orgs/micropython/discussions/14105
 import json
 import gc
 from pimoroni import RGBLED  # type: ignore (included in uf2 file)
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
-from time import time
+from time import time, sleep
+from hashlib import sha256
+from binascii import hexlify
+from random import randint
+import network # type: ignore (this is a pylance ignore warning directive)
+import gc
 
 # my own files
 import my_config
-from my_functions import wlan_init,wlan_conn_check,debug_sleep,debug_print,get_randNum_hash,transmit_message
-
 
 class RgbLed(object):
 
@@ -166,6 +169,99 @@ def send_message_and_wait_post(DEBUG_CFG:dict, message:dict):
         URL = "https://strommesser.ch/verbrauch/rx_v3.php?TX=pico&TXVER=3"
         transmit_message(DEBUG_CFG=DEBUG_CFG, URL=URL, message=message)
 
+def debug_print(DEBUG_CFG:dict, text:str):
+    if(DEBUG_CFG['print']):
+        print(text)
+    return # otherwise just return
+
+def debug_sleep(DEBUG_CFG:dict, time:int):
+    if(DEBUG_CFG['sleep'] == 'short'): # minimize wait times by sleeping only one second instead of the normal amount
+        time = 1
+    sleep(time)
+    return
+
+# is called once before while loop
+def wlan_init(DEBUG_CFG:dict):
+    if(DEBUG_CFG['wlan'] == 'simulated'):
+        print('WLAN connection is simulated...')
+        return() # no meaningful return value
+
+    config_wlan = my_config.get_wlan_config() # stored in external file            
+    wlanStatus = 0
+    waitCounter = 0
+    while wlanStatus != 3:
+        print('waiting for connection...WLAN Status: '+str(wlanStatus)+'. Counter: '+str(waitCounter))
+        wlan = network.WLAN(network.STA_IF)
+        wlan.active(True) # activate it. NB: disabling does not work correctly
+        sleep(2)
+        wlan.connect(config_wlan['ssid'], config_wlan['pw'])
+        wlanStatus = wlan.status()
+        # need to restart all, otherwise the status is always constant
+        if wlanStatus != 3:
+            wlan.active(False)
+            del wlan
+            gc.collect()
+        
+        waitCounter += 1
+        sleep(2)
+
+    wlanIfconfig = wlan.ifconfig()
+    print('connected. IP: ' + wlanIfconfig[0])
+    return(wlan)
+
+# is called in every while loop
+def wlan_conn_check(DEBUG_CFG:dict, wlan):
+    if (DEBUG_CFG['wlan'] == 'simulated'):
+        return() # no meaningful return value
+    if(wlan.isconnected()):
+        return(wlan) # nothing to do
+    else:
+        wlan.active(False)
+        del wlan
+        gc.collect() # garbage collection
+        wlanNew = wlan_init(DEBUG_CFG=DEBUG_CFG) # call the init
+        return(wlanNew)
+
+
+def urlencode(dictionary:dict):
+    urlenc = ""
+    for key, val in dictionary.items():
+        urlenc += "%s=%s&" %(key,val)
+    urlenc = urlenc[:-1] # gets me something like 'val0=23&val1=bla space'
+    return(urlenc)
+
+def transmit_message(DEBUG_CFG:dict, URL:str, message:dict):
+    if (not DEBUG_CFG['tx_to_server']):
+        return
+    HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
+    try:
+        urlenc = urlencode(message)
+        # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue 
+        response = request.post(URL, data=urlenc, headers=HEADERS)
+        if (response.status_code != 200):
+            print("Error: invalid status code. Resetting in 20 seconds...")
+            sleep(20)             
+            reset() # NB: connection to whatever device is getting lost; complicates debugging        
+        debug_print(DEBUG_CFG=DEBUG_CFG, text="Text:"+response.text)
+        response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
+        return
+    except:
+        print("Error: request.post did not work. Resetting in 20 seconds...")
+        sleep(20) # add a bit of debug possibility        
+        reset() # NB: connection to whatever device is getting lost; complicates debugging
+        return # this return will never be executed
+
+
+def get_randNum_hash(device_config):
+    rand_num = randint(1, 10000)
+    myhash = sha256(str(rand_num)+device_config['post_key'])
+    hashString = hexlify(myhash.digest())
+    returnVal = dict([
+        ('randNum', rand_num),
+        ('hash', hashString.decode())
+    ])
+    return(returnVal)
+
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
 DEVICE_CFG = my_config.get_device_config()
@@ -238,14 +334,14 @@ while True:
     x = 0
     for t in wattVals:
         # cons grow down (so plus direction in pixels), gen grow up (so need to 'invert' everything). Full range is (min+max Vals)
-        color_pen = display.create_pen(*val_to_rgb(val=t, minValCons=minValCons, maxValGen=maxValGen, led_brightness=255))        
+        color_pen = display.create_pen(*val_to_rgb(val=t, minValCons=minValCons, maxValGen=maxValGen, led_brightness=255))
         display.set_pen(color_pen)
         
         valHeight = int(float(HEIGHT) * float(abs(t)) / float(disp_y_range[2])) # between 0 and HEIGHT. E.g. 135*2827/3400
         if t < 0: 
             display.rectangle(x, zeroLine_y, BAR_WIDTH, valHeight)
         else: # direction goes up
-            display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)        
+            display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
 
     if wattVal < 0: display.set_pen(TEXT_BG_CONS)

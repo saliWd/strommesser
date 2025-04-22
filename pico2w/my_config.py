@@ -14,10 +14,11 @@ def get_device_config():
 
 def get_debug_settings():
     debug_settings = dict([
-        ('print',True),       # can be True|False
+        ('print',True),       # can be True|False. If true 
         ('wlan','simulated'), # can be 'real'|'simulated'. When simulated, json_data must be 'file'
         ('sleep','short'),    # can be 'normal'|'short'
-        ('json_data','file')  # can be 'local_net'|'web'|'file'. Latter two are for debug
+        ('json_data','file'), # can be 'local_net'|'web'|'file'. Latter two are for debug
+        ('tx_to_server',True) # can be True|False. whether data are updated on the server (every 2 mins)
     ])
     return(debug_settings)
 
