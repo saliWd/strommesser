@@ -109,10 +109,7 @@ def getDispYrange(values:list) -> list:
 
 # get request might be unstable (depends on internet connection)
 def json_get_request(DEBUG_CFG:dict) -> dict:
-    returnVal = dict([('valid',False)]) # minimal return value. Will be overwritten in more meaningful cases
-    
     URL = 'http://192.168.178.47/api/v1/report' # on the local net
-
     if DEBUG_CFG['json_data'] == 'web': # can be 'local_net'|'web'|'file'
         URL = "https://strommesser.ch/json_long.php"
     elif DEBUG_CFG['json_data'] == 'file':         
@@ -121,28 +118,28 @@ def json_get_request(DEBUG_CFG:dict) -> dict:
         response = request.get(url=URL, timeout=9)
         if (response.status_code != 200):
             print('status wrong: ',response.status_code)
-            return(returnVal)
+            return(dict([('valid',False)]))
         jdata = json.loads(response.content)
         response.close()        
         return(get_interesting_values(DEBUG_CFG=DEBUG_CFG, jdata=jdata))
     except Exception as error:
         print("An exception occurred:", error)
-        return(returnVal)
+        return(dict([('valid',False)]))
 
 def get_interesting_values(DEBUG_CFG:dict, jdata) -> dict:
     try:
         meas = dict([
             ('valid',True),
             ('date_time',jdata['system']['date_time']),
-            ('power_pos',jdata['report']['instantaneous_power']['active']['positive']['total']),
-            ('power_neg',jdata['report']['instantaneous_power']['active']['negative']['total']),
+            ('power_pos',float(jdata['report']['instantaneous_power']['active']['positive']['total'])),
+            ('power_neg',float(jdata['report']['instantaneous_power']['active']['negative']['total'])),
             ('energy_pos',jdata['report']['energy']['active']['positive']['total']),
             ('energy_neg',jdata['report']['energy']['active']['negative']['total']),
             ('energy_pos_t1',jdata['report']['energy']['active']['positive']['t1']),
-            ('energy_pos_t2',jdata['report']['energy']['active']['positive']['t2'])])
-        if(DEBUG_CFG['print']):
-            print_values(meas=meas)
-            print("Content:\n", jdata)
+            ('energy_pos_t2',jdata['report']['energy']['active']['positive']['t2'])
+        ])
+        #print_values(meas=meas)
+        #print("Content:\n", jdata)
     except Exception as error:
         print("Error: json values not as expected:", error)
         meas = dict([('valid',False)])
@@ -168,11 +165,6 @@ def send_message_and_wait_post(DEBUG_CFG:dict, message:dict):
     if(DEBUG_CFG['wlan'] == 'real'): # not sending anything in simulation
         URL = "https://strommesser.ch/verbrauch/rx_v3.php?TX=pico&TXVER=3"
         transmit_message(DEBUG_CFG=DEBUG_CFG, URL=URL, message=message)
-
-def debug_print(DEBUG_CFG:dict, text:str):
-    if(DEBUG_CFG['print']):
-        print(text)
-    return # otherwise just return
 
 def debug_sleep(DEBUG_CFG:dict, time:int):
     if(DEBUG_CFG['sleep'] == 'short'): # minimize wait times by sleeping only one second instead of the normal amount
@@ -242,7 +234,7 @@ def transmit_message(DEBUG_CFG:dict, URL:str, message:dict):
             print("Error: invalid status code. Resetting in 20 seconds...")
             sleep(20)             
             reset() # NB: connection to whatever device is getting lost; complicates debugging        
-        debug_print(DEBUG_CFG=DEBUG_CFG, text="Text:"+response.text)
+        #print('Text:'+response.text)
         response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
         return
     except:
@@ -300,19 +292,20 @@ while True:
         print('get request did not work')
         continue
 
-    wattVal = int(1000 * (-1 * meas['power_pos']) + meas['power_neg']) # cons is negative, gen positive. 0 is treated as gen
+    wattVal = int(1000.0 * (-1.0*meas['power_pos'] + meas['power_neg'])) # cons is negative, gen positive. 0 is treated as gen
+    
     if (abs(wattVal) < WATT_NOISE_LIMIT): # everything below this is just noise...
         wattVal = 0
-    debug_print(DEBUG_CFG=DEBUG_CFG, text='wattValue: '+str(wattVal))
-
+    #print('wattValue: '+str(wattVal))
+    
+    # TODO: get from server
     minValCons = 400 # meas["max"] # this is a positive value but needs to be treated negative in some cases
     maxValGen = 3400 # meas["maxGen"]
 
     # normalize the value between -ledMinValCons and ledMaxValGen (e.g. -400 to 3000)
     wattValMinMax = min(max(wattVal, (-1 * minValCons)),maxValGen)
 
-    debug_print(DEBUG_CFG, "normalized watt value: "+str(wattValMinMax)+
-                ", min/max: "+str(minValCons)+"/"+str(maxValGen))
+    #print("normalized watt value: "+str(wattValMinMax)+", min/max: "+str(minValCons)+"/"+str(maxValGen))
 
     # fills the screen with black
     display.set_pen(BLACK)
@@ -362,7 +355,7 @@ while True:
     display.update()
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
-    brightness = 33 #getBrightness(meas=meas)
+    brightness = 33 # TODO: getBrightness(meas=meas)
     if (wattVal == 0): brightness = 0 # disable LED when 0 consumption
     if (wattVal < 0):
         rgb_led.control(valid=meas['valid'], pulsating=False,
@@ -389,22 +382,14 @@ while True:
             ('randNum', randNum_hash['randNum']),
             ('hash', randNum_hash['hash'])
             ])
-        debug_print(DEBUG_CFG=DEBUG_CFG, text=str(message))
+        #print(str(message))
         send_message_and_wait_post(DEBUG_CFG=DEBUG_CFG, message=message)
+        del randNum_hash, meas_string, message
 
 
-
-
-
-
-
-
-
-    # do not delete wlan variable
+    # do not delete wlan variable and timeSinceLastTransmit
     del brightness, color_pen, disp_y_range, expand, minValCons, maxValGen, meas, t
     del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x, zeroLine_y  # to combat memAlloc issues
     gc.collect() # garbage collection
     
     debug_sleep(DEBUG_CFG=DEBUG_CFG,time=LOOP_SLEEP_SEC)
-    
-
