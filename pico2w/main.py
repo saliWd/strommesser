@@ -278,7 +278,7 @@ while True:
                                          maxValGen=maxValGen, 
                                          led_brightness=brightness))
 
-    if (loopCount%TRANSMIT_EVERY_X_LOOP == 0): # TODO: increase to about 2 minutes in between
+    if (loopCount%TRANSMIT_EVERY_X_LOOP == 0):
         # now transmit the stuff to the server
         randNum_hash = get_randNum_hash(DEVICE_CFG)
         meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])

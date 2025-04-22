@@ -5,12 +5,12 @@
     // with POST data (url encoded)
 
     function getDiffs($row_now, $row_before):string {
-      // `consumption` -> `consDiff`
-      // `consNt`      -> `consNtDiff`
-      // `consHt`      -> `consHtDiff`
-      // `gen`         -> `genDiff`
+      // `cons`    -> `consDiff`
+      // `consNt`  -> `consNtDiff`
+      // `consHt`  -> `consHtDiff`
+      // `gen`     -> `genDiff`
       $sqlString = '';
-      $sqlString .= '`consDiff` = "'.($row_now['consumption'] - $row_before['consumption']).'", ';      
+      $sqlString .= '`consDiff` = "'.($row_now['cons'] - $row_before['cons']).'", ';      
       $sqlString .= '`consNtDiff` = "'.($row_now['consNt'] - $row_before['consNt']).'", '; 
       $sqlString .= '`consHtDiff` = "'.($row_now['consHt'] - $row_before['consHt']).'", '; 
       $sqlString .= '`genDiff` = "'.($row_now['gen'] - $row_before['gen']).'", '; 
@@ -39,8 +39,8 @@
       $row = $result->fetch_assoc();
 
       // compact all from the last hour before this entry
-      $zeit = date_create($row['zeit']); // e.g. 18:43
-      $zeitHourAlignedString = $zeit->format($formatString); // start of the last hour, e.g. 18:00
+      $zeit = date_create(datetime: $row['zeit']); // e.g. 18:43
+      $zeitHourAlignedString = $zeit->format(format: $formatString); // start of the last hour, e.g. 18:00
 
       // get the last one where thinning was not yet applied
       $result = $dbConn->query('SELECT `id` FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'" ORDER BY `id` ASC LIMIT 1;');
@@ -49,7 +49,7 @@
       
       $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff`, ';
       $sql .= 'SUM(`genNtDiff`) as `sumGenNtDiff`, SUM(`genHtDiff`) as `sumGenHtDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-      $sql = $sql. ' WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'";';
+      $sql .= ' WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'";';
       $result = $dbConn->query($sql);
       $row = $result->fetch_assoc();
     
@@ -76,27 +76,26 @@
     // copies the newest set into the archive db (where no thinning is executed)
     function copyToArchive ($dbConn, $rowId):void {      
       $sql =  'INSERT INTO `verbrauchArchive` ';
-      $sql .= '(`userid`, `consumption`, `consDiff`, `consNt`, `consNtDiff`, `consHt`, `consHtDiff`, `gen`, `genDiff`, `genNt`, `genNtDiff`, `genHt`, `genHtDiff`, `zeit`, `zeitDiff`) ';
-      $sql .= 'SELECT `userid`, `consumption`, `consDiff`, `consNt`, `consNtDiff`, `consHt`, `consHtDiff`, `gen`, `genDiff`, `genNt`, `genNtDiff`, `genHt`, `genHtDiff`, `zeit`, `zeitDiff` ';
+      $sql .= '(`userid`, `cons`, `consDiff`, `consNt`, `consNtDiff`, `consHt`, `consHtDiff`, `gen`, `genDiff`, `genNt`, `genNtDiff`, `genHt`, `genHtDiff`, `zeit`, `zeitDiff`) ';
+      $sql .= 'SELECT `userid`, `cons`, `consDiff`, `consNt`, `consNtDiff`, `consHt`, `consHtDiff`, `gen`, `genDiff`, `genNt`, `genNtDiff`, `genHt`, `genHtDiff`, `zeit`, `zeitDiff` ';
       $sql .= 'FROM `verbrauch` WHERE `id` = "'.$rowId.'";';
       $result = $dbConn->query($sql);
     }
 
-    $userid = checkInputs($dbConn);
+    $userid = checkInputs(dbConn: $dbConn);
 
     $sqlSafe_values = sqlSafeStrFromPost(dbConn: $dbConn, varName: 'values', length: 255); // safe to insert into sql (not to output on html)
     // meas_string = meas['date_time']+'|'+meas['energy_pos']+'|'+meas['energy_neg']+'|'+meas['energy_pos_t1']+'|'+meas['energy_pos_t2']
 
     $values = explode(separator: '|',string: $sqlSafe_values, limit: 5);
     if (! $values[0]) {
-        printRawErrorAndDie('Error', 'values not found');
+        printRawErrorAndDie(heading: 'Error', text: 'values not found');
     }
 
-    if (! $result = $dbConn->query('INSERT INTO `verbrauch_tmp` (`userid`, `consumption`, `consNt`, `consHt`, `gen`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")')) {
-        printRawErrorAndDie('Error', 'db insert not ok');
+    // egs specialty: 1.8.1 = T1 = Zone 2 (NT) = Obersiggenthal, Zone 1 (HT) = Untersiggenthal
+    if (! $result = $dbConn->query(query: 'INSERT INTO `verbrauch` (`userid`, `cons`, `gen`, `consNt`, `consHt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")')) {
+        printRawErrorAndDie(heading: 'Error', text: 'db insert not ok');
     }
-
-    die();
 
     //NB: not using last inserted ID as other inserts may have happened in the meantime
     $result = $dbConn->query('SELECT * FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 2');
@@ -105,10 +104,10 @@
         $row_now = $result->fetch_assoc();
         $row_before = $result->fetch_assoc();
         $valueDiffsSql = getDiffs(row_now:$row_now, row_before:$row_before);
-        $zeitDiff = date_diff(date_create($row_before['zeit']), date_create($row_now['zeit']));
-        $zeitSecs = ($zeitDiff->d * 24 * 3600) + ($zeitDiff->h*3600) + ($zeitDiff->i * 60) + ($zeitDiff->s);
+        $zeitDiff = date_diff(baseObject: date_create(datetime: $row_before['zeit']), targetObject: date_create(datetime: $row_now['zeit']));
+        $zeitSecs = $zeitDiff->d*24*3600 + $zeitDiff->h*3600 + $zeitDiff->i*60 + $zeitDiff->s;
         
-        $result = $dbConn->query('UPDATE `verbrauch` SET '.$valueDiffsSql.'`zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
+        $result = $dbConn->query(query: 'UPDATE `verbrauch` SET '.$valueDiffsSql.'`zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
 
         copyToArchive(dbConn:$dbConn, rowId:$row_now['id']);
         
@@ -118,5 +117,3 @@
     } else {
         echo 'no previous data'; // not an error
     }
-    
-?>
