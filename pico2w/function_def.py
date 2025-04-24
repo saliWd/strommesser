@@ -2,13 +2,14 @@
 # does not work: Micropython version Raspberry Pico 2 W with Pimoroni libraries 0.0.11
 # working pimoroni libraries: MicroPython pico2_w_2025_04_09,   on 2025-04-15; Raspberry Pi Pico 2 W with RP2350 from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
 
-import requests_1 as request # from https://github.com/shariltumin/bit-and-pieces/tree/main/web-client, see also https://github.com/orgs/micropython/discussions/14105
-import json
-import gc
+from machine import reset # type: ignore
 from time import sleep
 from hashlib import sha256
 from binascii import hexlify
 from random import randint
+import requests_1 as request # from https://github.com/shariltumin/bit-and-pieces/tree/main/web-client, see also https://github.com/orgs/micropython/discussions/14105
+import json
+import gc
 import network # type: ignore (this is a pylance ignore warning directive)
 
 # my own files
