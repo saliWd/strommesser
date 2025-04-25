@@ -11,6 +11,7 @@ def get_device_config():
         ('local_ip', '192.168.178.47') # make sure this does not change (e.g. on router)
     ]))   
 
+# first value is the normal, non-debug value for standard functionality
 def get_debug_settings():
     return(dict([
         ('wlan','real'), # can be 'real'|'simulated'. When simulated, json_data must be 'file'
