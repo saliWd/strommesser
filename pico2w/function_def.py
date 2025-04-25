@@ -5,7 +5,7 @@
 from machine import reset # type: ignore
 from time import sleep
 from hashlib import sha256
-from binascii import hexlify
+from binascii import hexlify, unhexlify
 from random import randint
 import requests_1 as request # from https://github.com/shariltumin/bit-and-pieces/tree/main/web-client, see also https://github.com/orgs/micropython/discussions/14105
 import json
@@ -62,12 +62,12 @@ def getDispYrange(values:list) -> list:
     return [minimum,maximum,(minimum+maximum)]
 
 # get request might be unstable (depends on internet connection)
-def json_get_request(DEBUG_CFG:dict) -> dict:
-    URL = 'http://192.168.178.47/api/v1/report' # on the local net
+def json_get_request(DEBUG_CFG:dict, DEVICE_CFG:dict) -> dict:
+    URL = 'http://'+DEVICE_CFG['local_ip']+'/api/v1/report' # on the local net
     if DEBUG_CFG['json_data'] == 'web': # can be 'local_net'|'web'|'file'
         URL = "https://strommesser.ch/json_long.php"
     elif DEBUG_CFG['json_data'] == 'file':         
-        return(get_interesting_values(DEBUG_CFG=DEBUG_CFG, jdata=my_config.debug_jdata()))
+        return(get_interesting_values(jdata=my_config.get_debug_jdata()))
     try:
         response = request.get(url=URL, timeout=9)
         if (response.status_code != 200):
@@ -75,12 +75,12 @@ def json_get_request(DEBUG_CFG:dict) -> dict:
             return(dict([('valid',False)]))
         jdata = json.loads(response.content)
         response.close()        
-        return(get_interesting_values(DEBUG_CFG=DEBUG_CFG, jdata=jdata))
+        return(get_interesting_values(jdata=jdata))
     except Exception as error:
         print("An exception occurred:", error)
         return(dict([('valid',False)]))
 
-def get_interesting_values(DEBUG_CFG:dict, jdata) -> dict:
+def get_interesting_values(jdata) -> dict:
     try:
         meas = dict([
             ('valid',True),
@@ -127,12 +127,11 @@ def debug_sleep(DEBUG_CFG:dict, time:int):
     return
 
 # is called once before while loop
-def wlan_init(DEBUG_CFG:dict):
+def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict):
     if(DEBUG_CFG['wlan'] == 'simulated'):
         print('WLAN connection is simulated...')
-        return() # no meaningful return value
+        return(1) # no meaningful return value
 
-    config_wlan = my_config.get_wlan_config() # stored in external file            
     wlanStatus = 0
     waitCounter = 0
     while wlanStatus != 3:
@@ -140,7 +139,8 @@ def wlan_init(DEBUG_CFG:dict):
         wlan = network.WLAN(network.STA_IF)
         wlan.active(True) # activate it. NB: disabling does not work correctly
         sleep(2)
-        wlan.connect(config_wlan['ssid'], config_wlan['pw'])
+        wlan_pw = unhexlify(WLAN_CFG['pw'].encode()).decode() # change into byte stream and unhex it; then change it into string        
+        wlan.connect(WLAN_CFG['ssid'], wlan_pw)
         wlanStatus = wlan.status()
         # need to restart all, otherwise the status is always constant
         if wlanStatus != 3:
@@ -153,19 +153,20 @@ def wlan_init(DEBUG_CFG:dict):
 
     wlanIfconfig = wlan.ifconfig()
     print('connected. IP: ' + wlanIfconfig[0])
+    sleep(2)
     return(wlan)
 
 # is called in every while loop
-def wlan_conn_check(DEBUG_CFG:dict, wlan):
+def wlan_conn_check(DEBUG_CFG:dict, WLAN_CFG:dict, wlan):
     if (DEBUG_CFG['wlan'] == 'simulated'):
-        return() # no meaningful return value
+        return(wlan)
     if(wlan.isconnected()):
         return(wlan) # nothing to do
     else:
         wlan.active(False)
         del wlan
         gc.collect() # garbage collection
-        wlanNew = wlan_init(DEBUG_CFG=DEBUG_CFG) # call the init
+        wlanNew = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG) # call the init
         return(wlanNew)
 
 
@@ -207,6 +208,10 @@ def get_randNum_hash(device_config):
         ('hash', hashString.decode())
     ])
     return(returnVal)
+
+def hexlify_wlan(input:str):
+    hex_input = hexlify(input.encode()) # hex the bytestream of the string
+    print(hex_input.decode())
 
 def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict):
         randNum_hash = get_randNum_hash(DEVICE_CFG)

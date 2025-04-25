@@ -13,12 +13,13 @@ import my_config
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
 DEVICE_CFG = my_config.get_device_config()
+WLAN_CFG = my_config.get_wlan_config()
 LOOP_SLEEP_SEC = 5 # pause between loops
 WATT_NOISE_LIMIT = 15 # everything below 15 W will be set to 0
 TRANSMIT_EVERY_X_SECONDS = 120
 
 
-wlan = wlan_init(DEBUG_CFG=DEBUG_CFG)
+wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, rotate=0)
 display.set_backlight(0.5)
@@ -42,8 +43,8 @@ timeSinceLastTransmit = time() # returns seconds
 
 while True:
     loopCount += 1 # just let it overflow
-    wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, wlan=wlan) # check whether connection is still valid
-    meas = json_get_request(DEBUG_CFG=DEBUG_CFG)
+    wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG, wlan=wlan) # check whether connection is still valid
+    meas = json_get_request(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG)
     if not meas['valid']:
         print('get request did not work')
         continue
@@ -61,7 +62,7 @@ while True:
     # normalize the value between -ledMinValCons and ledMaxValGen (e.g. -400 to 3000)
     wattValMinMax = min(max(wattVal, (-1 * minValCons)),maxValGen)
 
-    #print("normalized watt value: "+str(wattValMinMax)+", min/max: "+str(minValCons)+"/"+str(maxValGen))
+    print("normalized watt value: "+str(wattValMinMax)+", min/max: "+str(minValCons)+"/"+str(maxValGen))
 
     # fills the screen with black
     display.set_pen(BLACK)
