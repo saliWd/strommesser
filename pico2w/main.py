@@ -8,7 +8,7 @@ from time import time
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, right_align, make_bold, getDispYrange, json_get_request, tx_to_server, debug_sleep, wlan_init, wlan_conn_check
+from function_def import val_to_rgb, right_align, make_bold, getDispYrange, json_get_req, tx_to_server, debug_sleep, wlan_init, wlan_conn_check
 import my_config
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
@@ -41,10 +41,12 @@ rgb_led.control(valid=False, pulsating=False, color=(255,0,0))
 loopCount:int = 0
 timeSinceLastTransmit = time() # returns seconds
 
+READER = 'gplug' # can be gplug or whatwatt
+
 while True:
     loopCount += 1 # just let it overflow
     wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG, wlan=wlan) # check whether connection is still valid
-    meas = json_get_request(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG)
+    meas = json_get_req(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, READER=READER)
     if not meas['valid']:
         print('get request did not work')
         continue
@@ -61,8 +63,7 @@ while True:
 
     # normalize the value between -ledMinValCons and ledMaxValGen (e.g. -400 to 3000)
     wattValMinMax = min(max(wattVal, (-1 * minValCons)),maxValGen)
-
-    print("normalized watt value: "+str(wattValMinMax)+", min/max: "+str(minValCons)+"/"+str(maxValGen))
+    #print("normalized watt value: "+str(wattValMinMax)+", min/max: "+str(minValCons)+"/"+str(maxValGen))
 
     # fills the screen with black
     display.set_pen(BLACK)

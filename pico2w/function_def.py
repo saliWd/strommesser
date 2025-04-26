@@ -12,9 +12,6 @@ import json
 import gc
 import network # type: ignore (this is a pylance ignore warning directive)
 
-# my own files
-import my_config
-
 # start with h = variable, s = 0.5, v = 0.5, a = LedBrightness/255
 def hsva_to_rgb(h:float, s:float, v:float, a:float) -> tuple: # inputs: values from 0.0 to 1.0. Outputs are integers, range 0 to 255
     if s:
@@ -62,12 +59,15 @@ def getDispYrange(values:list) -> list:
     return [minimum,maximum,(minimum+maximum)]
 
 # get request might be unstable (depends on internet connection)
-def json_get_request(DEBUG_CFG:dict, DEVICE_CFG:dict) -> dict:
+def json_get_req(DEBUG_CFG:dict, DEVICE_CFG:dict, READER:str) -> dict:
     URL = 'http://'+DEVICE_CFG['local_ip']+'/api/v1/report' # on the local net
+    if READER == 'gplug': # TODO
+        URL =  'http://192.168.178.58/cm?cmnd=status%2010'
+    # TODO: debug stuff for gplug
     if DEBUG_CFG['json_data'] == 'web': # can be 'local_net'|'web'|'file'
         URL = "https://strommesser.ch/json_long.php"
     elif DEBUG_CFG['json_data'] == 'file':         
-        return(get_interesting_values(jdata=my_config.get_debug_jdata()))
+        return(get_interesting_values(jdata=get_debug_jdata(READER=READER), READER=READER))
     try:
         response = request.get(url=URL, timeout=9)
         if (response.status_code != 200):
@@ -75,23 +75,42 @@ def json_get_request(DEBUG_CFG:dict, DEVICE_CFG:dict) -> dict:
             return(dict([('valid',False)]))
         jdata = json.loads(response.content)
         response.close()        
-        return(get_interesting_values(jdata=jdata))
+        return(get_interesting_values(jdata=jdata, READER=READER))
     except Exception as error:
         print("An exception occurred:", error)
         return(dict([('valid',False)]))
 
-def get_interesting_values(jdata) -> dict:
+def get_debug_jdata(READER:str):
+    if READER == 'whatwatt':
+        return({"report":{"id":292,"interval":2.737,"date_time":"2025-04-22T18:32:05Z","instantaneous_power":{"active":{"positive":{"total":0},"negative":{"total":1.803}}},"energy":{"active":{"positive":{"total":167.508,"t1":130.297,"t2":37.202},"negative":{"total":575.932,"t1":107.105,"t2":468.817}},"reactive":{"imported":{"inductive":{"total":152.881},"capacitive":{"total":10.117}},"exported":{"inductive":{"total":78.124},"capacitive":{"total":114.091}}}},"conv_factor":1},"meter":{"status":"OK","interface":"MBUS","protocol":"DLMS","id":"72913313","vendor":"Landis+Gyr","prefix":"LGZ"},"system":{"id":"ECC9FF5C80B0","date_time":"2025-04-22T17:32:12Z","boot_id":"E766FCAC","time_since_boot":1345}})
+    else:
+        return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":0.010,"Po":0.000,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
+
+def get_interesting_values(jdata, READER:str) -> dict:
     try:
-        meas = dict([
-            ('valid',True),
-            ('date_time',jdata['system']['date_time']),
-            ('power_pos',float(jdata['report']['instantaneous_power']['active']['positive']['total'])),
-            ('power_neg',float(jdata['report']['instantaneous_power']['active']['negative']['total'])),
-            ('energy_pos',jdata['report']['energy']['active']['positive']['total']),
-            ('energy_neg',jdata['report']['energy']['active']['negative']['total']),
-            ('energy_pos_t1',jdata['report']['energy']['active']['positive']['t1']),
-            ('energy_pos_t2',jdata['report']['energy']['active']['positive']['t2'])
-        ])
+        if READER == 'whatwatt':
+            meas = dict([
+                ('valid',True),
+                ('date_time',jdata['system']['date_time']),
+                ('power_pos',float(jdata['report']['instantaneous_power']['active']['positive']['total'])),
+                ('power_neg',float(jdata['report']['instantaneous_power']['active']['negative']['total'])),
+                ('energy_pos',jdata['report']['energy']['active']['positive']['total']),
+                ('energy_neg',jdata['report']['energy']['active']['negative']['total']),
+                ('energy_pos_t1',jdata['report']['energy']['active']['positive']['t1']),
+                ('energy_pos_t2',jdata['report']['energy']['active']['positive']['t2'])
+            ])
+        else: # gplug
+            meas = dict([
+                ('valid',True),
+                ('date_time',jdata['StatusSNS']['Time']),
+                ('power_pos',float(jdata['StatusSNS']['z']['Pi'])),
+                ('power_neg',float(jdata['StatusSNS']['z']['Po'])),
+                ('energy_pos',jdata['StatusSNS']['z']['Ei']),
+                ('energy_neg',jdata['StatusSNS']['z']['Eo']),
+                ('energy_pos_t1',jdata['StatusSNS']['z']['Ei1']),
+                ('energy_pos_t2',jdata['StatusSNS']['z']['Ei2'])
+            ])
+
         #print_values(meas=meas)
         #print("Content:\n", jdata)
     except Exception as error:

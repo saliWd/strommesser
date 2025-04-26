@@ -7,4 +7,6 @@
 1. change polarity on RJ12 connector: switch is now on the left side, close to RJ12 plug
 
 # REST API
-Not sure whether present, maybe with Status=10 doable (https://tasmota.github.io/docs/Commands/#management)
+JSON output available on:
+* http://192.168.178.58/cm?cmnd=status0 gets me the info in statusSNS
+* http://192.168.178.58/cm?cmnd=status%2010 gets me only the status of the sensor
