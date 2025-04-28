@@ -58,16 +58,18 @@ def getDispYrange(values:list) -> list:
     maximum = max(max(values),50)
     return [minimum,maximum,(minimum+maximum)]
 
-# get request might be unstable (depends on internet connection)
 def json_get_req(DEBUG_CFG:dict, DEVICE_CFG:dict, READER:str) -> dict:
-    URL = 'http://'+DEVICE_CFG['local_ip']+'/api/v1/report' # on the local net
-    if READER == 'gplug': # TODO
-        URL =  'http://192.168.178.58/cm?cmnd=status%2010'
-    # TODO: debug stuff for gplug
+    URL = 'http://'+DEVICE_CFG['local_ip']
+    if READER == 'whatwatt':
+        URL = URL + '/api/v1/report' # on the local net
+    else: # gplug. Maybe to do: could also use http://gplugm.local/cm?cmnd=status%2010. Does not help in my case though where I have two gplugm
+        URL =  URL + '/cm?cmnd=status%2010'
+
     if DEBUG_CFG['json_data'] == 'web': # can be 'local_net'|'web'|'file'
-        URL = "https://strommesser.ch/json_long.php"
+        URL = "https://strommesser.ch/pages/json.php?reader=READER"
     elif DEBUG_CFG['json_data'] == 'file':         
         return(get_interesting_values(jdata=get_debug_jdata(READER=READER), READER=READER))
+    # get request might be unstable (depends on internet connection)
     try:
         response = request.get(url=URL, timeout=9)
         if (response.status_code != 200):
