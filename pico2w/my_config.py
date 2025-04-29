@@ -14,8 +14,9 @@ def get_device_config():
 # first value is the normal, non-debug value for standard functionality
 def get_debug_settings():
     return(dict([
-        ('wlan','real'),      # can be 'real'|'simulated'. When simulated, json_data must be 'file'
-        ('sleep','normal'),   # can be 'normal'|'short'
-        ('json_data','file'), # can be 'local_net'|'web'|'file'. Latter two are for debug
-        ('tx_to_server',False) # can be True|False. whether data are updated on the server (every 2 mins)
+        ('wlan','real'),        # can be 'real'|'simulated'. When simulated, json_data must be 'file'
+        ('sleep','normal'),     # can be 'normal'|'short'
+        ('json_data','file'),   # can be 'local_net'|'web'|'file'. Latter two are for debug
+        ('tx_to_server',False),  # can be True|False. Whether data are updated on the server (every 2 mins)
+        ('rx_from_server',True) # can be True|False. Whether settings are received from the server (every 2 mins)
     ]))

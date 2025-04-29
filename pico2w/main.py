@@ -8,7 +8,7 @@ from time import time
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, right_align, make_bold, getDispYrange, json_get_req, tx_to_server, debug_sleep, wlan_init, wlan_conn_check
+from function_def import val_to_rgb, right_align, make_bold, getDispYrange, json_get_req, tx_to_server, debug_sleep, wlan_init, wlan_conn_check, print_loopCount
 import my_config
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
@@ -26,7 +26,6 @@ display.set_backlight(0.5)
 display.set_font("sans")
 WIDTH, HEIGHT = display.get_bounds() # 240x135
 BLACK = display.create_pen(0, 0, 0)
-WHITE = display.create_pen(255, 255, 255)
 TEXT_BG_GEN = display.create_pen(170, 255, 170)
 TEXT_BG_CONS = display.create_pen(255, 170, 170)
 BAR_WIDTH = 5
@@ -106,9 +105,7 @@ while True:
     make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
     make_bold(display, "W", 104, 23)
     
-    # debug output
-    display.set_pen(WHITE)
-    display.text(str(loopCount), 10, 120, scale=1.0)
+    print_loopCount(display=display, BLACK=BLACK, loopCount=str(loopCount))    
 
     display.update()
 

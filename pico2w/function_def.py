@@ -52,6 +52,17 @@ def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting i
     display.text(text, x, y, scale=1.1)
     display.text(text, x+1, y, scale=1.1)
 
+def print_loopCount(display, BLACK, loopCount:str):
+    x = 10
+    y = 120
+    display.set_pen(BLACK) # black border around the white text
+    display.text(loopCount, x-1, y, scale=1.0)
+    display.text(loopCount, x+1, y, scale=1.0)
+    display.text(loopCount, x, y-1, scale=1.0)
+    display.text(loopCount, x, y+1, scale=1.0)
+    display.set_pen(display.create_pen(255, 255, 255)) # white
+    display.text(loopCount, x, y, scale=1.0)
+
 def getDispYrange(values:list) -> list:
     """returns the range of the given values. extends the range to at least -50 to +50 if the min/max are smaller. returns 2 positive values"""
     minimum = abs(min(min(values),-50))
@@ -135,11 +146,35 @@ def print_values(meas:dict):
     
 def send_message_and_wait_post(DEBUG_CFG:dict, message:dict):
     # about TXVER: integer (range 0 to 9), increases when there is a change on the transmitted value format 
-    # 0 is doing GET-communication, 1 uses post to transmit an identifier, values as blob
-    # 2 uses authentification with a hash when sending
     if(DEBUG_CFG['wlan'] == 'real'): # not sending anything in simulation
         URL = "https://strommesser.ch/verbrauch/rx_v3.php?TX=pico&TXVER=3"
-        transmit_message(DEBUG_CFG=DEBUG_CFG, URL=URL, message=message)
+        transmit_message(DEBUG_CFG=DEBUG_CFG, send=True, URL=URL, message=message)
+
+def get_settings(DEBUG_CFG:dict, message:dict) -> dict:
+    URL = "https://strommesser.ch/verbrauch/getSettings.php?TX=pico&TXVER=3"
+    if (DEBUG_CFG['wlan'] == 'simulated'):
+        return(sepStrToArr(separatedString='1|500|100|700')) # valid|ledMaxValCon|ledBrightness|ledMaxValGen
+    
+    returnText = transmit_message(DEBUG_CFG=DEBUG_CFG, send=False, URL=URL, message=message)
+    return(sepStrToArr(separatedString=returnText))
+
+def sepStrToArr(separatedString:str):
+    valueArray = separatedString.split('|')
+    retVal = dict([
+            ('valid', 0),
+            ('brightness', 80),
+            ('maxCon', 405),
+            ('maxGen', 1050)
+    ])
+    if (len(valueArray) > 2 ):
+            retVal['valid'] = int(valueArray[0])
+            retVal['brightness'] = int(valueArray[1])
+            retVal['maxCon'] = int(valueArray[2])
+            retVal['maxGen'] = int(valueArray[3])
+    return retVal
+
+
+
 
 def debug_sleep(DEBUG_CFG:dict, time:int):
     if(DEBUG_CFG['sleep'] == 'short'): # minimize wait times by sleeping only one second instead of the normal amount
@@ -198,9 +233,11 @@ def urlencode(dictionary:dict):
     urlenc = urlenc[:-1] # gets me something like 'val0=23&val1=bla space'
     return(urlenc)
 
-def transmit_message(DEBUG_CFG:dict, URL:str, message:dict):
-    if (not DEBUG_CFG['tx_to_server']):
+def transmit_message(DEBUG_CFG:dict, send:bool, URL:str, message:dict):
+    if (send and (not DEBUG_CFG['tx_to_server'])):
         return
+    if ((not send) and (not DEBUG_CFG['rx_from_server'])):        
+        return('1|500|100|700')
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     try:
         urlenc = urlencode(message)
@@ -211,8 +248,9 @@ def transmit_message(DEBUG_CFG:dict, URL:str, message:dict):
             sleep(20)             
             reset() # NB: connection to whatever device is getting lost; complicates debugging        
         #print('Text:'+response.text)
+        answer = response.text
         response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
-        return
+        return(answer)
     except:
         print("Error: request.post did not work. Resetting in 20 seconds...")
         sleep(20) # add a bit of debug possibility        
@@ -234,7 +272,7 @@ def hexlify_wlan(input:str):
     hex_input = hexlify(input.encode()) # hex the bytestream of the string
     print(hex_input.decode())
 
-def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict):
+def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict) -> dict:
         randNum_hash = get_randNum_hash(DEVICE_CFG)
         meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])
 
@@ -246,6 +284,7 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict):
             ])
         #print(str(message))
         send_message_and_wait_post(DEBUG_CFG=DEBUG_CFG, message=message)
+        settings = get_settings(DEBUG_CFG=DEBUG_CFG, message=message)
         del randNum_hash, meas_string, message
-        return
+        return(settings)
 
