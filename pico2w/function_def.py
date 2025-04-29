@@ -153,26 +153,23 @@ def send_message_and_wait_post(DEBUG_CFG:dict, message:dict):
 def get_settings(DEBUG_CFG:dict, message:dict) -> dict:
     URL = "https://strommesser.ch/verbrauch/getSettings.php?TX=pico&TXVER=3"
     if (DEBUG_CFG['wlan'] == 'simulated'):
-        return(sepStrToArr(separatedString='1|500|100|700')) # valid|ledMaxValCon|ledBrightness|ledMaxValGen
+        return(sepStrToArr(valueString='1|80|200|2000')) # valid|ledBrightness|ledMinValCon|ledMaxValGen
     
     returnText = transmit_message(DEBUG_CFG=DEBUG_CFG, send=False, URL=URL, message=message)
-    return(sepStrToArr(separatedString=returnText))
+    return(sepStrToArr(valueString=returnText))
 
-def sepStrToArr(separatedString:str):
-    valueArray = separatedString.split('|')
-    retVal = dict([
-            ('valid', 0),
-            ('brightness', 80),
-            ('maxCon', 405),
-            ('maxGen', 1050)
-    ])
+def sepStrToArr(valueString:str):
+    valueArray = valueString.split('|')
     if (len(valueArray) > 2 ):
-            retVal['valid'] = int(valueArray[0])
-            retVal['brightness'] = int(valueArray[1])
-            retVal['maxCon'] = int(valueArray[2])
-            retVal['maxGen'] = int(valueArray[3])
-    return retVal
-
+        return(dict([
+            ('valid',True),
+            ('serverOk', int(valueArray[0])),
+            ('brightness', int(valueArray[1])),
+            ('minValCon', int(valueArray[2])),
+            ('maxValGen', int(valueArray[3]))
+        ]))
+    else:
+        return (dict([('valid',False)]))
 
 
 
@@ -272,7 +269,7 @@ def hexlify_wlan(input:str):
     hex_input = hexlify(input.encode()) # hex the bytestream of the string
     print(hex_input.decode())
 
-def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict) -> dict:
+def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, settings:dict) -> dict:
         randNum_hash = get_randNum_hash(DEVICE_CFG)
         meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])
 
@@ -284,7 +281,9 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict) -> dict:
             ])
         #print(str(message))
         send_message_and_wait_post(DEBUG_CFG=DEBUG_CFG, message=message)
-        settings = get_settings(DEBUG_CFG=DEBUG_CFG, message=message)
+        new_settings = get_settings(DEBUG_CFG=DEBUG_CFG, message=message)
+        if (new_settings['valid']):
+            settings = new_settings # otherwise keep the old settings
         del randNum_hash, meas_string, message
         return(settings)
 
