@@ -143,7 +143,17 @@ def print_values(meas:dict):
     print('energy + T1:',meas['energy_pos_t1'])
     print('energy + T2:',meas['energy_pos_t2'])
     return
+
+# TODO
+def send_message_and_get_settings(DEBUG_CFG:dict, message:dict):
+    if(DEBUG_CFG['wlan'] == 'real'): # not sending anything in simulation
+        URL = "https://strommesser.ch/verbrauch/picow2_v3.php?TX=pico&TXVER=3"
+        returnText = transmit_message(DEBUG_CFG=DEBUG_CFG, URL=URL, message=message)
+    else: # wlan simulated    
+        return(sepStrToArr(valueString='1|80|200|2000')) # valid|ledBrightness|ledMinValCon|ledMaxValGen
     
+    return(sepStrToArr(valueString=returnText))
+
 def send_message_and_wait_post(DEBUG_CFG:dict, message:dict):
     # about TXVER: integer (range 0 to 9), increases when there is a change on the transmitted value format 
     if(DEBUG_CFG['wlan'] == 'real'): # not sending anything in simulation
@@ -280,6 +290,7 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, settings:dict) -> d
             ('hash', randNum_hash['hash'])
             ])
         #print(str(message))
+        # TODO: combine those two. Have the server part report back the settings as well...
         send_message_and_wait_post(DEBUG_CFG=DEBUG_CFG, message=message)
         new_settings = get_settings(DEBUG_CFG=DEBUG_CFG, message=message)
         if (new_settings['valid']):
