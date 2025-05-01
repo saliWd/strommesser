@@ -35,7 +35,7 @@ display.set_pen(BLACK)
 display.clear()
 display.update()
 rgb_led = RgbLed()
-rgb_led.control(valid=False, pulsating=False, color=(255,0,0))
+rgb_led.control(allOk=False, pulsating=False, color=(255,0,0))
 
 loopCount:int = 0
 timeSinceLastTransmit = time() # returns seconds
@@ -66,9 +66,9 @@ while True:
     minValCon = settings['minValCon'] # this is a positive value but needs to be treated negative in some cases
     maxValGen = settings['maxValGen']
 
-    # normalize the value between -ledMinValCons and ledMaxValGen (e.g. -400 to 3000)
+    # normalize the value between -ledMinValCon and ledMaxValGen (e.g. -400 to 3000)
     wattValMinMax = min(max(wattVal, (-1 * minValCon)),maxValGen)
-    #print("normalized watt value: "+str(wattValMinMax)+", min/max: "+str(minValCons)+"/"+str(maxValGen))
+    #print("normalized watt value: "+str(wattValMinMax)+", min/max: "+str(minValCon)+"/"+str(maxValGen))
 
     # fills the screen with black
     display.set_pen(BLACK)
@@ -77,7 +77,7 @@ while True:
     wattVals.append(wattValMinMax)
     if len(wattVals) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
         wattVals.pop(0)
-    valColor = val_to_rgb(val=wattValMinMax, minValCons=minValCon, maxValGen=maxValGen, led_brightness=255)
+    valColor = val_to_rgb(val=wattValMinMax, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255)
     # draw the zero line in the current color (1 pix)
     display.set_pen(display.create_pen(*valColor))
     disp_y_range = getDispYrange(wattVals)
@@ -90,7 +90,7 @@ while True:
     x = 0
     for t in wattVals:
         # cons grow down (so plus direction in pixels), gen grow up (so need to 'invert' everything). Full range is (min+max Vals)
-        color_pen = display.create_pen(*val_to_rgb(val=t, minValCons=minValCon, maxValGen=maxValGen, led_brightness=255))
+        color_pen = display.create_pen(*val_to_rgb(val=t, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255))
         display.set_pen(color_pen)
         
         valHeight = int(float(HEIGHT) * float(abs(t)) / float(disp_y_range[2])) # between 0 and HEIGHT. E.g. 135*2827/3400
@@ -117,17 +117,18 @@ while True:
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
     brightness = settings['brightness'] # TODO: getBrightness(meas=meas). dependency on time...
+    allOk = meas['valid'] and settings['serverOk']
     if (wattVal == 0): brightness = 0 # disable LED when 0 consumption
     if (wattVal < 0):
-        rgb_led.control(valid=meas['valid'], pulsating=False,
+        rgb_led.control(allOk=allOk, pulsating=False,
                         color=val_to_rgb(val=wattValMinMax,
-                                         minValCons=minValCon, 
+                                         minValCon=minValCon, 
                                          maxValGen=maxValGen, 
                                          led_brightness=int(brightness/2))) # led is quite bright when shining constantly
     else:
-        rgb_led.control(valid=meas['valid'], pulsating=True,
+        rgb_led.control(allOk=allOk, pulsating=True,
                         color=val_to_rgb(val=wattValMinMax, 
-                                         minValCons=minValCon, 
+                                         minValCon=minValCon, 
                                          maxValGen=maxValGen, 
                                          led_brightness=brightness))
 

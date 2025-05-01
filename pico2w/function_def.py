@@ -31,11 +31,11 @@ def hsva_to_rgb(h:float, s:float, v:float, a:float) -> tuple: # inputs: values f
         if i==5: return (v, w, q)
     else: v = int(255*v); return (v, v, v)
 
-def val_to_rgb(val:int, minValCons:int, maxValGen:int, led_brightness:int)-> list: # goes from red to blue
+def val_to_rgb(val:int, minValCon:int, maxValGen:int, led_brightness:int)-> list: # goes from red to blue
     # value has a range from -minValCons to +maxValGen. minVal and maxVal are both positive numbers but minVal may be treated as negative
     if val < 0: val = val * 2 # get a higher color 'resolution' for negative values
-    val = val + 2*minValCons # bring it to the range 0..(min+max)
-    h = float(val) / float(1.4*(2*minValCons+maxValGen)) # h value makes a 'circle'. This means 0 degree is the same as 360°. -> Need to limit it (but not to 180°, just less than 360)
+    val = val + 2*minValCon # bring it to the range 0..(min+max)
+    h = float(val) / float(1.4*(2*minValCon+maxValGen)) # h value makes a 'circle'. This means 0 degree is the same as 360°. -> Need to limit it (but not to 180°, just less than 360)
     a = float(led_brightness) / float(255)
     return list(hsva_to_rgb(h, 1.0, 1.0, a))
 
@@ -144,29 +144,38 @@ def print_values(meas:dict):
     print('energy + T2:',meas['energy_pos_t2'])
     return
 
-# TODO
-def send_message_and_get_settings(DEBUG_CFG:dict, message:dict):
-    if(DEBUG_CFG['wlan'] == 'real'): # not sending anything in simulation
-        URL = "https://strommesser.ch/verbrauch/picow2_v3.php?TX=pico&TXVER=3"
-        returnText = transmit_message(DEBUG_CFG=DEBUG_CFG, URL=URL, message=message)
+# sends the measurement data and gets the settings
+def server_communication(DEBUG_CFG:dict, message:dict):
+    if(DEBUG_CFG['wlan'] == 'real'): # not sending anything in simulation        
+        returnText = transmit_message(DEBUG_CFG=DEBUG_CFG, message=message)
     else: # wlan simulated    
-        return(sepStrToArr(valueString='1|80|200|2000')) # valid|ledBrightness|ledMinValCon|ledMaxValGen
+        return(sepStrToArr(valueString='1|80|200|2000')) # serverok|ledBrightness|ledMinValCon|ledMaxValGen
     
     return(sepStrToArr(valueString=returnText))
 
-def send_message_and_wait_post(DEBUG_CFG:dict, message:dict):
-    # about TXVER: integer (range 0 to 9), increases when there is a change on the transmitted value format 
-    if(DEBUG_CFG['wlan'] == 'real'): # not sending anything in simulation
-        URL = "https://strommesser.ch/verbrauch/rx_v3.php?TX=pico&TXVER=3"
-        transmit_message(DEBUG_CFG=DEBUG_CFG, send=True, URL=URL, message=message)
-
-def get_settings(DEBUG_CFG:dict, message:dict) -> dict:
-    URL = "https://strommesser.ch/verbrauch/getSettings.php?TX=pico&TXVER=3"
-    if (DEBUG_CFG['wlan'] == 'simulated'):
-        return(sepStrToArr(valueString='1|80|200|2000')) # valid|ledBrightness|ledMinValCon|ledMaxValGen
-    
-    returnText = transmit_message(DEBUG_CFG=DEBUG_CFG, send=False, URL=URL, message=message)
-    return(sepStrToArr(valueString=returnText))
+# TODO: maybe try once more before resetting?
+def transmit_message(DEBUG_CFG:dict, message:dict):    
+    if (not DEBUG_CFG['server_txrx']):        
+        return('1|500|100|700')
+    URL = "https://strommesser.ch/verbrauch/picow2_v3.php?TX=pico&TXVER=3"
+    HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
+    try:
+        urlenc = urlencode(message)
+        # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue 
+        response = request.post(URL, data=urlenc, headers=HEADERS)
+        if (response.status_code != 200):
+            print("Error: invalid status code. Resetting in 20 seconds...")
+            sleep(20)             
+            reset() # NB: connection to whatever device is getting lost; complicates debugging        
+        #print('Text:'+response.text)
+        answer = response.text
+        response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
+        return(answer)
+    except:
+        print("Error: request.post did not work. Resetting in 20 seconds...")
+        sleep(20) # add a bit of debug possibility        
+        reset() # NB: connection to whatever device is getting lost; complicates debugging
+        return # this return will never be executed
 
 def sepStrToArr(valueString:str):
     valueArray = valueString.split('|')
@@ -180,8 +189,6 @@ def sepStrToArr(valueString:str):
         ]))
     else:
         return (dict([('valid',False)]))
-
-
 
 def debug_sleep(DEBUG_CFG:dict, time:int):
     if(DEBUG_CFG['sleep'] == 'short'): # minimize wait times by sleeping only one second instead of the normal amount
@@ -232,38 +239,12 @@ def wlan_conn_check(DEBUG_CFG:dict, WLAN_CFG:dict, wlan):
         wlanNew = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG) # call the init
         return(wlanNew)
 
-
 def urlencode(dictionary:dict):
     urlenc = ""
     for key, val in dictionary.items():
         urlenc += "%s=%s&" %(key,val)
     urlenc = urlenc[:-1] # gets me something like 'val0=23&val1=bla space'
     return(urlenc)
-
-def transmit_message(DEBUG_CFG:dict, send:bool, URL:str, message:dict):
-    if (send and (not DEBUG_CFG['tx_to_server'])):
-        return
-    if ((not send) and (not DEBUG_CFG['rx_from_server'])):        
-        return('1|500|100|700')
-    HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
-    try:
-        urlenc = urlencode(message)
-        # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue 
-        response = request.post(URL, data=urlenc, headers=HEADERS)
-        if (response.status_code != 200):
-            print("Error: invalid status code. Resetting in 20 seconds...")
-            sleep(20)             
-            reset() # NB: connection to whatever device is getting lost; complicates debugging        
-        #print('Text:'+response.text)
-        answer = response.text
-        response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
-        return(answer)
-    except:
-        print("Error: request.post did not work. Resetting in 20 seconds...")
-        sleep(20) # add a bit of debug possibility        
-        reset() # NB: connection to whatever device is getting lost; complicates debugging
-        return # this return will never be executed
-
 
 def get_randNum_hash(device_config):
     rand_num = randint(1, 10000)
@@ -290,9 +271,7 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, settings:dict) -> d
             ('hash', randNum_hash['hash'])
             ])
         #print(str(message))
-        # TODO: combine those two. Have the server part report back the settings as well...
-        send_message_and_wait_post(DEBUG_CFG=DEBUG_CFG, message=message)
-        new_settings = get_settings(DEBUG_CFG=DEBUG_CFG, message=message)
+        new_settings = server_communication(DEBUG_CFG=DEBUG_CFG, message=message)
         if (new_settings['valid']):
             settings = new_settings # otherwise keep the old settings
         del randNum_hash, meas_string, message

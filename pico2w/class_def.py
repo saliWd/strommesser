@@ -29,8 +29,8 @@ class RgbLed(object):
         
         self.led_rgb.set_rgb(*(self.rgb))
         
-    def control(self, valid:bool, pulsating:bool, color):
-        if not valid:
+    def control(self, allOk:bool, pulsating:bool, color):
+        if not allOk:
             self.color = (240, 0, 0)
             self.freq = 100
             self.timer_rgb.init(freq=self.freq, callback=self.pulse_cb)

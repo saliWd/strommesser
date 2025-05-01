@@ -17,6 +17,5 @@ def get_debug_settings():
         ('wlan','real'),        # can be 'real'|'simulated'. When simulated, json_data must be 'file'
         ('sleep','normal'),     # can be 'normal'|'short'
         ('json_data','file'),   # can be 'local_net'|'web'|'file'. Latter two are for debug
-        ('tx_to_server',False),  # can be True|False. Whether data are updated on the server (every 2 mins)
-        ('rx_from_server',True) # can be True|False. Whether settings are received from the server (every 2 mins)
+        ('server_txrx',False)  # can be True|False. Whether meas data are sent to the server and settings received (every 2 mins)
     ]))
