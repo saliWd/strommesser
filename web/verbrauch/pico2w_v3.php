@@ -31,7 +31,7 @@
         $thinUpdate = '24';
       }
       // search the newest one where thinnig has not yet been applied (and is older than 25h)
-      $sql = 'SELECT `zeit` FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` > DATE_SUB(NOW(), INTERVAL '.$interval.' HOUR) ORDER BY `id` ASC LIMIT 1;';
+      $sql = 'SELECT `zeit` FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` < DATE_SUB(NOW(), INTERVAL '.$interval.' HOUR) ORDER BY `id` ASC LIMIT 1;';
       $result = $dbConn->query($sql);
       if ($result->num_rows < 1) { // if there is no entry older than 25h, there is nothing to do. NB: there is a difference between NOW and last-insert-time
         return;
@@ -44,6 +44,9 @@
 
       // get the last one where thinning was not yet applied
       $result = $dbConn->query('SELECT `id` FROM `verbrauch` WHERE '.$sqlNoThin.' AND `zeit` < "'.$zeitHourAlignedString.'" ORDER BY `id` ASC LIMIT 1;');
+      if ($result->num_rows < 1) { // if there is no entry within this hour, there is nothing to do
+        return;
+      }
       $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
       $idToUpdate = $row['id'];
       
