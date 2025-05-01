@@ -146,36 +146,42 @@ def print_values(meas:dict):
 
 # sends the measurement data and gets the settings
 def server_communication(DEBUG_CFG:dict, message:dict):
-    if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled       
-        returnText = transmit_message(message=message)
-    else: # wlan simulated    
-        return(sepStrToArr(valueString='1|80|200|2000')) # serverok|ledBrightness|ledMinValCon|ledMaxValGen
+    if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled
+        valueString=transmit_message(message=message)
+    else: # wlan simulated
+        valueString='1|80|200|2000' # serverok|ledBrightness|ledMinValCon|ledMaxValGen
+    return(sepStrToArr(valueString=valueString))
     
-    return(sepStrToArr(valueString=returnText))
 
-# TODO: maybe try once more before resetting?
-def transmit_message(message:dict):    
+def transmit_message(message:dict):
     URL = "https://strommesser.ch/verbrauch/pico2w_v3.php?TX=pico&TXVER=3"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
-    try:
-        urlenc = urlencode(message)
-        # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue
-        # print(URL)
-        # print(message)
-        response = request.post(URL, data=urlenc, headers=HEADERS)
-        if (response.status_code != 200):
-            print("Error: invalid status code:"+str(response.status_code)+". Resetting in 20 seconds...")
-            sleep(20)             
-            reset() # NB: connection to whatever device is getting lost; complicates debugging        
-        #print('Text:'+response.text)
-        answer = response.text
-        response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
-        return(answer)
-    except:
-        print("Error: request.post did not work. Resetting in 20 seconds...")
-        sleep(20) # add a bit of debug possibility        
-        reset() # NB: connection to whatever device is getting lost; complicates debugging
-        return # this return will never be executed
+    failureCount = 0
+    while failureCount < 3:
+        try:
+            urlenc = urlencode(message)
+            #print(URL)
+            #print(message)
+            response = request.post(URL, data=urlenc, headers=HEADERS) # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue
+            if (response.status_code == 200):
+                #print('Text:'+response.text)
+                answer = response.text
+                response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
+                return(answer)
+            else:
+                print("Error: invalid status code:"+str(response.status_code)+". FailureCount: "+str(failureCount))
+                response.close()
+                failureCount += 1
+        except:
+            print("Error: request.post did not work")
+            failureCount += 1
+        sleep(5) # wait in between the loops
+    
+    # while loop has passed, did not work several times, do a reset now
+    print("Error: failure count too high:"+str(failureCount)+". Resetting in 20 seconds...")
+    sleep(20) # add a bit of debug possibility
+    reset() # NB: connection to whatever device is getting lost; complicates debugging
+    return # this return will never be executed
 
 def sepStrToArr(valueString:str):
     valueArray = valueString.split('|')
