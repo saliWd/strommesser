@@ -794,7 +794,7 @@ function safeStrFromExt(string $source, string $varName, int $length):string {
 }
 
 function limitInt(int $input, int $lower, int $upper):int {
-  return min(value: max(value:$input, values:$lower), values:$upper);  
+  return min(max($input,$lower),$upper);  
 }
 
  

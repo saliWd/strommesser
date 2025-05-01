@@ -3,7 +3,7 @@ require_once('functions.php');
 $dbConn = initialize();
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 
-$LIMIT_LED_MAX_VALUE_CONS = 2000;
+$LIMIT_LED_MIN_VALUE_CON = 2000;
 $LIMIT_LED_MAX_VAL_GEN = 8000;
 $LIMIT_LED_BRIGHTNESS = 255;
 
@@ -14,7 +14,7 @@ $doSafe = safeIntFromExt('GET', 'do', 2); // this is an integer (range 1 to 99) 
 // do = 3: present the 'delete exported data?'
 // do = 4: process 'delete archived'
 if ($doSafe === 0) { // entry point of this site
-  $result = $dbConn->query('SELECT `ledMaxValue`, `ledMaxValGen`, `ledBrightness`, `priceConsHt`, `priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
+  $result = $dbConn->query('SELECT `ledMinValCon`, `ledMaxValGen`, `ledBrightness`, `priceConsHt`, `priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
   $row = $result->fetch_assoc();
   
   printBeginOfPage_v2(site:'settings.php');  
@@ -40,9 +40,9 @@ if ($doSafe === 0) { // entry point of this site
       </tr>
       <tr>
         <td width="49%" align="right">
-          <input dir="rtl" id="ledMaxValue" name="ledMaxValue" type="range" min="50" max="'.$LIMIT_LED_MAX_VALUE_CONS.'" step="50" value="'.$row['ledMaxValue'].'" class="range w-36" oninput="getElementById(\'tooltip-ledMaxValue-value\').value=this.value">           
-          <div id="tooltip-ledMaxValue" class="absolute z-20 inline-block px-3 py-2 my-8 -mx-24 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm">
-            -<output id="tooltip-ledMaxValue-value">'.$row['ledMaxValue'].'</output>W
+          <input dir="rtl" id="ledMinValCon" name="ledMinValCon" type="range" min="50" max="'.$LIMIT_LED_MIN_VALUE_CON.'" step="50" value="'.$row['ledMinValCon'].'" class="range w-36" oninput="getElementById(\'tooltip-ledMinValCon-value\').value=this.value">           
+          <div id="tooltip-ledMinValCon" class="absolute z-20 inline-block px-3 py-2 my-8 -mx-24 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm">
+            -<output id="tooltip-ledMinValCon-value">'.$row['ledMinValCon'].'</output>W
           </div>
         </td>
         <td width="2%"></td>
@@ -136,14 +136,14 @@ if ($doSafe === 0) { // entry point of this site
   echo '<script>setTimeout(() => { window.location.href = \'settings.php?do=3\'; }, 2000);</script>';
 } elseif ($doSafe === 2) {
   printBeginOfPage_v2(site:'settings.php', title:'Einstellungen');
-  $ledMaxValue  = abs(safeIntFromExt(source:'POST',varName:'ledMaxValue', length:4)); // this one is displayed as negative value, stored as positive one though
+  $ledMinValCon  = abs(num:safeIntFromExt(source:'POST',varName:'ledMinValCon', length:4)); // this one is displayed as negative value, stored as positive one though
   $ledMaxValGen = safeIntFromExt(source:'POST',varName:'ledMaxValGen',length:4);
   $ledBrightness = safeIntFromExt(source:'POST',varName:'ledBrightness',length:3);
-  $ledMaxValue   = limitInt(input:$ledMaxValue,  lower:0, upper:$LIMIT_LED_MAX_VALUE_CONS);
+  $ledMinValCon  = limitInt(input:$ledMinValCon, lower:0, upper:$LIMIT_LED_MIN_VALUE_CON);
   $ledMaxValGen  = limitInt(input:$ledMaxValGen, lower:0, upper:$LIMIT_LED_MAX_VAL_GEN);
   $ledBrightness = limitInt(input:$ledBrightness,lower:0, upper:$LIMIT_LED_BRIGHTNESS);
 
-  $result = $dbConn->query('UPDATE `kunden` SET `ledMaxValue` = "'.$ledMaxValue.'", `ledMaxValGen` = "'.$ledMaxValGen.'", `ledBrightness` = "'.$ledBrightness.'" WHERE `id` = "'.$userid.'";');
+  $result = $dbConn->query('UPDATE `kunden` SET `ledMinValCon` = "'.$ledMinValCon.'", `ledMaxValGen` = "'.$ledMaxValGen.'", `ledBrightness` = "'.$ledBrightness.'" WHERE `id` = "'.$userid.'";');
 
   echo 'gespeichert<br>';
   echo '<script>setTimeout(() => { window.location.href = \'settings.php\'; }, 2000);</script>';
