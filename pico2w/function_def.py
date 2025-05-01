@@ -146,18 +146,16 @@ def print_values(meas:dict):
 
 # sends the measurement data and gets the settings
 def server_communication(DEBUG_CFG:dict, message:dict):
-    if(DEBUG_CFG['wlan'] == 'real'): # not sending anything in simulation        
-        returnText = transmit_message(DEBUG_CFG=DEBUG_CFG, message=message)
+    if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled       
+        returnText = transmit_message(message=message)
     else: # wlan simulated    
         return(sepStrToArr(valueString='1|80|200|2000')) # serverok|ledBrightness|ledMinValCon|ledMaxValGen
     
     return(sepStrToArr(valueString=returnText))
 
 # TODO: maybe try once more before resetting?
-def transmit_message(DEBUG_CFG:dict, message:dict):    
-    if (not DEBUG_CFG['server_txrx']):        
-        return('1|500|100|700')
-    URL = "https://strommesser.ch/verbrauch/picow2_v3.php?TX=pico&TXVER=3"
+def transmit_message(message:dict):    
+    URL = "https://strommesser.ch/verbrauch/pico2w_v3.php?TX=pico&TXVER=3"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     try:
         urlenc = urlencode(message)

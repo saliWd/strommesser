@@ -1,7 +1,7 @@
 <?php declare(strict_types=1); 
     require_once 'functions.php';
     $dbConn = get_dbConn(); // do not use initialize as I don't use sessions
-    // expecting a call like "https://strommesser.ch/verbrauch/rx_v3.php?TX=pico&TXVER=3"
+    // expecting a call like "https://strommesser.ch/verbrauch/pico2w_v3.php?TX=pico&TXVER=3"
     // with POST data (url encoded)
 
     function getDiffs($row_now, $row_before):string {
@@ -113,7 +113,31 @@
         
         // dbThinnings: do not need to run every time but it doesn't hurt either        
         doDbThinning(dbConn:$dbConn, userid:$userid);
-         
-    } else {
-        echo 'no previous data'; // not an error
     }
+
+    // check whether the last measurement is not older than 5 mins and 
+    // get the settings and output them on the screen   
+    $result = $dbConn->query(query: 'SELECT `zeit` FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 1;');
+    $queryCount = $result->num_rows; // this may be 0 or 1
+    if ($queryCount !== 1) {
+        printRawErrorAndDie(heading: 'Error', text: 'no meas data');
+    }
+    $row = $result->fetch_assoc();
+
+    $zeitNewest = date_create(datetime: $row['zeit']);
+    $zeitNow = date_create(datetime: 'now');
+    $zeitNow->modify(modifier: '- 5 minutes'); // latest entry must be newer than '5 minutes ago'
+    $serverOk = ($zeitNewest > $zeitNow) ? 1:0;
+    
+    $result = $dbConn->query(query: 'SELECT `ledMinValCon`,`ledMaxValGen`,`ledBrightness` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
+    if ($result->num_rows !== 1) {
+        printRawErrorAndDie(heading: 'Error', text: 'no config data');
+    } 
+    $rowKunden = $result->fetch_assoc();
+    
+    // serverok|ledBrightness|ledMinValCon|ledMaxValGen
+    echo $serverOk.'|'.$rowKunden['ledBrightness'].'|'.$rowKunden['ledMinValCon'].'|'.$rowKunden['ledMaxValGen'];
+
+
+
+
