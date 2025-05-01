@@ -159,10 +159,12 @@ def transmit_message(message:dict):
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     try:
         urlenc = urlencode(message)
-        # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue 
+        # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue
+        # print(URL)
+        # print(message)
         response = request.post(URL, data=urlenc, headers=HEADERS)
         if (response.status_code != 200):
-            print("Error: invalid status code. Resetting in 20 seconds...")
+            print("Error: invalid status code:"+str(response.status_code)+". Resetting in 20 seconds...")
             sleep(20)             
             reset() # NB: connection to whatever device is getting lost; complicates debugging        
         #print('Text:'+response.text)
