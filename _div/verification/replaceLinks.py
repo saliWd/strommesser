@@ -12,6 +12,7 @@ def replace_content(dict_replace, target):
 dict_replace = {
   'login.php"': 'static.login.html"',
   'login.php\?do=.?' : 'static.login.html',
+  'now.php"': 'static.now.html"',
   'settings.php"': 'static.settings.html"',
   'settings.php\?do=.?': 'static.settings.html',
   'statistic.php"': 'static.statistic.html"',
@@ -27,7 +28,8 @@ dict_replace = {
 file_names = ('static.index.1','static.index.7','static.index.30','static.index.365',
 'static.settings',
 'static.statistic',
-'static.login')
+'static.login',
+'static.now')
 
 fileCounter = 0
 
