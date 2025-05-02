@@ -144,6 +144,20 @@ def print_values(meas:dict):
     print('energy + T2:',meas['energy_pos_t2'])
     return
 
+def getBrightness(setting:int, time:str)->int:
+    """adjusts the brightness (from the server) during the night"""
+    brightness = setting
+    # time is either 2025-04-22T18:32:05Z or 2025-04-26T22:49:54 (with or without Z)
+    try:
+        date_time_split = time.split('T')
+        hour_split = date_time_split[1].split(':')
+        hour = int(hour_split[0])
+        if (hour > 20) or (hour < 6):
+            brightness = int(0.25 * setting) # darker from 21:00 to 05:59. rounded down
+    except:
+        print('Error: time format not as expected')
+    return brightness
+
 # sends the measurement data and gets the settings
 def server_communication(DEBUG_CFG:dict, message:dict):
     if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled

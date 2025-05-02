@@ -8,7 +8,7 @@ from time import time
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, right_align, make_bold, getDispYrange, json_get_req, tx_to_server, debug_sleep, wlan_init, wlan_conn_check, print_loopCount
+from function_def import val_to_rgb, right_align, make_bold, getDispYrange, json_get_req, tx_to_server, debug_sleep, wlan_init, wlan_conn_check, print_loopCount, getBrightness
 import my_config
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
@@ -116,7 +116,8 @@ while True:
     display.update()
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
-    brightness = settings['brightness'] # TODO: getBrightness(meas=meas). dependency on time...
+    brightness = getBrightness(setting=settings['brightness'], time=meas['date_time']) # dependency on time
+    #print('brightness: settings:applied'+str(settings['brightness'])+':'+str(brightness))
     allOk = meas['valid'] and settings['serverOk']
     if (wattVal == 0): brightness = 0 # disable LED when 0 consumption
     if (wattVal < 0):
