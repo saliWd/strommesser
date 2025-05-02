@@ -144,13 +144,15 @@ def print_values(meas:dict):
     print('energy + T2:',meas['energy_pos_t2'])
     return
 
-def getBrightness(setting:int, time:str, wattVal:int)->int:
+def getBrightness(setting:int, time:str, wattVal:int):
     """adjusts the brightness (from the server) during the night and depending on the measured value"""
+    pulsed = False
     if (wattVal == 0): 
         return(0) # disable LED when 0 consumption
     if (wattVal < 0): 
         brightness=int(setting/2) # when consuming energy the led is shining constantly and thus quite bright
     else:
+        pulsed = True
         brightness = setting
 
     # time is either 2025-04-22T18:32:05Z or 2025-04-26T22:49:54 (with or without Z)
@@ -162,7 +164,7 @@ def getBrightness(setting:int, time:str, wattVal:int)->int:
             brightness = int(0.25 * setting) # darker from 21:00 to 05:59. rounded down
     except:
         print('Error: time format not as expected')
-    return brightness
+    return (brightness, pulsed)
 
 # sends the measurement data and gets the settings
 def server_communication(DEBUG_CFG:dict, message:dict):
