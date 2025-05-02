@@ -1,5 +1,4 @@
-# using MicroPython v1.25.0 on 2025-04-15; Raspberry Pi Pico 2 W with RP2350
-# does not work: Micropython version Raspberry Pico 2 W with Pimoroni libraries 0.0.11
+# not using MicroPython v1.25.0 on 2025-04-15; Raspberry Pi Pico 2 W with RP2350
 # working pimoroni libraries: MicroPython pico2_w_2025_04_09,   on 2025-04-15; Raspberry Pi Pico 2 W with RP2350 from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
 
 import gc
@@ -116,30 +115,25 @@ while True:
     display.update()
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
-    brightness = getBrightness(setting=settings['brightness'], time=meas['date_time']) # dependency on time
-    #print('brightness: settings:applied'+str(settings['brightness'])+':'+str(brightness))
+    brightness = getBrightness(setting=settings['brightness'], time=meas['date_time'], wattVal=wattVal) # dependency on time
+    #print('brightness output: wattVal:settings:applied'+str(wattVal)+':'+str(settings['brightness'])+':'+str(brightness))
     allOk = meas['valid'] and settings['serverOk']
-    if (wattVal == 0): brightness = 0 # disable LED when 0 consumption
-    if (wattVal < 0):
-        rgb_led.control(allOk=allOk, pulsating=False,
-                        color=val_to_rgb(val=wattValMinMax,
-                                         minValCon=minValCon, 
-                                         maxValGen=maxValGen, 
-                                         led_brightness=int(brightness/2))) # led is quite bright when shining constantly
-    else:
-        rgb_led.control(allOk=allOk, pulsating=True,
-                        color=val_to_rgb(val=wattValMinMax, 
-                                         minValCon=minValCon, 
-                                         maxValGen=maxValGen, 
-                                         led_brightness=brightness))
-
+    rgb_led.control(
+        allOk=allOk, 
+        pulsating=(wattVal >= 0),
+        color=val_to_rgb(
+            val=wattValMinMax,
+            minValCon=minValCon, 
+            maxValGen=maxValGen, 
+            led_brightness=int(brightness/2))) # led is quite bright when shining constantly
+    
     if ((time() - timeSinceLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
         timeSinceLastTransmit = time() # reset the counter        
         settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, settings=settings) # now transmit the stuff to the server
 
 
     # do not delete wlan variable and timeSinceLastTransmit
-    del brightness, color_pen, disp_y_range, expand, minValCon, maxValGen, meas, t
+    del brightness, color_pen, disp_y_range, expand, minValCon, maxValGen, meas, t, allOk
     del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x, zeroLine_y  # to combat memAlloc issues
     gc.collect() # garbage collection
     

@@ -97,7 +97,7 @@ def get_debug_jdata(READER:str):
     if READER == 'whatwatt':
         return({"report":{"id":292,"interval":2.737,"date_time":"2025-04-22T18:32:05Z","instantaneous_power":{"active":{"positive":{"total":0},"negative":{"total":1.803}}},"energy":{"active":{"positive":{"total":167.508,"t1":130.297,"t2":37.202},"negative":{"total":575.932,"t1":107.105,"t2":468.817}},"reactive":{"imported":{"inductive":{"total":152.881},"capacitive":{"total":10.117}},"exported":{"inductive":{"total":78.124},"capacitive":{"total":114.091}}}},"conv_factor":1},"meter":{"status":"OK","interface":"MBUS","protocol":"DLMS","id":"72913313","vendor":"Landis+Gyr","prefix":"LGZ"},"system":{"id":"ECC9FF5C80B0","date_time":"2025-04-22T17:32:12Z","boot_id":"E766FCAC","time_since_boot":1345}})
     else:
-        return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":0.010,"Po":0.000,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
+        return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":0.020,"Po":0.000,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
 
 def get_interesting_values(jdata, READER:str) -> dict:
     try:
@@ -144,9 +144,15 @@ def print_values(meas:dict):
     print('energy + T2:',meas['energy_pos_t2'])
     return
 
-def getBrightness(setting:int, time:str)->int:
-    """adjusts the brightness (from the server) during the night"""
-    brightness = setting
+def getBrightness(setting:int, time:str, wattVal:int)->int:
+    """adjusts the brightness (from the server) during the night and depending on the measured value"""
+    if (wattVal == 0): 
+        return(0) # disable LED when 0 consumption
+    if (wattVal < 0): 
+        brightness=int(setting/2) # when consuming energy the led is shining constantly and thus quite bright
+    else:
+        brightness = setting
+
     # time is either 2025-04-22T18:32:05Z or 2025-04-26T22:49:54 (with or without Z)
     try:
         date_time_split = time.split('T')
