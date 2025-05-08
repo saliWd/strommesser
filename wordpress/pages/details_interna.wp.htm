@@ -1,0 +1,47 @@
+<!-- wp:paragraph -->
+<p>Auf den anderen Seiten wird StromMesser kurz und prägnant vorgestellt. Auf dieser Seite hier ist ein bisschen mehr Fleisch am Knochen. Hier beantworte ich Fragen à la: <em>Wie funktioniert StromMesser, wo liegen welche Daten, was mache ich wenn etwas nicht funktioniert, wem gehören die Geräte, wie künde ich, etc...</em> </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Wie funktioniert StromMesser</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Reader</h3>
+<!-- /wp:heading -->
+
+<!-- wp:image {"id":279,"sizeSlug":"medium","linkDestination":"none"} -->
+<figure class="wp-block-image size-medium"><img src="https://strommesser.ch/wp/wp-content/uploads/2025/05/20250430_095839-179x300.jpg" alt="" class="wp-image-279"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Es werden zwei Mikrocontroller benötigt. Direkt am Leistungsmesser wird der Reader angeschlossen. Dieser bezieht seine Energie direkt aus der MBUS-Schnittstelle (auch meter bus genannt). Auf dieser Schnittstelle liefert der SmartMeter mehrmals pro Sekunde die aktuelle Leistung in Watt und ca. minütlich die bisher verbrauchte/eingespiesene Leistung in kWh (die genaue zeitliche Auflösung hängt von der Smartmeterkonfiguration ab).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Normalerweise ist diese Kundenschnittstelle am Leistungsmesser nicht aktiv (Aktivierung muss beim EW angefragt werden). Nach der Aktivierung kriegst du vom EW ein Entschlüsselungspasswort, dieses muss ich beim Reader eintragen.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Der Reader (ein ESP Mikrocontroller) hängt im lokalen WLAN (z.B. 192.168.178.58), das heisst er ist vom Internet aus nicht sichtbar. Das heimische WLAN-Signal (2.4 GHz) muss beim Leistungsmesserstandort dementsprechend genügend stark sein. </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Anzeige</h3>
+<!-- /wp:heading -->
+
+<!-- wp:image {"id":29,"sizeSlug":"medium","linkDestination":"none"} -->
+<figure class="wp-block-image size-medium"><img src="https://strommesser.ch/wp/wp-content/uploads/2022/12/1671481132487-202x300.jpg" alt="ein kleines Display mit farbiger LED" class="wp-image-29"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Der zweite Mikrocontroller zeigt den aktuellen Verbrauch kontinuierlich auf einem kleinen LCD Display an und sendet die Leistungsdaten alle zwei Minuten an die StromMesser-Datenbank im Internet.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:separator -->
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<!-- /wp:separator -->
+
+<!-- wp:paragraph -->
+<p>...weitere Erklärungen folgen in den nächsten Tagen...</p>
+<!-- /wp:paragraph -->
