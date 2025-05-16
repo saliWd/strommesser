@@ -1,47 +1,65 @@
-# install micropython-mdns package
+from phew import logging, server, access_point, dns
+from phew.template import render_template
+from phew.server import redirect
 
-import network # type: ignore
-import time
-import socket
+DOMAIN = "pico.wireless"  # This is the address that is shown on the Captive Portal
 
+@server.route("/", methods=['GET'])
+def index(request):
+    """ Render the Index page"""
+    if request.method == 'GET':
+        logging.debug("Get request")
+        return render_template("index.html")
 
-def web_page():
-  html = """<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>
-            <body><h1>StromMesser web page</h1></body>
-            </html>
-         """
-  return html
-
-# issues on this implementation
-# - client must connect to the given ip (e.g. 192.168.4.1). Can I at least define this IP?
-# - mobile might switch to another WLAN as this one does not provide internet connection
-# - ...need to move some stuff into a function... Currently a tech demo.
-
-ssid='strommesser'
-
-ap = network.WLAN(network.AP_IF) # access point
-# not sure what this does... network.hostname('strommesser.local')
-ap.config(essid=ssid, security=0) # open network, no password
-ap.active(True)
-
-while ap.active() == False:
-    pass
-print('AP Mode Is Active, You can Now Connect')
-print('IP Address To Connect to: ' + ap.ifconfig()[0])
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)   #creating socket object
-s.bind(('', 80))
-s.listen(5)
-
-while True:
-  conn, addr = s.accept()
-  print('Got a connection from %s' % str(addr))
-  request = conn.recv(1024)
-  print('Content = %s' % str(request))
-  response = web_page()
-  conn.send(response)
-  conn.close()
-  time.sleep(3)
+# microsoft windows redirects
+@server.route("/ncsi.txt", methods=["GET"])
+def hotspot(request):
+    print(request)
+    print("ncsi.txt")
+    return "", 200
 
 
+@server.route("/connecttest.txt", methods=["GET"])
+def hotspot(request):
+    print(request)
+    print("connecttest.txt")
+    return "", 200
 
+
+@server.route("/redirect", methods=["GET"])
+def hotspot(request):
+    print(request)
+    print("****************ms redir*********************")
+    return redirect(f"http://{DOMAIN}/", 302)
+
+# android redirects
+@server.route("/generate_204", methods=["GET"])
+def hotspot(request):
+    print(request)
+    print("******generate_204********")
+    return redirect(f"http://{DOMAIN}/", 302)
+
+# apple redir
+@server.route("/hotspot-detect.html", methods=["GET"])
+def hotspot(request):
+    print(request)
+    """ Redirect to the Index Page """
+    return render_template("index.html")
+
+
+@server.catchall()
+def catch_all(request):
+    print("***************CATCHALL***********************\n" + str(request))
+    return redirect("http://" + DOMAIN + "/")
+
+
+# Set to Accesspoint mode
+# Change this to whatever Wifi SSID you wish
+ap = access_point("strommesser")
+ip = ap.ifconfig()[0]
+# Grab the IP address and store it
+logging.info(f"starting DNS server on {ip}")
+# # Catch all requests and reroute them
+dns.run_catchall(ip)
+server.run()                            # Run the server
+logging.info("Webserver Started")
