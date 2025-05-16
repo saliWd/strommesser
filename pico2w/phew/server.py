@@ -1,4 +1,4 @@
-import uasyncio, os, time
+import uasyncio, os, time # type: ignore
 from . import logging
 
 _routes = []
@@ -231,10 +231,7 @@ async def _handle_request(reader, writer):
     if request.headers["content-type"].startswith("multipart/form-data"):
       request.form = await _parse_form_data(reader, request.headers)
     if request.headers["content-type"].startswith("application/json"):
-      request.data = await _parse_json_body(reader, request.headers)
-    if request.headers["content-type"].startswith("application/x-www-form-urlencoded"):
-      form_data = await reader.read(int(request.headers["content-length"]))
-      request.form = _parse_query_string(form_data.decode()) 
+      request.data = await _parse_json_body(reader, request.headers)   
 
   route = _match_route(request)
   if route:
