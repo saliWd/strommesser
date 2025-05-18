@@ -1,5 +1,6 @@
 # not using MicroPython v1.25.0 on 2025-04-15; Raspberry Pi Pico 2 W with RP2350
-# working pimoroni libraries: MicroPython pico2_w_2025_04_09,   on 2025-04-15; Raspberry Pi Pico 2 W with RP2350 from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
+# working pimoroni libraries: rpi_pico2_w-v0.1.0-micropython.uf2
+# on 2025-04-15; Version 0.1.0 - MicroPython 1.25.0 (Preview) from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
 
 import gc
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
