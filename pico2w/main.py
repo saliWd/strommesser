@@ -22,7 +22,7 @@ TRANSMIT_EVERY_X_SECONDS = 120
 wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, rotate=0)
-display.set_backlight(0.5)
+display.set_backlight(0.8)
 display.set_font("sans")
 WIDTH, HEIGHT = display.get_bounds() # 240x135
 BLACK = display.create_pen(0, 0, 0)
