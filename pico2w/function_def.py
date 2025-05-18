@@ -194,8 +194,8 @@ def transmit_message(message:dict):
                 print("Error: invalid status code:"+str(response.status_code)+". FailureCount: "+str(failureCount))
                 response.close()
                 failureCount += 1
-        except:
-            print("Error: request.post did not work")
+        except Exception as error:
+            print("Error: request.post did not work. Error:", error)        
             failureCount += 1
         sleep(5) # wait in between the loops
     
