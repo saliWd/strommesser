@@ -118,9 +118,9 @@ while True:
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
     brightness, pulsed = getBrightness(setting=settings['brightness'], time=meas['date_time'], wattVal=wattVal) # dependency on time
     #print('brightness output: wattVal:settings:applied'+str(wattVal)+':'+str(settings['brightness'])+':'+str(brightness))
-    allOk = meas['valid'] and settings['serverOk']
+    
     rgb_led.control(
-        allOk=allOk, 
+        allOk=(meas['valid'] and settings['serverOk']), 
         pulsating=pulsed,
         color=val_to_rgb(
             val=wattValMinMax,
@@ -134,7 +134,7 @@ while True:
 
 
     # do not delete wlan variable and timeSinceLastTransmit
-    del brightness, pulsed, color_pen, disp_y_range, expand, minValCon, maxValGen, meas, t, allOk
+    del brightness, pulsed, color_pen, disp_y_range, expand, minValCon, maxValGen, meas, t
     del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x, zeroLine_y  # to combat memAlloc issues
     gc.collect() # garbage collection
     
