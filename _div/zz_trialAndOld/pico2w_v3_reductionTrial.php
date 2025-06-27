@@ -35,10 +35,8 @@
       }
       // search the oldest one where thinnig has not yet been applied (and is older than 25h)
       $sql = "SELECT `zeit` FROM `verbrauch_tmp` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR) ORDER BY `id` ASC LIMIT 1;";
-      //echo "$sql<br>";
       $result = $dbConn->query($sql);
       if ($result->num_rows < 1) { // if there is no entry older than 25h, there is nothing to do. NB: there is a difference between NOW and last-insert-time
-        //echo "no older entry than $interval h <br>";
         return;
       }
       $row = $result->fetch_assoc();
@@ -52,29 +50,20 @@
       $zeitAlignedPlusPlus = $zeitAligned->modify(modifier: $modifier); // go one hour/day further, 20:00
       $zeitAlignedPlusPlusStr = $zeitAlignedPlusPlus->format(format: $formatString); // as string: 20:00
 
-      //echo 'zeit: '.$zeit->format(format: 'Y-m-d H:i:s').'<br>';      
-      //echo "zeitAligned: $zeitAlignedStr <br>";
-      //echo "zeitAlignedPlus: $zeitAlignedPlusStr <br>";
-      //echo "zeitAlignedPlusPlus: $zeitAlignedPlusPlusStr <br>";
-
       // check whether this one is still old enough and thinning is ok
-      $sql = "SELECT `id`,`zeit` FROM `verbrauch_tmp` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
+      $sql = "SELECT `id` FROM `verbrauch_tmp` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
       $sql .= " AND `zeit` < \"$zeitAlignedPlusPlusStr\" AND `zeit` >= \"$zeitAlignedPlusStr\"";
       $sql .= " ORDER BY `id` ASC LIMIT 1;";
-      //echo "$sql<br>";
       $result = $dbConn->query($sql);
       if ($result->num_rows < 1) { // if there is no entry within this hour, there is nothing to do
-        //echo 'no entry between zeitAlignedPlus and zeitAlignedPlusPlus<br>';
         return;
       }
 
-      $sql = "SELECT `id`,`zeit` FROM `verbrauch_tmp` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
+      $sql = "SELECT `id` FROM `verbrauch_tmp` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
       $sql .= " AND `zeit` < \"$zeitAlignedPlusStr\" AND `zeit` >= \"$zeitAlignedStr\"";
       $sql .= " ORDER BY `id` ASC LIMIT 1;";
-      // echo "$sql<br>";
       $result = $dbConn->query($sql);
       if ($result->num_rows < 1) { // if there is no entry within this hour, there is nothing to do
-        //echo 'no entry between zeitAligned and zeitAlignedPlus<br>';
         return;
       }
 
@@ -84,7 +73,6 @@
       $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff`,';
       $sql .= ' SUM(`genNtDiff`) as `sumGenNtDiff`, SUM(`genHtDiff`) as `sumGenHtDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch_tmp`';
       $sql .= " WHERE $sqlNoThin AND `zeit` < \"$zeitAlignedPlusStr\";";
-      //echo "$sql<br>";
       $result = $dbConn->query($sql);
       $row = $result->fetch_assoc();
     
@@ -92,11 +80,9 @@
       $sql = 'UPDATE `verbrauch_tmp` SET `consDiff` = "'.$row['sumConsDiff'].'", `consNtDiff` = "'.$row['sumConsNtDiff'].'", `consHtDiff` = "'.$row['sumConsHtDiff'].'",';
       $sql .= ' `genDiff` = "'.$row['sumGenDiff'].'", `genNtDiff` = "'.$row['sumGenNtDiff'].'", `genHtDiff` = "'.$row['sumGenHtDiff'].'",';
       $sql .= ' `zeitDiff` = "'.$row['sumZeitDiff'].'", `thin` = "'.$thinUpdate.'" WHERE `id` = "'.$idToUpdate.'";';
-      //echo "$sql<br>";
       $result = $dbConn->query($sql);
             
       $sql = "DELETE FROM `verbrauch_tmp` WHERE $sqlNoThin AND `zeit` < \"$zeitAlignedPlusStr\";";
-      //echo "$sql<br>";
       $result = $dbConn->query($sql);
     }
 
