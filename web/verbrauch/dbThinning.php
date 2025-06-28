@@ -99,5 +99,8 @@
 
     $userid = 1;
     doDbThinning(dbConn:$dbConn, userid:$userid);
+    echo '<br><br>';
+    $userid = 2;
+    doDbThinning(dbConn:$dbConn, userid:$userid);
 
 
