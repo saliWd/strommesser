@@ -3,7 +3,7 @@
     $dbConn = get_dbConn(); // do not use initialize as I don't use sessions
 
     function doReduction($dbConn, int $userid, bool $smlTimeScale):void {
-      $tableName = 'verbrauch_tmp';
+      $tableName = 'verbrauch';
       report(dbConn:$dbConn, userid:$userid,tableName:$tableName);
       
       // possible issues: 
@@ -36,12 +36,10 @@
       $zeitAlignedStr = $zeitAligned->format(format: $formatString); // as string: 19:00
       $zeitAlignedPlus = $zeitAligned->modify(modifier: $modifier); // go one hour/day further, 19:00
       $zeitAlignedPlusStr = $zeitAlignedPlus->format(format: $formatString); // as string: 19:00
-      $zeitAlignedPlusPlus = $zeitAligned->modify(modifier: $modifier); // go one hour/day further, 20:00
-      $zeitAlignedPlusPlusStr = $zeitAlignedPlusPlus->format(format: $formatString); // as string: 20:00
-
+      
       // check whether this one is still old enough and thinning is ok
       $sql = "SELECT `id` FROM `$tableName` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
-      $sql .= " AND `zeit` < \"$zeitAlignedPlusPlusStr\" AND `zeit` >= \"$zeitAlignedPlusStr\"";
+      $sql .= " AND `zeit` >= \"$zeitAlignedPlusStr\"";
       $sql .= " ORDER BY `id` ASC LIMIT 1;";
       $result = $dbConn->query($sql);
       if ($result->num_rows < 1) { // if there is no entry within this hour, there is nothing to do
