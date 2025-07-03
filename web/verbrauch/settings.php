@@ -148,9 +148,9 @@ if ($doSafe === 0) { // entry point of this site
   echo 'gespeichert<br>';
   echo '<script>setTimeout(() => { window.location.href = \'settings.php\'; }, 2000);</script>';
 } elseif ($doSafe === 3) {  // do the export and die afterwards
-  header("Content-Type: application/octet-stream");
-  header("Content-Transfer-Encoding: Binary");
-  header("Content-disposition: attachment; filename=\"verbrauch.csv\"");
+  header(header:'Content-Type: application/octet-stream');
+  header(header:'Content-Transfer-Encoding: Binary');
+  header(header:'Content-disposition: attachment; filename="verbrauch.csv"');
   /*
   `id` bigint(20) UNSIGNED NOT NULL,
   `userid` int(10) UNSIGNED NOT NULL,
@@ -162,16 +162,12 @@ if ($doSafe === 0) { // entry point of this site
   `consHtDiff` decimal(10,3) NOT NULL,
   `gen` decimal(10,3) NOT NULL,
   `genDiff` decimal(10,3) NOT NULL,
-  `genNt` decimal(10,3) NOT NULL,
-  `genNtDiff` decimal(10,3) NOT NULL,
-  `genHt` decimal(10,3) NOT NULL,
-  `genHtDiff` decimal(10,3) NOT NULL,
   `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
   `zeitDiff` int(11) NOT NULL,
   */
-  $outFile = fopen("php://output", "w");
-  fputcsv($outFile, array('id','userid','cons','consDiff','consNt','consNtDiff','consHt','consHtDiff','gen','genDiff','genNt','genNtDiff','genHt','genHtDiff','zeit','zeitDiff'));
-  $result = $dbConn->query('SELECT * FROM `verbrauchArchive` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 24000;'); // limit 24k = bit more than one month. To limit file size
+  $outFile = fopen(filename:'php://output', mode: 'w');
+  fputcsv(stream: $outFile, fields: array('id','userid','cons','consDiff','consNt','consNtDiff','consHt','consHtDiff','gen','genDiff','zeit','zeitDiff'));
+  $result = $dbConn->query(query: "SELECT * FROM `verbrauchArchive` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 24000;"); // limit 24k = bit more than one month. To limit file size
   $exportedLines = $result->num_rows;
   while ($row = $result->fetch_row()) { 
     fputcsv($outFile, $row); 
@@ -183,7 +179,7 @@ if ($doSafe === 0) { // entry point of this site
   $num = safeIntFromExt(source:'GET', varName:'num', length:5);
   $num = min($num, 24000); // do never delete more than 24k (get param may be changed by user)
 
-  $result = $dbConn->query('DELETE FROM `verbrauchArchive` WHERE `userid` = "'.$userid.'" ORDER BY `id` LIMIT '.$num.';');
+  $result = $dbConn->query(query: "DELETE FROM `verbrauchArchive` WHERE `userid` = \"$userid\" ORDER BY `id` LIMIT $num;");
 
   echo '
   <div id="anchorDataExport" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">

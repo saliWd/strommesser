@@ -16,7 +16,7 @@ CREATE TABLE `kunden` (
   `lastLogin` timestamp NOT NULL DEFAULT current_timestamp(),
   `pwHash` char(255) NOT NULL,
   `randCookie` char(64) NOT NULL,
-  `ledMaxValue` smallint(5) UNSIGNED NOT NULL DEFAULT 405,
+  `ledMinValCon` smallint(5) UNSIGNED NOT NULL DEFAULT 405,
   `ledMaxValGen` smallint(5) UNSIGNED NOT NULL DEFAULT 2000,
   `ledBrightness` tinyint(3) UNSIGNED NOT NULL DEFAULT 160,
   `priceConsHt` decimal(5,4) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE `status` (
 CREATE TABLE `verbrauch` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `userid` int(10) UNSIGNED NOT NULL,
-  `consumption` decimal(10,3) NOT NULL,
+  `cons` decimal(10,3) NOT NULL,
   `consDiff` decimal(10,3) NOT NULL,
   `consNt` decimal(10,3) NOT NULL,
   `consNtDiff` decimal(10,3) NOT NULL,
@@ -49,10 +49,6 @@ CREATE TABLE `verbrauch` (
   `consHtDiff` decimal(10,3) NOT NULL,
   `gen` decimal(10,3) NOT NULL,
   `genDiff` decimal(10,3) NOT NULL,
-  `genNt` decimal(10,3) NOT NULL,
-  `genNtDiff` decimal(10,3) NOT NULL,
-  `genHt` decimal(10,3) NOT NULL,
-  `genHtDiff` decimal(10,3) NOT NULL,
   `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
   `zeitDiff` int(11) NOT NULL,
   `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
@@ -61,7 +57,7 @@ CREATE TABLE `verbrauch` (
 CREATE TABLE `verbrauchArchive` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `userid` int(10) UNSIGNED NOT NULL,
-  `consumption` decimal(10,3) NOT NULL,
+  `cons` decimal(10,3) NOT NULL,
   `consDiff` decimal(10,3) NOT NULL,
   `consNt` decimal(10,3) NOT NULL,
   `consNtDiff` decimal(10,3) NOT NULL,
@@ -69,10 +65,6 @@ CREATE TABLE `verbrauchArchive` (
   `consHtDiff` decimal(10,3) NOT NULL,
   `gen` decimal(10,3) NOT NULL,
   `genDiff` decimal(10,3) NOT NULL,
-  `genNt` decimal(10,3) NOT NULL,
-  `genNtDiff` decimal(10,3) NOT NULL,
-  `genHt` decimal(10,3) NOT NULL,
-  `genHtDiff` decimal(10,3) NOT NULL,
   `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
   `zeitDiff` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
