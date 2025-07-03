@@ -10,7 +10,7 @@
       // `consHt`  -> `consHtDiff`
       // `gen`     -> `genDiff`
       $sqlString = '';
-      $sqlString .= '`consDiff` = "'.($row_now['cons'] - $row_before['cons']).'", ';      
+      $sqlString .= '`consDiff` = "'.($row_now['cons'] - $row_before['cons']).'", ';
       $sqlString .= '`consNtDiff` = "'.($row_now['consNt'] - $row_before['consNt']).'", '; 
       $sqlString .= '`consHtDiff` = "'.($row_now['consHt'] - $row_before['consHt']).'", '; 
       $sqlString .= '`genDiff` = "'.($row_now['gen'] - $row_before['gen']).'", '; 
@@ -68,17 +68,17 @@
       }
 
       $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
-      $idToUpdate = $row['id']; // oldest one      
+      $idToUpdate = $row['id']; // oldest one
 
       $sql = 'SELECT SUM(`consDiff`) as `sumConsDiff`, SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff`,';
-      $sql .= ' SUM(`genNtDiff`) as `sumGenNtDiff`, SUM(`genHtDiff`) as `sumGenHtDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+      $sql .= ' SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
       $sql .= " WHERE $sqlNoThin AND `zeit` < \"$zeitAlignedPlusStr\";";
       $result = $dbConn->query($sql);
       $row = $result->fetch_assoc();
     
       // now do the update and then delete the others
       $sql = 'UPDATE `verbrauch` SET `consDiff` = "'.$row['sumConsDiff'].'", `consNtDiff` = "'.$row['sumConsNtDiff'].'", `consHtDiff` = "'.$row['sumConsHtDiff'].'",';
-      $sql .= ' `genDiff` = "'.$row['sumGenDiff'].'", `genNtDiff` = "'.$row['sumGenNtDiff'].'", `genHtDiff` = "'.$row['sumGenHtDiff'].'",';
+      $sql .= ' `genDiff` = "'.$row['sumGenDiff'].'",';
       $sql .= ' `zeitDiff` = "'.$row['sumZeitDiff'].'", `thin` = "'.$thinUpdate.'" WHERE `id` = "'.$idToUpdate.'";';
       $result = $dbConn->query($sql);
             
@@ -86,23 +86,13 @@
       $result = $dbConn->query($sql);
     }
 
-    function doDbThinning($dbConn, int $userid):void {
-      // doing the thinning in 2 steps
-      // - everything older than 24hours thin to 1 meas per hour: thin = 1 (hour)
-      // - everything older than 72hours thin to 1 meas per day: thin = 24 (hour)
-
-      // do so in a way the remaining data point after thinning is the first in his period, meaning the first datapoint of a day has always a timestamp of 00:00 or 00:01...
-      doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:TRUE);
-      doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:FALSE);
-    }
-
     // copies the newest set into the archive db (where no thinning is executed)
-    function copyToArchive ($dbConn, $rowId):void {      
+    function copyToArchive ($dbConn, $rowId):void {
       $sql =  'INSERT INTO `verbrauchArchive` ';
-      $sql .= '(`userid`, `cons`, `consDiff`, `consNt`, `consNtDiff`, `consHt`, `consHtDiff`, `gen`, `genDiff`, `genNt`, `genNtDiff`, `genHt`, `genHtDiff`, `zeit`, `zeitDiff`) ';
-      $sql .= 'SELECT `userid`, `cons`, `consDiff`, `consNt`, `consNtDiff`, `consHt`, `consHtDiff`, `gen`, `genDiff`, `genNt`, `genNtDiff`, `genHt`, `genHtDiff`, `zeit`, `zeitDiff` ';
-      $sql .= 'FROM `verbrauch` WHERE `id` = "'.$rowId.'";';
-      $result = $dbConn->query($sql);
+      $sql .= '(`userid`, `cons`, `consDiff`, `consNt`, `consNtDiff`, `consHt`, `consHtDiff`, `gen`, `genDiff`, `zeit`, `zeitDiff`) ';
+      $sql .= 'SELECT `userid`, `cons`, `consDiff`, `consNt`, `consNtDiff`, `consHt`, `consHtDiff`, `gen`, `genDiff`, `zeit`, `zeitDiff` ';
+      $sql .= "FROM `verbrauch` WHERE `id` = \"$rowId\";";
+      $dbConn->query($sql);
     }
 
     $userid = checkInputs(dbConn: $dbConn);
@@ -134,12 +124,13 @@
 
         copyToArchive(dbConn:$dbConn, rowId:$row_now['id']);
         
-        // dbThinnings: do not need to run every time but it doesn't hurt either        
-        doDbThinning(dbConn:$dbConn, userid:$userid);
+        // dbThinnings: do not need to run every time but it doesn't hurt either
+        doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:TRUE);
+        doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:FALSE);
     }
 
     // check whether the last measurement is not older than 5 mins and 
-    // get the settings and output them on the screen   
+    // get the settings and output them on the screen
     $result = $dbConn->query(query: 'SELECT `zeit` FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 1;');
     $queryCount = $result->num_rows; // this may be 0 or 1
     if ($queryCount !== 1) {
