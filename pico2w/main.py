@@ -88,6 +88,9 @@ while True:
     # if len(wattVals) == 12: wattVals[7] = wattVals[7]*-1
 
     x = 0
+    color_pen = display.create_pen(BLACK)
+    valHeight = 0
+    t = 0
     for t in wattVals:
         # cons grow down (so plus direction in pixels), gen grow up (so need to 'invert' everything). Full range is (min+max Vals)
         color_pen = display.create_pen(*val_to_rgb(val=t, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255))
@@ -120,16 +123,16 @@ while True:
     #print('brightness output: wattVal:settings:applied'+str(wattVal)+':'+str(settings['brightness'])+':'+str(brightness))
     
     rgb_led.control(
-        allOk=(meas['valid'] and settings['serverOk']), 
+        allOk=(meas['valid'] and settings['serverOk']),
         pulsating=pulsed,
         color=val_to_rgb(
             val=wattValMinMax,
-            minValCon=minValCon, 
-            maxValGen=maxValGen, 
+            minValCon=minValCon,
+            maxValGen=maxValGen,
             led_brightness=int(brightness/2))) # led is quite bright when shining constantly
     
     if ((time() - timeSinceLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
-        timeSinceLastTransmit = time() # reset the counter        
+        timeSinceLastTransmit = time() # reset the counter
         settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, settings=settings) # now transmit the stuff to the server
 
 
