@@ -88,7 +88,7 @@ while True:
     # if len(wattVals) == 12: wattVals[7] = wattVals[7]*-1
 
     x = 0
-    color_pen = display.create_pen(BLACK)
+    color_pen = BLACK
     valHeight = 0
     t = 0
     for t in wattVals:
