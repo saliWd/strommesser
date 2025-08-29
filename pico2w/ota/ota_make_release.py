@@ -1,7 +1,11 @@
+import sys
 import os
-from re import sub
+from re import sub, match
 
-version = 'v1.0.1' # TODO: take from command line, needs to match a "vNumberPointNumberPointNumber"-pattern, otherwise end the script
+def is_valid_version(version):
+    # Regex pattern: starts with 'v', followed by three groups of digits separated by dots
+    pattern = r'^v\d+\.\d+\.\d+$'
+    return match(pattern, version) is not None
 
 def replace_content(dict_replace, target):
   """Based on dict, replaces key with the value on the target."""
@@ -23,10 +27,23 @@ def changeVersionComment(version:str, inputFile:str, outputFile:str):
     new_file_open.write(new_content)
     new_file_open.close()
 
-fileNames = ['boot.py',  'main.py', 'my_functions.py']
+fileNames = ['boot.py',  'main.py', 'function_def.py', 'class_def.py'] # my_config.py is not part of ota
+
+if len(sys.argv) != 2:
+    print('Usage: python ota_make_release.py <version>')
+    sys.exit(1)
+
+version_input = sys.argv[1]
+
+if is_valid_version(version_input):
+    version = version_input
+else:
+    print(f">> Error: '{version_input}' is NOT a valid version string, needs to be something like v1.2.3")
+    print('...exiting program')
+    sys.exit(1)
 
 # make sure the version directory exists
-outFilePath = '../../web/pico_w_ota/'+ version
+outFilePath = '../../web/ota/'+ version
 if os.path.exists(outFilePath):
     print (">> warning. "+outFilePath+" already exists. Continuing anyway...") # files are just overwritten
 else:
@@ -37,12 +54,12 @@ else:
 for i in range(0,len(fileNames)):  
   changeVersionComment(
      version=version, 
-     inputFile=fileNames[i], 
+     inputFile='../'+fileNames[i], 
      outputFile=outFilePath+'/'+fileNames[i]
     )
 
 # need a file called 'version' one directory up. Containing only the version string
-new_file_open = open('../../web/pico_w_ota/version', 'w')
+new_file_open = open('../../web/ota/version', 'w')
 new_file_open.write(version)
 new_file_open.close()
 

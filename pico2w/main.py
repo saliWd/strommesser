@@ -59,9 +59,9 @@ while True:
     ## do it once, shortly (2 mins) after booting, then don't do it for about 8 hours
     #if loopCount == 2:
     #    micropython_ota.ota_update(
-    #        host='https://strommesser.ch/pico_w_ota/',
-    #        project='display',
-    #        filenames=['boot.py', 'main.py', 'my_functions.py'], # config (and libraries) is not changed
+    #        host='https://strommesser.ch/ota/',
+    #        project='strommesser',
+    #        filenames=['boot.py', 'main.py', 'function_def.py', 'class_def.py'], # config (and libraries) is not changed
     #        use_version_prefix=False
     #    )
 

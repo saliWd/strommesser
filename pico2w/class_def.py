@@ -1,3 +1,4 @@
+## xx_version_placeholder_xx
 # using MicroPython v1.25.0 on 2025-04-15; Raspberry Pi Pico 2 W with RP2350
 # does not work: Micropython version Raspberry Pico 2 W with Pimoroni libraries 0.0.11
 # working pimoroni libraries: MicroPython pico2_w_2025_04_09,   on 2025-04-15; Raspberry Pi Pico 2 W with RP2350 from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
