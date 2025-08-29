@@ -29,7 +29,10 @@ def hsva_to_rgb(h:float, s:float, v:float, a:float) -> tuple: # inputs: values f
         if i==3: return (w, q, v)
         if i==4: return (t, w, v)
         if i==5: return (v, w, q)
-    else: v = int(255*v); return (v, v, v)
+        return(0,0,0) # default return statement
+    else: 
+        v = int(255*v); 
+        return (v, v, v)
 
 def val_to_rgb(val:int, minValCon:int, maxValGen:int, led_brightness:int)-> list: # goes from red to blue
     # value has a range from -minValCons to +maxValGen. minVal and maxVal are both positive numbers but minVal may be treated as negative
@@ -69,17 +72,14 @@ def getDispYrange(values:list) -> list:
     maximum = max(max(values),50)
     return [minimum,maximum,(minimum+maximum)]
 
-def json_get_req(DEBUG_CFG:dict, DEVICE_CFG:dict, READER:str) -> dict:
-    URL = 'http://'+DEVICE_CFG['local_ip']
-    if READER == 'whatwatt':
-        URL = URL + '/api/v1/report' # on the local net
-    else: # gplug. Maybe to do: could also use http://gplugm.local/cm?cmnd=status%2010. Does not help in my case though where I have two gplugm
-        URL =  URL + '/cm?cmnd=status%2010'
-
+def json_get_req(DEBUG_CFG:dict, DEVICE_CFG:dict) -> dict:
+    URL = 'http://'+ DEVICE_CFG['local_ip'] + '/cm?cmnd=status%2010'
+    # Maybe to do: could also use http://gplugm.local/cm?cmnd=status%2010. Does not help in my case though where I have two gplugm
+    
     if DEBUG_CFG['json_data'] == 'web': # can be 'local_net'|'web'|'file'
-        URL = "https://strommesser.ch/pages/json.php?reader=READER"
+        URL = "https://strommesser.ch/pages/json.php?reader=gplug"
     elif DEBUG_CFG['json_data'] == 'file':         
-        return(get_interesting_values(jdata=get_debug_jdata(READER=READER), READER=READER))
+        return(get_interesting_values(jdata=get_debug_jdata()))
     # get request might be unstable (depends on internet connection)
     try:
         response = request.get(url=URL, timeout=9)
@@ -88,42 +88,26 @@ def json_get_req(DEBUG_CFG:dict, DEVICE_CFG:dict, READER:str) -> dict:
             return(dict([('valid',False)]))
         jdata = json.loads(response.content)
         response.close()        
-        return(get_interesting_values(jdata=jdata, READER=READER))
+        return(get_interesting_values(jdata=jdata))
     except Exception as error:
         print("An exception occurred:", error)
         return(dict([('valid',False)]))
 
-def get_debug_jdata(READER:str):
-    if READER == 'whatwatt':
-        return({"report":{"id":292,"interval":2.737,"date_time":"2025-04-22T18:32:05Z","instantaneous_power":{"active":{"positive":{"total":0},"negative":{"total":1.803}}},"energy":{"active":{"positive":{"total":167.508,"t1":130.297,"t2":37.202},"negative":{"total":575.932,"t1":107.105,"t2":468.817}},"reactive":{"imported":{"inductive":{"total":152.881},"capacitive":{"total":10.117}},"exported":{"inductive":{"total":78.124},"capacitive":{"total":114.091}}}},"conv_factor":1},"meter":{"status":"OK","interface":"MBUS","protocol":"DLMS","id":"72913313","vendor":"Landis+Gyr","prefix":"LGZ"},"system":{"id":"ECC9FF5C80B0","date_time":"2025-04-22T17:32:12Z","boot_id":"E766FCAC","time_since_boot":1345}})
-    else:
-        return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":0.020,"Po":0.000,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
+def get_debug_jdata():
+    return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":0.020,"Po":0.000,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
 
-def get_interesting_values(jdata, READER:str) -> dict:
+def get_interesting_values(jdata) -> dict:
     try:
-        if READER == 'whatwatt':
-            meas = dict([
-                ('valid',True),
-                ('date_time',jdata['system']['date_time']),
-                ('power_pos',float(jdata['report']['instantaneous_power']['active']['positive']['total'])),
-                ('power_neg',float(jdata['report']['instantaneous_power']['active']['negative']['total'])),
-                ('energy_pos',jdata['report']['energy']['active']['positive']['total']),
-                ('energy_neg',jdata['report']['energy']['active']['negative']['total']),
-                ('energy_pos_t1',jdata['report']['energy']['active']['positive']['t1']),
-                ('energy_pos_t2',jdata['report']['energy']['active']['positive']['t2'])
-            ])
-        else: # gplug
-            meas = dict([
-                ('valid',True),
-                ('date_time',jdata['StatusSNS']['Time']),
-                ('power_pos',float(jdata['StatusSNS']['z']['Pi'])),
-                ('power_neg',float(jdata['StatusSNS']['z']['Po'])),
-                ('energy_pos',jdata['StatusSNS']['z']['Ei']),
-                ('energy_neg',jdata['StatusSNS']['z']['Eo']),
-                ('energy_pos_t1',jdata['StatusSNS']['z']['Ei1']),
-                ('energy_pos_t2',jdata['StatusSNS']['z']['Ei2'])
-            ])
-
+        meas = dict([
+            ('valid',True),
+            ('date_time',jdata['StatusSNS']['Time']),
+            ('power_pos',float(jdata['StatusSNS']['z']['Pi'])),
+            ('power_neg',float(jdata['StatusSNS']['z']['Po'])),
+            ('energy_pos',jdata['StatusSNS']['z']['Ei']),
+            ('energy_neg',jdata['StatusSNS']['z']['Eo']),
+            ('energy_pos_t1',jdata['StatusSNS']['z']['Ei1']),
+            ('energy_pos_t2',jdata['StatusSNS']['z']['Ei2'])
+        ])
         #print_values(meas=meas)
         #print("Content:\n", jdata)
     except Exception as error:
@@ -167,7 +151,7 @@ def getBrightness(setting:int, time:str, wattVal:int):
     return (brightness,pulsed)
 
 # sends the measurement data and gets the settings
-def server_communication(DEBUG_CFG:dict, message:dict):
+def server_communication(DEBUG_CFG:dict, message:dict) -> dict:
     if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled
         valueString=transmit_message(message=message)
     else: # wlan simulated
@@ -175,7 +159,7 @@ def server_communication(DEBUG_CFG:dict, message:dict):
     return(sepStrToArr(valueString=valueString))
     
 
-def transmit_message(message:dict):
+def transmit_message(message:dict) -> str:
     URL = "https://strommesser.ch/verbrauch/pico2w_v3.php?TX=pico&TXVER=3"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     failureCount = 0
@@ -203,9 +187,9 @@ def transmit_message(message:dict):
     print("Error: failure count too high:"+str(failureCount)+". Resetting in 20 seconds...")
     sleep(20) # add a bit of debug possibility
     reset() # NB: connection to whatever device is getting lost; complicates debugging
-    return # this return will never be executed
+    return('bla') # this return will never be executed
 
-def sepStrToArr(valueString:str):
+def sepStrToArr(valueString:str) -> dict:
     valueArray = valueString.split('|')
     if (len(valueArray) > 2 ):
         return(dict([
@@ -232,6 +216,7 @@ def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict):
 
     wlanStatus = 0
     waitCounter = 0
+    wlan = network.WLAN(network.STA_IF)
     while wlanStatus != 3:
         print('waiting for connection...WLAN Status: '+str(wlanStatus)+'. Counter: '+str(waitCounter))
         wlan = network.WLAN(network.STA_IF)
@@ -245,14 +230,16 @@ def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict):
             wlan.active(False)
             del wlan
             gc.collect()
-        
+        else: # status did change to 3 just above
+            wlanIfconfig = wlan.ifconfig()
+            print('connected. IP: ' + wlanIfconfig[0])
+            sleep(2)
+            return(wlan) # type: ignore        
+
         waitCounter += 1
         sleep(2)
+    return(0) # this should never happen
 
-    wlanIfconfig = wlan.ifconfig()
-    print('connected. IP: ' + wlanIfconfig[0])
-    sleep(2)
-    return(wlan)
 
 # is called in every while loop
 def wlan_conn_check(DEBUG_CFG:dict, WLAN_CFG:dict, wlan):

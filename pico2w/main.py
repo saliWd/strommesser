@@ -1,7 +1,9 @@
+## xx_version_placeholder_xx
 # not using MicroPython v1.25.0 on 2025-04-15; Raspberry Pi Pico 2 W with RP2350
 # working pimoroni libraries: rpi_pico2_w-v0.1.0-micropython.uf2
 # on 2025-04-15; Version 0.1.0 - MicroPython 1.25.0 (Preview) from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
 
+import micropython_ota # type: ignore
 import gc
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
 from time import time
@@ -40,7 +42,6 @@ rgb_led.control(allOk=False, pulsating=False, color=(255,0,0))
 loopCount:int = 0
 timeSinceLastTransmit = time() # returns seconds
 
-READER = 'gplug' # can be gplug or whatwatt
 settings = dict([
     ('valid',True),
     ('serverOk', 1),
@@ -52,7 +53,23 @@ settings = dict([
 while True:
     loopCount += 1 # just let it overflow
     wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG, wlan=wlan) # check whether connection is still valid
-    meas = json_get_req(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, READER=READER)
+
+
+    ## OTA stuff. Do it before the display calculation etc
+    ## do it once, shortly (2 mins) after booting, then don't do it for about 8 hours
+    #if loopCount == 2:
+    #    micropython_ota.ota_update(
+    #        host='https://strommesser.ch/pico_w_ota/',
+    #        project='display',
+    #        filenames=['boot.py', 'main.py', 'my_functions.py'], # config (and libraries) is not changed
+    #        use_version_prefix=False
+    #    )
+
+
+
+
+
+    meas = json_get_req(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG)
     if not meas['valid']:
         print('get request did not work')
         continue
@@ -123,7 +140,7 @@ while True:
     #print('brightness output: wattVal:settings:applied'+str(wattVal)+':'+str(settings['brightness'])+':'+str(brightness))
     
     rgb_led.control(
-        allOk=(meas['valid'] and settings['serverOk']),
+        allOk=((meas['valid']) and (settings['serverOk'] and True)), # need some type conversion (and True) to satisfy pylance
         pulsating=pulsed,
         color=val_to_rgb(
             val=wattValMinMax,
