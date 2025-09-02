@@ -11,7 +11,7 @@ wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
 
 micropython_ota.ota_update(
     host='https://strommesser.ch/ota/', 
-    project='strommesser', 
+    project='display', 
     filenames=['boot.py', 'main.py', 'function_def.py', 'class_def.py'], 
     use_version_prefix=False
 )

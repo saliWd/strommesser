@@ -3,7 +3,7 @@
 # working pimoroni libraries: rpi_pico2_w-v0.1.0-micropython.uf2
 # on 2025-04-15; Version 0.1.0 - MicroPython 1.25.0 (Preview) from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
 
-import micropython_ota # type: ignore
+import micropython_ota # type: ignore using version 2.1.0. install with thonny/tools/packages
 import gc
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
 from time import time
@@ -19,7 +19,7 @@ WLAN_CFG = my_config.get_wlan_config()
 LOOP_SLEEP_SEC = 5 # pause between loops
 WATT_NOISE_LIMIT = 15 # everything below 15 W will be set to 0
 TRANSMIT_EVERY_X_SECONDS = 120
-
+otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h after the first check
 
 wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
 
@@ -41,6 +41,7 @@ rgb_led.control(allOk=False, pulsating=False, color=(255,0,0))
 
 loopCount:int = 0
 timeSinceLastTransmit = time() # returns seconds
+timeSinceLastOtaCheck = time()
 
 settings = dict([
     ('valid',True),
@@ -54,20 +55,16 @@ while True:
     loopCount += 1 # just let it overflow
     wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG, wlan=wlan) # check whether connection is still valid
 
-
-    ## OTA stuff. Do it before the display calculation etc
-    ## do it once, shortly (2 mins) after booting, then don't do it for about 8 hours
-    #if loopCount == 2:
-    #    micropython_ota.ota_update(
-    #        host='https://strommesser.ch/ota/',
-    #        project='strommesser',
-    #        filenames=['boot.py', 'main.py', 'function_def.py', 'class_def.py'], # config (and libraries) is not changed
-    #        use_version_prefix=False
-    #    )
-
-
-
-
+    ## do it once, shortly (3 mins) after booting, then don't do it for about 24 hours
+    if ((time() - timeSinceLastOtaCheck) > otaCheckAfterXseconds):
+        timeSinceLastOtaCheck = time() # reset the counter
+        otaCheckAfterXseconds = 86400 # 24h
+        micropython_ota.ota_update(
+            host='https://strommesser.ch/ota/',
+            project='display',
+            filenames=['boot.py', 'main.py', 'function_def.py', 'class_def.py'], # config (and libraries) is not changed
+            use_version_prefix=False
+        )
 
     meas = json_get_req(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG)
     if not meas['valid']:
