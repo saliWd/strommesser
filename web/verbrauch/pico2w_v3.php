@@ -105,13 +105,14 @@
         printRawErrorAndDie(heading: 'Error', text: 'values not found');
     }
 
+    // TODO: end of September: change this, egs speciality should go away
     // egs specialty: 1.8.1 = T1 = Zone 2 (NT) = Obersiggenthal, Zone 1 (HT) = Untersiggenthal
     if (! $result = $dbConn->query(query: 'INSERT INTO `verbrauch` (`userid`, `cons`, `gen`, `consNt`, `consHt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")')) {
         printRawErrorAndDie(heading: 'Error', text: 'db insert not ok');
     }
 
     //NB: not using last inserted ID as other inserts may have happened in the meantime
-    $result = $dbConn->query('SELECT * FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 2');
+    $result = $dbConn->query(query: 'SELECT * FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 2');
     $queryCount = $result->num_rows; // this may be 1 or 2
     if ($queryCount === 2) {
         $row_now = $result->fetch_assoc();
