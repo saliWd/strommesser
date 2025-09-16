@@ -7,6 +7,7 @@ import micropython_ota # type: ignore using version 2.1.0. install with thonny/t
 import gc
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
 from time import time
+import machine # type: ignore 
 
 # my own files
 from class_def import RgbLed # class def
@@ -22,6 +23,10 @@ TRANSMIT_EVERY_X_SECONDS = 120
 otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h after the first check
 
 wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
+
+# start the watchdog after wlan_init (which may take longer and does a reboot if not successful)
+if DEBUG_CFG['use_watchdog']:
+    wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, rotate=0)
 display.set_backlight(0.8)
@@ -155,4 +160,6 @@ while True:
     del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x, zeroLine_y  # to combat memAlloc issues
     gc.collect() # garbage collection
     
+    if DEBUG_CFG['use_watchdog']:
+        wdt.feed() # type: ignore    
     debug_sleep(DEBUG_CFG=DEBUG_CFG,time=LOOP_SLEEP_SEC)
