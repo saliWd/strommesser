@@ -1,7 +1,4 @@
 ## xx_version_placeholder_xx
-# working pimoroni libraries: rpi_pico2_w-v0.1.0-micropython.uf2
-# on 2025-04-15; Version 0.1.0 - MicroPython 1.25.0 (Preview) from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
-# TODO: can also use unversioned file from https://github.com/pimoroni/pimoroni-pico-rp2350/actions/runs/17854634429/artifacts/4054684845 (dated 2025.09.19)
 
 import micropython_ota # type: ignore | using version 2.1.0., install with thonny/tools/packages
 import gc
@@ -25,8 +22,8 @@ otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h 
 wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
 
 # start the watchdog after wlan_init (which may take longer and does a reboot if not successful)
-if DEBUG_CFG['use_watchdog']:
-    wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
+if DEBUG_CFG['use_watchdog']: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
+else: wdt = 0
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, rotate=0)
 display.set_backlight(0.8)
@@ -56,7 +53,13 @@ settings = dict([
     ('maxValGen', 3400)
 ])
 
+def debug_feed(useWatchdog:bool, wdt):
+    if useWatchdog:
+        wdt.feed() # type: ignore
+    return
+
 while True:
+    debug_feed(useWatchdog=DEBUG_CFG['use_watchdog'],wdt=wdt)
     loopCount += 1 # just let it overflow
     wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG, wlan=wlan) # check whether connection is still valid
 
@@ -70,10 +73,12 @@ while True:
             filenames=['boot.py', 'main.py', 'function_def.py', 'class_def.py'], # config (and libraries) is not changed
             use_version_prefix=False
         )
+        debug_feed(useWatchdog=DEBUG_CFG['use_watchdog'],wdt=wdt)
 
     meas = json_get_req(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG)
     if not meas['valid']:
-        print('get request did not work')
+        print('get request did not work, waiting 10s')
+        debug_sleep(DEBUG_CFG=DEBUG_CFG,time=10) # this will trigger the watchdog and force a reboot
         continue
 
     wattVal = int(1000.0 * (-1.0*meas['power_pos'] + meas['power_neg'])) # cons is negative, gen positive. 0 is treated as gen
@@ -133,7 +138,7 @@ while True:
     make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
     make_bold(display, "W", 104, 23)
     
-    print_loopCount(display=display, BLACK=BLACK, loopCount=str(loopCount))    
+    print_loopCount(display=display, BLACK=BLACK, loopCount=str(loopCount))
 
     display.update()
 
@@ -152,6 +157,7 @@ while True:
     
     if ((time() - timeSinceLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
         timeSinceLastTransmit = time() # reset the counter
+        debug_feed(useWatchdog=DEBUG_CFG['use_watchdog'],wdt=wdt)
         settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, settings=settings) # now transmit the stuff to the server
 
 
@@ -160,6 +166,5 @@ while True:
     del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x, zeroLine_y  # to combat memAlloc issues
     gc.collect() # garbage collection
     
-    if DEBUG_CFG['use_watchdog']:
-        wdt.feed() # type: ignore    
+    debug_feed(useWatchdog=DEBUG_CFG['use_watchdog'],wdt=wdt)
     debug_sleep(DEBUG_CFG=DEBUG_CFG,time=LOOP_SLEEP_SEC)
