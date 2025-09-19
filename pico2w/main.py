@@ -1,9 +1,9 @@
 ## xx_version_placeholder_xx
-# not using MicroPython v1.25.0 on 2025-04-15; Raspberry Pi Pico 2 W with RP2350
 # working pimoroni libraries: rpi_pico2_w-v0.1.0-micropython.uf2
 # on 2025-04-15; Version 0.1.0 - MicroPython 1.25.0 (Preview) from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
+# TODO: can also use unversioned file from https://github.com/pimoroni/pimoroni-pico-rp2350/actions/runs/17854634429/artifacts/4054684845 (dated 2025.09.19)
 
-import micropython_ota # type: ignore using version 2.1.0. install with thonny/tools/packages
+import micropython_ota # type: ignore | using version 2.1.0., install with thonny/tools/packages
 import gc
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
 from time import time
