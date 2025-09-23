@@ -447,8 +447,8 @@ function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, str
     return [$costTotal, $aveCost];
   }
   elseif ($param === Param::cons)  { $paramGen = Param::gen;}
-  elseif ($param === Param::consNt){ $paramGen = Param::genNt;}
-  elseif ($param === Param::consHt){ $paramGen = Param::genHt;}  
+  elseif ($param === Param::consNt){ $paramGen = Param::gen;} // TODO: not really correct, no real gen value here
+  elseif ($param === Param::consHt){ $paramGen = Param::gen;} // TODO: not really correct, no real gen value here 
   
   $sql[0] = 'SELECT SUM(`'.$param->name.   'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
   $sql[1] = 'SELECT SUM(`'.$paramGen->name.'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
