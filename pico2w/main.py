@@ -8,10 +8,13 @@ import machine # type: ignore
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, right_align, make_bold, getDispYrange, json_get_req, tx_to_server, debug_sleep, wlan_init, wlan_conn_check, print_loopCount, getBrightness
+from function_def import val_to_rgb, right_align, make_bold, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, wlan_conn_check, print_loopCount, getBrightness
 import my_config
 
+
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
+USE_WDT:bool = DEBUG_CFG['use_watchdog']
+
 DEVICE_CFG = my_config.get_device_config()
 WLAN_CFG = my_config.get_wlan_config()
 LOOP_SLEEP_SEC = 5 # pause between loops
@@ -22,7 +25,7 @@ otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h 
 wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
 
 # start the watchdog after wlan_init (which may take longer and does a reboot if not successful)
-if DEBUG_CFG['use_watchdog']: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
+if USE_WDT: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
 else: wdt = 0
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, rotate=0)
@@ -52,14 +55,10 @@ settings = dict([
     ('minValCon', 400),
     ('maxValGen', 3400)
 ])
-
-def debug_feed(useWatchdog:bool, wdt):
-    if useWatchdog:
-        wdt.feed() # type: ignore
-    return
+feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
 while True:
-    debug_feed(useWatchdog=DEBUG_CFG['use_watchdog'],wdt=wdt)
+    feed_wdt(useWdt=USE_WDT,wdt=wdt)
     loopCount += 1 # just let it overflow
     wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG, wlan=wlan) # check whether connection is still valid
 
@@ -67,15 +66,17 @@ while True:
     if ((time() - timeSinceLastOtaCheck) > otaCheckAfterXseconds):
         timeSinceLastOtaCheck = time() # reset the counter
         otaCheckAfterXseconds = 86400 # 24h
+        feed_wdt(useWdt=USE_WDT,wdt=wdt)
         micropython_ota.ota_update(
             host='https://strommesser.ch/ota/',
             project='display',
             filenames=['boot.py', 'main.py', 'function_def.py', 'class_def.py'], # config (and libraries) is not changed
             use_version_prefix=False
         )
-        debug_feed(useWatchdog=DEBUG_CFG['use_watchdog'],wdt=wdt)
 
+    feed_wdt(useWdt=USE_WDT,wdt=wdt)
     meas = json_get_req(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG)
+    feed_wdt(useWdt=USE_WDT,wdt=wdt)
     if not meas['valid']:
         print('get request did not work, waiting 10s')
         debug_sleep(DEBUG_CFG=DEBUG_CFG,time=10) # this will trigger the watchdog and force a reboot
@@ -143,6 +144,7 @@ while True:
     display.update()
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
+    feed_wdt(useWdt=USE_WDT,wdt=wdt)
     brightness, pulsed = getBrightness(setting=settings['brightness'], time=meas['date_time'], wattVal=wattVal) # dependency on time
     #print('brightness output: wattVal:settings:applied'+str(wattVal)+':'+str(settings['brightness'])+':'+str(brightness))
     
@@ -157,8 +159,9 @@ while True:
     
     if ((time() - timeSinceLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
         timeSinceLastTransmit = time() # reset the counter
-        debug_feed(useWatchdog=DEBUG_CFG['use_watchdog'],wdt=wdt)
-        settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, settings=settings) # now transmit the stuff to the server
+        feed_wdt(useWdt=USE_WDT,wdt=wdt)
+        settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, settings=settings, useWdt=USE_WDT, wdt=wdt) # now transmit the stuff to the server
+        feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
 
     # do not delete wlan variable and timeSinceLastTransmit
@@ -166,5 +169,6 @@ while True:
     del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x, zeroLine_y  # to combat memAlloc issues
     gc.collect() # garbage collection
     
-    debug_feed(useWatchdog=DEBUG_CFG['use_watchdog'],wdt=wdt)
+    feed_wdt(useWdt=USE_WDT,wdt=wdt)
     debug_sleep(DEBUG_CFG=DEBUG_CFG,time=LOOP_SLEEP_SEC)
+    feed_wdt(useWdt=USE_WDT,wdt=wdt)

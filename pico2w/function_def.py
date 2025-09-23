@@ -152,41 +152,47 @@ def getBrightness(setting:int, time:str, wattVal:int):
     return (brightness,pulsed)
 
 # sends the measurement data and gets the settings
-def server_communication(DEBUG_CFG:dict, message:dict) -> dict:
+def server_communication(DEBUG_CFG:dict, message:dict, useWdt:bool, wdt) -> dict:
     if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled
-        valueString=transmit_message(message=message)
+        valueString=transmit_message(message=message, useWdt=useWdt, wdt=wdt)
     else: # wlan simulated
         valueString='1|80|200|2000' # serverok|ledBrightness|ledMinValCon|ledMaxValGen
     return(sepStrToArr(valueString=valueString))
     
 
-def transmit_message(message:dict) -> str:
+def transmit_message(message:dict, useWdt:bool, wdt) -> str:
     URL = "https://strommesser.ch/verbrauch/pico2w_v3.php?TX=pico&TXVER=3"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     failureCount = 0
+    feed_wdt(useWdt=useWdt,wdt=wdt)
     while failureCount < 3:
         try:
             urlenc = urlencode(message)
             #print(URL)
             #print(message)
+            feed_wdt(useWdt=useWdt,wdt=wdt)
             response = request.post(URL, data=urlenc, headers=HEADERS) # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue
+            feed_wdt(useWdt=useWdt,wdt=wdt)
             if (response.status_code == 200):
                 #print('Text:'+response.text)
                 answer = response.text
                 response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
+                feed_wdt(useWdt=useWdt,wdt=wdt)
                 return(answer)
             else:
                 print("Error: invalid status code:"+str(response.status_code)+". FailureCount: "+str(failureCount))
-                response.close()
+                response.close()                
                 failureCount += 1
         except Exception as error:
             print("Error: request.post did not work. Error:", error)        
             failureCount += 1
+        feed_wdt(useWdt=useWdt,wdt=wdt)    
         sleep(5) # wait in between the loops
+        feed_wdt(useWdt=useWdt,wdt=wdt)
     
     # while loop has passed, did not work several times, do a reset now
-    print("Error: failure count too high:"+str(failureCount)+". Resetting in 20 seconds...")
-    sleep(20) # add a bit of debug possibility
+    print("Error: failure count too high:"+str(failureCount)+". Resetting in 20 seconds or with the watchdog...")
+    sleep(20) # add a bit of debug possibility. NB: # this will trigger the watchdog timer (if enabled) and reset as well    
     reset() # NB: connection to whatever device is getting lost; complicates debugging
     return('bla') # this return will never be executed
 
@@ -276,7 +282,7 @@ def hexlify_wlan(input:str):
     hex_input = hexlify(input.encode()) # hex the bytestream of the string
     print(hex_input.decode())
 
-def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, settings:dict) -> dict:
+def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, settings:dict, useWdt:bool, wdt) -> dict:
         randNum_hash = get_randNum_hash(DEVICE_CFG)
         meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])
 
@@ -287,9 +293,15 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, settings:dict) -> d
             ('hash', randNum_hash['hash'])
             ])
         #print(str(message))
-        new_settings = server_communication(DEBUG_CFG=DEBUG_CFG, message=message)
+        new_settings = server_communication(DEBUG_CFG=DEBUG_CFG, message=message, useWdt=useWdt, wdt=wdt)
         if (new_settings['valid']):
             settings = new_settings # otherwise keep the old settings
         del randNum_hash, meas_string, message
         return(settings)
+
+def feed_wdt(useWdt:bool, wdt):
+    if useWdt:
+        wdt.feed() # type: ignore
+    return
+
 
