@@ -105,9 +105,15 @@
         printRawErrorAndDie(heading: 'Error', text: 'values not found');
     }
 
-    // TODO: end of September: change this, egs speciality should go away
+    // end of September: egs speciality should go away
+    $now = date_create();
+    $month = $now->format(format: 'm');
     // egs specialty: 1.8.1 = T1 = Zone 2 (NT) = Obersiggenthal, Zone 1 (HT) = Untersiggenthal
-    if (! $result = $dbConn->query(query: 'INSERT INTO `verbrauch` (`userid`, `cons`, `gen`, `consNt`, `consHt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")')) {
+    $query = 'INSERT INTO `verbrauch` (`userid`, `cons`, `gen`, `consNt`, `consHt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")';
+    if ($month > 9) { // TODO need to remove this before January
+      $query = 'INSERT INTO `verbrauch` (`userid`, `cons`, `gen`, `consHt`, `consNt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")'; // Ht and Nt switched
+    }
+    if (! $result = $dbConn->query(query: $query)) {
         printRawErrorAndDie(heading: 'Error', text: 'db insert not ok');
     }
 
