@@ -2,7 +2,7 @@
 
 import micropython_ota # type: ignore | using version 2.1.0., install with thonny/tools/packages
 import gc
-from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY  # type: ignore
+from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2  # type: ignore
 from time import time
 import machine # type: ignore 
 
@@ -28,13 +28,13 @@ wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
 if USE_WDT: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
 else: wdt = 0
 
-display = PicoGraphics(display=DISPLAY_PICO_DISPLAY, rotate=0)
+display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, rotate=0)
 display.set_backlight(0.8)
 display.set_font("sans")
-WIDTH, HEIGHT = display.get_bounds() # 240x135
+WIDTH, HEIGHT = display.get_bounds() # 320x240 (previously 240x135)
 BLACK = display.create_pen(0, 0, 0)
 TEXT_BG_GEN = display.create_pen(170, 255, 170)
-TEXT_BG_CONS = display.create_pen(255, 170, 170)
+TEXT_BG_CON = display.create_pen(255, 170, 170)
 BAR_WIDTH = 5
 wattVals = []
 # fills the screen with black
@@ -42,7 +42,7 @@ display.set_pen(BLACK)
 display.clear()
 display.update()
 rgb_led = RgbLed()
-rgb_led.control(allOk=False, pulsating=False, color=(255,0,0))
+rgb_led.control(allOk=False, pulsating=False, color=[255,0,0])
 
 loopCount:int = 0
 timeSinceLastTransmit = time() # returns seconds
@@ -128,7 +128,7 @@ while True:
             display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
 
-    if wattVal < 0: display.set_pen(TEXT_BG_CONS)
+    if wattVal < 0: display.set_pen(TEXT_BG_CON)
     else:           display.set_pen(TEXT_BG_GEN)
     display.rectangle(1, 1, 137, 41) # draws a background for the black text
     wattVal4digits = min(abs(wattVal), 9999) # limit it to 4 digits, range 0...9999. Sign is lost
@@ -139,7 +139,7 @@ while True:
     make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
     make_bold(display, "W", 104, 23)
     
-    print_loopCount(display=display, BLACK=BLACK, loopCount=str(loopCount))
+    print_loopCount(display=display, BLACK=BLACK, loopCount=str(loopCount)) # TODO: different y coord
 
     display.update()
 
