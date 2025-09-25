@@ -3,14 +3,13 @@
 ## Pico 2 W Micropython installation
 
 need an uf2 file with pimoroni picographics included. For RPI2350 (pico 2W). There is no stand-alone library available, needs to be compiled into the uf2
-Can use the rp2 version from here https://github.com/pimoroni/pimoroni-pico-rp2350/releases (version number 0.1.0, 1.25 preview)
-or (TODO: maybe) the unversioned file from https://github.com/pimoroni/pimoroni-pico-rp2350/actions/runs/17854634429/artifacts/4054684845 (dated 2025.09.19)
+Using this one: rpi_pico2_w-v1.26.1-micropython.uf2 from https://github.com/pimoroni/pimoroni-pico-rp2350/releases/tag/v1.26.1
+Documentation can be found here: https://github.com/pimoroni/pimoroni-pico/tree/main/micropython/modules/picographics
 
 ## Display
-   * Currently using the pimoroni 240x135 PICO_DISPLAY (1.14", RGB IPS LCD, with an RGB LED, for about 15.-)
+   * Currently using the Pimoroni 2.8” IPS LCD screen (320 x 240 pixels) with RGB LED, for about 20.-
 
 ### Alternatives
-   * Pimoroni 2.8” IPS LCD screen (320 x 240 pixels), also with RGB LED, for about 20.-
    * Luxurious variant: Pimoroni Presto for 77.- (includes micro controller (RP2350 based))
 
 

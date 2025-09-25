@@ -6,6 +6,8 @@ from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2  # type: ignore
 from time import time
 import machine # type: ignore 
 
+from pngdec import PNG # type: ignore
+
 # my own files
 from class_def import RgbLed # class def
 from function_def import val_to_rgb, right_align, make_bold, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, wlan_conn_check, print_loopCount, getBrightness
@@ -99,6 +101,11 @@ while True:
     display.set_pen(BLACK)
     display.clear()
 
+    # TODO: trial. Above two lines are not necessary if this works
+    png = PNG(display)
+    png.open_file("background.png")
+    png.decode(0, 0)
+
     wattVals.append(wattValMinMax)
     if len(wattVals) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
         wattVals.pop(0)
@@ -136,8 +143,12 @@ while True:
 
     # writes the reading as text in the rectangle
     display.set_pen(BLACK)
-    make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
-    make_bold(display, "W", 104, 23)
+    # TODO: use display.set_thickness(n) instead
+    display.set_thickness(2)
+    display.text(expand+str(wattVal4digits), 7, 23, 1.5) # TODO: adapt x/y coordinates (previous scale was 1.1)
+    display.character(87, 104, 23, 1.5) # displays a W
+    # make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
+    # make_bold(display, "W", 104, 23) # TODO: use display.character(87, x, y, scale) instead
     
     print_loopCount(display=display, BLACK=BLACK, loopCount=str(loopCount)) # TODO: different y coord
 
