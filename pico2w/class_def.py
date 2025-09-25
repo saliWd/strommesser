@@ -13,9 +13,10 @@ class RgbLed(object):
         self.led_rgb = RGBLED(6, 7, 8)
         self.timer_rgb = Timer() # no need to specify a number on pico, all SW timers
         self.color = (0,0,0)
-        self.rgb   = (0,0,0)
+        self.rgb = (0,0,0)
         self.freq = 5
         self.sineX = 0.0
+        self.led_rgb.set_rgb(*(self.rgb))
         self.timerIsInitialized = False
 
     def pulse_cb(self, noIdeaWhyThisIsNeeded):
@@ -30,7 +31,7 @@ class RgbLed(object):
         
         self.led_rgb.set_rgb(*(self.rgb))
         
-    def control(self, allOk:bool, pulsating:bool, color):
+    def control(self, allOk:bool, pulsating:bool, color:list):
         if not allOk:
             self.color = (240, 0, 0)
             self.freq = 100

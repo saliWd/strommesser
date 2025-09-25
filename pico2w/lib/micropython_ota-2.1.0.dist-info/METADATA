@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: micropython-ota
+Version: 2.1.0
+Summary: Micropython library for upgrading code over-the-air (OTA)
+Author: Oliver Gregorius
+Author-email: oliver@gregorius.dev
