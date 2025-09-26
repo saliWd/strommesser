@@ -56,7 +56,8 @@ settings = dict([
     ('serverOk', 1),
     ('brightness', 33),
     ('minValCon', 400),
-    ('maxValGen', 3400)
+    ('maxValGen', 3400),
+    ('earn', 0.0)
 ])
 feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
@@ -70,12 +71,13 @@ while True:
         timeSinceLastOtaCheck = time() # reset the counter
         otaCheckAfterXseconds = 86400 # 24h
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
-        micropython_ota.ota_update(
-            host='https://strommesser.ch/ota/',
-            project='display',
-            filenames=['boot.py', 'main.py', 'function_def.py', 'class_def.py'], # config (and libraries) is not changed
-            use_version_prefix=False
-        )
+        if (DEBUG_CFG['wlan'] == 'real'): # don't do ota otherwise
+            micropython_ota.ota_update(
+                host='https://strommesser.ch/ota/',
+                project='display',
+                filenames=['boot.py', 'main.py', 'function_def.py', 'class_def.py'], # config (and libraries) is not changed
+                use_version_prefix=False
+            )
 
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     meas = json_get_req(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG)
@@ -91,8 +93,8 @@ while True:
         wattVal = 0
     #print('wattValue: '+str(wattVal))
     
-    minValCon = settings['minValCon'] # this is a positive value but needs to be treated negative in some cases
-    maxValGen = settings['maxValGen']
+    minValCon = int(settings['minValCon']) # this is a positive value but needs to be treated negative in some cases
+    maxValGen = int(settings['maxValGen'])
 
     # normalize the value between -ledMinValCon and ledMaxValGen (e.g. -400 to 3000)
     wattValMinMax = min(max(wattVal, (-1 * minValCon)),maxValGen)
@@ -104,7 +106,7 @@ while True:
 
     # TODO: trial. Above two lines are not necessary if this works
     png = PNG(display)
-    png.open_file("background.png")
+    png.open_file("background.png") # TODO: if this works, add it to ota as well
     png.decode(0, 0)
 
     wattVals.append(wattValMinMax)
@@ -149,18 +151,29 @@ while True:
     display.text('W', 104, 23, scale=1.5) # NB: display.character cannot handle float scale
     # make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
     # make_bold(display, "W", 104, 23)
-    
+
+    # trial
+    earn = settings['earn'] # float value
+    if earn < 0: display.set_pen(TEXT_BG_CON)
+    else:        display.set_pen(TEXT_BG_GEN)
+    display.rectangle(221, 1, 98, 41) # draws a background for the black text
+    display.set_pen(BLACK)
+    display.set_thickness(2)
+    display.text(str(earn), 229, 23, scale=1.5) # max 5 characters: -1.27    
+    print('daily earnings: '+str(earn))
+    # /end of trial
+
     print_loopCount(display=display, BLACK=BLACK, loopCount=str(loopCount)) # TODO: different y coord
 
     display.update()
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
-    brightness, pulsed = getBrightness(setting=settings['brightness'], time=meas['date_time'], wattVal=wattVal) # dependency on time
+    brightness, pulsed = getBrightness(setting=int(settings['brightness']), time=meas['date_time'], wattVal=wattVal) # dependency on time
     # print('brightness output: wattVal:settings:applied'+str(wattVal)+':'+str(settings['brightness'])+':'+str(brightness))
     
     rgb_led.control(
-        allOk=((meas['valid']) and (settings['serverOk'] and True)), # need some type conversion (and True) to satisfy pylance
+        allOk=((meas['valid']) and (bool(settings['serverOk']) and True)), # need some type conversion (and True) to satisfy pylance
         pulsating=pulsed,
         color=val_to_rgb(
             val=wattValMinMax,

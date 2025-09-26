@@ -156,12 +156,12 @@ def server_communication(DEBUG_CFG:dict, message:dict, useWdt:bool, wdt) -> dict
     if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled
         valueString=transmit_message(message=message, useWdt=useWdt, wdt=wdt)
     else: # wlan simulated
-        valueString='1|80|200|2000' # serverok|ledBrightness|ledMinValCon|ledMaxValGen
+        valueString='1|80|200|2000|-0.27' # serverok|ledBrightness|ledMinValCon|ledMaxValGen|earn
     return(sepStrToArr(valueString=valueString))
     
 
 def transmit_message(message:dict, useWdt:bool, wdt) -> str:
-    URL = "https://strommesser.ch/verbrauch/pico2w_v3.php?TX=pico&TXVER=3"
+    URL = "https://strommesser.ch/verbrauch/pico2w_v4.php?TX=pico&TXVER=3"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     failureCount = 0
     feed_wdt(useWdt=useWdt,wdt=wdt)
@@ -198,13 +198,14 @@ def transmit_message(message:dict, useWdt:bool, wdt) -> str:
 
 def sepStrToArr(valueString:str) -> dict:
     valueArray = valueString.split('|')
-    if (len(valueArray) > 2 ):
+    if (len(valueArray) > 3 ):
         return(dict([
             ('valid',True),
             ('serverOk', int(valueArray[0])),
             ('brightness', int(valueArray[1])),
             ('minValCon', int(valueArray[2])),
-            ('maxValGen', int(valueArray[3]))
+            ('maxValGen', int(valueArray[3])),
+            ('earn', float(valueArray[4])) # two decimals, pos or negative
         ]))
     else:
         return (dict([('valid',False)]))
