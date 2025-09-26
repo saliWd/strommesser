@@ -7,9 +7,9 @@ $userid = getUserid(); // this will get a valid return because if not, the initi
 printBeginOfPage_v2(site:'now.php');
 
 $sql = 'SELECT `cons`, `gen`, `zeit`, `consDiff`, `zeitDiff`, `genDiff`, `consNt`, `consHt` ';
-$sql .= 'from `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `zeit` DESC LIMIT 1;';
+$sql .= "from `verbrauch` WHERE `userid` = \"$userid\" ORDER BY `zeit` DESC LIMIT 1;";
 
-$result = $dbConn->query($sql);
+$result = $dbConn->query(query: $sql);
 $rowNewest = $result->fetch_assoc();
 
 if ($rowNewest['zeitDiff'] > 0) { // divide by 0 exception
@@ -23,6 +23,38 @@ if ($rowNewest['zeitDiff'] > 0) { // divide by 0 exception
 $zeitNewest = date_create($rowNewest['zeit']);
 $zeitString = $zeitNewest->format('Y-m-d H:i');
 
+
+// daily cost (TODO: move into function, use in pico2w_v4)
+$resultKunden = $dbConn->query(query: "SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = \"$userid\" LIMIT 1;");
+if ($resultKunden->num_rows !== 1) {
+    printRawErrorAndDie(heading: 'Error', text: 'no config data');
+} 
+$rowKunden = $resultKunden->fetch_assoc();
+
+$zeitOldestString = $zeitNewest->format(format: 'Y-m-d 00:00:00'); // beginning of the current day
+ 
+$sql = "SELECT `gen`, `consNt`, `consHt` from `verbrauch` WHERE `userid` = \"$userid\" AND `zeit` > \"$zeitOldestString\" ORDER BY `zeit` DESC;";
+
+$result = $dbConn->query(query: $sql);
+$result->data_seek(offset: $result->num_rows - 1); // skip to the last entry of the rows
+$rowOldest = $result->fetch_assoc();
+$result->data_seek(offset: 0); // go back to the first row
+$row = $result->fetch_assoc();
+
+$cost = -1.0 * 
+            (($row['consNt'] - $rowOldest['consNt'])*$rowKunden['priceConsNt'] +
+            ($row['consHt'] - $rowOldest['consHt'])*$rowKunden['priceConsHt'] -
+            ($row['gen'] - $rowOldest['gen'])*$rowKunden['priceGen']);
+$cost = round(num: $cost,precision: 2);
+if ($cost > 0) {
+  $color = 'text-green-600';
+  $text = 'Täglicher Ertrag';
+} else {
+  $color = 'text-red-500';
+  $text = 'Tägliche Kosten';
+}
+
+
 echo '
 <div class="text-left mt-8">
 <table>
@@ -33,6 +65,9 @@ echo '
   <tr><td>Verbrauch: </td><td>'.$rowNewest['cons'].' kWh</td></tr>
   <tr><td>Verbrauch NT: </td><td>'.$rowNewest['consNt'].' kWh</td></tr>
   <tr><td>Verbrauch HT: </td><td>'.$rowNewest['consHt'].' kWh</td></tr>
+  <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr><td>Messzeit Ertrag/Kosten:&nbsp;</td><td>'.$zeitOldestString.' bis '.$zeitNewest->format(format: 'Y-m-d H:i:s').'</td></tr>
+  <tr><td><b>'.$text.':&nbsp;</b></td><td><b><span class="'.$color.'">'.number_format(num:(float)$cost,decimals:2,decimal_separator:'.',thousands_separator:'').' CHF</span></b></td></tr>
 </table>
 <p>&nbsp;</p>
 <p>Diese Seite aktualisiert sich alle 90 Sekunden.</p>
