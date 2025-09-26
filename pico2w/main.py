@@ -2,6 +2,7 @@
 
 import micropython_ota # type: ignore | using version 2.1.0., install with thonny/tools/packages
 import gc
+# trial from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_RGB565  # type: ignore
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2  # type: ignore
 from time import time
 import machine # type: ignore 
@@ -10,7 +11,7 @@ from pngdec import PNG # type: ignore
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, right_align, make_bold, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, wlan_conn_check, print_loopCount, getBrightness
+from function_def import val_to_rgb, right_align, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, wlan_conn_check, print_loopCount, getBrightness
 import my_config
 
 
@@ -30,7 +31,7 @@ wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
 if USE_WDT: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
 else: wdt = 0
 
-display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, rotate=0)
+display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, rotate=0) #,trial pen_type=PEN_RGB565)
 display.set_backlight(0.8)
 display.set_font("sans")
 WIDTH, HEIGHT = display.get_bounds() # 320x240 (previously 240x135)
@@ -143,12 +144,11 @@ while True:
 
     # writes the reading as text in the rectangle
     display.set_pen(BLACK)
-    # TODO: use display.set_thickness(n) instead
     display.set_thickness(2)
-    display.text(expand+str(wattVal4digits), 7, 23, 1.5) # TODO: adapt x/y coordinates (previous scale was 1.1)
-    display.character(87, 104, 23, 1.5) # displays a W
+    display.text(expand+str(wattVal4digits), 7, 23, scale=1.5) # TODO: adapt x/y coordinates (previous scale was 1.1)
+    display.text('W', 104, 23, scale=1.5) # NB: display.character cannot handle float scale
     # make_bold(display, expand+str(wattVal4digits), 7, 23) # str.format does not work as intended
-    # make_bold(display, "W", 104, 23) # TODO: use display.character(87, x, y, scale) instead
+    # make_bold(display, "W", 104, 23)
     
     print_loopCount(display=display, BLACK=BLACK, loopCount=str(loopCount)) # TODO: different y coord
 
@@ -157,7 +157,7 @@ while True:
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     brightness, pulsed = getBrightness(setting=settings['brightness'], time=meas['date_time'], wattVal=wattVal) # dependency on time
-    #print('brightness output: wattVal:settings:applied'+str(wattVal)+':'+str(settings['brightness'])+':'+str(brightness))
+    # print('brightness output: wattVal:settings:applied'+str(wattVal)+':'+str(settings['brightness'])+':'+str(brightness))
     
     rgb_led.control(
         allOk=((meas['valid']) and (settings['serverOk'] and True)), # need some type conversion (and True) to satisfy pylance
