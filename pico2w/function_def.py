@@ -43,7 +43,7 @@ def val_to_rgb(val:int, minValCon:int, maxValGen:int, led_brightness:int)-> list
     a = float(led_brightness) / float(255)
     return list(hsva_to_rgb(h, 1.0, 1.0, a))
 
-def right_align(value4digits:int):
+def right_align(value4digits:int)->str:
     if value4digits < 10:
         return "   "
     if value4digits < 100:
@@ -52,20 +52,9 @@ def right_align(value4digits:int):
         return " "
     return ""
 
-def make_bold(display, text:str, x:int, y:int): # making it 'bold' by shifting it 1px right (not very nice hack)
-    display.text(text, x, y, scale=1.1)
-    display.text(text, x+1, y, scale=1.1)
-
-def print_loopCount(display, BLACK, loopCount:str):
-    x = 10
-    y = 120
-    display.set_pen(BLACK) # black border around the white text
-    display.text(loopCount, x-1, y, scale=1.0)
-    display.text(loopCount, x+1, y, scale=1.0)
-    display.text(loopCount, x, y-1, scale=1.0)
-    display.text(loopCount, x, y+1, scale=1.0)
-    display.set_pen(display.create_pen(255, 255, 255)) # white
-    display.text(loopCount, x, y, scale=1.0)
+def make_bold(display, text:str, x:int, y:int, scale:float): # making it 'bold' by shifting it 1px right (not very nice hack)
+    display.text(text, x, y, scale=scale)
+    display.text(text, x+1, y, scale=scale)
 
 def getDispYrange(values:list) -> list:
     """returns the range of the given values. extends the range to at least -50 to +50 if the min/max are smaller. returns 2 positive values"""
@@ -95,7 +84,7 @@ def json_get_req(DEBUG_CFG:dict, DEVICE_CFG:dict) -> dict:
         return(dict([('valid',False)]))
 
 def get_debug_jdata():
-    return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":0.020,"Po":0.000,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
+    return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":0.027,"Po":0.000,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
 
 def get_interesting_values(jdata) -> dict:
     try:
