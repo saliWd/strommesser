@@ -12,7 +12,12 @@ Documentation can be found here: https://github.com/pimoroni/pimoroni-pico/tree/
 ### Alternatives
    * Luxurious variant: Pimoroni Presto for 77.- (includes micro controller (RP2350 based))
 
+## Design choices
 
+### Display background
+   * Size 2560 x 1920 (scale 8 times down)
+   * Font: Trebuchet MS Regular, size 256
+   * Lines: White, border 8 px
 ---
 
 # Old stuff

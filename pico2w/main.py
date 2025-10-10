@@ -42,7 +42,7 @@ BAR_WIDTH = 5
 wattVals = []
 # fills the screen
 png = PNG(display)
-png.open_file("background.png") # TODO: add it to ota as well
+png.open_file("pico_background.png") # TODO: add it to ota as well
 png.decode(0, 0)
 display.update()
 
@@ -143,11 +143,10 @@ while True:
     # writes the reading as text in the rectangle
     display.set_pen(WHITE)
     make_bold(display, expand+str(wattVal4digits), 12, 23, scale=TXT_SCALE) # str.format does not work as intended
-    make_bold(display, "W", 85, 23, scale=TXT_SCALE)
-
+    
     # trial
     earn = settings['earn'] # float value
-    earn_str = 'CHF {0:.2f}'.format(earn)
+    earn_str = '{0:.2f}'.format(earn)
 #    if earn < 0: display.set_pen(TEXT_BG_CON)
 #    else:        display.set_pen(TEXT_BG_GEN)
 #    display.rectangle(221, 1, 98, 41) # draws a background for the text
