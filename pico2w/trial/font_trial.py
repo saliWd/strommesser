@@ -11,7 +11,7 @@
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_P4 # type: ignore
 from pimoroni import RGBLED # type: ignore
 led = RGBLED(6, 7, 8)
-led.set_rgb(0,0,0)     # Turn RGBLED OFF
+led.set_rgb(255,0,0)
 # https://github.com/russhughes/ili9342c_mpy/blob/main/fonts/bitmap/vga1_16x16.py
 WIDTH = 16
 HEIGHT = 16
@@ -162,6 +162,7 @@ def prnt_st(asci,xx,yy,):  # Text string
 prnt_st("Tony Goodhew",10,50)
 prnt_st("vga 16x16",10,80)
 prnt_st("0123456789",10,100)
+prnt_st("1.20 27 W",10,120)
 display.set_pen(255)
-display.text("Bitmap8 size 2", 50, 140, 160,2)
+display.text("Bitmap8 size 2", 50, 160, 160,2)
 display.update()
