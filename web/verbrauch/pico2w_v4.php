@@ -105,17 +105,11 @@
         printRawErrorAndDie(heading: 'Error', text: 'values not found');
     }
 
-    // end of September: egs speciality should go away
-    $now = date_create();
-    $month = $now->format(format: 'm');
-    // egs specialty: 1.8.1 = T1 = Zone 2 (NT) = Obersiggenthal, Zone 1 (HT) = Untersiggenthal
-    $query = 'INSERT INTO `verbrauch` (`userid`, `cons`, `gen`, `consNt`, `consHt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")';
-    if ($month > 9) { // TODO need to remove this before January
-      $query = 'INSERT INTO `verbrauch` (`userid`, `cons`, `gen`, `consHt`, `consNt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")'; // Ht and Nt switched
-    }
-    if (! $result = $dbConn->query(query: $query)) {
+    // NB: previously egs had a different Ht and Nt definition
+    if (! $result = $dbConn->query(query:'INSERT INTO `verbrauch` (`userid`, `cons`, `gen`, `consHt`, `consNt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")')) {
         printRawErrorAndDie(heading: 'Error', text: 'db insert not ok');
     }
+
 
     //NB: not using last inserted ID as other inserts may have happened in the meantime
     $result = $dbConn->query(query: "SELECT * FROM `verbrauch` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 2");
