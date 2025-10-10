@@ -48,10 +48,10 @@ $cost = -1.0 *
 $cost = round(num: $cost,precision: 2);
 if ($cost > 0) {
   $color = 'text-green-600';
-  $text = 'Täglicher Ertrag';
+  $text = 'Tagesertrag';
 } else {
   $color = 'text-red-500';
-  $text = 'Tägliche Kosten';
+  $text = 'Tageskosten';
 }
 
 
@@ -66,7 +66,7 @@ echo '
   <tr><td>Verbrauch NT: </td><td>'.$rowNewest['consNt'].' kWh</td></tr>
   <tr><td>Verbrauch HT: </td><td>'.$rowNewest['consHt'].' kWh</td></tr>
   <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-  <tr><td>Messzeit Ertrag/Kosten:&nbsp;</td><td>'.$zeitOldestString.' bis '.$zeitNewest->format(format: 'Y-m-d H:i:s').'</td></tr>
+  <tr><td>Messzeit Ertrag/Kosten:&nbsp;</td><td>Heute 00:00 Uhr bis '.$zeitNewest->format(format: 'Y-m-d H:i:s').'</td></tr>
   <tr><td><b>'.$text.':&nbsp;</b></td><td><b><span class="'.$color.'">'.number_format(num:(float)$cost,decimals:2,decimal_separator:'.',thousands_separator:'').' CHF</span></b></td></tr>
 </table>
 <p>&nbsp;</p>
