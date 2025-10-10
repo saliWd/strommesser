@@ -142,7 +142,7 @@ while True:
 
     # writes the reading as text in the rectangle
     display.set_pen(WHITE)
-    make_bold(display, expand+str(wattVal4digits), 12, 23, scale=TXT_SCALE) # str.format does not work as intended
+    make_bold(display, expand+str(wattVal4digits), 52, 23, scale=TXT_SCALE) # str.format does not work as intended
     
     # trial
     earn = settings['earn'] # float value
@@ -150,7 +150,7 @@ while True:
 #    if earn < 0: display.set_pen(TEXT_BG_CON)
 #    else:        display.set_pen(TEXT_BG_GEN)
 #    display.rectangle(221, 1, 98, 41) # draws a background for the text
-    make_bold(display, earn_str, 205, 220, scale=TXT_SCALE) # max 5 characters: -1.27    
+    make_bold(display, earn_str, 252, 218, scale=TXT_SCALE) # max 5 characters: -1.27    
     #print('daily earnings: '+str(earn))
     # /end of trial
 
