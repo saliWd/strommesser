@@ -10,7 +10,7 @@ from pimoroni import RGBLED  # type: ignore (included in uf2 file)
 class RgbLed(object):
 
     def __init__(self):
-        self.led_rgb = RGBLED(6, 7, 8)
+        self.led_rgb = RGBLED(26, 27, 28)
         self.timer_rgb = Timer() # no need to specify a number on pico, all SW timers
         self.color = (0,0,0)
         self.rgb = (0,0,0)

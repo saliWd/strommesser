@@ -1,6 +1,6 @@
 from pimoroni import RGBLED # type: ignore
 from time import sleep
-led = RGBLED(6, 7, 8)
+led = RGBLED(26, 27, 28)
 led.set_rgb(0, 0, 0)
 sleep(5)
 led.set_rgb(255, 0, 0)
