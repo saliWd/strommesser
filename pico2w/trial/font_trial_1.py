@@ -14,7 +14,7 @@ display.set_backlight(0.8)
 
 vector = PicoVector(display)
 vector.set_antialiasing(ANTIALIAS_X4)
-result = vector.set_font('IndieFlower-Regular.af', 50)  # font from , stored in root on filesystem
+result = vector.set_font('Roboto-regular.af', 50)  # font from , stored in root on filesystem
 print(result)
 
 #SET PALETTE

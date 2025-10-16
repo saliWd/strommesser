@@ -3,6 +3,7 @@
 import micropython_ota # type: ignore | using version 2.1.0., install with thonny/tools/packages
 import gc
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_RGB565  # type: ignore
+from picovector import PicoVector, ANTIALIAS_X16 # type: ignore
 from time import time
 import machine # type: ignore 
 
@@ -10,7 +11,7 @@ from pngdec import PNG # type: ignore
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, right_align, getDispYrange, make_bold, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, wlan_conn_check, getBrightness
+from function_def import val_to_rgb, right_align, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, wlan_conn_check, getBrightness
 import my_config
 
 
@@ -32,7 +33,15 @@ else: wdt = 0
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, rotate=0, pen_type=PEN_RGB565)
 display.set_backlight(0.8)
-display.set_font("sans")
+
+vector = PicoVector(display)
+vector.set_antialiasing(ANTIALIAS_X16)
+# font from https://github.com/Gadgetoid/alright-fonts/blob/effb2fca35909a0f2aff7ed04b76c14286490817/sample-fonts/OpenSans/OpenSans-SemiBold.af, stored in root on filesystem. 
+# TODO: add to ota as well
+result = vector.set_font('font.af', 30)
+print(result)
+
+
 TXT_SCALE = 0.8
 WIDTH, HEIGHT = display.get_bounds() # 320x240
 WHITE = display.create_pen(225, 225, 225)
@@ -133,29 +142,24 @@ while True:
             display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
 
-#    if wattVal < 0: display.set_pen(TEXT_BG_CON)
-#    else:           display.set_pen(TEXT_BG_GEN)
-#    display.rectangle(1, 1, 137, 41) # draws a background for the black text
+    #if wattVal < 0: display.set_pen(TEXT_BG_CON)
+    #else:           display.set_pen(TEXT_BG_GEN)
+    #display.rectangle(1, 1, 137, 41) # draws a background for the black text
     wattVal4digits = min(abs(wattVal), 9999) # limit it to 4 digits, range 0...9999. Sign is lost
     expand = right_align(value4digits=wattVal4digits) # string formatting does not work correctly. Do it myself
-#    display.set_thickness(2)
 
     # writes the reading as text in the rectangle
     display.set_pen(WHITE)
-    make_bold(display, expand+str(wattVal4digits), 52, 23, scale=TXT_SCALE) # str.format does not work as intended
+    vector.text(expand+str(wattVal4digits), 52, 32, 0)
     
-    # trial
     earn = settings['earn'] # float value
     earn_str = '{0:.2f}'.format(earn)
-#    if earn < 0: display.set_pen(TEXT_BG_CON)
-#    else:        display.set_pen(TEXT_BG_GEN)
-#    display.rectangle(221, 1, 98, 41) # draws a background for the text
-    make_bold(display, earn_str, 252, 218, scale=TXT_SCALE) # max 5 characters: -1.27    
-    #print('daily earnings: '+str(earn))
-    # /end of trial
-
-    make_bold(display, str(loopCount), 10, 220, scale=TXT_SCALE)
-
+    #if earn < 0: display.set_pen(TEXT_BG_CON)
+    #else:        display.set_pen(TEXT_BG_GEN)
+    #display.rectangle(221, 1, 98, 41) # draws a background for the text
+    vector.text(earn_str, 256, 227, 0)
+    vector.text(str(loopCount), 10, 227, 0)
+    
     display.update()
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
