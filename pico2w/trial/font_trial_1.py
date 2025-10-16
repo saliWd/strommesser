@@ -7,6 +7,9 @@ display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2)
 display.set_backlight(0.8)
 # font taken from
 # https://github.com/Gadgetoid/alright-fonts/blob/effb2fca35909a0f2aff7ed04b76c14286490817/sample-fonts/IndieFlower/IndieFlower-Regular.af
+# probably one of those: "Open Sans" or "Roboto". Thin font: "Alumni Sans Pinstripe"
+# could also generate a file for numbers only, see github.com/Gadgetoid/alright-fonts description 
+
 # (https://github.com/lowfatcode/alright-fonts/tree/main/sample-fonts does not work, see https://forums.pimoroni.com/t/presto-and-alright-fonts-issue-picovector/28396/4)
 
 vector = PicoVector(display)
