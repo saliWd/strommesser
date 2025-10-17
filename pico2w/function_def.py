@@ -209,43 +209,25 @@ def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict):
 
     wlanStatus = 0
     waitCounter = 0
-    wlan = network.WLAN(network.STA_IF)
-    while wlanStatus != 3:
+    wlan = 0
+    while wlanStatus != network.STAT_GOT_IP: # STAT_GOT_IP = 3, STAT_CONNECTING = 1
         print('waiting for connection...WLAN Status: '+str(wlanStatus)+'. Counter: '+str(waitCounter))
-        wlan = network.WLAN(network.STA_IF)
+        wlan = network.WLAN(network.WLAN.IF_STA)
         wlan.active(True) # activate it. NB: disabling does not work correctly
         sleep(2)
         wlan_pw = unhexlify(WLAN_CFG['pw'].encode()).decode() # change into byte stream and unhex it; then change it into string        
         wlan.connect(WLAN_CFG['ssid'], wlan_pw)
+        sleep(2)
         wlanStatus = wlan.status()
-        # need to restart all, otherwise the status is always constant
-        if wlanStatus != 3:
-            wlan.active(False)
-            del wlan
-            gc.collect()
-        else: # status did change to 3 just above
+        if wlanStatus == network.STAT_GOT_IP: # success
             wlanIfconfig = wlan.ifconfig()
             print('connected. IP: ' + wlanIfconfig[0])
-            sleep(2)
             return(wlan) # type: ignore        
 
         waitCounter += 1
         sleep(2)
-    return(0) # this should never happen
+    return(wlan) # this should never happen
 
-
-# is called in every while loop
-def wlan_conn_check(DEBUG_CFG:dict, WLAN_CFG:dict, wlan):
-    if (DEBUG_CFG['wlan'] == 'simulated'):
-        return(wlan)
-    if(wlan.isconnected()):
-        return(wlan) # nothing to do
-    else:
-        wlan.active(False)
-        del wlan
-        gc.collect() # garbage collection
-        wlanNew = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG) # call the init
-        return(wlanNew)
 
 def urlencode(dictionary:dict):
     urlenc = ""

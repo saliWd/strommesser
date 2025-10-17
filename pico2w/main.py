@@ -11,7 +11,7 @@ from pngdec import PNG # type: ignore
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, right_align, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, wlan_conn_check, getBrightness
+from function_def import val_to_rgb, right_align, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, getBrightness
 import my_config
 
 
@@ -38,9 +38,7 @@ vector = PicoVector(display)
 vector.set_antialiasing(ANTIALIAS_X16)
 # font from https://github.com/Gadgetoid/alright-fonts/blob/effb2fca35909a0f2aff7ed04b76c14286490817/sample-fonts/OpenSans/OpenSans-SemiBold.af, stored in root on filesystem. 
 # TODO: add to ota as well
-result = vector.set_font('font.af', 30)
-print(result)
-
+vector.set_font('font.af', 30)
 
 TXT_SCALE = 0.8
 WIDTH, HEIGHT = display.get_bounds() # 320x240
@@ -75,7 +73,6 @@ feed_wdt(useWdt=USE_WDT,wdt=wdt)
 while True:
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     loopCount += 1 # just let it overflow
-    wlan = wlan_conn_check(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG, wlan=wlan) # check whether connection is still valid
 
     ## do it once, shortly (3 mins) after booting, then don't do it for about 24 hours
     if ((time() - timeSinceLastOtaCheck) > otaCheckAfterXseconds):
@@ -99,17 +96,18 @@ while True:
         continue
 
     wattVal = int(1000.0 * (-1.0*meas['power_pos'] + meas['power_neg'])) # cons is negative, gen positive. 0 is treated as gen
+    # print('wattValue: '+str(wattVal)) # debug
     
     if (abs(wattVal) < WATT_NOISE_LIMIT): # everything below this is just noise...
         wattVal = 0
-    #print('wattValue: '+str(wattVal))
+    # print('wattValue: '+str(wattVal))
     
     minValCon = int(settings['minValCon']) # this is a positive value but needs to be treated negative in some cases
     maxValGen = int(settings['maxValGen'])
 
     # normalize the value between -ledMinValCon and ledMaxValGen (e.g. -400 to 3000)
     wattValMinMax = min(max(wattVal, (-1 * minValCon)),maxValGen)
-    #print("normalized watt value: "+str(wattValMinMax)+", min/max: "+str(minValCon)+"/"+str(maxValGen))
+    # print("normalized watt value: "+str(wattValMinMax)+", min/max: "+str(minValCon)+"/"+str(maxValGen))
 
     png.decode(0, 0)
 
