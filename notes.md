@@ -15,9 +15,9 @@ Documentation can be found here: https://github.com/pimoroni/pimoroni-pico/tree/
 ## Design choices
 
 ### Display background
-   * Size 2560 x 1920 (scale 8 times down)
-   * Font: Trebuchet MS Regular, size 256
-   * Lines: White, border 8 px
+   * Size 2552 x 1912 (scale ~8 times down to 320x240)
+   * Font: Raleway (see main.py)
+   * Lines: White, border 5 px
 ---
 
 # Old stuff
