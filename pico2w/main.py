@@ -150,14 +150,14 @@ while True:
 
     # writes the reading as text in the rectangle
     display.set_pen(WHITE)
-    vector.text(expand+str(wattVal4digits), 52, 32, 0)
+    vector.text(expand+str(wattVal4digits)+' W', 52, 32, 0)
     
     earn = settings['earn'] # float value
-    earn_str = '{0:.2f}'.format(earn)
+    earn_str = 'CHF {0:.2f}'.format(earn)
     #if earn < 0: display.set_pen(TEXT_BG_CON)
     #else:        display.set_pen(TEXT_BG_GEN)
     #display.rectangle(221, 1, 98, 41) # draws a background for the text
-    vector.text(earn_str, 256, 227, 0)
+    vector.text(earn_str, 226, 227, 0)
     vector.text(str(loopCount), 10, 227, 0)
     
     display.update()

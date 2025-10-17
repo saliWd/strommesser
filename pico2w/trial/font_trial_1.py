@@ -9,12 +9,14 @@ display.set_backlight(0.8)
 # https://github.com/Gadgetoid/alright-fonts/blob/effb2fca35909a0f2aff7ed04b76c14286490817/sample-fonts/IndieFlower/IndieFlower-Regular.af
 # probably one of those: "Open Sans" or "Roboto". Thin font: "Alumni Sans Pinstripe"
 # could also generate a file for numbers only, see github.com/Gadgetoid/alright-fonts description 
+# need to use this branch to get working files: https://github.com/Gadgetoid/alright-fonts/tree/feature/16bit-afinate
+# generate with python afinate --characters "CHFW 0123456789.-" --font Raleway-Regular.ttf Raleway_min.af
 
 # (https://github.com/lowfatcode/alright-fonts/tree/main/sample-fonts does not work, see https://forums.pimoroni.com/t/presto-and-alright-fonts-issue-picovector/28396/4)
 
 vector = PicoVector(display)
 vector.set_antialiasing(ANTIALIAS_X4)
-result = vector.set_font('Roboto-regular.af', 50)  # font from , stored in root on filesystem
+result = vector.set_font('font.af', 50)  # font from , stored in root on filesystem
 print(result)
 
 #SET PALETTE
@@ -27,7 +29,7 @@ display.clear()
 
 #SET PEN AND DISPLAY TEXT
 display.set_pen(WHITE)
-vector.text("Hello World!", 60, 90, 0)
+vector.text("CHF -23.45", 60, 90, 0)
 
 #UPDATE SCREEN
 display.update()
