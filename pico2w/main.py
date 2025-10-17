@@ -150,7 +150,7 @@ while True:
 
     # writes the reading as text in the rectangle
     display.set_pen(WHITE)
-    vector.text(expand+str(wattVal4digits)+' W', 52, 32, 0)
+    vector.text(str(wattVal4digits)+' W', 52+expand*20, 32, 0) # TODO: check width of one char (assuming 20 at the moment)
     
     earn = settings['earn'] # float value
     earn_str = 'CHF {0:.2f}'.format(earn)

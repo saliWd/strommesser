@@ -43,18 +43,14 @@ def val_to_rgb(val:int, minValCon:int, maxValGen:int, led_brightness:int)-> list
     a = float(led_brightness) / float(255)
     return list(hsva_to_rgb(h, 1.0, 1.0, a))
 
-def right_align(value4digits:int)->str:
+def right_align(value4digits:int)->int:
     if value4digits < 10:
-        return "   "
+        return 3
     if value4digits < 100:
-        return "  "
+        return 2
     if value4digits < 1000:
-        return " "
-    return ""
-
-def make_bold(display, text:str, x:int, y:int, scale:float): # making it 'bold' by shifting it 1px right (not very nice hack)
-    display.text(text, x, y, scale=scale)
-    display.text(text, x+1, y, scale=scale)
+        return 1
+    return 0
 
 def getDispYrange(values:list) -> list:
     """returns the range of the given values. extends the range to at least -50 to +50 if the min/max are smaller. returns 2 positive values"""
