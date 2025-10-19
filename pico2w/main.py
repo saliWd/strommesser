@@ -143,20 +143,39 @@ while True:
 
     #if wattVal < 0: display.set_pen(TEXT_BG_CON)
     #else:           display.set_pen(TEXT_BG_GEN)
-    #display.rectangle(1, 1, 137, 41) # draws a background for the black text
     wattVal4digits = min(abs(wattVal), 9999) # limit it to 4 digits, range 0...9999. Sign is lost
     expand = right_align(value4digits=wattVal4digits) # string formatting does not work correctly. Do it myself
 
+    # TODO: remove again
+    import random
+    wattVal4digits = 0
+    rand = random.randint(0,4)
+    if rand == 1:
+        wattVal4digits = random.randint(1,9)
+    if rand == 2:
+        wattVal4digits = random.randint(10,99)
+    if rand == 3:
+        wattVal4digits = random.randint(100,999)
+    if rand == 4:
+        wattVal4digits = random.randint(1000,9999)
+    # 
+
+    
     # writes the reading as text in the rectangle
     display.set_pen(WHITE)
-    txt = str(wattVal4digits)+' W'
-    x, y, w, h = vector.measure_text(txt, x=44, y=32, angle=None)
+    txtNum = str(wattVal4digits)
+    x, y, w, h = vector.measure_text(txtNum, x=44, y=32, angle=None)
+    x = 44
+    y = 28 
+    h = 20 # overwrite those, always at the same position
+    w = int(w)
     padding = 8
 
     w_outline = Polygon()
-    w_outline.rectangle(x-padding,y-15-padding,w+2*padding,h+2*padding, corners=(0, 0, 0, 0), stroke=2)
+    w_outline.rectangle(x-padding,y-14-padding,81+2*padding,h+2*padding, corners=(0, 0, 0, 0), stroke=2)
     vector.draw(w_outline)
-    vector.text(txt, int(x), int(y), 0)
+    vector.text('W', 102, y+4, 0)
+    vector.text(txtNum, 92-w, y+2, 0)
     
     earn = settings['earn'] # float value
     earn_str = 'CHF {0:.2f}'.format(earn)

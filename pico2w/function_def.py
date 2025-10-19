@@ -10,7 +10,6 @@ from binascii import hexlify, unhexlify
 from random import randint
 import requests_1 as request # from https://github.com/shariltumin/bit-and-pieces/tree/main/web-client, see also https://github.com/orgs/micropython/discussions/14105
 import json
-import gc
 import network # type: ignore (this is a pylance ignore warning directive)
 
 # start with h = variable, s = 0.5, v = 0.5, a = LedBrightness/255
