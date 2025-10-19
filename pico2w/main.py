@@ -11,7 +11,7 @@ from pngdec import PNG # type: ignore
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, right_align, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, getBrightness
+from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, getBrightness
 import my_config
 
 
@@ -25,12 +25,6 @@ WATT_NOISE_LIMIT = 15 # everything below 15 W will be set to 0
 TRANSMIT_EVERY_X_SECONDS = 120
 otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h after the first check
 
-wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
-
-# start the watchdog after wlan_init (which may take longer and does a reboot if not successful)
-if USE_WDT: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
-else: wdt = 0
-
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, rotate=0, pen_type=PEN_RGB565)
 display.set_backlight(0.8)
 
@@ -43,9 +37,9 @@ vector.set_font('font.af', 30)
 TXT_SCALE = 0.8
 WIDTH, HEIGHT = 320, 240 # display.get_bounds() # 320x240
 BAR_HEIGHT = 200
-WHITE = display.create_pen(225, 225, 225)
-TEXT_BG_GEN = display.create_pen(170, 255, 170)
-TEXT_BG_CON = display.create_pen(255, 170, 170)
+WHITE       = display.create_pen(225, 225, 225)
+COLOR_PLUS  = display.create_pen(170, 255, 170)
+COLOR_MINUS = display.create_pen(255, 170, 170)
 BAR_WIDTH = 5
 wattVals = []
 # fills the screen
@@ -57,10 +51,15 @@ display.update()
 rgb_led = RgbLed()
 rgb_led.control(allOk=False, pulsating=False, color=[255,0,0])
 
+wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
+
+# start the watchdog after wlan_init (which may take longer and does a reboot if not successful)
+if USE_WDT: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
+else: wdt = 0
+
 loopCount:int = 0
 timeSinceLastTransmit = time() # returns seconds
 timeSinceLastOtaCheck = time()
-
 settings = dict([
     ('valid',True),
     ('serverOk', 1),
@@ -69,6 +68,7 @@ settings = dict([
     ('maxValGen', 3400),
     ('earn', 0.0)
 ])
+measErrorCnt:int = 0
 feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
 while True:
@@ -91,9 +91,15 @@ while True:
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     meas = json_get_req(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG)
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
-    if not meas['valid']:
-        print('get request did not work, waiting 10s')
-        debug_sleep(DEBUG_CFG=DEBUG_CFG,time=10) # this will trigger the watchdog and force a reboot
+    if meas['valid']:
+        measErrorCnt = 0
+    else:
+        measErrorCnt += 1
+        print('get request did not work')
+        if measErrorCnt > 5:
+            print('sleeping for 10 seconds')
+            debug_sleep(DEBUG_CFG=DEBUG_CFG,time=10) # this will trigger the watchdog and force a reboot
+        debug_sleep(DEBUG_CFG=DEBUG_CFG,time=2)
         continue
 
     wattVal = int(1000.0 * (-1.0*meas['power_pos'] + meas['power_neg'])) # cons is negative, gen positive. 0 is treated as gen
@@ -122,9 +128,6 @@ while True:
     zeroLine_y = HEIGHT - int(float(HEIGHT) * float(disp_y_range[0]) / float(disp_y_range[2]))
     display.rectangle(0, zeroLine_y, WIDTH, 1)
 
-    # Debug code, to get both cons and gen
-    # if len(wattVals) == 12: wattVals[7] = wattVals[7]*-1
-
     x = 0
     color_pen = WHITE
     valHeight = 0
@@ -141,48 +144,30 @@ while True:
             display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
 
-    #if wattVal < 0: display.set_pen(TEXT_BG_CON)
-    #else:           display.set_pen(TEXT_BG_GEN)
+    if wattVal < 0: display.set_pen(COLOR_MINUS)
+    else:           display.set_pen(COLOR_PLUS)
     wattVal4digits = min(abs(wattVal), 9999) # limit it to 4 digits, range 0...9999. Sign is lost
-    expand = right_align(value4digits=wattVal4digits) # string formatting does not work correctly. Do it myself
 
-    # TODO: remove again
-    import random
-    wattVal4digits = 0
-    rand = random.randint(0,4)
-    if rand == 1:
-        wattVal4digits = random.randint(1,9)
-    if rand == 2:
-        wattVal4digits = random.randint(10,99)
-    if rand == 3:
-        wattVal4digits = random.randint(100,999)
-    if rand == 4:
-        wattVal4digits = random.randint(1000,9999)
-    # 
-
-    
     # writes the reading as text in the rectangle
-    display.set_pen(WHITE)
     txtNum = str(wattVal4digits)
     x, y, w, h = vector.measure_text(txtNum, x=44, y=32, angle=None)
-    x = 44
-    y = 28 
-    h = 20 # overwrite those, always at the same position
     w = int(w)
-    padding = 8
 
-    w_outline = Polygon()
-    w_outline.rectangle(x-padding,y-14-padding,81+2*padding,h+2*padding, corners=(0, 0, 0, 0), stroke=2)
-    vector.draw(w_outline)
-    vector.text('W', 102, y+4, 0)
-    vector.text(txtNum, 92-w, y+2, 0)
+    wOutline = Polygon()
+    wOutline.rectangle(6,6,127,36, corners=(2, 2, 2, 2), stroke=2)
+    vector.draw(wOutline)
+    display.set_pen(WHITE)
+    vector.text('W', 102, 32, 0)
+    vector.text(txtNum, 92-w, 31, 0)
     
-    earn = settings['earn'] # float value
-    earn_str = 'CHF {0:.2f}'.format(earn)
-    #if earn < 0: display.set_pen(TEXT_BG_CON)
-    #else:        display.set_pen(TEXT_BG_GEN)
-    #display.rectangle(221, 1, 98, 41) # draws a background for the text
-    vector.text(earn_str, 196, 227, 0)
+    earnTxt = '{0:.2f}'.format(settings['earn'])
+    x, y, w, h = vector.measure_text(earnTxt, x=196, y=227, angle=None)
+    w = int(w)
+
+    display.set_pen(WHITE)
+    vector.text('CHF',201,227,0)
+    vector.text(earnTxt,306-w,225,0)
+
     vector.text(str(loopCount), 10, 227, 0)
     
     display.update()
@@ -209,8 +194,8 @@ while True:
 
 
     # do not delete wlan variable and timeSinceLastTransmit
-    del brightness, pulsed, color_pen, disp_y_range, expand, minValCon, maxValGen, meas, t
-    del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x, zeroLine_y  # to combat memAlloc issues
+    del brightness, pulsed, color_pen, disp_y_range, minValCon, maxValGen, meas, t, earnTxt, txtNum
+    del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x,y,w,h, zeroLine_y  # to combat memAlloc issues
     gc.collect() # garbage collection
     
     feed_wdt(useWdt=USE_WDT,wdt=wdt)

@@ -42,15 +42,6 @@ def val_to_rgb(val:int, minValCon:int, maxValGen:int, led_brightness:int)-> list
     a = float(led_brightness) / float(255)
     return list(hsva_to_rgb(h, 1.0, 1.0, a))
 
-def right_align(value4digits:int)->int:
-    if value4digits < 10:
-        return 3
-    if value4digits < 100:
-        return 2
-    if value4digits < 1000:
-        return 1
-    return 0
-
 def getDispYrange(values:list) -> list:
     """returns the range of the given values. extends the range to at least -50 to +50 if the min/max are smaller. returns 2 positive values"""
     minimum = abs(min(min(values),-50))
