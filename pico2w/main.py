@@ -3,7 +3,7 @@
 import micropython_ota # type: ignore | using version 2.1.0., install with thonny/tools/packages
 import gc
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_RGB565  # type: ignore
-from picovector import PicoVector, ANTIALIAS_X16 # type: ignore
+from picovector import PicoVector, ANTIALIAS_X16, Polygon # type: ignore See https://github.com/pimoroni/presto/blob/main/docs/picovector.md
 from time import time
 import machine # type: ignore 
 
@@ -41,7 +41,8 @@ vector.set_antialiasing(ANTIALIAS_X16)
 vector.set_font('font.af', 30)
 
 TXT_SCALE = 0.8
-WIDTH, HEIGHT = display.get_bounds() # 320x240
+WIDTH, HEIGHT = 320, 240 # display.get_bounds() # 320x240
+BAR_HEIGHT = 200
 WHITE = display.create_pen(225, 225, 225)
 TEXT_BG_GEN = display.create_pen(170, 255, 170)
 TEXT_BG_CON = display.create_pen(255, 170, 170)
@@ -133,7 +134,7 @@ while True:
         color_pen = display.create_pen(*val_to_rgb(val=t, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255))
         display.set_pen(color_pen)
         
-        valHeight = int(float(HEIGHT) * float(abs(t)) / float(disp_y_range[2])) # between 0 and HEIGHT. E.g. 135*2827/3400
+        valHeight = int(float(BAR_HEIGHT) * float(abs(t)) / float(disp_y_range[2])) # between 0 and BAR_HEIGHT. E.g. 135*2827/3400
         if t < 0: 
             display.rectangle(x, zeroLine_y, BAR_WIDTH, valHeight)
         else: # direction goes up
@@ -148,7 +149,14 @@ while True:
 
     # writes the reading as text in the rectangle
     display.set_pen(WHITE)
-    vector.text(str(wattVal4digits)+' W', 42+expand*20, 32, 0) # TODO: check width of one char (assuming 20 at the moment)
+    txt = str(wattVal4digits)+' W'
+    x, y, w, h = vector.measure_text(txt, x=44, y=32, angle=None)
+    padding = 8
+
+    w_outline = Polygon()
+    w_outline.rectangle(x-padding,y-15-padding,w+2*padding,h+2*padding, corners=(0, 0, 0, 0), stroke=2)
+    vector.draw(w_outline)
+    vector.text(txt, int(x), int(y), 0)
     
     earn = settings['earn'] # float value
     earn_str = 'CHF {0:.2f}'.format(earn)
