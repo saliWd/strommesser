@@ -26,6 +26,7 @@ otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h 
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, rotate=0, pen_type=PEN_RGB565)
 display.set_backlight(0.8)
+display.set_font("sans") # for the non-fancy text output during startup
 
 vector = PicoVector(display)
 vector.set_antialiasing(ANTIALIAS_X16)
@@ -34,21 +35,30 @@ vector.set_font('font.af', 30)
 
 TXT_SCALE = 0.8
 WIDTH, HEIGHT, BAR_HEIGHT = 320, 240, 180 # want some empty space on top/bottom, bar is thus smaller than 240
-WHITE       = display.create_pen(225, 225, 225)
+BLACK       = display.create_pen(0, 0, 0)
+WHITE       = display.create_pen(255, 255, 255)
 COLOR_PLUS  = display.create_pen(170, 255, 170)
 COLOR_MINUS = display.create_pen(255, 170, 170)
 BAR_WIDTH = 5
 wattVals = []
+
+rgb_led = RgbLed()
+rgb_led.control(allOk=False, pulsating=False, color=[255,0,0])
+
+display.set_pen(BLACK)
+display.clear()
+display.set_pen(WHITE)
+display.text('...verbinde mit WLAN...', 10, 10, scale=2)
+display.text(WLAN_CFG['ssid'], 10, 35, scale=2)
+display.update()
+
+wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
+
 # fills the screen
 png = PNG(display)
 png.open_file('background.png')
 png.decode(0, 0)
 display.update()
-
-rgb_led = RgbLed()
-rgb_led.control(allOk=False, pulsating=False, color=[255,0,0])
-
-wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
 
 # start the watchdog after wlan_init (which may take longer and does a reboot if not successful)
 if USE_WDT: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
