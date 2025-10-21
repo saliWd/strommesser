@@ -1,6 +1,5 @@
 ## xx_version_placeholder_xx
 
-import micropython_ota # type: ignore | using version 2.1.0., install with thonny/tools/packages
 import gc
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_RGB565  # type: ignore
 from picovector import PicoVector, ANTIALIAS_X16, Polygon # type: ignore See https://github.com/pimoroni/presto/blob/main/docs/picovector.md
@@ -11,7 +10,7 @@ from pngdec import PNG # type: ignore
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, getBrightness
+from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, getBrightness, do_ota
 import my_config
 
 
@@ -31,12 +30,10 @@ display.set_backlight(0.8)
 vector = PicoVector(display)
 vector.set_antialiasing(ANTIALIAS_X16)
 # font from https://github.com/Gadgetoid/alright-fonts/blob/effb2fca35909a0f2aff7ed04b76c14286490817/sample-fonts/OpenSans/OpenSans-SemiBold.af, stored in root on filesystem. 
-# TODO: add to ota as well
 vector.set_font('font.af', 30)
 
 TXT_SCALE = 0.8
-WIDTH, HEIGHT = 320, 240 # display.get_bounds() # 320x240
-BAR_HEIGHT = 200
+WIDTH, HEIGHT, BAR_HEIGHT = 320, 240, 180 # want some empty space on top/bottom, bar is thus smaller than 240
 WHITE       = display.create_pen(225, 225, 225)
 COLOR_PLUS  = display.create_pen(170, 255, 170)
 COLOR_MINUS = display.create_pen(255, 170, 170)
@@ -44,7 +41,7 @@ BAR_WIDTH = 5
 wattVals = []
 # fills the screen
 png = PNG(display)
-png.open_file("pico_background.png") # TODO: add it to ota as well
+png.open_file('background.png')
 png.decode(0, 0)
 display.update()
 
@@ -80,13 +77,7 @@ while True:
         timeSinceLastOtaCheck = time() # reset the counter
         otaCheckAfterXseconds = 86400 # 24h
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
-        if (DEBUG_CFG['wlan'] == 'real'): # don't do ota otherwise
-            micropython_ota.ota_update(
-                host='https://strommesser.ch/ota/',
-                project='display',
-                filenames=['boot.py', 'main.py', 'function_def.py', 'class_def.py'], # config (and libraries) is not changed
-                use_version_prefix=False
-            )
+        do_ota(DEBUG_CFG)
 
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     meas = json_get_req(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG)

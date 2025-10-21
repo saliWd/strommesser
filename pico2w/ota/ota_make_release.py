@@ -1,6 +1,7 @@
 import sys
 import os
 from re import sub, match
+import shutil
 
 def is_valid_version(version):
     # Regex pattern: starts with 'v', followed by three groups of digits separated by dots
@@ -27,7 +28,8 @@ def changeVersionComment(version:str, inputFile:str, outputFile:str):
     new_file_open.write(new_content)
     new_file_open.close()
 
-FILE_NAMES = ['boot.py',  'main.py', 'function_def.py', 'class_def.py'] # my_config.py is not part of ota
+FILE_NAMES        = ['boot.py',  'main.py', 'function_def.py', 'class_def.py'] # my_config.py is not part of ota
+FILE_NAMES_BINARY = ['font.af', 'background.png'] # not replacing any content, just copying those to output dir
 OUT_FILE_DIR = '../../web/ota/display/' # project is called display
 
 
@@ -61,10 +63,13 @@ for i in range(0,len(FILE_NAMES)):
         inputFile='../'+FILE_NAMES[i], 
         outputFile=outFilePath+'/'+FILE_NAMES[i]
     )
+for i in range(0,len(FILE_NAMES_BINARY)):
+    shutil.copyfile('../'+FILE_NAMES_BINARY[i], 
+                    outFilePath+'/'+FILE_NAMES_BINARY[i])     
 
 # need a file called 'version' one directory up. Containing only the version string
 new_file_open = open(OUT_FILE_DIR+'version', 'w')
 new_file_open.write(version)
 new_file_open.close()
 
-print (">>> Done. Created "+str(len(FILE_NAMES))+" files in the "+outFilePath+"-directory and the corresponding version file")
+print (">>> Done. Created "+str(len(FILE_NAMES)+len(FILE_NAMES_BINARY))+" files in the "+outFilePath+"-directory and the corresponding version file")

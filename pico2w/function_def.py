@@ -11,6 +11,7 @@ from random import randint
 import requests_1 as request # from https://github.com/shariltumin/bit-and-pieces/tree/main/web-client, see also https://github.com/orgs/micropython/discussions/14105
 import json
 import network # type: ignore (this is a pylance ignore warning directive)
+import micropython_ota # type: ignore | using version 2.1.0., install with thonny/tools/packages
 
 # start with h = variable, s = 0.5, v = 0.5, a = LedBrightness/255
 def hsva_to_rgb(h:float, s:float, v:float, a:float) -> tuple: # inputs: values from 0.0 to 1.0. Outputs are integers, range 0 to 255
@@ -260,6 +261,16 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, settings:dict, useW
 def feed_wdt(useWdt:bool, wdt):
     if useWdt:
         wdt.feed() # type: ignore
+    return
+
+def do_ota(DEBUG_CFG):
+    if (DEBUG_CFG['wlan'] == 'real'): # don't do ota otherwise
+        micropython_ota.ota_update(
+            host='https://strommesser.ch/ota/',
+            project='display',
+            filenames=['boot.py', 'main.py', 'function_def.py', 'class_def.py', 'font.af', 'background.png'], # config (and libraries) is not changed
+            use_version_prefix=False
+        )
     return
 
 
