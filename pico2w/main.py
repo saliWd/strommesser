@@ -26,7 +26,7 @@ otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h 
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, rotate=0, pen_type=PEN_RGB565)
 display.set_backlight(0.8)
-display.set_font("sans") # for the non-fancy text output during startup
+display.set_font('sans') # for the non-fancy text output during startup
 
 vector = PicoVector(display)
 vector.set_antialiasing(ANTIALIAS_X16)
@@ -52,7 +52,7 @@ display.text('...verbinde mit WLAN...', 10, 10, scale=2)
 display.text(WLAN_CFG['ssid'], 10, 35, scale=2)
 display.update()
 
-wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG)
+wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG) # may take some time
 
 # fills the screen
 png = PNG(display)
@@ -115,7 +115,7 @@ while True:
 
     # normalize the value between -ledMinValCon and ledMaxValGen (e.g. -400 to 3000)
     wattValMinMax = min(max(wattVal, (-1 * minValCon)),maxValGen)
-    # print("normalized watt value: "+str(wattValMinMax)+", min/max: "+str(minValCon)+"/"+str(maxValGen))
+    #print('normalized watt value: '+str(wattValMinMax)+', min/max: '+str(minValCon)+'/'+str(maxValGen))
 
     png.decode(0, 0)
 
