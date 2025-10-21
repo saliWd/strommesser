@@ -185,8 +185,8 @@ while True:
 
 
     # do not delete wlan variable and timeSinceLastTransmit
-    del brightness, pulsed, color_pen, disp_y_range, minValCon, maxValGen, meas, t, earnTxt, txtNum
-    del valColor, valHeight, wattVal, wattVal4digits, wattValMinMax, x,y,w,h, zeroLine_y  # to combat memAlloc issues
+    del x,y,w,h,t,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range
+    del zeroLine_y,color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
     gc.collect() # garbage collection
     
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
