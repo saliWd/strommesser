@@ -26,7 +26,7 @@ otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h 
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, rotate=0, pen_type=PEN_RGB565)
 display.set_backlight(0.8)
-display.set_font('sans') # for the non-fancy text output during startup
+display.set_font('bitmap8') # for the non-fancy text output during startup
 
 vector = PicoVector(display)
 vector.set_antialiasing(ANTIALIAS_X16)
@@ -48,8 +48,8 @@ rgb_led.control(allOk=False, pulsating=False, color=[255,0,0])
 display.set_pen(BLACK)
 display.clear()
 display.set_pen(WHITE)
-display.text('...verbinde mit WLAN...', 10, 10, scale=2)
-display.text(WLAN_CFG['ssid'], 10, 35, scale=2)
+display.text('...verbinde mit WLAN...', 10, 10, scale=1)
+display.text(WLAN_CFG['ssid'], 10, 25, scale=1)
 display.update()
 
 wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG) # may take some time
