@@ -3,14 +3,14 @@
 import gc
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_RGB565  # type: ignore
 from picovector import PicoVector, ANTIALIAS_X16, Polygon # type: ignore See https://github.com/pimoroni/presto/blob/main/docs/picovector.md
-from time import time
+from time import time, sleep
 import machine # type: ignore 
 from pngdec import PNG # type: ignore
 from micropython import const # type: ignore
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, getBrightness, do_ota
+from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, wlan_init, getBrightness, do_ota
 import my_config
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
@@ -98,8 +98,8 @@ while True:
         print('get request did not work')
         if measErrorCnt > 5:
             print('sleeping for 10 seconds')
-            debug_sleep(DEBUG_CFG=DEBUG_CFG,time=10) # this will trigger the watchdog and force a reboot
-        debug_sleep(DEBUG_CFG=DEBUG_CFG,time=2)
+            sleep(10) # this will trigger the watchdog and force a reboot
+        sleep(2)
         continue
 
     wattVal = int(1000.0 * (-1.0*meas['power_pos'] + meas['power_neg'])) # cons is negative, gen positive. 0 is treated as gen
@@ -202,4 +202,4 @@ while True:
     gc.collect() # garbage collection
     
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
-    debug_sleep(DEBUG_CFG=DEBUG_CFG,time=LOOP_SLEEP_SEC)
+    sleep(LOOP_SLEEP_SEC)

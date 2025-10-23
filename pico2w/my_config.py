@@ -15,7 +15,6 @@ def get_device_config()->dict:
 def get_debug_settings()->dict:
     return(dict([
         ('wlan','real'),           # can be 'real'|'simulated'. When simulated, json_data must be 'file'
-        ('sleep','normal'),        # can be 'normal'|'short'
         ('json_data','local_net'), # can be 'local_net'|'web'|'file'. Latter two are for debug
         ('server_txrx',True),      # can be True|False. Whether meas data are sent to the server and settings received (every 2 mins)
         ('use_watchdog', True)     # can be True|False

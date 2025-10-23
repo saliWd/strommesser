@@ -1,7 +1,4 @@
 ## xx_version_placeholder_xx
-# using MicroPython v1.25.0 on 2025-04-15; Raspberry Pi Pico 2 W with RP2350
-# does not work: Micropython version Raspberry Pico 2 W with Pimoroni libraries 0.0.11
-# working pimoroni libraries: MicroPython pico2_w_2025_04_09,   on 2025-04-15; Raspberry Pi Pico 2 W with RP2350 from https://github.com/pimoroni/pimoroni-pico-rp2350/releases
 
 from machine import reset # type: ignore
 from time import sleep
@@ -84,26 +81,13 @@ def get_interesting_values(jdata) -> dict:
             ('energy_neg',jdata['StatusSNS']['z']['Eo']),
             ('energy_pos_t1',jdata['StatusSNS']['z']['Ei1']),
             ('energy_pos_t2',jdata['StatusSNS']['z']['Ei2'])
-        ])
-        #print_values(meas=meas)
+        ])        
         #print("Content:\n", jdata)
     except Exception as error:
         print("Error: json values not as expected:", error)
         meas = dict([('valid',False)])
     
     return(meas)
-
-def print_values(meas:dict):
-    print('date time:',meas['date_time'])
-    print('current power +:',meas['power_pos'])
-    print('current power -:',meas['power_neg'])
-
-    print('energy +:',meas['energy_pos'])
-    print('energy -:',meas['energy_neg'])
-    
-    print('energy + T1:',meas['energy_pos_t1'])
-    print('energy + T2:',meas['energy_pos_t2'])
-    return
 
 def getBrightness(setting:int, time:str, wattVal:int):
     """adjusts the brightness (from the server) during the night and depending on the measured value"""
@@ -185,12 +169,6 @@ def sepStrToArr(valueString:str) -> dict:
     else:
         return (dict([('valid',False)]))
 
-def debug_sleep(DEBUG_CFG:dict, time:int):
-    if(DEBUG_CFG['sleep'] == 'short'): # minimize wait times by sleeping only one second instead of the normal amount
-        time = 1
-    sleep(time)
-    return
-
 # is called once before while loop
 def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict):
     if(DEBUG_CFG['wlan'] == 'simulated'):
@@ -237,6 +215,7 @@ def get_randNum_hash(device_config):
     return(returnVal)
 
 def hexlify_wlan(input:str):
+    """a helper function, not used in the code itself"""
     hex_input = hexlify(input.encode()) # hex the bytestream of the string
     print(hex_input.decode())
 
