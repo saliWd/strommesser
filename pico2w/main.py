@@ -63,8 +63,8 @@ if USE_WDT: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
 else: wdt = 0
 
 loopCount:int = 0
-timeSinceLastTransmit = time() # returns seconds
-timeSinceLastOtaCheck = time()
+timeAtLastTransmit = time() # returns seconds
+timeAtLastOtaCheck = time()
 settings = dict([
     ('valid',True),
     ('serverOk', 1),
@@ -81,8 +81,8 @@ while True:
     loopCount += 1 # just let it overflow
 
     ## do it once, shortly (3 mins) after booting, then don't do it for about 24 hours
-    if ((time() - timeSinceLastOtaCheck) > otaCheckAfterXseconds):
-        timeSinceLastOtaCheck = time() # reset the counter
+    if ((time() - timeAtLastOtaCheck) > otaCheckAfterXseconds):
+        timeAtLastOtaCheck = time() # reset the counter
         otaCheckAfterXseconds = 86400 # 24h
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
         do_ota(DEBUG_CFG) # maybe reboots, maybe not
@@ -188,14 +188,12 @@ while True:
             maxValGen=maxValGen,
             led_brightness=int(brightness/2))) # led is quite bright when shining constantly
     
-    if ((time() - timeSinceLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
-        timeSinceLastTransmit = time() # reset the counter
+    if ((time() - timeAtLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
+        timeAtLastTransmit = time() # reset the counter
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
         settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, settings=settings, useWdt=USE_WDT, wdt=wdt) # now transmit the stuff to the server
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
-
-
-    # do not delete wlan variable and timeSinceLastTransmit
+    
     try:
         del x,y,w,h,t,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range
         del zeroLine_y,color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
