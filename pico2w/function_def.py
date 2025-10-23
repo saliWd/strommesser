@@ -49,8 +49,8 @@ def getDispYrange(values:list) -> list:
     maximum = max(max(values),50)
     return [minimum,maximum,(minimum+maximum)]
 
-def json_get_req(DEBUG_CFG:dict, DEVICE_CFG:dict) -> dict:
-    URL = 'http://'+ DEVICE_CFG['local_ip'] + '/cm?cmnd=status%2010'
+def json_get_req(DEBUG_CFG:dict, local_ip:str) -> dict:
+    URL = 'http://'+ local_ip + '/cm?cmnd=status%2010'
     # Maybe to do: could also use http://gplugm.local/cm?cmnd=status%2010. Does not help in my case though where I have two gplugm
     
     if DEBUG_CFG['json_data'] == 'web': # can be 'local_net'|'web'|'file'
@@ -140,8 +140,8 @@ def transmit_message(message:dict, useWdt:bool, wdt) -> str:
     URL = "https://strommesser.ch/verbrauch/pico2w_v4.php?TX=pico&TXVER=3"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     failureCount = 0
-    feed_wdt(useWdt=useWdt,wdt=wdt)
     while failureCount < 3:
+        feed_wdt(useWdt=useWdt,wdt=wdt)
         try:
             urlenc = urlencode(message)
             #print(URL)
@@ -162,9 +162,8 @@ def transmit_message(message:dict, useWdt:bool, wdt) -> str:
         except Exception as error:
             print("Error: request.post did not work. Error:", error)        
             failureCount += 1
-        feed_wdt(useWdt=useWdt,wdt=wdt)    
-        sleep(5) # wait in between the loops
         feed_wdt(useWdt=useWdt,wdt=wdt)
+        sleep(4) # wait in between the loops
     
     # while loop has passed, did not work several times, do a reset now
     print("Error: failure count too high:"+str(failureCount)+". Resetting in 20 seconds or with the watchdog...")
@@ -252,6 +251,7 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, settings:dict, useW
             ('hash', randNum_hash['hash'])
             ])
         #print(str(message))
+        feed_wdt(useWdt=useWdt,wdt=wdt)
         new_settings = server_communication(DEBUG_CFG=DEBUG_CFG, message=message, useWdt=useWdt, wdt=wdt)
         if (new_settings['valid']):
             settings = new_settings # otherwise keep the old settings

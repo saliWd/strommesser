@@ -5,23 +5,22 @@ from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_RGB565  # typ
 from picovector import PicoVector, ANTIALIAS_X16, Polygon # type: ignore See https://github.com/pimoroni/presto/blob/main/docs/picovector.md
 from time import time
 import machine # type: ignore 
-
 from pngdec import PNG # type: ignore
+from micropython import const # type: ignore
 
 # my own files
 from class_def import RgbLed # class def
 from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, debug_sleep, wlan_init, getBrightness, do_ota
 import my_config
 
-
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
 USE_WDT:bool = DEBUG_CFG['use_watchdog']
 
 DEVICE_CFG = my_config.get_device_config()
 WLAN_CFG = my_config.get_wlan_config()
-LOOP_SLEEP_SEC = 3 # pause between loops. Results in about 5 seconds loop
-WATT_NOISE_LIMIT = 15 # everything below 15 W will be set to 0
-TRANSMIT_EVERY_X_SECONDS = 120
+LOOP_SLEEP_SEC = const(3) # pause between loops. Results in about 5 seconds loop
+WATT_NOISE_LIMIT = const(15) # everything below 15 W will be set to 0
+TRANSMIT_EVERY_X_SECONDS = const(120)
 otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h after the first check
 
 display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, rotate=0, pen_type=PEN_RGB565)
@@ -33,13 +32,12 @@ vector.set_antialiasing(ANTIALIAS_X16)
 # font from https://github.com/Gadgetoid/alright-fonts/blob/effb2fca35909a0f2aff7ed04b76c14286490817/sample-fonts/OpenSans/OpenSans-SemiBold.af, stored in root on filesystem. 
 vector.set_font('font.af', 30)
 
-TXT_SCALE = 0.8
-WIDTH, HEIGHT, BAR_HEIGHT = 320, 240, 180 # want some empty space on top/bottom, bar is thus smaller than 240
+WIDTH, HEIGHT, BAR_HEIGHT = const(320), const(240), const(180) # want some empty space on top/bottom, bar is thus smaller than 240
 BLACK       = display.create_pen(0, 0, 0)
 WHITE       = display.create_pen(255, 255, 255)
 COLOR_PLUS  = display.create_pen(170, 255, 170)
 COLOR_MINUS = display.create_pen(255, 170, 170)
-BAR_WIDTH = 5
+BAR_WIDTH = const(5)
 wattVals = []
 
 rgb_led = RgbLed()
@@ -87,10 +85,11 @@ while True:
         timeSinceLastOtaCheck = time() # reset the counter
         otaCheckAfterXseconds = 86400 # 24h
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
-        do_ota(DEBUG_CFG)
+        do_ota(DEBUG_CFG) # maybe reboots, maybe not
+        continue
 
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
-    meas = json_get_req(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG)
+    meas = json_get_req(DEBUG_CFG=DEBUG_CFG, local_ip=DEVICE_CFG['local_ip'])
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     if meas['valid']:
         measErrorCnt = 0
@@ -118,6 +117,7 @@ while True:
     #print('normalized watt value: '+str(wattValMinMax)+', min/max: '+str(minValCon)+'/'+str(maxValGen))
 
     png.decode(0, 0)
+    feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
     wattVals.append(wattValMinMax)
     if len(wattVals) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
@@ -144,6 +144,7 @@ while True:
         else: # direction goes up
             display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
+    feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
     if wattVal < 0: display.set_pen(COLOR_MINUS)
     else:           display.set_pen(COLOR_PLUS)
@@ -179,7 +180,7 @@ while True:
     # print('brightness output: wattVal:settings:applied'+str(wattVal)+':'+str(settings['brightness'])+':'+str(brightness))
     
     rgb_led.control(
-        allOk=((meas['valid']) and (bool(settings['serverOk']) and True)), # need some type conversion (and True) to satisfy pylance
+        allOk=bool(settings['serverOk']), # NB: meas['valid'] is True. Otherwise we break the loop
         pulsating=pulsed,
         color=val_to_rgb(
             val=wattValMinMax,
@@ -195,10 +196,12 @@ while True:
 
 
     # do not delete wlan variable and timeSinceLastTransmit
-    del x,y,w,h,t,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range
-    del zeroLine_y,color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
+    try:
+        del x,y,w,h,t,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range
+        del zeroLine_y,color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
+    except Exception as error:
+        print("An exception occurred:", error)
     gc.collect() # garbage collection
     
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     debug_sleep(DEBUG_CFG=DEBUG_CFG,time=LOOP_SLEEP_SEC)
-    feed_wdt(useWdt=USE_WDT,wdt=wdt)
