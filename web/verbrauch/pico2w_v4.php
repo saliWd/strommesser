@@ -100,14 +100,21 @@
     $sqlSafe_values = sqlSafeStrFromPost(dbConn: $dbConn, varName: 'values', length: 255); // safe to insert into sql (not to output on html)
     // meas_string = meas['date_time']+'|'+meas['energy_pos']+'|'+meas['energy_neg']+'|'+meas['energy_pos_t1']+'|'+meas['energy_pos_t2']
 
-    $values = explode(separator: '|',string: $sqlSafe_values, limit: 5);
+    $values = explode(separator: '|',string: $sqlSafe_values, limit: 6);
     if (! $values[0]) {
-        printRawErrorAndDie(heading: 'Error', text: 'values not found');
+      printRawErrorAndDie(heading: 'Error', text: 'values not found');
     }
 
     // NB: previously egs had a different Ht and Nt definition
     if (! $result = $dbConn->query(query:'INSERT INTO `verbrauch` (`userid`, `cons`, `gen`, `consHt`, `consNt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")')) {
-        printRawErrorAndDie(heading: 'Error', text: 'db insert not ok');
+      printRawErrorAndDie(heading: 'Error', text: 'db insert not ok');
+    }
+
+    if ($values[5]) { // this is for the log data base
+      if (! $result = $dbConn->query(query:'INSERT INTO `pico_log` (`userid`, `loopCount`) VALUES ("$userid", "'.$values[5].'")')) {
+        printRawErrorAndDie(heading: 'Error', text: 'log db insert not ok');
+      }
+      // TODO: need to clean up the log data base from time to time
     }
 
 
@@ -115,19 +122,19 @@
     $result = $dbConn->query(query: "SELECT * FROM `verbrauch` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 2");
     $queryCount = $result->num_rows; // this may be 1 or 2
     if ($queryCount === 2) {
-        $row_now = $result->fetch_assoc();
-        $row_before = $result->fetch_assoc();
-        $valueDiffsSql = getDiffs(row_now:$row_now, row_before:$row_before);
-        $zeitDiff = date_diff(baseObject: date_create(datetime: $row_before['zeit']), targetObject: date_create(datetime: $row_now['zeit']));
-        $zeitSecs = $zeitDiff->d*24*3600 + $zeitDiff->h*3600 + $zeitDiff->i*60 + $zeitDiff->s;
-        
-        $result = $dbConn->query(query: 'UPDATE `verbrauch` SET '.$valueDiffsSql.'`zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
+      $row_now = $result->fetch_assoc();
+      $row_before = $result->fetch_assoc();
+      $valueDiffsSql = getDiffs(row_now:$row_now, row_before:$row_before);
+      $zeitDiff = date_diff(baseObject: date_create(datetime: $row_before['zeit']), targetObject: date_create(datetime: $row_now['zeit']));
+      $zeitSecs = $zeitDiff->d*24*3600 + $zeitDiff->h*3600 + $zeitDiff->i*60 + $zeitDiff->s;
+      
+      $result = $dbConn->query(query: 'UPDATE `verbrauch` SET '.$valueDiffsSql.'`zeitDiff` = "'.$zeitSecs.'" WHERE `id` = "'.$row_now['id'].'";');
 
-        copyToArchive(dbConn:$dbConn, rowId:$row_now['id']);
-        
-        // dbThinnings: do not need to run every time but it doesn't hurt either
-        doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:TRUE);
-        doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:FALSE);
+      copyToArchive(dbConn:$dbConn, rowId:$row_now['id']);
+      
+      // dbThinnings: do not need to run every time but it doesn't hurt either
+      doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:TRUE);
+      doReduction(dbConn:$dbConn, userid:$userid, smlTimeScale:FALSE);
     }
 
     // check whether the last measurement is not older than 5 mins and 
@@ -135,7 +142,7 @@
     $result = $dbConn->query(query: "SELECT `zeit` FROM `verbrauch` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 1;");
     $queryCount = $result->num_rows; // this may be 0 or 1
     if ($queryCount !== 1) {
-        printRawErrorAndDie(heading: 'Error', text: 'no meas data');
+      printRawErrorAndDie(heading: 'Error', text: 'no meas data');
     }
     $row = $result->fetch_assoc();
 
@@ -146,7 +153,7 @@
     
     $result = $dbConn->query(query: "SELECT `priceConsHt`,`priceConsNt`,`priceGen`,`ledMinValCon`,`ledMaxValGen`,`ledBrightness` FROM `kunden` WHERE `id` = \"$userid\" LIMIT 1;");
     if ($result->num_rows !== 1) {
-        printRawErrorAndDie(heading: 'Error', text: 'no config data');
+      printRawErrorAndDie(heading: 'Error', text: 'no config data');
     } 
     $rowKunden = $result->fetch_assoc();
 

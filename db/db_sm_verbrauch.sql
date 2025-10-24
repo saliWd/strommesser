@@ -22,7 +22,15 @@ CREATE TABLE `kunden` (
   `priceConsHt` decimal(5,4) NOT NULL,
   `priceConsNt` decimal(5,4) NOT NULL,
   `priceGen` decimal(5,4) NOT NULL,
-  `paidUntil` date NOT NULL
+  `paidUntil` date NOT NULL,
+  `local_ip` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
+CREATE TABLE `pico_log` (
+  `id` bigint(20) NOT NULL,
+  `userid` int(11) NOT NULL,
+  `loopCount` bigint(20) NOT NULL,
+  `zeit` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE `pwForgot` (
@@ -73,6 +81,9 @@ CREATE TABLE `verbrauchArchive` (
 ALTER TABLE `kunden`
   ADD PRIMARY KEY (`id`);
 
+ALTER TABLE `pico_log`
+  ADD PRIMARY KEY (`id`);
+
 ALTER TABLE `pwForgot`
   ADD PRIMARY KEY (`id`);
 
@@ -88,6 +99,9 @@ ALTER TABLE `verbrauchArchive`
 
 ALTER TABLE `kunden`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `pico_log`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `pwForgot`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
