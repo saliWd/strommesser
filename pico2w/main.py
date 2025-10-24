@@ -191,7 +191,8 @@ while True:
     if ((time() - timeAtLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
         timeAtLastTransmit = time() # reset the counter
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
-        settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, settings=settings, useWdt=USE_WDT, wdt=wdt) # now transmit the stuff to the server
+        settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, loopCount=loopCount,
+                                settings=settings, useWdt=USE_WDT, wdt=wdt) # now transmit the stuff to the server
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
     
     try:

@@ -219,9 +219,9 @@ def hexlify_wlan(input:str):
     hex_input = hexlify(input.encode()) # hex the bytestream of the string
     print(hex_input.decode())
 
-def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, settings:dict, useWdt:bool, wdt) -> dict:
+def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, settings:dict, useWdt:bool, wdt) -> dict:
         randNum_hash = get_randNum_hash(DEVICE_CFG)
-        meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])
+        meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])+'|'+str(loopCount)
 
         message = dict([
             ('userid', DEVICE_CFG['userid']),
