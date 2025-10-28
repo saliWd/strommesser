@@ -66,7 +66,6 @@ loopCount:int = 0
 timeAtLastTransmit = time() # returns seconds
 timeAtLastOtaCheck = time()
 settings = dict([
-    ('valid',True),
     ('serverOk', 1),
     ('brightness', 33),
     ('minValCon', 400),
@@ -192,7 +191,7 @@ while True:
         timeAtLastTransmit = time() # reset the counter
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
         settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, loopCount=loopCount,
-                                settings=settings, useWdt=USE_WDT, wdt=wdt) # now transmit the stuff to the server
+                                useWdt=USE_WDT, wdt=wdt) # now transmit the stuff to the server
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
     
     try:

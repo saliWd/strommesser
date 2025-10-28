@@ -110,7 +110,7 @@
       printRawErrorAndDie(heading: 'Error', text: 'db insert not ok');
     }
 
-    if ($values[5]) { // this is for the log data base
+    if (count(value: $values) > 5) { // this is for the log data base
       if (! $result = $dbConn->query(query:'INSERT INTO `pico_log` (`userid`, `loopCount`) VALUES ("$userid", "'.$values[5].'")')) {
         printRawErrorAndDie(heading: 'Error', text: 'log db insert not ok');
       }

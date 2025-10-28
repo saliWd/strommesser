@@ -114,13 +114,16 @@ def getBrightness(setting:int, time:str, wattVal:int):
 # sends the measurement data and gets the settings
 def server_communication(DEBUG_CFG:dict, message:dict, useWdt:bool, wdt) -> dict:
     if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled
-        valueString=transmit_message(message=message, useWdt=useWdt, wdt=wdt)
+        return(transmit_message(message=message, useWdt=useWdt, wdt=wdt))
     else: # wlan simulated
-        valueString='1|80|200|2000|-0.27' # serverok|ledBrightness|ledMinValCon|ledMaxValGen|earn
-    return(sepStrToArr(valueString=valueString))
+        return(dict([('serverOk', 1),
+                     ('brightness', 80), # just some different values
+                     ('minValCon', 200),
+                     ('maxValGen', 2000),
+                     ('earn', -0.27)]))    
     
 
-def transmit_message(message:dict, useWdt:bool, wdt) -> str:
+def transmit_message(message:dict, useWdt:bool, wdt) -> dict:
     URL = "https://strommesser.ch/verbrauch/pico2w_v4.php?TX=pico&TXVER=3"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     failureCount = 0
@@ -128,8 +131,7 @@ def transmit_message(message:dict, useWdt:bool, wdt) -> str:
         feed_wdt(useWdt=useWdt,wdt=wdt)
         try:
             urlenc = urlencode(message)
-            #print(URL)
-            #print(message)
+            #print(URL) #print(message)
             feed_wdt(useWdt=useWdt,wdt=wdt)
             response = request.post(URL, data=urlenc, headers=HEADERS) # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue
             feed_wdt(useWdt=useWdt,wdt=wdt)
@@ -138,10 +140,20 @@ def transmit_message(message:dict, useWdt:bool, wdt) -> str:
                 answer = response.text
                 response.close() # this is needed, I'm getting outOfMemory exception otherwise after 4 loops
                 feed_wdt(useWdt=useWdt,wdt=wdt)
-                return(answer)
+                valueArray = answer.split('|',4) # maxsplit=4, returns up to 5 elements
+                valueArrayLen = len(valueArray)
+                if (valueArrayLen > 3 ):
+                    return(dict([('serverOk', int(valueArray[0])),
+                                 ('brightness', int(valueArray[1])),
+                                 ('minValCon', int(valueArray[2])),
+                                 ('maxValGen', int(valueArray[3])),
+                                 ('earn', float(valueArray[4]))])) # two decimals, pos or negative
+                else:
+                    print("Error: server response not as expected. Length of return array: "+str(valueArrayLen)+". FailureCount: "+str(failureCount))
+                    failureCount += 1
             else:
                 print("Error: invalid status code:"+str(response.status_code)+". FailureCount: "+str(failureCount))
-                response.close()                
+                response.close()
                 failureCount += 1
         except Exception as error:
             print("Error: request.post did not work. Error:", error)        
@@ -153,21 +165,8 @@ def transmit_message(message:dict, useWdt:bool, wdt) -> str:
     print("Error: failure count too high:"+str(failureCount)+". Resetting in 20 seconds or with the watchdog...")
     sleep(20) # add a bit of debug possibility. NB: # this will trigger the watchdog timer (if enabled) and reset as well    
     reset() # NB: connection to whatever device is getting lost; complicates debugging
-    return('bla') # this return will never be executed
+    return(dict([('serverOk', 0)])) # this return will never be executed
 
-def sepStrToArr(valueString:str) -> dict:
-    valueArray = valueString.split('|')
-    if (len(valueArray) > 3 ):
-        return(dict([
-            ('valid',True),
-            ('serverOk', int(valueArray[0])),
-            ('brightness', int(valueArray[1])),
-            ('minValCon', int(valueArray[2])),
-            ('maxValGen', int(valueArray[3])),
-            ('earn', float(valueArray[4])) # two decimals, pos or negative
-        ]))
-    else:
-        return (dict([('valid',False)]))
 
 # is called once before while loop
 def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict):
@@ -219,7 +218,7 @@ def hexlify_wlan(input:str):
     hex_input = hexlify(input.encode()) # hex the bytestream of the string
     print(hex_input.decode())
 
-def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, settings:dict, useWdt:bool, wdt) -> dict:
+def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useWdt:bool, wdt) -> dict:
         randNum_hash = get_randNum_hash(DEVICE_CFG)
         meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])+'|'+str(loopCount)
 
@@ -231,9 +230,7 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, sett
             ])
         #print(str(message))
         feed_wdt(useWdt=useWdt,wdt=wdt)
-        new_settings = server_communication(DEBUG_CFG=DEBUG_CFG, message=message, useWdt=useWdt, wdt=wdt)
-        if (new_settings['valid']):
-            settings = new_settings # otherwise keep the old settings
+        settings = server_communication(DEBUG_CFG=DEBUG_CFG, message=message, useWdt=useWdt, wdt=wdt)        
         del randNum_hash, meas_string, message
         return(settings)
 
