@@ -18,7 +18,7 @@ USE_WDT:bool = DEBUG_CFG['use_watchdog']
 
 DEVICE_CFG = my_config.get_device_config()
 WLAN_CFG = my_config.get_wlan_config()
-LOOP_SLEEP_SEC = const(3) # pause between loops. Results in about 5 seconds loop
+LOOP_SLEEP_SEC = const(4) # pause between loops. Results in about 5 seconds loop
 WATT_NOISE_LIMIT = const(15) # everything below 15 W will be set to 0
 TRANSMIT_EVERY_X_SECONDS = const(120)
 otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h after the first check
