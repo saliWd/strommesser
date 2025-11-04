@@ -105,6 +105,17 @@
       printRawErrorAndDie(heading: 'Error', text: 'values not found');
     }
 
+    // sanity check, all values which go into the DB have to be bigger than 0
+    if (
+        ($values[1] <= 0) or
+        ($values[2] <= 0) or
+        ($values[3] <= 0) or
+        ($values[4] <= 0) or
+        ($userid <= 0)
+      ) {
+      printRawErrorAndDie(heading: 'Error', text: 'sanity check for the values not ok');
+    }
+
     // NB: previously egs had a different Ht and Nt definition
     if (! $result = $dbConn->query(query:'INSERT INTO `verbrauch` (`userid`, `cons`, `gen`, `consHt`, `consNt`) VALUES ("'.$userid.'", "'.$values[1].'", "'.$values[2].'", "'.$values[3].'", "'.$values[4].'")')) {
       printRawErrorAndDie(heading: 'Error', text: 'db insert not ok');
