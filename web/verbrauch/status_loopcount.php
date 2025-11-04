@@ -106,9 +106,8 @@ if ($totalCount > 0) {// this may be 0
     const data = {
       labels: labels,
       datasets: [{
-        label: "Verbrauch total [kWh]",
-        data: '.$val_y_loopCount.',
-        yAxisID: "yright",
+        label: "Counter value",
+        data: '.$val_y_loopCount.',        
         backgroundColor: "rgba(239, 68, 68, 0.2)",
         showLine: false
       }
@@ -128,7 +127,7 @@ if ($totalCount > 0) {// this may be 0
             type: "time",
             time: { '.$timeUnit.' }
           },
-          yleft: { type: "linear", position: "left", ticks: {color: "rgb(25, 99, 132)"} }
+          y: { type: "linear", ticks: {color: "rgb(25, 99, 132)"} }
         }
       }
     };
@@ -145,12 +144,8 @@ if ($totalCount > 0) {// this may be 0
 }
 
 echo '
-<hr>
 <div class="flex items-center">
-  <div class="text-sm font-light text-gray-500">
-    Info / Details:
-    <button data-popover-target="popover-descriptionIndex" data-popover-placement="bottom-end" type="button">'.getSvg(whichSvg:Svg::QuestionMark).'<span class="sr-only">Info</span></button>
-  </div>
+  <div class="text-sm font-light text-gray-500">&nbsp;</div>
   <div class="flex-auto text-right">Insgesamt '.$totalCount.' Einträge</div>
 </div>
 <br>';
