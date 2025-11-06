@@ -125,9 +125,7 @@
       if (! $result = $dbConn->query(query:'INSERT INTO `pico_log` (`userid`, `loopCount`) VALUES ("'.$userid.'", "'.$values[5].'")')) {
         printRawErrorAndDie(heading: 'Error', text: 'log db insert not ok');
       }
-      // TODO: need to clean up the log data base from time to time
     }
-
 
     //NB: not using last inserted ID as other inserts may have happened in the meantime
     $result = $dbConn->query(query: "SELECT * FROM `verbrauch` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 2");

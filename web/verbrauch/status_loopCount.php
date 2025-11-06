@@ -1,16 +1,7 @@
 <?php declare(strict_types=1); 
-require_once('functions.php');
+require_once 'functions.php';
 $dbConn = initialize();
 
-// returns the time range to be displayed as int. Possible values are: 1 (for last 1 hour), 6, 24, 25. 25 means: all data
-function getTimeRange():int {
-  $returnVal = 7;  // default time range
-  $unsafeInt = safeIntFromExt(source:'GET',varName:'range',length:3);
-  if (($unsafeInt === 1) or ($unsafeInt === 7) or ($unsafeInt === 30) or ($unsafeInt === 365)) {
-    $returnVal = $unsafeInt; 
-  }
-  return $returnVal;
-}
 function doReduce($dbConn, int $userid):void {
   $sqlNoThin = "`userid` = $userid AND `thin` = 0";
   $interval = 25; // hours. Age before doing compacting
@@ -55,15 +46,13 @@ function doReduce($dbConn, int $userid):void {
   // now do the update and then delete the others
   $sql = 'UPDATE `pico_log` SET `thin` = "'.$thinUpdate.'" WHERE `id` = "'.$idToUpdate.'";';
   $result = $dbConn->query($sql);
-  echo 'update sql: '.$sql.'<br>';
         
   $sql = "DELETE FROM `pico_log` WHERE $sqlNoThin AND `zeit` < \"$zeitAlignedPlusStr\";";
   $result = $dbConn->query($sql);
-  echo 'delete sql: '.$sql.'<br>';
 }
 
 
-$timeSelected = getTimeRange();
+$timeSelected = getTimeRange(defaultVal: 7);
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 
 $resultCnt = $dbConn->query('SELECT COUNT(*) as `total` FROM `pico_log` WHERE `userid` = "'.$userid.'" LIMIT 1;'); // guaranteed to return one row
@@ -74,7 +63,7 @@ $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
 printBeginOfPage_v2(site:'status_loopCount.php');
-doReduce(dbConn:$dbConn, userid:$userid);
+doReduce(dbConn:$dbConn, userid:$userid); // maybe TODO: move the reduction to pico2w_v4
 
 $tabTexts = array (  
   '1'   => array('1',  'Tag',  'border-transparent hover:text-gray-600 hover:border-gray-300'),

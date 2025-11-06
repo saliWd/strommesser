@@ -1,18 +1,8 @@
 <?php declare(strict_types=1); 
-require_once('functions.php');
+require_once 'functions.php';
 $dbConn = initialize();
 
-// returns the time range to be displayed as int. Possible values are: 1 (for last 1 hour), 6, 24, 25. 25 means: all data
-function getTimeRange():int {
-  $returnVal = 1;  // default time range
-  $unsafeInt = safeIntFromExt(source:'GET',varName:'range',length:3);
-  if (($unsafeInt === 1) or ($unsafeInt === 7) or ($unsafeInt === 30) or ($unsafeInt === 365)) {
-    $returnVal = $unsafeInt; 
-  }
-  return $returnVal;
-}
-
-$timeSelected = getTimeRange();
+$timeSelected = getTimeRange(defaultVal: 1);
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 
 $resultCnt = $dbConn->query('SELECT COUNT(*) as `total` FROM `verbrauch` WHERE `userid` = "'.$userid.'" LIMIT 1;'); // guaranteed to return one row

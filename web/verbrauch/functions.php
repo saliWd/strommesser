@@ -685,6 +685,16 @@ foreach ($items as $link => $title) {
   }
 }
 
+function getTimeRange(int $defaultVal):int {
+  $returnVal = $defaultVal;  // default time range
+  $unsafeInt = safeIntFromExt(source:'GET',varName:'range',length:3);
+  if (($unsafeInt === 1) or ($unsafeInt === 7) or ($unsafeInt === 30) or ($unsafeInt === 365)) {
+    $returnVal = $unsafeInt; 
+  }
+  return $returnVal;
+}
+
+
 // checks the params retrieved over get and returns TRUE if they are ok
 function verifyGetParams():bool {  
   if (safeStrFromExt('GET','TX', 4) !== 'pico') {                
