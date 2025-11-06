@@ -27,10 +27,11 @@ CREATE TABLE `kunden` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE `pico_log` (
-  `id` bigint(20) NOT NULL,
-  `userid` int(11) NOT NULL,
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `userid` int(10) UNSIGNED NOT NULL,
   `loopCount` bigint(20) NOT NULL,
-  `zeit` timestamp NOT NULL DEFAULT current_timestamp()
+  `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
+  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE `pwForgot` (
@@ -101,7 +102,7 @@ ALTER TABLE `kunden`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `pico_log`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `pwForgot`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;

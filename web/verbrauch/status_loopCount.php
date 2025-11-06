@@ -11,6 +11,57 @@ function getTimeRange():int {
   }
   return $returnVal;
 }
+function doReduce($dbConn, int $userid):void {
+  $sqlNoThin = "`userid` = $userid AND `thin` = 0";
+  $interval = 25; // hours. Age before doing compacting
+  $formatString = 'Y-m-d H:00:00';
+  $thinUpdate = '1';
+  $modifier = '+1 hour';
+  // search the oldest one where thinnig has not yet been applied (and is older than 25h)
+  $sql = "SELECT `zeit` FROM `pico_log` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR) ORDER BY `id` ASC LIMIT 1;";
+  $result = $dbConn->query($sql);
+  if ($result->num_rows < 1) { // if there is no entry older than 25h, there is nothing to do. NB: there is a difference between NOW and last-insert-time
+    return;
+  }
+  $row = $result->fetch_assoc();
+
+  // compact all from the last hour before this entry
+  $zeit = date_create(datetime: $row['zeit']); // e.g. 18:43
+  $zeitAligned = date_create(datetime: $zeit->format(format: $formatString)); // start of the last hour, e.g. 18:00
+  $zeitAlignedStr = $zeitAligned->format(format: $formatString); // as string: 19:00
+  $zeitAlignedPlus = $zeitAligned->modify(modifier: $modifier); // go one hour/day further, 19:00
+  $zeitAlignedPlusStr = $zeitAlignedPlus->format(format: $formatString); // as string: 19:00
+  
+  // check whether this one is still old enough and thinning is ok
+  $sql = "SELECT `id` FROM `pico_log` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
+  $sql .= " AND `zeit` >= \"$zeitAlignedPlusStr\"";
+  $sql .= " ORDER BY `id` ASC LIMIT 1;";
+  $result = $dbConn->query($sql);
+  if ($result->num_rows < 1) { // if there is no entry within this hour, there is nothing to do
+    return;
+  }
+
+  $sql = "SELECT `id` FROM `pico_log` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
+  $sql .= " AND `zeit` < \"$zeitAlignedPlusStr\" AND `zeit` >= \"$zeitAlignedStr\"";
+  $sql .= " ORDER BY `id` DESC LIMIT 1;"; // NB: this is ASC in the reduction code from pico2w_v4. I'm interested in the last one, not the first
+  $result = $dbConn->query($sql);
+  if ($result->num_rows < 1) { // if there is no entry within this hour, there is nothing to do
+    return;
+  }
+
+  $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
+  $idToUpdate = $row['id']; // oldest one
+  
+  // now do the update and then delete the others
+  $sql = 'UPDATE `pico_log` SET `thin` = "'.$thinUpdate.'" WHERE `id` = "'.$idToUpdate.'";';
+  $result = $dbConn->query($sql);
+  echo 'update sql: '.$sql.'<br>';
+        
+  $sql = "DELETE FROM `pico_log` WHERE $sqlNoThin AND `zeit` < \"$zeitAlignedPlusStr\";";
+  $result = $dbConn->query($sql);
+  echo 'delete sql: '.$sql.'<br>';
+}
+
 
 $timeSelected = getTimeRange();
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
@@ -23,6 +74,7 @@ $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
 printBeginOfPage_v2(site:'status_loopCount.php');
+doReduce(dbConn:$dbConn, userid:$userid);
 
 $tabTexts = array (  
   '1'   => array('1',  'Tag',  'border-transparent hover:text-gray-600 hover:border-gray-300'),
