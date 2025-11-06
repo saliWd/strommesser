@@ -146,15 +146,11 @@ while True:
         display.set_pen(color_pen)
         
         valHeight = int(float(BAR_HEIGHT) * float(abs(wattValNonNorm)) / float(disp_y_range[2])) # between 0 and BAR_HEIGHT. E.g. 135*2827/3400
-        #if i == 0: # debug_out
-        #    print('val height:', end=' ') # debug_out
-        #print(str(wattValNonNorm)+': '+str(valHeight), end=' ') # debug_out
         if wattValNonNorm < 0: 
             display.rectangle(x, zeroLine_y, BAR_WIDTH, valHeight)
         else: # direction goes up
             display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
-    #print('....')  # debug_out
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
     if wattVal < 0: display.set_pen(COLOR_MINUS)
