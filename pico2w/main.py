@@ -38,7 +38,9 @@ WHITE       = display.create_pen(255, 255, 255)
 COLOR_PLUS  = display.create_pen(170, 255, 170)
 COLOR_MINUS = display.create_pen(255, 170, 170)
 BAR_WIDTH = const(5)
-wattVals = []
+wattValsNorm = []
+wattValsNonNorm = []
+
 
 rgb_led = RgbLed()
 rgb_led.control(allOk=False, pulsating=False, color=[255,0,0])
@@ -118,31 +120,41 @@ while True:
     png.decode(0, 0)
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
-    wattVals.append(wattValMinMax)
-    if len(wattVals) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
-        wattVals.pop(0)
+    wattValsNorm.append(wattValMinMax)
+    wattValsNonNorm.append(wattVal) # the non-normalized value
+    if len(wattValsNorm) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
+        wattValsNorm.pop(0)
+        wattValsNonNorm.pop(0)
     valColor = val_to_rgb(val=wattValMinMax, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255)
     # draw the zero line in the current color (1 pix)
     display.set_pen(display.create_pen(*valColor))
-    disp_y_range = getDispYrange(wattVals)
+    disp_y_range = getDispYrange(wattValsNonNorm)
     zeroLine_y = HEIGHT - int(float(HEIGHT) * float(disp_y_range[0]) / float(disp_y_range[2]))
     display.rectangle(0, zeroLine_y, WIDTH, 1)
 
     x = 0
     color_pen = WHITE
     valHeight = 0
-    t = 0
-    for t in wattVals:
+    wattValNorm, wattValNonNorm = 0,0
+    length = len(wattValsNorm) # length of both arrays are equal
+    for i in range(length):
+        wattValNorm = wattValsNorm[i] # this is used for the color
+        wattValNonNorm = wattValsNonNorm[i] # this is used for the size
+
         # cons grow down (so plus direction in pixels), gen grow up (so need to 'invert' everything). Full range is (min+max Vals)
-        color_pen = display.create_pen(*val_to_rgb(val=t, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255))
+        color_pen = display.create_pen(*val_to_rgb(val=wattValNorm, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255))
         display.set_pen(color_pen)
         
-        valHeight = int(float(BAR_HEIGHT) * float(abs(t)) / float(disp_y_range[2])) # between 0 and BAR_HEIGHT. E.g. 135*2827/3400
-        if t < 0: 
+        valHeight = int(float(BAR_HEIGHT) * float(abs(wattValNonNorm)) / float(disp_y_range[2])) # between 0 and BAR_HEIGHT. E.g. 135*2827/3400
+        #if i == 0: # debug_out
+        #    print('val height:', end=' ') # debug_out
+        #print(str(wattValNonNorm)+': '+str(valHeight), end=' ') # debug_out
+        if wattValNonNorm < 0: 
             display.rectangle(x, zeroLine_y, BAR_WIDTH, valHeight)
         else: # direction goes up
             display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
+    #print('....')  # debug_out
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
     if wattVal < 0: display.set_pen(COLOR_MINUS)
@@ -195,7 +207,7 @@ while True:
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
     
     try:
-        del x,y,w,h,t,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range
+        del x,y,w,h,wattValNorm,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range,length,wattValNonNorm
         del zeroLine_y,color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
     except Exception as error:
         print("An exception occurred:", error)

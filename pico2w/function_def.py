@@ -68,7 +68,12 @@ def json_get_req(DEBUG_CFG:dict, local_ip:str) -> dict:
         return(dict([('valid',False)]))
 
 def get_debug_jdata():
-    return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":0.027,"Po":0.000,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
+    consumption = randint(0, 3000)
+    consumption = consumption / 1000.0 # range between -3.000 and 3.000 (kW)
+    po, pi = 0.000, consumption # pi = consuming, po = generating
+    if randint(0,1) == 0: # 50%, pos or neg
+        pi, po = 0.000, consumption
+    return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":pi,"Po":po,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
 
 def get_interesting_values(jdata) -> dict:
     try:
