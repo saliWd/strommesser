@@ -4,7 +4,7 @@ $dbConn = initialize();
 
 // returns the time range to be displayed as int. Possible values are: 1 (for last 1 hour), 6, 24, 25. 25 means: all data
 function getTimeRange():int {
-  $returnVal = 1;  // default time range
+  $returnVal = 7;  // default time range
   $unsafeInt = safeIntFromExt(source:'GET',varName:'range',length:3);
   if (($unsafeInt === 1) or ($unsafeInt === 7) or ($unsafeInt === 30) or ($unsafeInt === 365)) {
     $returnVal = $unsafeInt; 
