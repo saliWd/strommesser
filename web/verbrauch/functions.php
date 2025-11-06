@@ -551,14 +551,15 @@ function getValues(
 
 // prints header with css/js and body, container-div and h1 title
 function printBeginOfPage_v2(string $site, string $title=''):void {
-  $SITE_TITLES = array(
-    'index.php' => 'Übersicht',
-    'settings.php' => 'Einstellungen',
-    'login.php' => 'Login, Logout',
-    'statistic.php' => 'Statistiken',
-    'status.php' => 'Status',
-    'contact.php' => 'Kontaktformular',
-    'now.php' => 'Aktuelle Werte'
+  $SITE_PROPERTIES = array(   // title            // requires graph js
+    'index.php'            => ['Übersicht',        true],
+    'settings.php'         => ['Einstellungen',    false],
+    'login.php'            => ['Login, Logout',    false],
+    'statistic.php'        => ['Statistiken',      true],
+    'status.php'           => ['Status',           false],
+    'status_loopCount.php' => ['Status LoopCount', true],
+    'contact.php'          => ['Kontaktformular',  false],
+    'now.php'              => ['Aktuelle Werte',   false]
   );
   echo '<!DOCTYPE html>
   <html>
@@ -566,13 +567,13 @@ function printBeginOfPage_v2(string $site, string $title=''):void {
   <meta charset="utf-8">
   ';
   $scripts = '';
-  if (($site === 'index.php') or ($site === 'statistic.php')) {
+  if ($SITE_PROPERTIES[$site][1]) {
     $scripts = '<script src="../verbrauch/script/chart.umd.js"></script>
   <script src="../verbrauch/script/moment.min.mine.js"></script>
   <script src="../verbrauch/script/chartjs-adapter-moment.mine.js"></script>';
   } 
   
-  echo '<title>StromMesser '.$SITE_TITLES[$site].'</title>';
+  echo '<title>StromMesser '.$SITE_PROPERTIES[$site][0].'</title>';
   if ($site === 'now.php') {
     echo '
   <meta http-equiv="refresh" content="90">';
@@ -597,14 +598,15 @@ function printBeginOfPage_v2(string $site, string $title=''):void {
 }
 
 function printNavMenu_v2 (string $site, string $title): void {
-  $topLevelSites = array( // NB: partial repetition of SITE_TITLES (only those within 'verbrauch' directory)
-    ['index.php', 'Übersicht'],
-    ['statistic.php', 'Statistiken'],
-    ['settings.php', 'Einstellungen'],
-    ['now.php', 'Aktuelle Werte'],
-    ['#', '&nbsp;'],
-    ['login.php?do=2', 'LogOut']    
-  );  
+  $TOP_LEVEL_SITES = array( // NB: partial repetition of SITE_PROPERTIES (but only those within 'verbrauch' directory)
+    'index.php' =>      'Übersicht',
+    'statistic.php' =>  'Statistiken',
+    'settings.php' =>   'Einstellungen',
+    'now.php' =>        'Aktuelle Werte',
+    'status_loopCount.php' => 'Status LoopCount',
+    '#' =>              '&nbsp;',
+    'login.php?do=2' => 'LogOut'
+  );
   echo '
 <nav class="border-gray-400 rounded bg-gray-100 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
   <ol class="inline-flex items-center mb-3 sm:mb-0">
@@ -616,43 +618,36 @@ function printNavMenu_v2 (string $site, string $title): void {
         </button>
         <div id="dropdown-NavMain" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
           <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
-  printListItems($topLevelSites);
+  printListItems(items: $TOP_LEVEL_SITES);
   echo '
           </ul>
         </div> 
       </div>
     </li>';
 
-  $inPageTargets = array();  
-  $siteName = '';
+  $inPageTargets = [];  
+  $siteName = $TOP_LEVEL_SITES[$site];
   if ($site === 'index.php') {
     $inPageTargets = array(
-      ['#myChart', 'Leistungsübersicht'],
-      ['#anchorWcons', 'Wöchentlich'],
-      ['#anchorMcons', 'Monatlich'],
-      ['#anchorYcons', 'Jährlich']
-    );
-    $siteName = 'Übersicht';
+      '#myChart'    => 'Leistungsübersicht',
+      '#anchorWcons'=> 'Wöchentlich',      
+      '#anchorMcons'=> 'Monatlich',
+      '#anchorYcons'=> 'Jährlich'
+    );    
   } elseif ($site === 'statistic.php') {
     $inPageTargets = array(
-      ['#anchorW', 'Wöchentlich'],
-      ['#anchorM', 'Monatlich'],
-      ['#anchorY', 'Jährlich']
+      '#anchorW'=> 'Wöchentlich',
+      '#anchorM'=> 'Monatlich',
+      '#anchorY'=> 'Jährlich'
     );
-    $siteName = 'Statistiken';
   } elseif ($site === 'settings.php') {
     $inPageTargets = array(
-      ['#anchorMiniDisplay', 'Mini-Display'],
-      ['#anchorUserAccount', 'Benutzereinstellungen'],
-      ['#anchorDataExport', 'Daten exportieren']
+      '#anchorMiniDisplay'=> 'Mini-Display',
+      '#anchorUserAccount'=> 'Benutzereinstellungen',
+      '#anchorDataExport' => 'Daten exportieren'
     );
-    $siteName = 'Einstellungen';
-  } elseif ($site === 'now.php') {
-    $siteName = 'Aktuelle Werte';
-  } elseif ($site === 'login.php') {
-    $siteName = 'Login';
   }
-  if ($title) { $siteName = $title; }
+  if ($title) { $siteName = $title; } // required for the login/logout case
   printInPageNav(inPageTargets:$inPageTargets, siteName:$siteName);
   echo '</ol>
 </nav>';
@@ -671,7 +666,7 @@ function printInPageNav(array $inPageTargets, string $siteName): void {
     echo '
       <div id="dropdown-Nav2nd" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
         <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
-        printListItems($inPageTargets);
+        printListItems(items: $inPageTargets);
     echo '
         </ul>
       </div>';
@@ -681,12 +676,11 @@ function printInPageNav(array $inPageTargets, string $siteName): void {
   </li>
 ';
 }
-
 function printListItems(array $items): void {
-  foreach ($items as $item) {
+foreach ($items as $link => $title) {
     echo '
         <li>
-          <a href="'.$item[0].'" class="block px-4 py-2 hover:bg-gray-100">'.$item[1].'</a>
+          <a href="'.$link.'" class="block px-4 py-2 hover:bg-gray-100">'.$title.'</a>
         </li>';
   }
 }

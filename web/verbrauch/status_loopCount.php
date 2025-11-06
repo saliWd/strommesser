@@ -22,7 +22,7 @@ $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
-printBeginOfPage_v2(site:'index.php');
+printBeginOfPage_v2(site:'status_loopCount.php');
 
 $tabTexts = array (  
   '1'   => array('1',  'Tag',  'border-transparent hover:text-gray-600 hover:border-gray-300'),
@@ -37,7 +37,7 @@ echo '
 foreach ($tabTexts as $tabText) {
   echo '
         <li class="mr-2">
-            <a href="status_loopcount.php?range='.$tabText[0].'" class="inline-block p-4 border-b-2 rounded-t-lg '.$tabText[2].'">'.$tabText[1].'</a>
+            <a href="status_loopCount.php?range='.$tabText[0].'" class="inline-block p-4 border-b-2 rounded-t-lg '.$tabText[2].'">'.$tabText[1].'</a>
         </li>';
 }
 echo '
@@ -145,7 +145,7 @@ if ($totalCount > 0) {// this may be 0
 
 echo '
 <div class="flex items-center">
-  <div class="text-sm font-light text-gray-500">&nbsp;</div>
+  <div>&nbsp;</div>
   <div class="flex-auto text-right">Insgesamt '.$totalCount.' Einträge</div>
 </div>
 <br>';
