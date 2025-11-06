@@ -81,10 +81,19 @@ def get_interesting_values(jdata) -> dict:
             ('energy_neg',jdata['StatusSNS']['z']['Eo']),
             ('energy_pos_t1',jdata['StatusSNS']['z']['Ei1']),
             ('energy_pos_t2',jdata['StatusSNS']['z']['Ei2'])
-        ])        
+        ])
         #print("Content:\n", jdata)
+        # sanity check, all energy values have to be bigger than 0. Otherwise will try again
+        if (
+            meas['energy_pos'] <= 0 or 
+            meas['energy_neg'] <= 0 or 
+            meas['energy_pos_t1'] <= 0 or 
+            meas['energy_pos_t2'] <= 0
+        ):
+            print("Error: at least one energy value is zero")
+            meas = dict([('valid',False)])
     except Exception as error:
-        print("Error: json values not as expected:", error)
+        print("Error: json values not as expected: ", error)
         meas = dict([('valid',False)])
     
     return(meas)
