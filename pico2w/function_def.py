@@ -41,9 +41,9 @@ def val_to_rgb(val:int, minValCon:int, maxValGen:int, led_brightness:int)-> list
     return list(hsva_to_rgb(h, 1.0, 1.0, a))
 
 def getDispYrange(values:list) -> list:
-    """returns the range of the given values. extends the range to at least -50 to +50 if the min/max are smaller. returns 2 positive values"""
-    minimum = abs(min(min(values),-50))
-    maximum = max(max(values),50)
+    """returns the range of the given values. -1 to +1 if the min/max are smaller. returns 3 positive values"""
+    minimum = abs(min(min(values),-1)) # -1 and +1 guarantees that min+max is bigger than 0
+    maximum = max(max(values),1)
     return [minimum,maximum,(minimum+maximum)]
 
 def json_get_req(DEBUG_CFG:dict, local_ip:str) -> dict:

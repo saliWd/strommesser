@@ -32,7 +32,7 @@ vector.set_antialiasing(ANTIALIAS_X16)
 # font from https://github.com/Gadgetoid/alright-fonts/blob/effb2fca35909a0f2aff7ed04b76c14286490817/sample-fonts/OpenSans/OpenSans-SemiBold.af, stored in root on filesystem. 
 vector.set_font('font.af', 30)
 
-WIDTH, HEIGHT, BAR_HEIGHT = const(320), const(240), const(180) # want some empty space on top/bottom, bar is thus smaller than 240
+WIDTH, CANVAS_HEIGHT, BAR_HEIGHT, PADDING = const(320), const(200), const(180), const(20) # want some empty space on top/bottom, bar is thus smaller than 240
 BLACK       = display.create_pen(0, 0, 0)
 WHITE       = display.create_pen(255, 255, 255)
 COLOR_PLUS  = display.create_pen(170, 255, 170)
@@ -129,7 +129,7 @@ while True:
     # draw the zero line in the current color (1 pix)
     display.set_pen(display.create_pen(*valColor))
     disp_y_range = getDispYrange(wattValsNonNorm)
-    zeroLine_y = HEIGHT - int(float(HEIGHT) * float(disp_y_range[0]) / float(disp_y_range[2]))
+    zeroLine_y = CANVAS_HEIGHT+PADDING - int(float(CANVAS_HEIGHT) * float(disp_y_range[0]) / float(disp_y_range[2]))    
     display.rectangle(0, zeroLine_y, WIDTH, 1)
 
     x = 0
