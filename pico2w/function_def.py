@@ -124,20 +124,8 @@ def getBrightness(setting:int, time:str, wattVal:int):
     except:
         print('Error: time format not as expected')
     return (brightness,pulsed)
-
-# sends the measurement data and gets the settings
-def server_communication(DEBUG_CFG:dict, message:dict, useWdt:bool, wdt) -> dict:
-    if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled
-        return(transmit_message(message=message, useWdt=useWdt, wdt=wdt))
-    else: # wlan simulated
-        return(dict([('serverOk', 1),
-                     ('brightness', 80), # just some different values
-                     ('minValCon', 200),
-                     ('maxValGen', 2000),
-                     ('earn', -0.27)]))    
-    
-
-def transmit_message(message:dict, useWdt:bool, wdt) -> dict:
+   
+def transmit_message(message:dict, useWdt:bool, wdt, errorLog) -> dict:
     URL = "https://strommesser.ch/verbrauch/pico2w_v4.php?TX=pico&TXVER=3"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     failureCount = 0
@@ -169,13 +157,14 @@ def transmit_message(message:dict, useWdt:bool, wdt) -> dict:
                 print("Error: invalid status code:"+str(response.status_code)+". FailureCount: "+str(failureCount))
                 response.close()
                 failureCount += 1
-        except Exception as error:
+        except Exception as error:            
             print("Error: request.post did not work. Error:", error)        
             failureCount += 1
         feed_wdt(useWdt=useWdt,wdt=wdt)
         sleep(4) # wait in between the loops
     
     # while loop has passed, did not work several times, do a reset now
+    errorLog.write("\nError in transmit_message function: failure count too high:"+str(failureCount))
     print("Error: failure count too high:"+str(failureCount)+". Resetting in 20 seconds or with the watchdog...")
     sleep(20) # add a bit of debug possibility. NB: # this will trigger the watchdog timer (if enabled) and reset as well    
     reset() # NB: connection to whatever device is getting lost; complicates debugging
@@ -232,7 +221,7 @@ def hexlify_wlan(input:str):
     hex_input = hexlify(input.encode()) # hex the bytestream of the string
     print(hex_input.decode())
 
-def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useWdt:bool, wdt) -> dict:
+def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useWdt:bool, wdt, errorLog) -> dict:
         randNum_hash = get_randNum_hash(DEVICE_CFG)
         meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])+'|'+str(loopCount)
 
@@ -244,7 +233,15 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useW
             ])
         #print(str(message))
         feed_wdt(useWdt=useWdt,wdt=wdt)
-        settings = server_communication(DEBUG_CFG=DEBUG_CFG, message=message, useWdt=useWdt, wdt=wdt)        
+
+        if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled
+            settings = transmit_message(message=message, useWdt=useWdt, wdt=wdt, errorLog=errorLog)
+        else: # wlan simulated
+            settings = dict([('serverOk', 1),
+                             ('brightness', 80), # just some different values
+                             ('minValCon', 200),
+                             ('maxValGen', 2000),
+                             ('earn', -0.27)])
         del randNum_hash, meas_string, message
         return(settings)
 

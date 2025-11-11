@@ -13,12 +13,14 @@ from class_def import RgbLed # class def
 from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, wlan_init, getBrightness, do_ota
 import my_config
 
+errorLog = open('error.log', 'a') # append
+
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
 USE_WDT:bool = DEBUG_CFG['use_watchdog']
 
 DEVICE_CFG = my_config.get_device_config()
 WLAN_CFG = my_config.get_wlan_config()
-LOOP_SLEEP_SEC = const(4) # pause between loops. Results in about 5 seconds loop
+LOOP_SLEEP_SEC = const(4.2) # pause between loops. Results in about 5 seconds loop
 WATT_NOISE_LIMIT = const(15) # everything below 15 W will be set to 0
 TRANSMIT_EVERY_X_SECONDS = const(120)
 otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h after the first check
@@ -32,7 +34,7 @@ vector.set_antialiasing(ANTIALIAS_X16)
 # font from https://github.com/Gadgetoid/alright-fonts/blob/effb2fca35909a0f2aff7ed04b76c14286490817/sample-fonts/OpenSans/OpenSans-SemiBold.af, stored in root on filesystem. 
 vector.set_font('font.af', 30)
 
-WIDTH, CANVAS_HEIGHT, BAR_HEIGHT, PADDING = const(320), const(200), const(180), const(20) # want some empty space on top/bottom, bar is thus smaller than 240
+WIDTH, BAR_HEIGHT, MIDDLE = const(320), const(110), const(120) # want some empty space on top/bottom, bar is thus smaller than 120
 BLACK       = display.create_pen(0, 0, 0)
 WHITE       = display.create_pen(255, 255, 255)
 COLOR_PLUS  = display.create_pen(170, 255, 170)
@@ -41,6 +43,7 @@ BAR_WIDTH = const(5)
 wattValsNorm = []
 wattValsNonNorm = []
 
+sleep(5) # some wait time to enlarge time between boots
 
 rgb_led = RgbLed()
 rgb_led.control(allOk=False, pulsating=False, color=[255,0,0])
@@ -74,6 +77,7 @@ settings = dict([
     ('maxValGen', 3400),
     ('earn', 0.0)
 ])
+settingsFromServer = False
 measErrorCnt:int = 0
 feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
@@ -98,6 +102,7 @@ while True:
         measErrorCnt += 1
         print('get request did not work')
         if measErrorCnt > 5:
+            errorLog.write("\nError in main.py, main loop: meas error count > 5")
             print('sleeping for 10 seconds')
             sleep(10) # this will trigger the watchdog and force a reboot
         sleep(2)
@@ -125,13 +130,8 @@ while True:
     if len(wattValsNorm) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
         wattValsNorm.pop(0)
         wattValsNonNorm.pop(0)
-    valColor = val_to_rgb(val=wattValMinMax, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255)
-    # draw the zero line in the current color (1 pix)
-    display.set_pen(display.create_pen(*valColor))
     disp_y_range = getDispYrange(wattValsNonNorm)
-    zeroLine_y = CANVAS_HEIGHT+PADDING - int(float(CANVAS_HEIGHT) * float(disp_y_range[0]) / float(disp_y_range[2]))    
-    display.rectangle(0, zeroLine_y, WIDTH, 1)
-
+    
     x = 0
     color_pen = WHITE
     valHeight = 0
@@ -147,10 +147,16 @@ while True:
         
         valHeight = int(float(BAR_HEIGHT) * float(abs(wattValNonNorm)) / float(disp_y_range[2])) # between 0 and BAR_HEIGHT. E.g. 135*2827/3400
         if wattValNonNorm < 0: 
-            display.rectangle(x, zeroLine_y, BAR_WIDTH, valHeight)
+            display.rectangle(x, MIDDLE, BAR_WIDTH, valHeight)
         else: # direction goes up
-            display.rectangle(x, zeroLine_y-valHeight, BAR_WIDTH, valHeight)
+            display.rectangle(x, MIDDLE-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
+    
+    valColor = val_to_rgb(val=wattValMinMax, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255)
+    # draw the zero line in the current color (1 pix)
+    display.set_pen(display.create_pen(*valColor))
+    display.rectangle(0, MIDDLE, WIDTH, 1)
+
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
     if wattVal < 0: display.set_pen(COLOR_MINUS)
@@ -174,8 +180,9 @@ while True:
     w = int(w)
 
     display.set_pen(WHITE)
-    vector.text('CHF',201,227,0)
-    vector.text(earnTxt,306-w,225,0)
+    if settingsFromServer: # otherwise don't display the earning text
+        vector.text('CHF',201,227,0)
+        vector.text(earnTxt,306-w,225,0)
 
     vector.text(str(loopCount), 10, 227, 0)
     
@@ -199,12 +206,13 @@ while True:
         timeAtLastTransmit = time() # reset the counter
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
         settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, loopCount=loopCount,
-                                useWdt=USE_WDT, wdt=wdt) # now transmit the stuff to the server
+                                useWdt=USE_WDT, wdt=wdt, errorLog=errorLog) # now transmit the stuff to the server
+        settingsFromServer = True
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
     
     try:
         del x,y,w,h,wattValNorm,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range,length,wattValNonNorm
-        del zeroLine_y,color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
+        del color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
     except Exception as error:
         print("An exception occurred:", error)
     gc.collect() # garbage collection
