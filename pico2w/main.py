@@ -20,7 +20,7 @@ USE_WDT:bool = DEBUG_CFG['use_watchdog']
 
 DEVICE_CFG = my_config.get_device_config()
 WLAN_CFG = my_config.get_wlan_config()
-LOOP_SLEEP_SEC = const(4.2) # pause between loops. Results in about 5 seconds loop
+LOOP_SLEEP_SEC = const(4.6) # pause between loops. Results in about 5 seconds loop
 WATT_NOISE_LIMIT = const(15) # everything below 15 W will be set to 0
 TRANSMIT_EVERY_X_SECONDS = const(120)
 otaCheckAfterXseconds = 180 # first check after 3 mins, will be extended to 24h after the first check
@@ -172,11 +172,11 @@ while True:
     w = int(w)
 
     wOutline = Polygon()
-    wOutline.rectangle(6,6,127,36, corners=(2, 2, 2, 2), stroke=2)
+    wOutline.rectangle(1,1,127,36, corners=(2, 2, 2, 2), stroke=2)
     vector.draw(wOutline)
     display.set_pen(WHITE)
-    vector.text('W', 102, 32, 0)
-    vector.text(txtNum, 92-w, 31, 0)
+    vector.text('W', 97, 27, 0)
+    vector.text(txtNum, 87-w, 26, 0)
     
     earnTxt = '{0:.2f}'.format(settings['earn'])
     x, y, w, h = vector.measure_text(earnTxt, x=196, y=227, angle=None)
@@ -184,10 +184,10 @@ while True:
 
     display.set_pen(WHITE)
     if settingsFromServer: # otherwise don't display the earning text
-        vector.text('CHF',201,227,0)
-        vector.text(earnTxt,306-w,225,0)
+        vector.text('CHF',201,229,0)
+        vector.text(earnTxt,306-w,227,0)
 
-    vector.text(str(loopCount), 10, 227, 0)
+    vector.text(str(loopCount), 10, 229, 0)
     
     display.update()
 
