@@ -40,11 +40,12 @@ def val_to_rgb(val:int, minValCon:int, maxValGen:int, led_brightness:int)-> list
     a = float(led_brightness) / float(255)
     return list(hsva_to_rgb(h, 1.0, 1.0, a))
 
-def getDispYrange(values:list) -> list:
-    """returns the range of the given values. -1 to +1 if the min/max are smaller. returns 3 positive values"""
-    minimum = abs(min(min(values),-1)) # -1 and +1 guarantees that min+max is bigger than 0
-    maximum = max(max(values),1)
-    return [minimum,maximum,(minimum+maximum)]
+def getDispYrange(values:list, BAR_HEIGHT:int) -> float:
+    """returns the range of the given values. returns a float value scaled with bar height"""
+    minimum = abs(min(min(values),0)) # 0 or positive
+    maximum = max(max(values),0) # 0 or positive
+    retMinSize = max(minimum,maximum,10) # 10 or bigger
+    return float(BAR_HEIGHT) / float(retMinSize)
 
 def json_get_req(DEBUG_CFG:dict, local_ip:str) -> dict:
     URL = 'http://'+ local_ip + '/cm?cmnd=status%2010'

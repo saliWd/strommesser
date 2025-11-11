@@ -130,13 +130,14 @@ while True:
     if len(wattValsNorm) > WIDTH // BAR_WIDTH: # shifts the wattValues history to the left by one sample
         wattValsNorm.pop(0)
         wattValsNonNorm.pop(0)
-    disp_y_range = getDispYrange(wattValsNonNorm)
+    disp_y_range = getDispYrange(values=wattValsNonNorm, BAR_HEIGHT=BAR_HEIGHT)
     
     x = 0
     color_pen = WHITE
     valHeight = 0
     wattValNorm, wattValNonNorm = 0,0
     length = len(wattValsNorm) # length of both arrays are equal
+    #print('value,height: ',end='')# debug
     for i in range(length):
         wattValNorm = wattValsNorm[i] # this is used for the color
         wattValNonNorm = wattValsNonNorm[i] # this is used for the size
@@ -145,12 +146,14 @@ while True:
         color_pen = display.create_pen(*val_to_rgb(val=wattValNorm, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255))
         display.set_pen(color_pen)
         
-        valHeight = int(float(BAR_HEIGHT) * float(abs(wattValNonNorm)) / float(disp_y_range[2])) # between 0 and BAR_HEIGHT. E.g. 135*2827/3400
+        valHeight = int(float(abs(wattValNonNorm)) * disp_y_range) # between 0 and BAR_HEIGHT. E.g. 135*2827/3400        
+        #print(str(wattValNonNorm)+' '+str(valHeight),end=' ')# debug
         if wattValNonNorm < 0: 
             display.rectangle(x, MIDDLE, BAR_WIDTH, valHeight)
         else: # direction goes up
             display.rectangle(x, MIDDLE-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
+    #print('.')# debug
     
     valColor = val_to_rgb(val=wattValMinMax, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255)
     # draw the zero line in the current color (1 pix)
