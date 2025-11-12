@@ -603,6 +603,7 @@ function printNavMenu_v2 (string $site, string $title): void {
     'statistic.php' =>  'Statistiken',
     'settings.php' =>   'Einstellungen',
     'now.php' =>        'Aktuelle Werte',
+    'status.php' =>     'Status',
     'status_loopCount.php' => 'Status LoopCount',
     '#' =>              '&nbsp;',
     'login.php?do=2' => 'LogOut'
