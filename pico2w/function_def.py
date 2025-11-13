@@ -248,7 +248,7 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useW
 
 def feed_wdt(useWdt:bool, wdt):
     if useWdt:
-        wdt.feed() # type: ignore
+        wdt.feed()
     return
 
 def do_ota(DEBUG_CFG):
