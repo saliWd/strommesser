@@ -165,7 +165,7 @@ def transmit_message(message:dict, useWdt:bool, wdt, errorLog) -> dict:
         sleep(4) # wait in between the loops
     
     # while loop has passed, did not work several times, do a reset now
-    errorLog.write("\nError in transmit_message function: failure count too high:"+str(failureCount))
+    errorLog.write("Error in transmit_message function: failure count too high:"+str(failureCount)+"\n")
     print("Error: failure count too high:"+str(failureCount)+". Resetting in 20 seconds or with the watchdog...")
     sleep(20) # add a bit of debug possibility. NB: # this will trigger the watchdog timer (if enabled) and reset as well    
     reset() # NB: connection to whatever device is getting lost; complicates debugging

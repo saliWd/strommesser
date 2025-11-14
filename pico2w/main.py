@@ -14,6 +14,9 @@ from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, 
 import my_config
 
 errorLog = open('error.log', 'a') # append
+string = "reset reason (1=power, 3=watchdog): "+str(machine.reset_cause())+"\n"
+errorLog.write(string)
+print(string,end='')
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
 USE_WDT:bool = DEBUG_CFG['use_watchdog']
@@ -102,7 +105,7 @@ while True:
         measErrorCnt += 1
         print('get request did not work')
         if measErrorCnt > 5:
-            errorLog.write("\nError in main.py, main loop: meas error count > 5")
+            errorLog.write("Error in main.py, main loop: meas error count > 5\n")
             print('sleeping for 10 seconds')
             sleep(10) # this will trigger the watchdog and force a reboot
         sleep(2)
