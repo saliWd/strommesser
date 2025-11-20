@@ -165,15 +165,16 @@ def transmit_message(message:dict, useWdt:bool, wdt, errorLog) -> dict:
         sleep(4) # wait in between the loops
     
     # while loop has passed, did not work several times, do a reset now
-    errorLog.write("Error in transmit_message function: failure count too high:"+str(failureCount)+"\n")
-    print("Error: failure count too high:"+str(failureCount)+". Resetting in 20 seconds or with the watchdog...")
+    logString = "Error in transmit_message function: failure count too high:"+str(failureCount)+". Resetting in 20 seconds.\n"
+    errorLog.write(logString)
+    print(logString,end='')
     sleep(20) # add a bit of debug possibility. NB: # this will trigger the watchdog timer (if enabled) and reset as well    
     reset() # NB: connection to whatever device is getting lost; complicates debugging
     return(dict([('serverOk', 0)])) # this return will never be executed
 
 
 # is called once before while loop
-def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict):
+def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict, useWdt:bool, wdt):
     if(DEBUG_CFG['wlan'] == 'simulated'):
         print('WLAN connection is simulated...')
         return(1) # no meaningful return value
@@ -182,23 +183,44 @@ def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict):
     waitCounter = 0
     wlan = 0
     while wlanStatus != network.STAT_GOT_IP: # STAT_GOT_IP = 3, STAT_CONNECTING = 1
-        print('waiting for connection...WLAN Status: '+str(wlanStatus)+'. Counter: '+str(waitCounter))
+        print('wlan_init: waiting for connection...WLAN Status: '+str(wlanStatus)+'. Counter: '+str(waitCounter))
         wlan = network.WLAN(network.WLAN.IF_STA)
         wlan.active(True) # activate it. NB: disabling does not work correctly
+        feed_wdt(useWdt=useWdt,wdt=wdt)
         sleep(2)
         wlan_pw = unhexlify(WLAN_CFG['pw'].encode()).decode() # change into byte stream and unhex it; then change it into string        
         wlan.connect(WLAN_CFG['ssid'], wlan_pw)
+        feed_wdt(useWdt=useWdt,wdt=wdt)
         sleep(2)
         wlanStatus = wlan.status()
         if wlanStatus == network.STAT_GOT_IP: # success
             wlanIfconfig = wlan.ifconfig()
             print('connected. IP: ' + wlanIfconfig[0])
-            return(wlan) # type: ignore        
+            return(wlan) # type: ignore
 
         waitCounter += 1
+        feed_wdt(useWdt=useWdt,wdt=wdt)
         sleep(2)
     return(wlan) # this should never happen
 
+# is called once before while loop
+def wlan_check(DEBUG_CFG:dict, useWdt:bool, wdt, wlan, errorLog)->bool:
+    if(DEBUG_CFG['wlan'] == 'simulated'):        
+        return(True)
+
+    waitCounter = 0
+    while wlan.status() != network.STAT_GOT_IP: # STAT_GOT_IP = 3, STAT_CONNECTING = 1
+        feed_wdt(useWdt=useWdt,wdt=wdt)
+        if waitCounter > 8: # a time out
+            logString = "Error in wlan_check function: did loose wlan connection. Trying to re-init the connection.\n"
+            errorLog.write(logString)
+            print(logString,end='')
+            wlan.active(False) # does not really change anything though
+            return(False)
+        print('wlan_check: waiting for connection...WLAN Status: '+str(wlan.status())+'. Counter: '+str(waitCounter))
+        sleep(4)
+        waitCounter += 1
+    return(True) # this should never happen
 
 def urlencode(dictionary:dict):
     urlenc = ""

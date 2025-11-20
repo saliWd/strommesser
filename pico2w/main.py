@@ -10,7 +10,7 @@ from micropython import const # type: ignore
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, wlan_init, getBrightness, do_ota
+from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, wlan_init, wlan_check, getBrightness, do_ota
 import my_config
 
 errorLog = open('error.log', 'a') # append
@@ -58,17 +58,16 @@ display.text('...verbinde mit WLAN...', 10, 10, scale=1)
 display.text(WLAN_CFG['ssid'], 10, 25, scale=1)
 display.update()
 
-wlan = wlan_init(DEBUG_CFG=DEBUG_CFG, WLAN_CFG=WLAN_CFG) # may take some time
+if USE_WDT: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
+else: wdt = 0
+
+wlan = wlan_init(DEBUG_CFG=DEBUG_CFG,WLAN_CFG=WLAN_CFG,useWdt=USE_WDT,wdt=wdt) # may take some time
 
 # fills the screen
 png = PNG(display)
 png.open_file('background.png')
 png.decode(0, 0)
 display.update()
-
-# start the watchdog after wlan_init (which may take longer and does a reboot if not successful)
-if USE_WDT: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
-else: wdt = 0
 
 loopCount:int = 0
 timeAtLastTransmit = time() # returns seconds
@@ -86,7 +85,13 @@ feed_wdt(useWdt=USE_WDT,wdt=wdt)
 
 while True:
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
-    loopCount += 1 # just let it overflow
+    loopCount += 1 # ints in micropython can be huge. Will not have an overflow issue
+
+    if not wlan_check(DEBUG_CFG=DEBUG_CFG,useWdt=USE_WDT,wdt=wdt,wlan=wlan,errorLog=errorLog):
+        del wlan
+        feed_wdt(useWdt=USE_WDT,wdt=wdt)        
+        wlan = wlan_init(DEBUG_CFG=DEBUG_CFG,WLAN_CFG=WLAN_CFG,useWdt=USE_WDT,wdt=wdt) # may take some time
+        continue # let's start a fresh loop
 
     ## do it once, shortly (3 mins) after booting, then don't do it for about 24 hours
     if ((time() - timeAtLastOtaCheck) > otaCheckAfterXseconds):
