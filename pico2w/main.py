@@ -13,6 +13,8 @@ from class_def import RgbLed # class def
 from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, wlan_init, wlan_check, getBrightness, do_ota
 import my_config
 
+runLog = open('run.log', 'a') # append
+runLog.write("startup\n")
 errorLog = open('error.log', 'a') # append
 string = "reset reason (1=power, 3=watchdog): "+str(machine.reset_cause())+"\n"
 errorLog.write(string)
@@ -82,42 +84,57 @@ settings = dict([
 settingsFromServer = False
 measErrorCnt:int = 0
 feed_wdt(useWdt=USE_WDT,wdt=wdt)
-
+runLog.write("beforeLoop\n")
 while True:
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     loopCount += 1 # ints in micropython can be huge. Will not have an overflow issue
+    runLog.write("\n{:8.0f} ".format(loopCount)) # new line here. Otherwise no new lines in the loop
 
     if not wlan_check(DEBUG_CFG=DEBUG_CFG,useWdt=USE_WDT,wdt=wdt,wlan=wlan,errorLog=errorLog):
+        runLog.write('A ')
         del wlan
         feed_wdt(useWdt=USE_WDT,wdt=wdt)        
         wlan = wlan_init(DEBUG_CFG=DEBUG_CFG,WLAN_CFG=WLAN_CFG,useWdt=USE_WDT,wdt=wdt) # may take some time
+        runLog.write('B ')
         continue # let's start a fresh loop
 
+    runLog.write('c ')
     ## do it once, shortly (3 mins) after booting, then don't do it for about 24 hours
     if ((time() - timeAtLastOtaCheck) > otaCheckAfterXseconds):
+        runLog.write('D ')
         timeAtLastOtaCheck = time() # reset the counter
         otaCheckAfterXseconds = 86400 # 24h
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
         do_ota(DEBUG_CFG) # maybe reboots, maybe not
+        runLog.write('E ')
         continue
-
+    
+    runLog.write('f ')
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
-    meas = json_get_req(DEBUG_CFG=DEBUG_CFG, local_ip=DEVICE_CFG['local_ip'])
+    meas = json_get_req(DEBUG_CFG=DEBUG_CFG,local_ip=DEVICE_CFG['local_ip'],runLog=runLog) #runLog g
+    runLog.write('h ')
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     if meas['valid']:
+        runLog.write('i ')
         measErrorCnt = 0
     else:
+        runLog.write('j ')
         measErrorCnt += 1
         print('get request did not work')
         if measErrorCnt > 5:
+            runLog.write('k ')
             errorLog.write("Error in main.py, main loop: meas error count > 5\n")
             print('sleeping for 10 seconds')
             sleep(10) # this will trigger the watchdog and force a reboot
         sleep(2)
+        runLog.write('l ')
         continue
 
+    runLog.write('m ')
     wattVal = int(1000.0 * (-1.0*meas['power_pos'] + meas['power_neg'])) # cons is negative, gen positive. 0 is treated as gen
-    # print('wattValue: '+str(wattVal)) # debug
+    string = "Watt: {:6.0f} ".format(wattVal)
+    print(string)
+    runLog.write(string)
     
     if (abs(wattVal) < WATT_NOISE_LIMIT): # everything below this is just noise...
         wattVal = 0
@@ -126,6 +143,7 @@ while True:
     minValCon = int(settings['minValCon']) # this is a positive value but needs to be treated negative in some cases
     maxValGen = int(settings['maxValGen'])
 
+    runLog.write('n ')
     # normalize the value between -ledMinValCon and ledMaxValGen (e.g. -400 to 3000)
     wattValMinMax = min(max(wattVal, (-1 * minValCon)),maxValGen)
     #print('normalized watt value: '+str(wattValMinMax)+', min/max: '+str(minValCon)+'/'+str(maxValGen))
@@ -139,7 +157,7 @@ while True:
         wattValsNorm.pop(0)
         wattValsNonNorm.pop(0)
     disp_y_range = getDispYrange(values=wattValsNonNorm, BAR_HEIGHT=BAR_HEIGHT)
-    
+    runLog.write('o ')
     x = 0
     color_pen = WHITE
     valHeight = 0
@@ -162,7 +180,7 @@ while True:
             display.rectangle(x, MIDDLE-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
     #print('.')# debug
-    
+    runLog.write('p ')
     valColor = val_to_rgb(val=wattValMinMax, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255)
     # draw the zero line in the current color (1 pix)
     display.set_pen(display.create_pen(*valColor))
@@ -189,7 +207,7 @@ while True:
     earnTxt = '{0:.2f}'.format(settings['earn'])
     x, y, w, h = vector.measure_text(earnTxt, x=196, y=227, angle=None)
     w = int(w)
-
+    runLog.write('q ')
     display.set_pen(WHITE)
     if settingsFromServer: # otherwise don't display the earning text
         vector.text('CHF',201,229,0)
@@ -212,21 +230,26 @@ while True:
             minValCon=minValCon,
             maxValGen=maxValGen,
             led_brightness=int(brightness/2))) # led is quite bright when shining constantly
-    
+    runLog.write('r ')
     if ((time() - timeAtLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
+        runLog.write('S ')
         timeAtLastTransmit = time() # reset the counter
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
-        settings = tx_to_server(DEBUG_CFG=DEBUG_CFG, DEVICE_CFG=DEVICE_CFG, meas=meas, loopCount=loopCount,
-                                useWdt=USE_WDT, wdt=wdt, errorLog=errorLog) # now transmit the stuff to the server
+        settings = tx_to_server(DEBUG_CFG=DEBUG_CFG,DEVICE_CFG=DEVICE_CFG,meas=meas,loopCount=loopCount,
+                                useWdt=USE_WDT,wdt=wdt,errorLog=errorLog,runLog=runLog) # now transmit the stuff to the server. runLog T
         settingsFromServer = True
+        runLog.write('U ')
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
     
     try:
+        runLog.write('V ')
         del x,y,w,h,wattValNorm,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range,length,wattValNonNorm
         del color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
     except Exception as error:
+        runLog.write('W ')
         print("An exception occurred:", error)
     gc.collect() # garbage collection
     
+    runLog.write('X ')
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     sleep(LOOP_SLEEP_SEC)
