@@ -84,7 +84,7 @@ settings = dict([
 settingsFromServer = False
 measErrorCnt:int = 0
 feed_wdt(useWdt=USE_WDT,wdt=wdt)
-runLog.write("beforeLoop\n")
+runLog.write('beforeLoop') # no newline here
 while True:
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     loopCount += 1 # ints in micropython can be huge. Will not have an overflow issue
