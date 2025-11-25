@@ -47,30 +47,29 @@ def getDispYrange(values:list, BAR_HEIGHT:int) -> float:
     retMinSize = max(minimum,maximum,10) # 10 or bigger
     return float(BAR_HEIGHT) / float(retMinSize)
 
-def json_get_req(DEBUG_CFG:dict, local_ip:str, runLog) -> dict:
-    runLog.write('g0 ')
+def json_get_req(DEBUG_CFG:dict, local_ip:str, logFile) -> dict:
+    runLog(file=logFile,string='g0 ')
     URL = 'http://'+ local_ip + '/cm?cmnd=status%2010'
     # Maybe to do: could also use http://gplugm.local/cm?cmnd=status%2010. Does not help in my case though where I have two gplugm
     
     if DEBUG_CFG['json_data'] == 'web': # can be 'local_net'|'web'|'file'
         URL = "https://strommesser.ch/pages/json.php?reader=gplug"
     elif DEBUG_CFG['json_data'] == 'file':
-        runLog.write('g1 ')
-        return(get_interesting_values(jdata=get_debug_jdata(),runLog=runLog))
+        runLog(file=logFile,string='g1 ')
+        return(get_interesting_values(jdata=get_debug_jdata(),logFile=logFile))
     # get request might be unstable (depends on internet connection)
     try:
-        runLog.write('g2 ')
+        runLog(file=logFile,string='g2 ')
         response = request.get(url=URL, timeout=9)
         if (response.status_code != 200):
             print('status wrong: ',response.status_code)
             return(dict([('valid',False)]))
         jdata = json.loads(response.content)
         response.close()
-        runLog.write('g3 ')        
-        return(get_interesting_values(jdata=jdata,runLog=runLog))
-    except Exception as error:
-        runLog.write('g4 ')
-        print("An exception occurred:", error)
+        runLog(file=logFile,string='g3 ')        
+        return(get_interesting_values(jdata=jdata,logFile=logFile))
+    except:
+        runLog(file=logFile,string="WARN|function_def|json_get_req: Exception at json_get_request\n",serial=True)
         return(dict([('valid',False)]))
 
 def get_debug_jdata():
@@ -81,8 +80,15 @@ def get_debug_jdata():
         pi, po = 0.000, consumption
     return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":pi,"Po":po,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
 
-def get_interesting_values(jdata, runLog) -> dict:
-    runLog.write('g5 ')
+def runLog(file, string:str, serial:bool=False): # category 0=important and seldom messages, 1=to serial and to file, 2=status to file only
+    file.write(string)
+    if serial: # print to serial as well
+        print(string,end='') # no newline (as writing to file)
+        file.flush() # make sure it's written before any reset happens
+    return
+
+def get_interesting_values(jdata, logFile) -> dict:
+    runLog(file=logFile,string='g5 ')
     try:
         meas = dict([
             ('valid',True),
@@ -94,7 +100,7 @@ def get_interesting_values(jdata, runLog) -> dict:
             ('energy_pos_t1',jdata['StatusSNS']['z']['Ei1']),
             ('energy_pos_t2',jdata['StatusSNS']['z']['Ei2'])
         ])
-        runLog.write('g6 ')
+        runLog(file=logFile,string='g6 ')
         #print("Content:\n", jdata)
         # sanity check, all energy values have to be bigger than 0. Otherwise will try again
         if (
@@ -103,17 +109,15 @@ def get_interesting_values(jdata, runLog) -> dict:
             meas['energy_pos_t1'] <= 0 or 
             meas['energy_pos_t2'] <= 0
         ):
-            runLog.write('g7 ')
-            print("Error: at least one energy value is zero")
+            runLog(file=logFile,string="WARN|function_def|get_interesting_values: at least one energy value is zero",serial=True)
             meas = dict([('valid',False)])
-    except Exception as error:
-        runLog.write('g8 ')
-        print("Error: json values not as expected: ", error)
+    except:
+        runLog(file=logFile,string="WARN|function_def|get_interesting_values: json values not as expected\n",serial=True)
         meas = dict([('valid',False)])
-    runLog.write('g9 ')
+    runLog(file=logFile,string='g7 ')
     return(meas)
 
-def getBrightness(setting:int, time:str, wattVal:int):
+def getBrightness(setting:int, time:str, wattVal:int, logFile):
     """adjusts the brightness (from the server) during the night and depending on the measured value"""
     pulsed = False
     if (wattVal == 0): 
@@ -132,24 +136,25 @@ def getBrightness(setting:int, time:str, wattVal:int):
         if (hour > 20) or (hour < 6):
             brightness = int(0.25 * setting) # darker from 21:00 to 05:59. rounded down
     except:
-        print('Error: time format not as expected')
+        runLog(file=logFile,string="WARN|function_def|getBrightness: time format not as expected\n",serial=True)
+        return(50,False) # just some value
     return (brightness,pulsed)
    
-def transmit_message(message:dict, useWdt:bool, wdt, errorLog, runLog) -> dict:
+def transmit_message(message:dict, useWdt:bool, wdt, logFile) -> dict:
     URL = "https://strommesser.ch/verbrauch/pico2w_v4.php?TX=pico&TXVER=3"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     failureCount = 0
-    runLog.write('T03 ')
+    runLog(file=logFile,string='T0 ')
     while failureCount < 3:
-        runLog.write('T04 ')
+        runLog(file=logFile,string='T1 ')
         feed_wdt(useWdt=useWdt,wdt=wdt)
         try:
             urlenc = urlencode(message)
             #print(URL) #print(message)
             feed_wdt(useWdt=useWdt,wdt=wdt)
-            runLog.write('T05 ')
+            runLog(file=logFile,string='T2 ')
             response = request.post(URL, data=urlenc, headers=HEADERS) # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue
-            runLog.write('T06 ')
+            runLog(file=logFile,string='T3 ')
             feed_wdt(useWdt=useWdt,wdt=wdt)
             if (response.status_code == 200):
                 #print('Text:'+response.text)
@@ -159,51 +164,43 @@ def transmit_message(message:dict, useWdt:bool, wdt, errorLog, runLog) -> dict:
                 valueArray = answer.split('|',4) # maxsplit=4, returns up to 5 elements
                 valueArrayLen = len(valueArray)
                 if (valueArrayLen > 3 ):
-                    runLog.write('T07 ')
+                    runLog(file=logFile,string='T4 ')
                     return(dict([('serverOk', int(valueArray[0])),
                                  ('brightness', int(valueArray[1])),
                                  ('minValCon', int(valueArray[2])),
                                  ('maxValGen', int(valueArray[3])),
                                  ('earn', float(valueArray[4]))])) # two decimals, pos or negative
                 else:
-                    runLog.write('T08 ')
-                    print("Error: server response not as expected. Length of return array: "+str(valueArrayLen)+". FailureCount: "+str(failureCount))
+                    runLog(file=logFile,string="WARN|function_def|transmit_message: server response not as expected. Length of return array: "+str(valueArrayLen)+". FailureCount: "+str(failureCount)+"\n",serial=True)
                     failureCount += 1
             else:
-                runLog.write('T09 ')
-                print("Error: invalid status code:"+str(response.status_code)+". FailureCount: "+str(failureCount))
+                runLog(file=logFile,string="WARN|function_def|transmit_message: invalid status code:"+str(response.status_code)+". FailureCount: "+str(failureCount)+"\n",serial=True)
                 response.close()
                 failureCount += 1
-        except Exception as error:
-            runLog.write('T10 ')
-            print("Error: request.post did not work. Error:", error)        
+        except:
+            runLog(file=logFile,string="WARN|function_def|transmit_message: Request.post did not work. Trying again...\n",serial=True)
             failureCount += 1
         feed_wdt(useWdt=useWdt,wdt=wdt)
         sleep(4) # wait in between the loops
     
-    runLog.write('T11 ')
     # while loop has passed, did not work several times, do a reset now
-    logString = "Error in transmit_message function: failure count too high:"+str(failureCount)+". Resetting in 20 seconds.\n"
-    errorLog.write(logString)
-    errorLog.flush()
-    print(logString,end='')
+    runLog(file=logFile,string="ERROR|function_def|transmit_message: failure count too high:"+str(failureCount)+". Resetting in 20 seconds.\n",serial=True)
     sleep(20) # add a bit of debug possibility. NB: # this will trigger the watchdog timer (if enabled) and reset as well    
     reset() # NB: connection to whatever device is getting lost; complicates debugging
-    runLog.write('T12 ')
     return(dict([('serverOk', 0)])) # this return will never be executed
 
 
 # is called once before while loop
-def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict, useWdt:bool, wdt):
+def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict, useWdt:bool, wdt, logFile):
     if(DEBUG_CFG['wlan'] == 'simulated'):
-        print('WLAN connection is simulated...')
+        runLog(file=logFile,string="STAT|function_def|wlan_init: WLAN connection is simulated...\n",serial=True)
         return(1) # no meaningful return value
 
     wlanStatus = 0
     waitCounter = 0
     wlan = 0
     while wlanStatus != network.STAT_GOT_IP: # STAT_GOT_IP = 3, STAT_CONNECTING = 1
-        print('wlan_init: waiting for connection...WLAN Status: '+str(wlanStatus)+'. Counter: '+str(waitCounter))
+        runLog(file=logFile,string='STAT|function_def|wlan_init: waiting for connection...WLAN Status: '+str(wlanStatus)+'. Counter: '+str(waitCounter)+"\n")
         wlan = network.WLAN(network.WLAN.IF_STA)
         wlan.active(True) # activate it. NB: disabling does not work correctly
         feed_wdt(useWdt=useWdt,wdt=wdt)
@@ -215,7 +212,7 @@ def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict, useWdt:bool, wdt):
         wlanStatus = wlan.status()
         if wlanStatus == network.STAT_GOT_IP: # success
             wlanIfconfig = wlan.ifconfig()
-            print('connected. IP: ' + wlanIfconfig[0])
+            runLog(file=logFile,string='STAT|function_def|wlan_init: connected. IP: ' + wlanIfconfig[0]+"\n")
             return(wlan) # type: ignore
 
         waitCounter += 1
@@ -224,7 +221,7 @@ def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict, useWdt:bool, wdt):
     return(wlan) # this should never happen
 
 # is called once before while loop
-def wlan_check(DEBUG_CFG:dict, useWdt:bool, wdt, wlan, errorLog)->bool:
+def wlan_check(DEBUG_CFG:dict, useWdt:bool, wdt, wlan, logFile)->bool:
     if(DEBUG_CFG['wlan'] == 'simulated'):        
         return(True)
 
@@ -232,13 +229,10 @@ def wlan_check(DEBUG_CFG:dict, useWdt:bool, wdt, wlan, errorLog)->bool:
     while wlan.status() != network.STAT_GOT_IP: # STAT_GOT_IP = 3, STAT_CONNECTING = 1
         feed_wdt(useWdt=useWdt,wdt=wdt)
         if waitCounter > 8: # a time out
-            logString = "Error in wlan_check function: did loose wlan connection. Trying to re-init the connection.\n"
-            errorLog.write(logString)
-            errorLog.flush()
-            print(logString,end='')
+            runLog(file=logFile,string="ERROR|function_def|wlan_check: did loose wlan connection. Trying to re-init the connection.\n",serial=True)
             wlan.active(False) # does not really change anything though
             return(False)
-        print('wlan_check: waiting for connection...WLAN Status: '+str(wlan.status())+'. Counter: '+str(waitCounter))
+        runLog(file=logFile,string='WARN|function_def|wlan_check: waiting for connection...WLAN Status: '+str(wlan.status())+'. Counter: '+str(waitCounter)+"\n",serial=True)
         sleep(4)
         waitCounter += 1
     return(True) # this should never happen
@@ -265,8 +259,8 @@ def hexlify_wlan(input:str):
     hex_input = hexlify(input.encode()) # hex the bytestream of the string
     print(hex_input.decode())
 
-def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useWdt:bool, wdt, errorLog, runLog) -> dict:
-        runLog.write('T00 ')
+def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useWdt:bool, wdt, logFile) -> dict:
+        runLog(file=logFile,string='S0 ')
         randNum_hash = get_randNum_hash(DEVICE_CFG)
         meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])+'|'+str(loopCount)
 
@@ -278,19 +272,19 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useW
             ])
         #print(str(message))
         feed_wdt(useWdt=useWdt,wdt=wdt)
-        runLog.write('T01 ')
+        runLog(file=logFile,string='S1 ')
         if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled
-            runLog.write('T02 ')
-            settings = transmit_message(message=message,useWdt=useWdt,wdt=wdt,errorLog=errorLog,runLog=runLog)
+            runLog(file=logFile,string='S2 ')
+            settings = transmit_message(message=message,useWdt=useWdt,wdt=wdt,logFile=logFile)
         else: # wlan simulated
-            runLog.write('T15 ')
+            runLog(file=logFile,string='U0 ')
             settings = dict([('serverOk', 1),
                              ('brightness', 80), # just some different values
                              ('minValCon', 200),
                              ('maxValGen', 2000),
                              ('earn', -0.27)])
         del randNum_hash, meas_string, message
-        runLog.write('T16 ')
+        runLog(file=logFile,string='U1 ')
         return(settings)
 
 def feed_wdt(useWdt:bool, wdt):
