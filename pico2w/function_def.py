@@ -185,6 +185,7 @@ def transmit_message(message:dict, useWdt:bool, wdt, errorLog, runLog) -> dict:
     # while loop has passed, did not work several times, do a reset now
     logString = "Error in transmit_message function: failure count too high:"+str(failureCount)+". Resetting in 20 seconds.\n"
     errorLog.write(logString)
+    errorLog.flush()
     print(logString,end='')
     sleep(20) # add a bit of debug possibility. NB: # this will trigger the watchdog timer (if enabled) and reset as well    
     reset() # NB: connection to whatever device is getting lost; complicates debugging
@@ -233,6 +234,7 @@ def wlan_check(DEBUG_CFG:dict, useWdt:bool, wdt, wlan, errorLog)->bool:
         if waitCounter > 8: # a time out
             logString = "Error in wlan_check function: did loose wlan connection. Trying to re-init the connection.\n"
             errorLog.write(logString)
+            errorLog.flush()
             print(logString,end='')
             wlan.active(False) # does not really change anything though
             return(False)

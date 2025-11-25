@@ -18,6 +18,7 @@ runLog.write("\nstartup")
 errorLog = open('error.log', 'a') # append
 string = "reset reason (1=power, 3=watchdog): "+str(machine.reset_cause())+"\n"
 errorLog.write(string)
+errorLog.flush()
 print(string,end='')
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
@@ -124,6 +125,7 @@ while True:
         if measErrorCnt > 5:
             runLog.write('k ')
             errorLog.write("Error in main.py, main loop: meas error count > 5\n")
+            errorLog.flush()
             print('sleeping for 10 seconds')
             sleep(10) # this will trigger the watchdog and force a reboot
         sleep(2)
@@ -251,5 +253,6 @@ while True:
     gc.collect() # garbage collection
     
     runLog.write('X ')
+    runLog.flush()
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     sleep(LOOP_SLEEP_SEC)
