@@ -4,3 +4,5 @@ web/verbrauch/tmp.php
 .vscode/settings.json
 *.pyc
 web/ota/
+pico2w/error.log
+pico2w/run.log

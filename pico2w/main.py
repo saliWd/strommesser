@@ -14,7 +14,7 @@ from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, 
 import my_config
 
 runLog = open('run.log', 'a') # append
-runLog.write("startup\n")
+runLog.write("\nstartup")
 errorLog = open('error.log', 'a') # append
 string = "reset reason (1=power, 3=watchdog): "+str(machine.reset_cause())+"\n"
 errorLog.write(string)
@@ -84,7 +84,7 @@ settings = dict([
 settingsFromServer = False
 measErrorCnt:int = 0
 feed_wdt(useWdt=USE_WDT,wdt=wdt)
-runLog.write('beforeLoop') # no newline here
+runLog.write("\nbeforeLoop") # no newline afterwards
 while True:
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     loopCount += 1 # ints in micropython can be huge. Will not have an overflow issue
