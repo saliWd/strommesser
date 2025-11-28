@@ -72,7 +72,7 @@ def json_get_req(DEBUG_CFG:dict, local_ip:str, logFile) -> dict:
         runLog(file=logFile,string="WARN|function_def|json_get_req: Exception at json_get_request\n")
         return(dict([('valid',False)]))
 
-def get_debug_jdata():
+def get_debug_jdata() -> dict:
     consumption = randint(0, 3000)
     consumption = consumption / 1000.0 # range between -3.000 and 3.000 (kW)
     po, pi = 0.000, consumption # pi = consuming, po = generating
@@ -80,7 +80,7 @@ def get_debug_jdata():
         pi, po = 0.000, consumption
     return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":pi,"Po":po,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
 
-def runLog(file, string:str):
+def runLog(file, string:str) -> None:
     file.write(string)
     if len(string) > 2: # everything longer than 2 chars goes to serial as well and is immediately flushed to file (errors and warnings)
         print(string,end='') # no newline (as writing to file)
@@ -119,7 +119,7 @@ def get_interesting_values(jdata, logFile) -> dict:
     runLog(file=logFile,string='g7')
     return(meas)
 
-def getBrightness(setting:int, time:str, wattVal:int, logFile):
+def getBrightness(setting:int, time:str, wattVal:int, logFile) -> tuple:
     """adjusts the brightness (from the server) during the night and depending on the measured value"""
     pulsed = False
     if (wattVal == 0): 
@@ -223,7 +223,7 @@ def wlan_init(DEBUG_CFG:dict, WLAN_CFG:dict, useWdt:bool, wdt, logFile):
     return(wlan) # this should never happen
 
 # is called once before while loop
-def wlan_check(DEBUG_CFG:dict, useWdt:bool, wdt, wlan, logFile)->bool:
+def wlan_check(DEBUG_CFG:dict, useWdt:bool, wdt, wlan, logFile) -> bool:
     if(DEBUG_CFG['wlan'] == 'simulated'):        
         return(True)
 
@@ -243,14 +243,14 @@ def wlan_check(DEBUG_CFG:dict, useWdt:bool, wdt, wlan, logFile)->bool:
         waitCounter += 1
     return(True) # this should never happen
 
-def urlencode(dictionary:dict):
+def urlencode(dictionary:dict) -> str:
     urlenc = ""
     for key, val in dictionary.items():
         urlenc += "%s=%s&" %(key,val)
     urlenc = urlenc[:-1] # gets me something like 'val0=23&val1=bla space'
     return(urlenc)
 
-def get_randNum_hash(device_config):
+def get_randNum_hash(device_config) -> dict:
     rand_num = randint(1, 10000)
     myhash = sha256(str(rand_num)+device_config['post_key'])
     hashString = hexlify(myhash.digest())
@@ -260,10 +260,11 @@ def get_randNum_hash(device_config):
     ])
     return(returnVal)
 
-def hexlify_wlan(input:str):
+def hexlify_wlan(input:str) -> None:
     """a helper function, not used in the code itself"""
     hex_input = hexlify(input.encode()) # hex the bytestream of the string
     print(hex_input.decode())
+    return
 
 def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useWdt:bool, wdt, logFile) -> dict:
         runLog(file=logFile,string='S0')
@@ -293,12 +294,12 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useW
         runLog(file=logFile,string='U1')
         return(settings)
 
-def feed_wdt(useWdt:bool, wdt):
+def feed_wdt(useWdt:bool, wdt) -> None:
     if useWdt:
         wdt.feed()
     return
 
-def do_ota(DEBUG_CFG):
+def do_ota(DEBUG_CFG) -> None:
     if (DEBUG_CFG['wlan'] == 'real'): # don't do ota otherwise
         micropython_ota.ota_update(
             host='https://strommesser.ch/ota/',
