@@ -5,7 +5,7 @@ from time import sleep
 from hashlib import sha256
 from binascii import hexlify, unhexlify
 from random import randint
-import requests_1 as request # from https://github.com/shariltumin/bit-and-pieces/tree/main/web-client, see also https://github.com/orgs/micropython/discussions/14105
+import urequests as request # type: ignore
 import json
 import network # type: ignore (this is a pylance ignore warning directive)
 import micropython_ota # type: ignore | using version 2.1.0., install with thonny/tools/packages
