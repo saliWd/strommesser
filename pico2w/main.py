@@ -85,7 +85,7 @@ runLog(file=logFile,string="STAT|main: beforeLoop\n")
 while True:
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     loopCount += 1 # ints in micropython can be huge. Will not have an overflow issue
-    runLog(file=logFile,string="{:8.0f} ".format(loopCount))
+    runLog(file=logFile,string="{:8.0f} ".format(loopCount)) # this is outputtted in failure case
 
     if not wlan_check(DEBUG_CFG=DEBUG_CFG,useWdt=USE_WDT,wdt=wdt,wlan=wlan,logFile=logFile):
         runLog(file=logFile,string='A')
@@ -98,18 +98,16 @@ while True:
     runLog(file=logFile,string='c')
     ## do it once, shortly (3 mins) after booting, then don't do it for about 24 hours
     if ((time() - timeAtLastOtaCheck) > otaCheckAfterXseconds):
-        runLog(file=logFile,string='D')
         timeAtLastOtaCheck = time() # reset the counter
         otaCheckAfterXseconds = 86400 # 24h
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
         do_ota(DEBUG_CFG) # maybe reboots, maybe not
-        runLog(file=logFile,string="E\n")
         continue
     
     runLog(file=logFile,string='f')
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     meas = json_get_req(DEBUG_CFG=DEBUG_CFG,local_ip=DEVICE_CFG['local_ip'],logFile=logFile) #runLog g
-    runLog(file=logFile,string='h')
+    runLog(file=logFile,string='jsonOK')
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     if meas['valid']:
         runLog(file=logFile,string='i')
@@ -127,6 +125,7 @@ while True:
 
     runLog(file=logFile,string='l')
     wattVal = int(1000.0 * (-1.0*meas['power_pos'] + meas['power_neg'])) # cons is negative, gen positive. 0 is treated as gen
+    # this is not outputted in failure case. So error happens in between
     runLog(file=logFile,string="Watt: {:6.0f} ".format(wattVal)) # to file and to serial. No newline in the string itself
     if (abs(wattVal) < WATT_NOISE_LIMIT): # everything below this is just noise...
         wattVal = 0
@@ -135,7 +134,6 @@ while True:
     minValCon = int(settings['minValCon']) # this is a positive value but needs to be treated negative in some cases
     maxValGen = int(settings['maxValGen'])
 
-    runLog(file=logFile,string='m')
     # normalize the value between -ledMinValCon and ledMaxValGen (e.g. -400 to 3000)
     wattValMinMax = min(max(wattVal, (-1 * minValCon)),maxValGen)
     #print('normalized watt value: '+str(wattValMinMax)+', min/max: '+str(minValCon)+'/'+str(maxValGen))
@@ -149,7 +147,6 @@ while True:
         wattValsNorm.pop(0)
         wattValsNonNorm.pop(0)
     disp_y_range = getDispYrange(values=wattValsNonNorm, BAR_HEIGHT=BAR_HEIGHT)
-    runLog(file=logFile,string='n')
     x = 0
     color_pen = WHITE
     valHeight = 0
@@ -172,7 +169,6 @@ while True:
             display.rectangle(x, MIDDLE-valHeight, BAR_WIDTH, valHeight)
         x += BAR_WIDTH
     #print('.')# debug
-    runLog(file=logFile,string='o')
     valColor = val_to_rgb(val=wattValMinMax, minValCon=minValCon, maxValGen=maxValGen, led_brightness=255)
     # draw the zero line in the current color (1 pix)
     display.set_pen(display.create_pen(*valColor))
@@ -199,7 +195,6 @@ while True:
     earnTxt = '{0:.2f}'.format(settings['earn'])
     x, y, w, h = vector.measure_text(earnTxt, x=196, y=227, angle=None)
     w = int(w)
-    runLog(file=logFile,string='p')
     display.set_pen(WHITE)
     if settingsFromServer: # otherwise don't display the earning text
         vector.text('CHF',201,229,0)
@@ -222,26 +217,21 @@ while True:
             minValCon=minValCon,
             maxValGen=maxValGen,
             led_brightness=int(brightness/2))) # led is quite bright when shining constantly
-    runLog(file=logFile,string='q')
     if ((time() - timeAtLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
-        runLog(file=logFile,string='R')
         timeAtLastTransmit = time() # reset the counter
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
         settings = tx_to_server(DEBUG_CFG=DEBUG_CFG,DEVICE_CFG=DEVICE_CFG,meas=meas,loopCount=loopCount,
-                                useWdt=USE_WDT,wdt=wdt,logFile=logFile) # now transmit the stuff to the server. runLog S/T/U
+                                useWdt=USE_WDT,wdt=wdt,logFile=logFile) # now transmit the stuff to the server
         settingsFromServer = True
-        runLog(file=logFile,string='V')
         feed_wdt(useWdt=USE_WDT,wdt=wdt)
     
     try:
-        runLog(file=logFile,string='w')
         del x,y,w,h,wattValNorm,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range,length,wattValNonNorm
         del color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
     except:
         runLog(file=logFile,string="ERROR|main: Exception at garbage collection\n")
     gc.collect() # garbage collection
     
-    runLog(file=logFile,string='x')
     runLog(file=logFile,string="   \n") # add spaces to increase length
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     sleep(LOOP_SLEEP_SEC)

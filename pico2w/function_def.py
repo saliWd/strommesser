@@ -146,17 +146,13 @@ def transmit_message(message:dict, useWdt:bool, wdt, logFile) -> dict:
     URL = "https://strommesser.ch/verbrauch/pico2w_v4.php?TX=pico&TXVER=3"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     failureCount = 0
-    runLog(file=logFile,string='T0')
     while failureCount < 3:
-        runLog(file=logFile,string='T1')
         feed_wdt(useWdt=useWdt,wdt=wdt)
         try:
             urlenc = urlencode(message)
             #print(URL) #print(message)
             feed_wdt(useWdt=useWdt,wdt=wdt)
-            runLog(file=logFile,string='T2')
             response = request.post(URL, data=urlenc, headers=HEADERS) # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue
-            runLog(file=logFile,string='T3')
             feed_wdt(useWdt=useWdt,wdt=wdt)
             if (response.status_code == 200):
                 #print('Text:'+response.text)
@@ -166,7 +162,6 @@ def transmit_message(message:dict, useWdt:bool, wdt, logFile) -> dict:
                 valueArray = answer.split('|',4) # maxsplit=4, returns up to 5 elements
                 valueArrayLen = len(valueArray)
                 if (valueArrayLen > 3 ):
-                    runLog(file=logFile,string='T4')
                     return(dict([('serverOk', int(valueArray[0])),
                                  ('brightness', int(valueArray[1])),
                                  ('minValCon', int(valueArray[2])),
@@ -267,7 +262,6 @@ def hexlify_wlan(input:str) -> None:
     return
 
 def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useWdt:bool, wdt, logFile) -> dict:
-        runLog(file=logFile,string='S0')
         randNum_hash = get_randNum_hash(DEVICE_CFG)
         meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])+'|'+str(loopCount)
 
@@ -279,19 +273,15 @@ def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, useW
             ])
         #print(str(message))
         feed_wdt(useWdt=useWdt,wdt=wdt)
-        runLog(file=logFile,string='S1')
         if(DEBUG_CFG['wlan'] == 'real' and DEBUG_CFG['server_txrx']): # not sending anything in simulation or when server_txrx is disabled
-            runLog(file=logFile,string='S2')
             settings = transmit_message(message=message,useWdt=useWdt,wdt=wdt,logFile=logFile)
         else: # wlan simulated
-            runLog(file=logFile,string='U0')
             settings = dict([('serverOk', 1),
                              ('brightness', 80), # just some different values
                              ('minValCon', 200),
                              ('maxValGen', 2000),
                              ('earn', -0.27)])
         del randNum_hash, meas_string, message
-        runLog(file=logFile,string='U1')
         return(settings)
 
 def feed_wdt(useWdt:bool, wdt) -> None:
