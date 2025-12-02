@@ -77,8 +77,18 @@ def get_debug_jdata() -> dict:
     return({"StatusSNS":{"Time":"2025-04-26T22:49:54","z":{"SMid":"72913313","Pi":pi,"Po":po,"I1":0.35,"I2":0.42,"I3":0.12,"Ei":168.754,"Eo":604.610,"Ei1":130.675,"Ei2":38.070,"Eo1":114.819,"Eo2":489.779,"Q5":154.927,"Q6":10.593,"Q7":84.753,"Q8":121.569}}})
 
 def runLog(file, string:str) -> None:
-    file.write(string+"\n") # add a newline
-    file.flush() # make sure it's written before any reset happens
+    try:
+        file.write(string+"\n") # add a newline
+        file.flush() # make sure it's written before any reset happens
+    except: # most probably storage is full
+        logFile = open('run.log', 'w') # overwrite old file
+        logFile.write(string+"\n") # the original message
+        string = 'WARN|function_def|runLog: cannot append to logfile. Starting a new file...'
+        logFile.write(string+"\n") # add a newline
+        logFile.flush()
+        print(string)
+        sleep(2)
+        reset() # old file handle is stale now. starting new
     print(string)
     return
 

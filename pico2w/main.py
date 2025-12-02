@@ -12,11 +12,8 @@ from micropython import const # type: ignore
 from class_def import RgbLed # class def
 from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, wlan_init, wlan_check, getBrightness, do_ota, runLog
 import my_config
-try:
-    logFile = open('run.log', 'a') # append
-except: # most probably not enough space on the device
-    logFile = open('run.log', 'w') # start new
-    runLog(file=logFile,string='WARN|main: cannot append to logfile. Starting a new file...')
+
+logFile = open('run.log', 'a') # append
 
 runLog(file=logFile,string='STAT|main: startup')
 runLog(file=logFile,string='STAT|main: reset reason (1=power, 3=watchdog) is '+str(machine.reset_cause()))
