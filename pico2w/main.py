@@ -14,8 +14,8 @@ from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, 
 import my_config
 
 logFile = open('run.log', 'a') # append
-runLog(file=logFile,string="\nSTAT|main: startup\n")
-runLog(file=logFile,string="STAT|main: reset reason (1=power, 3=watchdog) is "+str(machine.reset_cause())+"\n")
+runLog(file=logFile,string='STAT|main: startup')
+runLog(file=logFile,string='STAT|main: reset reason (1=power, 3=watchdog) is '+str(machine.reset_cause()))
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
 USE_WDT:bool = DEBUG_CFG['use_watchdog']
@@ -81,21 +81,17 @@ settings = dict([
 settingsFromServer = False
 measErrorCnt:int = 0
 feed_wdt(useWdt=USE_WDT,wdt=wdt)
-runLog(file=logFile,string="STAT|main: beforeLoop\n")
 while True:
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     loopCount += 1 # ints in micropython can be huge. Will not have an overflow issue
-    runLog(file=logFile,string="{:8.0f} ".format(loopCount)) # this is outputtted in failure case
+    # runLog(file=logFile,string="{:8.0f} ".format(loopCount)) # this is outputtted in failure case
 
     if not wlan_check(DEBUG_CFG=DEBUG_CFG,useWdt=USE_WDT,wdt=wdt,wlan=wlan,logFile=logFile):
-        runLog(file=logFile,string='A')
         del wlan
         feed_wdt(useWdt=USE_WDT,wdt=wdt)        
         wlan = wlan_init(DEBUG_CFG=DEBUG_CFG,WLAN_CFG=WLAN_CFG,useWdt=USE_WDT,wdt=wdt,logFile=logFile) # may take some time
-        runLog(file=logFile,string="B\n")
         continue # let's start a fresh loop
 
-    runLog(file=logFile,string='c')
     ## do it once, shortly (3 mins) after booting, then don't do it for about 24 hours
     if ((time() - timeAtLastOtaCheck) > otaCheckAfterXseconds):
         timeAtLastOtaCheck = time() # reset the counter
@@ -104,32 +100,26 @@ while True:
         do_ota(DEBUG_CFG) # maybe reboots, maybe not
         continue
     
-    runLog(file=logFile,string='f')
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
-    meas = json_get_req(DEBUG_CFG=DEBUG_CFG,local_ip=DEVICE_CFG['local_ip'],logFile=logFile) #runLog g
-    runLog(file=logFile,string='jsonOK')
+    meas = json_get_req(DEBUG_CFG=DEBUG_CFG,local_ip=DEVICE_CFG['local_ip'],logFile=logFile)
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     if meas['valid']:
-        runLog(file=logFile,string='i')
         measErrorCnt = 0
     else:
         measErrorCnt += 1
-        runLog(file=logFile,string='WARN|main: request did not work, trying again. measErrorCnt='+str(measErrorCnt)+"\n")
+        runLog(file=logFile,string='WARN|main: request did not work, trying again. measErrorCnt='+str(measErrorCnt))
         if measErrorCnt > 5:
-            runLog(file=logFile,string="ERROR|main: main loop, meas error count > 5. Resetting...\n")
+            runLog(file=logFile,string='ERROR|main: main loop, meas error count > 5. Resetting...')
             sleep(20) # may trigger the watchdog and force a reboot
             machine.reset()
         sleep(2)
-        runLog(file=logFile,string="k\n")
         continue
 
-    runLog(file=logFile,string='l')
     wattVal = int(1000.0 * (-1.0*meas['power_pos'] + meas['power_neg'])) # cons is negative, gen positive. 0 is treated as gen
     # this is not outputted in failure case. So error happens in between
-    runLog(file=logFile,string="Watt: {:6.0f} ".format(wattVal)) # to file and to serial. No newline in the string itself
+    # runLog(file=logFile,string="Watt: {:6.0f} ".format(wattVal)) # to file and to serial. No newline in the string itself
     if (abs(wattVal) < WATT_NOISE_LIMIT): # everything below this is just noise...
         wattVal = 0
-    # print('wattValue: '+str(wattVal))
     
     minValCon = int(settings['minValCon']) # this is a positive value but needs to be treated negative in some cases
     maxValGen = int(settings['maxValGen'])
@@ -229,10 +219,9 @@ while True:
         del x,y,w,h,wattValNorm,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range,length,wattValNonNorm
         del color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
     except:
-        runLog(file=logFile,string="ERROR|main: Exception at garbage collection\n")
+        runLog(file=logFile,string='ERROR|main: Exception at garbage collection')
     gc.collect() # garbage collection
     
-    runLog(file=logFile,string="   \n") # add spaces to increase length
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     sleep(LOOP_SLEEP_SEC)
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
