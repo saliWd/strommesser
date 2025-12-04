@@ -62,6 +62,7 @@ def json_get_req(DEBUG_CFG:dict, local_ip:str, logFile, useWdt:bool, wdt) -> dic
         feed_wdt(useWdt=useWdt,wdt=wdt)
         if (response.status_code != 200):
             runLog(file=logFile,string='WARN|function_def|json_get_req: Status of response is wrong')
+            response.close()
             return(dict([('valid',False)]))
         jdata = json.loads(response.content)
         response.close()
