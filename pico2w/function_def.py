@@ -5,7 +5,7 @@ from time import sleep
 from hashlib import sha256
 from binascii import hexlify, unhexlify
 from random import randint
-import urequests as request # type: ignore
+from urequests import post, get # type: ignore
 import json
 import network # type: ignore (this is a pylance ignore warning directive)
 import micropython_ota # type: ignore | using version 2.1.0., install with thonny/tools/packages
@@ -47,7 +47,7 @@ def getDispYrange(values:list, BAR_HEIGHT:int) -> float:
     retMinSize = max(minimum,maximum,10) # 10 or bigger
     return float(BAR_HEIGHT) / float(retMinSize)
 
-def json_get_req(DEBUG_CFG:dict, local_ip:str, logFile) -> dict:
+def json_get_req(DEBUG_CFG:dict, local_ip:str, logFile, useWdt:bool, wdt) -> dict:
     URL = 'http://'+ local_ip + '/cm?cmnd=status%2010'
     # Maybe to do: could also use http://gplugm.local/cm?cmnd=status%2010. Does not help in my case though where I have two gplugm
     
@@ -57,15 +57,18 @@ def json_get_req(DEBUG_CFG:dict, local_ip:str, logFile) -> dict:
         return(get_interesting_values(jdata=get_debug_jdata(),logFile=logFile))
     # get request might be unstable (depends on internet connection)
     try:
-        response = request.get(url=URL, timeout=9)
+        feed_wdt(useWdt=useWdt,wdt=wdt)
+        response = get(url=URL, timeout=5) # watchdog is 8.x seconds
+        feed_wdt(useWdt=useWdt,wdt=wdt)
         if (response.status_code != 200):
             runLog(file=logFile,string='WARN|function_def|json_get_req: Status of response is wrong')
             return(dict([('valid',False)]))
         jdata = json.loads(response.content)
         response.close()
+        feed_wdt(useWdt=useWdt,wdt=wdt)
         return(get_interesting_values(jdata=jdata,logFile=logFile))
     except:
-        runLog(file=logFile,string='WARN|function_def|json_get_req: Exception at json_get_request')
+        runLog(file=logFile,string='WARN|function_def|json_get_req: Exception at request.get')
         return(dict([('valid',False)]))
 
 def get_debug_jdata() -> dict:
@@ -154,7 +157,7 @@ def transmit_message(message:dict, useWdt:bool, wdt, logFile) -> dict:
             urlenc = urlencode(message)
             #print(URL) #print(message)
             feed_wdt(useWdt=useWdt,wdt=wdt)
-            response = request.post(URL, data=urlenc, headers=HEADERS) # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue
+            response = post(URL, data=urlenc, headers=HEADERS, timeout=5) # this is the most critical part. does not work when no-WLAN or no-Server or pico-issue
             feed_wdt(useWdt=useWdt,wdt=wdt)
             if (response.status_code == 200):
                 #print('Text:'+response.text)

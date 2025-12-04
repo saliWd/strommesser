@@ -102,7 +102,7 @@ while True:
         continue
     
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
-    meas = json_get_req(DEBUG_CFG=DEBUG_CFG,local_ip=DEVICE_CFG['local_ip'],logFile=logFile)
+    meas = json_get_req(DEBUG_CFG=DEBUG_CFG,local_ip=DEVICE_CFG['local_ip'],logFile=logFile,useWdt=USE_WDT, wdt=wdt)
     feed_wdt(useWdt=USE_WDT,wdt=wdt)
     if meas['valid']:
         measErrorCnt = 0
@@ -118,7 +118,7 @@ while True:
 
     wattVal = int(1000.0 * (-1.0*meas['power_pos'] + meas['power_neg'])) # cons is negative, gen positive. 0 is treated as gen
     # this is not outputted in failure case. So error happens in between
-    # runLog(file=logFile,string="Watt: {:6.0f} ".format(wattVal)) # to file and to serial. No newline in the string itself
+    print("Watt: {:6.0f} ".format(wattVal)) # to file and to serial. No newline in the string itself
     if (abs(wattVal) < WATT_NOISE_LIMIT): # everything below this is just noise...
         wattVal = 0
     
