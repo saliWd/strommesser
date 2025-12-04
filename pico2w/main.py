@@ -4,22 +4,21 @@ import gc
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_RGB565  # type: ignore
 from picovector import PicoVector, ANTIALIAS_X16, Polygon # type: ignore See https://github.com/pimoroni/presto/blob/main/docs/picovector.md
 from time import time, sleep
-import machine # type: ignore Need WDT and reset
+from machine import reset_cause, reset, WDT # type: ignore
 from pngdec import PNG # type: ignore
 from micropython import const # type: ignore
 
 # my own files
 from class_def import RgbLed # class def
-from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wdt, wlan_init, wlan_check, getBrightness, do_ota, runLog
+from function_def import val_to_rgb, getDispYrange, json_get_req, tx_to_server, feed_wd, wlan_init, wlan_check, getBrightness, do_ota, runLog
 import my_config
 
-logFile = open('run.log', 'a') # append
+log = open('run.log', 'a') # append
 
-runLog(file=logFile,string='STAT|main: startup')
-runLog(file=logFile,string='STAT|main: reset reason (1=power, 3=watchdog) is '+str(machine.reset_cause()))
+runLog(file=log,string='STAT|main: startup')
+runLog(file=log,string='STAT|main: reset reason (1=power, 3=watchdog) is '+str(reset_cause()))
 
 DEBUG_CFG  = my_config.get_debug_settings() # debug stuff
-USE_WDT:bool = DEBUG_CFG['use_watchdog']
 
 DEVICE_CFG = my_config.get_device_config()
 WLAN_CFG = my_config.get_wlan_config()
@@ -34,8 +33,7 @@ display.set_font('bitmap8') # for the non-fancy text output during startup
 
 vector = PicoVector(display)
 vector.set_antialiasing(ANTIALIAS_X16)
-# font from https://github.com/Gadgetoid/alright-fonts/blob/effb2fca35909a0f2aff7ed04b76c14286490817/sample-fonts/OpenSans/OpenSans-SemiBold.af, stored in root on filesystem. 
-vector.set_font('font.af', 30)
+vector.set_font('font.af', 30) # contains only the characters 'CHFW 0123456789.-' (see notes.md)
 
 WIDTH, BAR_HEIGHT, MIDDLE = const(320), const(110), const(120) # want some empty space on top/bottom, bar is thus smaller than 120
 BLACK       = display.create_pen(0, 0, 0)
@@ -58,10 +56,13 @@ display.text('...verbinde mit WLAN...', 10, 10, scale=1)
 display.text(WLAN_CFG['ssid'], 10, 25, scale=1)
 display.update()
 
-if USE_WDT: wdt = machine.WDT(timeout=8388) # max time, 8.3 sec
-else: wdt = 0
+wd = [False, 0] # 0=use-the-watchdog, 1=watchdog-itself
+if DEBUG_CFG['use_watchdog']: 
+    wd[0] = True
+    wd[1] = WDT(timeout=8388) # max time, 8.3 sec
 
-wlan = wlan_init(DEBUG_CFG=DEBUG_CFG,WLAN_CFG=WLAN_CFG,useWdt=USE_WDT,wdt=wdt,logFile=logFile) # may take some time
+
+wlan = wlan_init(DEBUG_CFG=DEBUG_CFG,WLAN_CFG=WLAN_CFG,wd=wd,log=log) # may take some time
 
 # fills the screen
 png = PNG(display)
@@ -77,42 +78,42 @@ settings = dict([
     ('brightness', 33),
     ('minValCon', 400),
     ('maxValGen', 3400),
-    ('earn', 0.0)
+    ('earn', 0.0),
+    ('fromServer',False)
 ])
-settingsFromServer = False
 measErrorCnt:int = 0
-feed_wdt(useWdt=USE_WDT,wdt=wdt)
+feed_wd(wd=wd)
 while True:
-    feed_wdt(useWdt=USE_WDT,wdt=wdt)
+    feed_wd(wd=wd)
     loopCount += 1 # ints in micropython can be huge. Will not have an overflow issue
-    # runLog(file=logFile,string="{:8.0f} ".format(loopCount)) # this is outputtted in failure case
+    # runLog(file=log,string="{:8.0f} ".format(loopCount)) # this is outputtted in failure case
 
-    if not wlan_check(DEBUG_CFG=DEBUG_CFG,useWdt=USE_WDT,wdt=wdt,wlan=wlan,logFile=logFile):
+    if not wlan_check(DEBUG_CFG=DEBUG_CFG,wd=wd,wlan=wlan,log=log):
         del wlan
-        feed_wdt(useWdt=USE_WDT,wdt=wdt)        
-        wlan = wlan_init(DEBUG_CFG=DEBUG_CFG,WLAN_CFG=WLAN_CFG,useWdt=USE_WDT,wdt=wdt,logFile=logFile) # may take some time
+        feed_wd(wd=wd)        
+        wlan = wlan_init(DEBUG_CFG=DEBUG_CFG,WLAN_CFG=WLAN_CFG,wd=wd,log=log) # may take some time
         continue # let's start a fresh loop
 
     ## do it once, shortly (3 mins) after booting, then don't do it for about 24 hours
     if ((time() - timeAtLastOtaCheck) > otaCheckAfterXseconds):
         timeAtLastOtaCheck = time() # reset the counter
         otaCheckAfterXseconds = 86400 # 24h
-        feed_wdt(useWdt=USE_WDT,wdt=wdt)
+        feed_wd(wd=wd)
         do_ota(DEBUG_CFG) # maybe reboots, maybe not
         continue
     
-    feed_wdt(useWdt=USE_WDT,wdt=wdt)
-    meas = json_get_req(DEBUG_CFG=DEBUG_CFG,local_ip=DEVICE_CFG['local_ip'],logFile=logFile,useWdt=USE_WDT, wdt=wdt)
-    feed_wdt(useWdt=USE_WDT,wdt=wdt)
+    feed_wd(wd=wd)
+    meas = json_get_req(DEBUG_CFG=DEBUG_CFG,local_ip=DEVICE_CFG['local_ip'],log=log, wd=wd)
+    feed_wd(wd=wd)
     if meas['valid']:
         measErrorCnt = 0
     else:
         measErrorCnt += 1
-        runLog(file=logFile,string='WARN|main: request did not work, trying again. measErrorCnt='+str(measErrorCnt))
+        runLog(file=log,string='WARN|main: request did not work, trying again. measErrorCnt='+str(measErrorCnt))
         if measErrorCnt > 5:
-            runLog(file=logFile,string='ERROR|main: main loop, meas error count > 5. Resetting...')
+            runLog(file=log,string='ERROR|main: main loop, meas error count > 5. Resetting...')
             sleep(20) # may trigger the watchdog and force a reboot
-            machine.reset()
+            reset()
         sleep(2)
         continue
 
@@ -130,7 +131,7 @@ while True:
     #print('normalized watt value: '+str(wattValMinMax)+', min/max: '+str(minValCon)+'/'+str(maxValGen))
 
     png.decode(0, 0)
-    feed_wdt(useWdt=USE_WDT,wdt=wdt)
+    feed_wd(wd=wd)
 
     wattValsNorm.append(wattValMinMax)
     wattValsNonNorm.append(wattVal) # the non-normalized value
@@ -165,7 +166,7 @@ while True:
     display.set_pen(display.create_pen(*valColor))
     display.rectangle(0, MIDDLE, WIDTH, 1)
 
-    feed_wdt(useWdt=USE_WDT,wdt=wdt)
+    feed_wd(wd=wd)
 
     if wattVal < 0: display.set_pen(COLOR_MINUS)
     else:           display.set_pen(COLOR_PLUS)
@@ -187,7 +188,7 @@ while True:
     x, y, w, h = vector.measure_text(earnTxt, x=196, y=227, angle=None)
     w = int(w)
     display.set_pen(WHITE)
-    if settingsFromServer: # otherwise don't display the earning text
+    if settings['fromServer']: # otherwise don't display the earning text
         vector.text('CHF',201,229,0)
         vector.text(earnTxt,306-w,227,0)
 
@@ -196,8 +197,8 @@ while True:
     display.update()
 
     # lets also set the LED to match. It's pulsating when we are generating, it's constant when consuming
-    feed_wdt(useWdt=USE_WDT,wdt=wdt)
-    brightness, pulsed = getBrightness(setting=int(settings['brightness']),time=meas['date_time'],wattVal=wattVal,logFile=logFile) # dependency on time
+    feed_wd(wd=wd)
+    brightness, pulsed = getBrightness(setting=int(settings['brightness']),time=meas['date_time'],wattVal=wattVal,log=log) # dependency on time
     # print('brightness output: wattVal:settings:applied'+str(wattVal)+':'+str(settings['brightness'])+':'+str(brightness))
     
     rgb_led.control(
@@ -210,21 +211,19 @@ while True:
             led_brightness=int(brightness/2))) # led is quite bright when shining constantly
     if ((time() - timeAtLastTransmit) > TRANSMIT_EVERY_X_SECONDS):
         timeAtLastTransmit = time() # reset the counter
-        feed_wdt(useWdt=USE_WDT,wdt=wdt)
-        settings = tx_to_server(DEBUG_CFG=DEBUG_CFG,DEVICE_CFG=DEVICE_CFG,meas=meas,loopCount=loopCount,
-                                useWdt=USE_WDT,wdt=wdt,logFile=logFile) # now transmit the stuff to the server
-        settingsFromServer = True
-        feed_wdt(useWdt=USE_WDT,wdt=wdt)
+        feed_wd(wd=wd)
+        settings = tx_to_server(DEBUG_CFG=DEBUG_CFG,DEVICE_CFG=DEVICE_CFG,meas=meas,loopCount=loopCount,wd=wd,log=log) # now transmit the stuff to the server
+        feed_wd(wd=wd)
     
     try:
         del x,y,w,h,wattValNorm,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range,length,wattValNonNorm
         del color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
     except:
-        runLog(file=logFile,string='ERROR|main: Exception at garbage collection')
+        runLog(file=log,string='ERROR|main: Exception at garbage collection')
     gc.collect() # garbage collection
     
-    feed_wdt(useWdt=USE_WDT,wdt=wdt)
+    feed_wd(wd=wd)
     sleep(LOOP_SLEEP_SEC)
-    feed_wdt(useWdt=USE_WDT,wdt=wdt)
+    feed_wd(wd=wd)
     sleep(LOOP_SLEEP_SEC)
-    feed_wdt(useWdt=USE_WDT,wdt=wdt)
+    feed_wd(wd=wd)

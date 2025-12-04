@@ -8,7 +8,11 @@ Documentation can be found here: https://github.com/pimoroni/pimoroni-pico/tree/
 
 ## Display
    * Currently using the Pimoroni 2.8” IPS LCD screen (320 x 240 pixels) with RGB LED, for about 20.-
-
+   * Font for python script: Raleway. Generated my own minimal set with 
+     python afinate --characters "CHFW 0123456789.-" --font Raleway-Regular.ttf Raleway_min.af <br>
+     see: https://github.com/Gadgetoid/alright-fonts/tree/feature/16bit-afinate <br>
+     (https://github.com/lowfatcode/alright-fonts/tree/main/sample-fonts does not work, see https://forums.pimoroni.com/t/presto-and-alright-fonts-issue-picovector/28396/4)
+   
 ### Alternatives
    * Luxurious variant: Pimoroni Presto for 77.- (includes micro controller (RP2350 based))
 
@@ -16,23 +20,22 @@ Documentation can be found here: https://github.com/pimoroni/pimoroni-pico/tree/
 
 ### Display background
    * Size 2552 x 1912 (scale ~8 times down to 320x240)
-   * Font: Raleway (see main.py)
-   * Lines: White, border 5 px
+   * The font in the image itself is Raleway-Regular.ttf (add it to Gimp manually)
+   
 ---
 
-# Old stuff
-
 ## power meter readout 
-### gplugm and mqtt
-* still ongoing, setup issues
+### gplugm
+* about 50.-
+* getting current values as json data from static url ('http://'+ local_ip + '/cm?cmnd=status%2010')
 
 ### alternatives
 * whatwatt: https://whatwatt.ch/de/shop 90.-
-   * should work on the egs network as is, no issues found
+   * works on the egs network as is, no issues found. However, they changed to a subscription based pricing. Not really suitable
 * more information about interface: https://www.smart-metering-interface.ch
 
 
-
+# Old stuff
 ## consumption display on Pico and Pimoroni display
 see folder _pico2w_
 
