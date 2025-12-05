@@ -1,2 +1,2 @@
-tailwindcss-windows-x64.exe release 4.0.12. taken from https://github.com/tailwindlabs/tailwindcss/releases/
+tailwindcss-windows-x64.exe release v4.1.17. taken from https://github.com/tailwindlabs/tailwindcss/releases/
 rename it to tailwindcss.exe
