@@ -23,6 +23,22 @@ Documentation can be found here: https://github.com/pimoroni/pimoroni-pico/tree/
    * The font in the image itself is Raleway-Regular.ttf (add it to Gimp manually)
    
 ---
+## pricing 
+### 2026 EGS
+* no high/low price times anymore, distinction between HT and LT is meaningless, just reading the overall consumption
+* instead there will be different prices per quarter:
+   Summer (April/Mai/Juni/Juli/August/September): consumption 25.18 Rp/kWh, generation 8.00 Rp/kWh  <br>
+   Winter (Januar/Februar/März, Oktober/November/Dezember): consumption 28.08 Rp/kWh, generation 12.00 Rp/kWh
+1. could add a S/W boolean to 'verbrauch'
+1. already have a 'zeit' timestamp, could use this one
+1. could add a cost column, would also help with last-year-consumption but this-year-prices
+1. -> will use the cost column, can get rid of the ht/lt column in exchange
+   1. need a mechanism (in thinning) to select the correct value when they differ (should not as I thin in hours or days but could run over a date-border when outages occur). Same mechanism for gen.
+
+
+
+
+
 
 ## power meter readout 
 ### gplugm
