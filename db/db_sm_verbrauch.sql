@@ -23,7 +23,11 @@ CREATE TABLE `kunden` (
   `priceConsNt` decimal(5,4) NOT NULL,
   `priceGen` decimal(5,4) NOT NULL,
   `paidUntil` date NOT NULL,
-  `local_ip` varchar(15) NOT NULL
+  `local_ip` varchar(15) NOT NULL,
+  `rateConW` decimal(5,4) NOT NULL,
+  `rateConS` decimal(5,4) NOT NULL,
+  `rateGenW` decimal(5,4) NOT NULL,
+  `rateGenS` decimal(5,4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE `pico_log` (
@@ -63,24 +67,6 @@ CREATE TABLE `verbrauch` (
   `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
-CREATE TABLE `verbrauch_26` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `userid` int(10) UNSIGNED NOT NULL,
-  `con` decimal(10,3) NOT NULL,
-  `conDiff` decimal(10,3) NOT NULL,
-  `conRate` decimal(10,3) NOT NULL,
-  `gen` decimal(10,3) NOT NULL,
-  `genDiff` decimal(10,3) NOT NULL,
-  `genRate` decimal(10,3) NOT NULL,
-  `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
-  `zeitDiff` int(11) NOT NULL,
-  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
-ALTER TABLE `verbrauch_26`
-  ADD PRIMARY KEY (`id`);
-ALTER TABLE `verbrauch_26`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
 CREATE TABLE `verbrauchArchive` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `userid` int(10) UNSIGNED NOT NULL,
@@ -96,6 +82,20 @@ CREATE TABLE `verbrauchArchive` (
   `zeitDiff` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+CREATE TABLE `verbrauch_26` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `userid` int(10) UNSIGNED NOT NULL,
+  `con` decimal(10,3) NOT NULL,
+  `conDiff` decimal(10,3) NOT NULL,
+  `conRate` decimal(10,3) NOT NULL,
+  `gen` decimal(10,3) NOT NULL,
+  `genDiff` decimal(10,3) NOT NULL,
+  `genRate` decimal(10,3) NOT NULL,
+  `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
+  `zeitDiff` int(11) NOT NULL,
+  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
 
 ALTER TABLE `kunden`
   ADD PRIMARY KEY (`id`);
@@ -115,6 +115,9 @@ ALTER TABLE `verbrauch`
 ALTER TABLE `verbrauchArchive`
   ADD PRIMARY KEY (`id`);
 
+ALTER TABLE `verbrauch_26`
+  ADD PRIMARY KEY (`id`);
+
 
 ALTER TABLE `kunden`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
@@ -132,6 +135,9 @@ ALTER TABLE `verbrauch`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `verbrauchArchive`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `verbrauch_26`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 COMMIT;
 
