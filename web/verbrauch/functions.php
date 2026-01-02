@@ -126,18 +126,18 @@ function checkHashUserid (object $dbConn, int $userid): bool {
 }
 
 // function used to check post and get variables 
-function checkInputs(object $dbConn): int {
-  if (! verifyGetParams()) { // now I can look the post variables        
-    printRawErrorAndDie('Error', 'invalid params');
+function checkInputs(object $dbConn, int $txVersion=3): int {
+  if (! verifyGetParams(txVersion:$txVersion)) { // now I can look the post variables        
+    printRawErrorAndDie(heading:'Error', text:'invalid params');
     return 0;
   }
   $userid = validUseridInPost(dbConn:$dbConn);
   if (! $userid) {
-    printRawErrorAndDie('Error', 'userid not supported');
+    printRawErrorAndDie(heading:'Error', text:'userid not supported');
     return 0;
   }
   if (! checkHashUserid(dbConn:$dbConn, userid:$userid)) {
-    printRawErrorAndDie('Error', 'access key not ok');
+    printRawErrorAndDie(heading:'Error', text:'access key not ok');
     return 0;
   }
   return $userid;
@@ -697,11 +697,11 @@ function getTimeRange(int $defaultVal):int {
 
 
 // checks the params retrieved over get and returns TRUE if they are ok
-function verifyGetParams():bool {  
+function verifyGetParams(int $txVersion):bool {  
   if (safeStrFromExt('GET','TX', 4) !== 'pico') {                
       return FALSE;
   }
-  if (safeIntFromExt('GET','TXVER', 1) !== 3) { // don't accept other interface version numbers
+  if (safeIntFromExt('GET','TXVER', 1) !== $txVersion) { // don't accept other interface version numbers
       return FALSE;
   }
   return TRUE;

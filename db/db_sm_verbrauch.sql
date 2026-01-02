@@ -96,6 +96,20 @@ CREATE TABLE `verbrauch_26` (
   `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
+CREATE TABLE `verbrauch_26Archive` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `userid` int(10) UNSIGNED NOT NULL,
+  `con` decimal(10,3) NOT NULL,
+  `conDiff` decimal(10,3) NOT NULL,
+  `conRate` decimal(10,3) NOT NULL,
+  `gen` decimal(10,3) NOT NULL,
+  `genDiff` decimal(10,3) NOT NULL,
+  `genRate` decimal(10,3) NOT NULL,
+  `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
+  `zeitDiff` int(11) NOT NULL,
+  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+
 
 ALTER TABLE `kunden`
   ADD PRIMARY KEY (`id`);
@@ -118,6 +132,9 @@ ALTER TABLE `verbrauchArchive`
 ALTER TABLE `verbrauch_26`
   ADD PRIMARY KEY (`id`);
 
+ALTER TABLE `verbrauch_26Archive`
+  ADD PRIMARY KEY (`id`);
+
 
 ALTER TABLE `kunden`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
@@ -138,6 +155,9 @@ ALTER TABLE `verbrauchArchive`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `verbrauch_26`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `verbrauch_26Archive`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 COMMIT;
 

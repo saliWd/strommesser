@@ -149,7 +149,7 @@ def getBrightness(setting:int, time:str, wattVal:int, log) -> tuple:
         return(0,False) # just some value
    
 def transmit_message(message:dict, wd, log) -> dict:
-    URL = "https://strommesser.ch/verbrauch/pico2w_v4.php?TX=pico&TXVER=3"
+    URL = "https://strommesser.ch/verbrauch/pico2w_v5.php?TX=pico&TXVER=5"
     HEADERS = {'Content-Type':'application/x-www-form-urlencoded'}
     failureCount = 0
     while failureCount < 3:
@@ -270,7 +270,7 @@ def hexlify_wlan(input:str) -> None:
 
 def tx_to_server(DEBUG_CFG:dict, DEVICE_CFG:dict, meas:dict, loopCount:int, wd, log) -> dict:
         randNum_hash = get_randNum_hash(DEVICE_CFG)
-        meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(meas['energy_pos_t1'])+'|'+str(meas['energy_pos_t2'])+'|'+str(loopCount)
+        meas_string = str(meas['date_time'])+'|'+str(meas['energy_pos'])+'|'+str(meas['energy_neg'])+'|'+str(loopCount)
 
         message = dict([
             ('userid', DEVICE_CFG['userid']),
