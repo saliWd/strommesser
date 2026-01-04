@@ -170,10 +170,10 @@ while True:
 
     if wattVal < 0: display.set_pen(COLOR_MINUS)
     else:           display.set_pen(COLOR_PLUS)
-    wattVal4digits = min(abs(wattVal), 9999) # limit it to 4 digits, range 0...9999. Sign is lost
+    wattVal5digits = min(abs(wattVal), 99999) # limit it to 5 digits, range 0...99999. Sign is lost
 
     # writes the reading as text in the rectangle
-    txtNum = str(wattVal4digits)
+    txtNum = str(wattVal5digits)
     x, y, w, h = vector.measure_text(txtNum, x=44, y=32, angle=None)
     w = int(w)
 
@@ -217,7 +217,7 @@ while True:
     
     try:
         del x,y,w,h,wattValNorm,meas,wattVal,minValCon,maxValGen,wattValMinMax,valColor,disp_y_range,length,wattValNonNorm
-        del color_pen,valHeight,wattVal4digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
+        del color_pen,valHeight,wattVal5digits,txtNum,wOutline,earnTxt,brightness,pulsed # to combat memAlloc issues
     except:
         runLog(file=log,string='ERROR|main: Exception at garbage collection')
     gc.collect() # garbage collection

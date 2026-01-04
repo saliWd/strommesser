@@ -73,8 +73,8 @@ def json_get_req(DEBUG_CFG:dict, local_ip:str, log, wd) -> dict:
         return(dict([('valid',False)]))
 
 def get_debug_jdata() -> dict:
-    consumption = randint(0, 3000)
-    consumption = consumption / 1000.0 # range between -3.000 and 3.000 (kW)
+    consumption = randint(0, 30000)
+    consumption = consumption / 1000.0 # range between -30.000 and 30.000 (kW)
     po, pi = 0.000, consumption # pi = consuming, po = generating
     if randint(0,1) == 0: # 50%, pos or neg
         pi, po = 0.000, consumption
