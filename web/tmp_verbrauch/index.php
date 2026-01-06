@@ -58,9 +58,9 @@ if ($totalCount > 0) {// this may be 0
   $queryCount = $result->num_rows; // this may be < graph-limit ( = display at least the newest) or >= graph-limit ( = all good)
 
   // cost over the whole time range
-  $costTotal = round(num:-1.0 * (
-                      (($rowNewest['con'] - $rowOldest['con'])*$rowOldest['conRate']) - // FIXME: rowoldest and rownewest may not have the same rate
-                      (($rowNewest['gen'] - $rowOldest['gen'])*$rowOldest['genRate'])   // FIXME: same
+  $costTotal = round(num:-1.0 * ( // TODO: is this correct?
+                      ($rowNewest['con']*$rowNewest['conRate'] - $rowOldest['con']*$rowOldest['conRate']) - 
+                      ($rowNewest['gen']*$rowOldest['genRate'] - $rowOldest['gen']*$rowOldest['genRate'])
                     ), precision: 2);
 
   if ($rowNewest['zeitDiff'] > 0) { // divide by 0 exception
@@ -119,7 +119,7 @@ if ($totalCount > 0) {// this may be 0
       $val_yr_con_kwh = ($row['con'] - $rowOldest['con']) .', '.$val_yr_con_kwh; // to get a relative value (and not some huge numbers)
       $val_yr_gen_kwh = ($row['gen'] - $rowOldest['gen']) .', '.$val_yr_gen_kwh;
       $val_yr_cost = -1.0 * 
-                    ((($row['con'] - $rowOldest['con'])*$rowOldest['conRate']) - // FIXME
+                    ((($row['con'] - $rowOldest['con'])*$rowOldest['conRate']) - // TODO
                      (($row['gen'] - $rowOldest['gen'])*$rowOldest['genRate'])) .', '.$val_yr_cost;
       $val_yl_con_ave = $aveCon.', '.$val_yl_con_ave;
       $val_yl_gen_ave = $aveGen.', '.$val_yl_gen_ave;

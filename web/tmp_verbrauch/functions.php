@@ -415,15 +415,11 @@ function printBarGraph (
 function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, string $dayB, bool $kWh=false) { // returns two values
   $sql_where = ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
   if ($param === Param::cost) { // cost param is handled differently
-    $sql = 'SELECT SUM(`conDiff`) as `sumConDiff`, SUM(`genDiff`) as `sumGenDiff`, SUM(`zeitDiff`) as `sumZeitDiff`, `conRate`, `genRate` FROM `verbrauch_26`'; // TODO: do the multiplication here
+    $sql = 'SELECT SUM(`conDiff` * `conRate`) as `sumConDiff`, SUM(`genDiff` * `genRate`) as `sumGenDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch_26`';
     $result = $dbConn->query($sql.$sql_where); // returns only one row
     $row = $result->fetch_assoc();
 
-    $costTotal = round( num: -1.0 * (
-                        (($row['sumConDiff'])*$row['conRate']) - // TODO
-                        (($row['sumGenDiff'])*$row['genRate']) // TODO
-                      ), precision: 2);
-    
+    $costTotal = round(num:-1.0 * ($row['sumConDiff'] - $row['sumGenDiff']), precision:2);
     $aveCost = 0.0; // average cost per day
     if ($row['sumZeitDiff'] > 0) {
       $aveCost = round(24*3600 / $row['sumZeitDiff'] * $costTotal,2);
