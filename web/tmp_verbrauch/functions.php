@@ -200,7 +200,7 @@ function printGraphExplanation(bool $isIndexPage):void {
     <tbody>
         <tr class="bg-white border-b hover:bg-gray-50">
             <td class="p-4">
-                <img src="img/expl_00.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Ausgelesene Einzelwerte">
+                <img src="../verbrauch/img/expl_00.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Ausgelesene Einzelwerte">
             </td>
             <td class="px-6 py-4 font-semibold text-gray-900">
                 <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Ausgelesene Einzelwerte</h3>
@@ -211,7 +211,7 @@ function printGraphExplanation(bool $isIndexPage):void {
         </tr>
         <tr class="bg-white border-b hover:bg-gray-50">
             <td class="p-4">
-                <img src="img/expl_01.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Leistungsmessungen und Kostenmessungen">
+                <img src="../verbrauch/img/expl_01.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Leistungsmessungen und Kostenmessungen">
             </td>
             <td class="px-6 py-4 font-semibold text-gray-900">
                 <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Leistungsmessungen und Kostenmessungen</h3>
