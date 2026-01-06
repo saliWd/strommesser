@@ -9,3 +9,12 @@ pico2w/my_config_0001.py
 pico2w/my_config_0002.py
 pico2w/my_config_0004.py
 pico2w/trial/*
+web/tmp_verbrauch/fonts/*
+web/tmp_verbrauch/img/*
+web/tmp_verbrauch/script/*
+web/tmp_verbrauch/dbConn.php
+web/tmp_verbrauch/login.php
+web/tmp_verbrauch/now.php
+web/tmp_verbrauch/status_loopCount.php
+web/tmp_verbrauch/status.php
+web/tmp_verbrauch/strommesser.css
