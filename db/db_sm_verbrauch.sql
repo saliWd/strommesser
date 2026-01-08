@@ -64,7 +64,8 @@ CREATE TABLE `verbrauch` (
   `genDiff` decimal(10,3) NOT NULL,
   `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
   `zeitDiff` int(11) NOT NULL,
-  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
+  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
+  `copied` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 CREATE TABLE `verbrauchArchive` (
@@ -87,10 +88,10 @@ CREATE TABLE `verbrauch_26` (
   `userid` int(10) UNSIGNED NOT NULL,
   `con` decimal(10,3) NOT NULL,
   `conDiff` decimal(10,3) NOT NULL,
-  `conRate` decimal(10,3) NOT NULL,
+  `conRate` decimal(5,4) NOT NULL,
   `gen` decimal(10,3) NOT NULL,
   `genDiff` decimal(10,3) NOT NULL,
-  `genRate` decimal(10,3) NOT NULL,
+  `genRate` decimal(5,4) NOT NULL,
   `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
   `zeitDiff` int(11) NOT NULL,
   `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
