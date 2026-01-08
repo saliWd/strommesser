@@ -1,6 +1,14 @@
-<?php declare(strict_types=1); 
+<?php declare(strict_types=1);
 require_once 'functions.php';
 $dbConn = initialize();
+
+// sql command on old db:
+// SELECT * FROM `verbrauch` WHERE `zeit` < "2025-12-31 23:59:59" AND `copied` = 0 ORDER BY `id` DESC; 
+// rates for 2025 are
+// - HT:0.3318, NT:0.2718, GEN:0.1500
+// rates for 2026 are
+// - Winter: CON=0.2808, GEN=0.1200
+
 
 $sql = "SELECT * from `verbrauch` WHERE `zeit` < \"2025-12-31 23:59:59\" AND `copied` = 0 ORDER BY `id` DESC LIMIT 1"; 
 $result = $dbConn->query(query:$sql);
