@@ -11,7 +11,7 @@ $dbConn = initialize();
 
 function copyOneEntry(object $dbConn): void {
     // $sql = "SELECT * from `verbrauch` WHERE `zeit` < \"2025-12-31 23:59:59\" AND `copied` = 0 ORDER BY `id` DESC LIMIT 1"; 
-    $sql = 'SELECT * from `verbrauch` WHERE `userid` = "1" AND `copied` = 0 ORDER BY `id` DESC LIMIT 1';
+    $sql = 'SELECT * from `verbrauch` WHERE `copied` = 0 ORDER BY `id` DESC LIMIT 1';
     $result = $dbConn->query(query: $sql);
     $queryCount = $result->num_rows;
 
