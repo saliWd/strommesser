@@ -5,8 +5,8 @@ $dbConn = initialize();
 $timeSelected = getTimeRange(defaultVal: 1);
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 
-$resultCnt = $dbConn->query('SELECT COUNT(*) as `total` FROM `verbrauch` WHERE `userid` = "'.$userid.'" LIMIT 1;'); // guaranteed to return one row
-$resultFreshest = $dbConn->query('SELECT `zeit` FROM `verbrauch` WHERE `userid` = "'.$userid.'" ORDER BY `zeit` DESC LIMIT 1;'); // cannot combine those two
+$resultCnt = $dbConn->query('SELECT COUNT(*) as `total` FROM `verbrauch_26` WHERE `userid` = "'.$userid.'" LIMIT 1;'); // guaranteed to return one row
+$resultFreshest = $dbConn->query('SELECT `zeit` FROM `verbrauch_26` WHERE `userid` = "'.$userid.'" ORDER BY `zeit` DESC LIMIT 1;'); // cannot combine those two
 
 $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
@@ -45,52 +45,38 @@ if ($totalCount > 0) {// this may be 0
   $QUERY_LIMIT = 10000; // have some upper limit, both for js and db-performance
   $GRAPH_LIMIT = 3; // does not make sense to display a graph otherwise
 
-  $sql = 'SELECT `cons`, `gen`, `zeit`, `consDiff`, `zeitDiff`, `genDiff`, `consNt`, `consHt` ';
-  $sql .= 'from `verbrauch` WHERE `userid` = "'.$userid.'" AND `zeit` > "'.$zeitOldestString.'" ';
-  $sql .= 'ORDER BY `zeit` DESC LIMIT '.$QUERY_LIMIT.';';
+  $sql = 'SELECT `con`, `gen`, `zeit`, `conDiff`, `conRate`, `zeitDiff`, `genDiff`, `genRate` ';
+  $sql .= "from `verbrauch_26` WHERE `userid` = \"$userid\" AND `zeit` > \"$zeitOldestString\" ";
+  $sql .= "ORDER BY `zeit` DESC LIMIT $QUERY_LIMIT;";
 
-  $result = $dbConn->query($sql);
-  $result->data_seek($result->num_rows - 1); // skip to the last entry of the rows
+  $result = $dbConn->query(query:$sql);
+  $result->data_seek(offset:$result->num_rows - 1); // skip to the last entry of the rows
   $rowOldest = $result->fetch_assoc();
-  $result->data_seek(0); // go back to the first row
+  $result->data_seek(offset: 0); // go back to the first row
 
   $rowNewest = $result->fetch_assoc();
   $queryCount = $result->num_rows; // this may be < graph-limit ( = display at least the newest) or >= graph-limit ( = all good)
 
-  // get some account specific infos from the db
-  $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
-  if ($resultKunden->num_rows !== 1) {
-      printRawErrorAndDie('Error', 'no config data');
-  } 
-  $rowKunden = $resultKunden->fetch_assoc();
-
   // cost over the whole time range
-  // for the oldest entries, I don't have the Nt/Ht/Gen information
-  if ($rowOldest['consNt'] + $rowOldest['consHt'] + $rowOldest['gen'] > 0.001) { 
-    $costValid = TRUE;
-    $costTotal = round( -1.0 * 
-                        ((($rowNewest['consNt'] - $rowOldest['consNt'])*$rowKunden['priceConsNt']) +
-                         (($rowNewest['consHt'] - $rowOldest['consHt'])*$rowKunden['priceConsHt']) -
-                         (($rowNewest['gen']    - $rowOldest['gen'])*   $rowKunden['priceGen']   )), 2);
-  } else {
-    $costValid = FALSE;
-    $costTotal = 0.0;
-  } 
+  $costTotal = round(num:-1.0 * ( // TODO: is this correct?
+                      ($rowNewest['con']*$rowNewest['conRate'] - $rowOldest['con']*$rowOldest['conRate']) - 
+                      ($rowNewest['gen']*$rowOldest['genRate'] - $rowOldest['gen']*$rowOldest['genRate'])
+                    ), precision: 2);
 
   if ($rowNewest['zeitDiff'] > 0) { // divide by 0 exception
-      $newestCons = round($rowNewest['consDiff']*3600*1000 / $rowNewest['zeitDiff']); // kWh compared to seconds
+      $newestCon = round($rowNewest['conDiff']*3600*1000 / $rowNewest['zeitDiff']); // kWh compared to seconds
       $newestGen = round($rowNewest['genDiff']*3600*1000 / $rowNewest['zeitDiff']);
   } else { 
-    $newestCons = 0.0;
+    $newestCon = 0.0;
     $newestGen = 0.0;
   }
 
   $zeitDiff = strtotime($rowNewest['zeit']) - strtotime($rowOldest['zeit']); // difference in seconds
   if ($zeitDiff > 0) { // divide by 0 exception
-    $aveCons = round(($rowNewest['cons'] - $rowOldest['cons'])*3600*1000 / $zeitDiff); // kWh compared to seconds
+    $aveCon = round(($rowNewest['con'] - $rowOldest['con'])*3600*1000 / $zeitDiff); // kWh compared to seconds
     $aveGen = round(($rowNewest['gen'] - $rowOldest['gen'])*3600*1000 / $zeitDiff);
   } else { 
-    $aveCons = 0.0;
+    $aveCon = 0.0;
     $aveGen = 0.0;
   }
   
@@ -98,28 +84,28 @@ if ($totalCount > 0) {// this may be 0
   if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
     $zeitString = $zeitNewest->format('H:i');
   }
-  // COLORS: cons: red "text-red-500" = rgb(239 68 68); generation: green "text-green-600" = rgb(22 163 74);
+  // COLORS: con: red "text-red-500" = rgb(239 68 68); generation: green "text-green-600" = rgb(22 163 74);
   echo '<div class="flex">
-    <div class="flex-auto text-left"><b><span class="text-green-600">'.$newestGen.'W</span> / <span class="text-red-500">'.$newestCons.'W</span></b></div>
+    <div class="flex-auto text-left"><b><span class="text-green-600">'.$newestGen.'W</span> / <span class="text-red-500">'.$newestCon.'W</span></b></div>
     <div class="flex-auto text-center">'.$zeitString.'</div>
-    <div class="flex-auto text-right">Ø: <b><span class="text-green-600">'.$aveGen.'W</span> / <span class="text-red-500">'.$aveCons.'W</span></b></div>
+    <div class="flex-auto text-right">Ø: <b><span class="text-green-600">'.$aveGen.'W</span> / <span class="text-red-500">'.$aveCon.'W</span></b></div>
   </div>
   ';
 
   if ($queryCount >= $GRAPH_LIMIT) {   
     $axis_x = ''; // rightmost value comes first. Remove something again after the while loop
-    $val_yr_cons_kwh = '';
+    $val_yr_con_kwh = '';
     $val_yr_gen_kwh = '';
     $val_yr_cost = '';
-    $val_yl_cons_ave = '';
+    $val_yl_con_ave = '';
     $val_yl_gen_ave = '';
-    $val_yl_cons = '';
+    $val_yl_con = '';
     $val_yl_gen = '';
     
     while ($row = $result->fetch_assoc()) { // did already fetch the newest one. At least 2 remaining  
       if ($row['zeitDiff'] > 0) { // divide by 0 exception
         // 0 in log will not be displayed correctly... values smaller than 10 will not be displayed (empty space ' ')
-        $tmp = round($row['consDiff']*3600*1000 / $row['zeitDiff']);
+        $tmp = round($row['conDiff']*3600*1000 / $row['zeitDiff']);
         $watt = ( $tmp > 10 ) ? $tmp : ' ';
         $tmp = round($row['genDiff']*3600*1000 / $row['zeitDiff']);
         $gen = ($tmp > 10 ) ? $tmp : ' ';
@@ -130,29 +116,24 @@ if ($totalCount > 0) {// this may be 0
       
       // revert the ordering
       $axis_x = 'new Date("'.$row['zeit'].'"), '.$axis_x; // new Date("2020-03-01 12:00:12")
-      $val_yr_cons_kwh = ($row['cons'] - $rowOldest['cons']) .', '.$val_yr_cons_kwh; // to get a relative value (and not some huge numbers)
+      $val_yr_con_kwh = ($row['con'] - $rowOldest['con']) .', '.$val_yr_con_kwh; // to get a relative value (and not some huge numbers)
       $val_yr_gen_kwh = ($row['gen'] - $rowOldest['gen']) .', '.$val_yr_gen_kwh;
-      if($costValid) {
-        $val_yr_cost = -1.0 * 
-                    ((($row['consNt'] - $rowOldest['consNt'])*$rowKunden['priceConsNt']) +
-                     (($row['consHt'] - $rowOldest['consHt'])*$rowKunden['priceConsHt']) -
-                     (($row['gen'] - $rowOldest['gen'])*$rowKunden['priceGen'])) .', '.$val_yr_cost;
-      } else {
-        $val_yr_cost = ' , '.$val_yr_cost; // just empty string. No meaningful value available
-      }
-      $val_yl_cons_ave = $aveCons.', '.$val_yl_cons_ave;
+      $val_yr_cost = -1.0 * 
+                    ((($row['con'] - $rowOldest['con'])*$rowOldest['conRate']) - // TODO
+                     (($row['gen'] - $rowOldest['gen'])*$rowOldest['genRate'])) .', '.$val_yr_cost;
+      $val_yl_con_ave = $aveCon.', '.$val_yl_con_ave;
       $val_yl_gen_ave = $aveGen.', '.$val_yl_gen_ave;
-      $val_yl_cons = $watt.', '.$val_yl_cons;
+      $val_yl_con = $watt.', '.$val_yl_con;
       $val_yl_gen = $gen.', '.$val_yl_gen;
     } // while
     // remove the last two caracters (a comma-space) and add the brackets before and after
     $axis_x = '[ '.substr($axis_x, 0, -2).' ]';
-    $val_yr_cons_kwh = '[ '.substr($val_yr_cons_kwh, 0, -2).' ]';
+    $val_yr_con_kwh = '[ '.substr($val_yr_con_kwh, 0, -2).' ]';
     $val_yr_gen_kwh = '[ '.substr($val_yr_gen_kwh, 0, -2).' ]';
     $val_yr_cost = '[ '.substr($val_yr_cost, 0, -2).' ]';
-    $val_yl_cons_ave = '[ '.substr($val_yl_cons_ave, 0, -2).' ]';
+    $val_yl_con_ave = '[ '.substr($val_yl_con_ave, 0, -2).' ]';
     $val_yl_gen_ave = '[ '.substr($val_yl_gen_ave, 0, -2).' ]';
-    $val_yl_cons = '[ '.substr($val_yl_cons, 0, -2).' ]';
+    $val_yl_con = '[ '.substr($val_yl_con, 0, -2).' ]';
     $val_yl_gen = '[ '.substr($val_yl_gen, 0, -2).' ]';
     
     if ($timeSelected === 1) {
@@ -171,7 +152,7 @@ if ($totalCount > 0) {// this may be 0
       labels: labels,
       datasets: [{
         label: "Verbrauch total [kWh]",
-        data: '.$val_yr_cons_kwh.',
+        data: '.$val_yr_con_kwh.',
         yAxisID: "yright",
         backgroundColor: "rgba(239, 68, 68, 0.2)",
         showLine: false
@@ -185,7 +166,7 @@ if ($totalCount > 0) {// this may be 0
       },
       {
         label: "Durchschnittsverbrauch [W]",
-        data: '.$val_yl_cons_ave.',
+        data: '.$val_yl_con_ave.',
         yAxisID: "yleft",
         borderColor: "rgba(239, 68, 68, 0.8)",
         backgroundColor: "rgb(255,255,255)",
@@ -205,7 +186,7 @@ if ($totalCount > 0) {// this may be 0
       },
       {
         label: "Verbrauch [W]",
-        data: '.$val_yl_cons.',
+        data: '.$val_yl_con.',
         yAxisID: "yleft",
         backgroundColor: "rgba(239, 68, 68, 0.8)",
         showLine: false
@@ -242,74 +223,70 @@ if ($totalCount > 0) {// this may be 0
     </script>
     <hr>';
     
-    if($costValid) {
-      if ($costTotal >= 0.0) {
-        $costClass = 'text-green-600';
-        $costText  = 'Ertrag';
-      } else {
-        $costClass = 'text-red-500';
-        $costText  = 'Kosten';
-      }
-      echo '
-      <div class="flex">
-        <div class="flex-auto text-left"><b><span class="'.$costClass.'">'.$costText.' [CHF]</span></b></div>
-        <div class="flex-auto text-center">&nbsp;</div>
-        <div class="flex-auto text-right"><b><span class="'.$costClass.'">'. number_format((float)$costTotal, 2, '.', '').'</span></b></div>
-      </div>      
-      <canvas id="myChartCost" width="600" height="200" class="mb-2"></canvas>
-      <script>
-      const ctxCost = document.getElementById("myChartCost");
-      const labelsCost = '.$axis_x.';
-      const dataCost = {
-        labels: labelsCost,
-        datasets: [{
-          label: "Kosten [CHF]",
-          data: '.$val_yr_cost.',
-          yAxisID: "yrightCost",
-          backgroundColor: "rgba(0, 0, 0, 0.2)",
-          showLine: false
-        },
-        {
-          data: '.$val_yl_cons.',
-          yAxisID: "yleftCost",
-          backgroundColor: "rgba(255,255,255,0.0)",
-          borderColor: "rgba(255,255,255,0.0)",
-          showLine: false
-        },
-        {
-          data: '.$val_yl_gen.',
-          yAxisID: "yleftCost",
-          backgroundColor: "rgba(255,255,255,0.0)",
-          borderColor: "rgba(255,255,255,0.0)",
-          showLine: false
-        }
-      ],
-      };
-      const configCost = {
-        type: "line",
-        data: dataCost,
-        options: {
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            x: { 
-              type: "time", 
-              time: { '.$timeUnit.' },
-              ticks: { display: false }
-            },
-            yleftCost: { type: "logarithmic", position: "left", ticks: {color: "rgba(255, 255, 255, 0.01)"}, grid: {display: false } },
-            yrightCost: { type: "linear",  position: "right", ticks: {color: "rgb(0, 0, 0)"} }
-          }
-        }
-      };
-      const myChartCost = new Chart( document.getElementById("myChartCost"), configCost );
-      </script>';
-    }  else {
-      echo ' - ';    
+    if ($costTotal >= 0.0) {
+    $costClass = 'text-green-600';
+    $costText  = 'Ertrag';
+    } else {
+    $costClass = 'text-red-500';
+    $costText  = 'Kosten';
     }
+    echo '
+    <div class="flex">
+    <div class="flex-auto text-left"><b><span class="'.$costClass.'">'.$costText.' [CHF]</span></b></div>
+    <div class="flex-auto text-center">&nbsp;</div>
+    <div class="flex-auto text-right"><b><span class="'.$costClass.'">'. number_format((float)$costTotal, 2, '.', '').'</span></b></div>
+    </div>      
+    <canvas id="myChartCost" width="600" height="200" class="mb-2"></canvas>
+    <script>
+    const ctxCost = document.getElementById("myChartCost");
+    const labelsCost = '.$axis_x.';
+    const dataCost = {
+    labels: labelsCost,
+    datasets: [{
+        label: "Kosten [CHF]",
+        data: '.$val_yr_cost.',
+        yAxisID: "yrightCost",
+        backgroundColor: "rgba(0, 0, 0, 0.2)",
+        showLine: false
+    },
+    {
+        data: '.$val_yl_con.',
+        yAxisID: "yleftCost",
+        backgroundColor: "rgba(255,255,255,0.0)",
+        borderColor: "rgba(255,255,255,0.0)",
+        showLine: false
+    },
+    {
+        data: '.$val_yl_gen.',
+        yAxisID: "yleftCost",
+        backgroundColor: "rgba(255,255,255,0.0)",
+        borderColor: "rgba(255,255,255,0.0)",
+        showLine: false
+    }
+    ],
+    };
+    const configCost = {
+    type: "line",
+    data: dataCost,
+    options: {
+        plugins: {
+        legend: {
+            display: false
+        }
+        },
+        scales: {
+        x: { 
+            type: "time", 
+            time: { '.$timeUnit.' },
+            ticks: { display: false }
+        },
+        yleftCost: { type: "logarithmic", position: "left", ticks: {color: "rgba(255, 255, 255, 0.01)"}, grid: {display: false } },
+        yrightCost: { type: "linear",  position: "right", ticks: {color: "rgb(0, 0, 0)"} }
+        }
+    }
+    };
+    const myChartCost = new Chart( document.getElementById("myChartCost"), configCost );
+    </script>';
   } else {
     echo '<br><br> - weniger als '.$GRAPH_LIMIT.' Einträge - <br><br><br>';
   }    
@@ -352,9 +329,9 @@ echo '
     <div data-popper-arrow></div>
 </div>
 <br>';
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week,  param:Param::cons, goBack:safeIntFromExt('GET','goBackWcons', 2), isIndexPage:TRUE);
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::cons, goBack:safeIntFromExt('GET','goBackMcons', 2), isIndexPage:TRUE);
-printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year,  param:Param::cons, goBack:safeIntFromExt('GET','goBackYcons', 2), isIndexPage:TRUE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Week,  param:Param::con, goBack:safeIntFromExt('GET','goBackWcon', 2), isIndexPage:TRUE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Month, param:Param::con, goBack:safeIntFromExt('GET','goBackMcon', 2), isIndexPage:TRUE);
+printBarGraph(dbConn:$dbConn, userid:$userid, timerange:Timerange::Year,  param:Param::con, goBack:safeIntFromExt('GET','goBackYcon', 2), isIndexPage:TRUE);
 echo '<p>Weitere Auswertungen findest du auf der<a href="statistic.php" class="font-medium text-blue-600 hover:text-blue-700">'.getSvg(whichSvg:Svg::ArrowRight, classString:'w-6 h-6 inline').'Statistikseite</a></p>';
 
 ?>

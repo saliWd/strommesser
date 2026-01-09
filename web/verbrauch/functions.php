@@ -18,13 +18,9 @@ enum Svg
 }
 enum Param
 {
-  case cons;
-  case consNt;
-  case consHt;
+  case con;
   case cost;
   case gen;
-  case genNt;
-  case genHt;
 }
 
 // --------------------------
@@ -204,7 +200,7 @@ function printGraphExplanation(bool $isIndexPage):void {
     <tbody>
         <tr class="bg-white border-b hover:bg-gray-50">
             <td class="p-4">
-                <img src="img/expl_00.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Ausgelesene Einzelwerte">
+                <img src="../verbrauch/img/expl_00.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Ausgelesene Einzelwerte">
             </td>
             <td class="px-6 py-4 font-semibold text-gray-900">
                 <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Ausgelesene Einzelwerte</h3>
@@ -215,7 +211,7 @@ function printGraphExplanation(bool $isIndexPage):void {
         </tr>
         <tr class="bg-white border-b hover:bg-gray-50">
             <td class="p-4">
-                <img src="img/expl_01.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Leistungsmessungen und Kostenmessungen">
+                <img src="../verbrauch/img/expl_01.png" class="w-16 md:w-32 max-w-full max-h-full" alt="Leistungsmessungen und Kostenmessungen">
             </td>
             <td class="px-6 py-4 font-semibold text-gray-900">
                 <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900 text-left">Leistungsmessungen und Kostenmessungen</h3>
@@ -285,9 +281,7 @@ function printBarGraph (
   $statisticLink = 'statistic.php#anchor'.$chartId;
   $chartId .= $param->name;
   $numbersText = ' (Ø: <span class="text-green-600">'.$values[7].'</span>/<span class="text-red-500">'.$values[6].'</span>W)';
-  if ($param === Param::cons)       { $paramText = 'Leistung';}
-  elseif ($param === Param::consNt) { $paramText = 'Leistung NT';}
-  elseif ($param === Param::consHt) { $paramText = 'Leistung HT';}
+  if ($param === Param::con)       { $paramText = 'Leistung';}
   elseif ($param === Param::cost)   { 
     if ($values[7] < 0) {
       $paramText = 'Kosten'; 
@@ -421,37 +415,21 @@ function printBarGraph (
 function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, string $dayB, bool $kWh=false) { // returns two values
   $sql_where = ' WHERE `userid` = "'.$userid.'" AND `zeit` >= "'.$dayA.' 00:00:00" AND `zeit` <= "'.$dayB.' 23:59:59";';
   if ($param === Param::cost) { // cost param is handled differently
-    $resultKunden = $dbConn->query('SELECT `priceConsHt`,`priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
-    if ($resultKunden->num_rows !== 1) {
-        printRawErrorAndDie('Error', 'no config data');
-    } 
-    $rowKunden = $resultKunden->fetch_assoc();
-
-    $sql = 'SELECT SUM(`consNtDiff`) as `sumConsNtDiff`, SUM(`consHtDiff`) as `sumConsHtDiff`, SUM(`genDiff`) as `sumGenDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+    $sql = 'SELECT SUM(`conDiff` * `conRate`) as `sumConDiff`, SUM(`genDiff` * `genRate`) as `sumGenDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch_26`';
     $result = $dbConn->query($sql.$sql_where); // returns only one row
     $row = $result->fetch_assoc();
 
-    if ($row['sumConsNtDiff'] + $row['sumConsHtDiff'] + $row['sumGenDiff'] < 0.001) { // don't have the info for old values
-      return [' ', ' ']; // not really nice, returning empty string
-    }
-
-    $costTotal = round( -1.0 * 
-                      ((($row['sumConsNtDiff'])*$rowKunden['priceConsNt']) +
-                        (($row['sumConsHtDiff'])*$rowKunden['priceConsHt']) -
-                        (($row['sumGenDiff']   )*$rowKunden['priceGen']   )), 2);
-    
+    $costTotal = round(num:-1.0 * ($row['sumConDiff'] - $row['sumGenDiff']), precision:2);
     $aveCost = 0.0; // average cost per day
     if ($row['sumZeitDiff'] > 0) {
       $aveCost = round(24*3600 / $row['sumZeitDiff'] * $costTotal,2);
     }
     return [$costTotal, $aveCost];
   }
-  elseif ($param === Param::cons)  { $paramGen = Param::gen;}
-  elseif ($param === Param::consNt){ $paramGen = Param::gen;} // TODO: not really correct, no real gen value here
-  elseif ($param === Param::consHt){ $paramGen = Param::gen;} // TODO: not really correct, no real gen value here 
+  elseif ($param === Param::con)  { $paramGen = Param::gen;}
   
-  $sql[0] = 'SELECT SUM(`'.$param->name.   'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
-  $sql[1] = 'SELECT SUM(`'.$paramGen->name.'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch`';
+  $sql[0] = 'SELECT SUM(`'.$param->name.   'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch_26`';
+  $sql[1] = 'SELECT SUM(`'.$paramGen->name.'Diff`) as `sumDiff`, SUM(`zeitDiff`) as `sumZeitDiff` FROM `verbrauch_26`';
   
   $watt = [0, 0];
   for ($i = 0; $i < 2; $i++) {
