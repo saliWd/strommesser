@@ -11,7 +11,7 @@
 
         $output = '';
         foreach ($userids_to_check as $userid) {
-            $result = $dbConn->query(query:"SELECT `zeit` FROM `verbrauch` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 1");
+            $result = $dbConn->query(query:"SELECT `zeit` FROM `verbrauch_26` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 1");
             if ($result->num_rows !== 1) {
                 break;
             } 
