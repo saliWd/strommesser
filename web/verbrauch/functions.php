@@ -448,6 +448,25 @@ function getWattSum(object $dbConn, int $userid, Param $param, string $dayA, str
   return $watt; 
 }
 
+function getDailyCost(object $dbConn, int $userid):float {
+  $zeitNewest = date_create(datetime: 'now');
+  $zeitOldestString = $zeitNewest->format(format: 'Y-m-d 00:00:00'); // beginning of the current day
+ 
+  $sql = "SELECT `gen`, `con`, `genRate`, `conRate` from `verbrauch_26` WHERE `userid` = \"$userid\" AND `zeit` > \"$zeitOldestString\" ORDER BY `zeit` DESC;";
+  $result = $dbConn->query(query:$sql);
+  $result->data_seek(offset: $result->num_rows - 1); // skip to the last entry of the rows
+  $rowOldest = $result->fetch_assoc();
+  $result->data_seek(offset:0); // go back to the first row
+  $row = $result->fetch_assoc();
+
+  $earn = -1.0*(
+                ($row['con'] - $rowOldest['con'])*$row['conRate'] - // TODO: not always correct. Rate may not be constant
+                ($row['gen'] - $rowOldest['gen'])*$row['genRate']);
+  $earn = round(num:$earn,precision:2);
+  return($earn);
+}
+
+
 /*  
   $kWh = [0, 0];
   for ($i = 0; $i < 2; $i++) {

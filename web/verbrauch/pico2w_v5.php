@@ -159,22 +159,8 @@
     $zeitNow->modify(modifier: '- 5 minutes'); // latest entry must be newer than '5 minutes ago'
     $serverOk = ($zeitNewest > $zeitNow) ? 1:0;
 
-    // get daily costs
-    $zeitNewest = date_create(datetime: 'now');
-    $zeitOldestString = $zeitNewest->format(format: 'Y-m-d 00:00:00'); // beginning of the current day
- 
-    $sql = "SELECT `gen`, `con`, `genRate`, `conRate` from `verbrauch_26` WHERE `userid` = \"$userid\" AND `zeit` > \"$zeitOldestString\" ORDER BY `zeit` DESC;";
-    $result = $dbConn->query(query:$sql);
-    $result->data_seek(offset: $result->num_rows - 1); // skip to the last entry of the rows
-    $rowOldest = $result->fetch_assoc();
-    $result->data_seek(offset:0); // go back to the first row
-    $row = $result->fetch_assoc();
-
-    $earn = -1.0*(
-                  ($row['con'] - $rowOldest['con'])*$row['conRate'] -
-                  ($row['gen'] - $rowOldest['gen'])*$row['genRate']);
-    $earn = round(num:$earn,precision:2);
-    
+    $earn = getDailyCost(dbConn:$dbConn, userid:$userid);
+  
     // serverok|ledBrightness|ledMinValCon|ledMaxValGen|earn
     echo $serverOk.'|'.$rowKunden['ledBrightness'].'|'.$rowKunden['ledMinValCon'].'|'.$rowKunden['ledMaxValGen'].'|'.$earn;
 
