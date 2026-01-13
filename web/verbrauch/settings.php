@@ -7,17 +7,18 @@ $LIMIT_LED_MIN_VALUE_CON = 2000;
 $LIMIT_LED_MAX_VAL_GEN = 8000;
 $LIMIT_LED_BRIGHTNESS = 255;
 
-$doSafe = safeIntFromExt('GET', 'do', 2); // this is an integer (range 1 to 99) or non-existing
+$doSafe = safeIntFromExt(source:'GET', varName:'do', length:2); // this is an integer (range 1 to 99) or non-existing
 // do = 0: entry point
 // do = 1: export all user data
 // do = 2: process setting changes
 // do = 3: present the 'delete exported data?'
 // do = 4: process 'delete archived'
 if ($doSafe === 0) { // entry point of this site
-  $result = $dbConn->query('SELECT `ledMinValCon`, `ledMaxValGen`, `ledBrightness`, `priceConsHt`, `priceConsNt`, `priceGen` FROM `kunden` WHERE `id` = "'.$userid.'" LIMIT 1;');
+  $result = $dbConn->query(query: "SELECT `ledMinValCon`, `ledMaxValGen`, `ledBrightness`, `rateConW`, `rateConS`, `rateGenW`, `rateGenS` FROM `kunden` WHERE `id` = \"$userid\" LIMIT 1;");
   $row = $result->fetch_assoc();
   
   printBeginOfPage_v2(site:'settings.php');  
+  // TODO: image of display
   echo '
   <div id="anchorMiniDisplay" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Mini-Display</h3>
@@ -82,17 +83,21 @@ if ($doSafe === 0) { // entry point of this site
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Strompreise</h3>
     <form id="CostForm" action="settings.php?do=5" method="post">
       <div class="flex flex-row mt-8">
-        <div class="basis-2/3 self-center">Verbrauch Hochtarif (HT), in CHF pro kWh</div>
-        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="priceConsHt" type="text" maxlength="6" value="'.$row['priceConsHt'].'" required></div>
+        <div class="basis-2/3 self-center">Verbrauch Sommer, in CHF pro kWh</div>
+        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="rateConS" type="text" maxlength="6" value="'.$row['rateConS'].'" required></div>
       </div>
       <div class="flex flex-row mt-2">
-        <div class="basis-2/3 self-center">Verbrauch Niedertarif (NT), in CHF pro kWh</div>
-        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="priceConsNt" type="text" maxlength="6" value="'.$row['priceConsNt'].'" required></div>
+        <div class="basis-2/3 self-center">Einspeisung Sommer, in CHF pro kWh</div>
+        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="rateGenS" type="text" maxlength="6" value="'.$row['rateGenS'].'" required></div>
+      </div>
+      <div class="flex flex-row mt-8">
+        <div class="basis-2/3 self-center">Verbrauch Winter, in CHF pro kWh</div>
+        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="rateConW" type="text" maxlength="6" value="'.$row['rateConW'].'" required></div>
       </div>
       <div class="flex flex-row mt-2">
-        <div class="basis-2/3 self-center">Einspeisung, in CHF pro kWh</div>
-        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="priceGen" type="text" maxlength="6" value="'.$row['priceGen'].'" required></div>
-      </div>    
+        <div class="basis-2/3 self-center">Einspeisung Winter, in CHF pro kWh</div>
+        <div class="basis-1/3 inline-block align-middle"><input class="input-text w-20" name="rateGenW" type="text" maxlength="6" value="'.$row['rateGenW'].'" required></div>
+      </div>
       <div class="flex flex-row justify-center mt-2">
         <div><br><input id="CostFormSubmit" class="mt-8 input-text mx-auto" name="CostFormSubmit" type="submit" value="Strompreise speichern"></div>
       </div>
@@ -110,7 +115,7 @@ if ($doSafe === 0) { // entry point of this site
   ';
 } elseif ($doSafe === 1) { // export all entries
   printBeginOfPage_v2(site:'settings.php', title:'Datenexport');
-  $result = $dbConn->query('SELECT * FROM `verbrauchArchive` WHERE `userid` = "'.$userid.'" ORDER BY `id` DESC LIMIT 24000;'); // limit 24k = bit more than one month. To limit file size
+  $result = $dbConn->query(query: "SELECT * FROM `verbrauch_26Archive` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 24000;"); // limit 24k = bit more than one month. To limit file size
   $num = $result->num_rows;
 
   echo '
@@ -143,7 +148,7 @@ if ($doSafe === 0) { // entry point of this site
   $ledMaxValGen  = limitInt(input:$ledMaxValGen, lower:0, upper:$LIMIT_LED_MAX_VAL_GEN);
   $ledBrightness = limitInt(input:$ledBrightness,lower:0, upper:$LIMIT_LED_BRIGHTNESS);
 
-  $result = $dbConn->query('UPDATE `kunden` SET `ledMinValCon` = "'.$ledMinValCon.'", `ledMaxValGen` = "'.$ledMaxValGen.'", `ledBrightness` = "'.$ledBrightness.'" WHERE `id` = "'.$userid.'";');
+  $result = $dbConn->query(query:"UPDATE `kunden` SET `ledMinValCon` = \"$ledMinValCon\", `ledMaxValGen` = \"$ledMaxValGen\", `ledBrightness` = \"$ledBrightness\" WHERE `id` = \"$userid\";");
 
   echo 'gespeichert<br>';
   echo '<script>setTimeout(() => { window.location.href = \'settings.php\'; }, 2000);</script>';
@@ -154,25 +159,24 @@ if ($doSafe === 0) { // entry point of this site
   /*
   `id` bigint(20) UNSIGNED NOT NULL,
   `userid` int(10) UNSIGNED NOT NULL,
-  `cons` decimal(10,3) NOT NULL,
-  `consDiff` decimal(10,3) NOT NULL,
-  `consNt` decimal(10,3) NOT NULL,
-  `consNtDiff` decimal(10,3) NOT NULL,
-  `consHt` decimal(10,3) NOT NULL,
-  `consHtDiff` decimal(10,3) NOT NULL,
+  `con` decimal(10,3) NOT NULL,
+  `conDiff` decimal(10,3) NOT NULL,
+  `conRate` decimal(5,4) NOT NULL,
   `gen` decimal(10,3) NOT NULL,
   `genDiff` decimal(10,3) NOT NULL,
+  `genRate` decimal(5,4) NOT NULL,
   `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
   `zeitDiff` int(11) NOT NULL,
+  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0 --> this is not exported, always 0 for the archive
   */
   $outFile = fopen(filename:'php://output', mode: 'w');
-  fputcsv(stream: $outFile, fields: array('id','userid','cons','consDiff','consNt','consNtDiff','consHt','consHtDiff','gen','genDiff','zeit','zeitDiff'));
-  $result = $dbConn->query(query: "SELECT * FROM `verbrauchArchive` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 24000;"); // limit 24k = bit more than one month. To limit file size
+  fputcsv(stream: $outFile,      fields: ['id','userid','con','conDiff','conRate','gen','genDiff','genRate','zeit','zeitDiff']);
+  $result = $dbConn->query(query: "SELECT `id`,`userid`,`con`,`conDiff`,`conRate`,`gen`,`genDiff`,`genRate`,`zeit`,`zeitDiff` FROM `verbrauch_26Archive` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 24000;"); // limit 24k = bit more than one month. To limit file size
   $exportedLines = $result->num_rows;
   while ($row = $result->fetch_row()) { 
-    fputcsv($outFile, $row); 
+    fputcsv(stream:$outFile, fields:$row); 
   }
-  fclose($outFile);
+  fclose(stream:$outFile);
   exit();
 } elseif ($doSafe === 4) {  // do delete the previously exported data
   printBeginOfPage_v2(site:'settings.php', title:'Datenexport');
@@ -193,11 +197,12 @@ if ($doSafe === 0) { // entry point of this site
   ';
 } elseif ($doSafe === 5) {
   printBeginOfPage_v2(site:'settings.php', title:'Einstellungen');
-  $priceConsHt = abs(safeFloatFromExt(source:'POST',varName:'priceConsHt', length:6));
-  $priceConsNt = abs(safeFloatFromExt(source:'POST',varName:'priceConsNt', length:6));
-  $priceGen    = abs(safeFloatFromExt(source:'POST',varName:'priceGen',    length:6));
+  $rateConS = abs(safeFloatFromExt(source:'POST',varName:'rateConS', length:6));
+  $rateGenS = abs(safeFloatFromExt(source:'POST',varName:'rateGenS', length:6));
+  $rateConW = abs(safeFloatFromExt(source:'POST',varName:'rateConW', length:6));
+  $rateGenW = abs(safeFloatFromExt(source:'POST',varName:'rateGenW', length:6));
 
-  $result = $dbConn->query('UPDATE `kunden` SET `priceConsHt` = "'.$priceConsHt.'", `priceConsNt` = "'.$priceConsNt.'", `priceGen` = "'.$priceGen.'" WHERE `id` = "'.$userid.'";');
+  $result = $dbConn->query(query: "UPDATE `kunden` SET `rateConS` = \"$rateConS\", `rateGenS` = \"$rateGenS\", `rateConW` = \"$rateConW\", `rateGenW` = \"$rateGenW\" WHERE `id` = \"$userid\";");
 
   echo 'gespeichert<br>';
   echo '<script>setTimeout(() => { window.location.href = \'settings.php\'; }, 2000);</script>';
