@@ -166,8 +166,7 @@ if ($doSafe === 0) { // entry point of this site
   `genDiff` decimal(10,3) NOT NULL,
   `genRate` decimal(5,4) NOT NULL,
   `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
-  `zeitDiff` int(11) NOT NULL,
-  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0 --> this is not exported, always 0 for the archive
+  `zeitDiff` int(11) NOT NULL NB: field `thin` does not exist on the archive db (anyhow always 0)
   */
   $outFile = fopen(filename:'php://output', mode: 'w');
   fputcsv(stream:$outFile,        fields:['id','userid','con','conDiff','conRate','gen','genDiff','genRate','zeit','zeitDiff']);
