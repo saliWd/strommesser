@@ -18,7 +18,7 @@ if ($doSafe === 0) { // entry point of this site
   $row = $result->fetch_assoc();
   
   printBeginOfPage_v2(site:'settings.php');  
-  // TODO: image of display
+  // TODO: image of display (850x1264)
   echo '
   <div id="anchorMiniDisplay" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
     <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Mini-Display</h3>
@@ -170,7 +170,7 @@ if ($doSafe === 0) { // entry point of this site
   `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0 --> this is not exported, always 0 for the archive
   */
   $outFile = fopen(filename:'php://output', mode: 'w');
-  fputcsv(stream: $outFile,      fields: ['id','userid','con','conDiff','conRate','gen','genDiff','genRate','zeit','zeitDiff']);
+  fputcsv(stream:$outFile,        fields:['id','userid','con','conDiff','conRate','gen','genDiff','genRate','zeit','zeitDiff']);
   $result = $dbConn->query(query: "SELECT `id`,`userid`,`con`,`conDiff`,`conRate`,`gen`,`genDiff`,`genRate`,`zeit`,`zeitDiff` FROM `verbrauch_26Archive` WHERE `userid` = \"$userid\" ORDER BY `id` DESC LIMIT 24000;"); // limit 24k = bit more than one month. To limit file size
   $exportedLines = $result->num_rows;
   while ($row = $result->fetch_row()) { 
@@ -183,7 +183,7 @@ if ($doSafe === 0) { // entry point of this site
   $num = safeIntFromExt(source:'GET', varName:'num', length:5);
   $num = min($num, 24000); // do never delete more than 24k (get param may be changed by user)
 
-  $result = $dbConn->query(query: "DELETE FROM `verbrauchArchive` WHERE `userid` = \"$userid\" ORDER BY `id` LIMIT $num;");
+  $result = $dbConn->query(query: "DELETE FROM `verbrauch_26Archive` WHERE `userid` = \"$userid\" ORDER BY `id` LIMIT $num;");
 
   echo '
   <div id="anchorDataExport" class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
