@@ -54,7 +54,7 @@
         return;
       }
 
-      $sql = "SELECT `id` FROM `verbrauch` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
+      $sql = "SELECT `id` FROM `verbrauch_26` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
       $sql .= " AND `zeit` < \"$zeitAlignedPlusStr\" AND `zeit` >= \"$zeitAlignedStr\"";
       $sql .= " ORDER BY `id` ASC LIMIT 1;";
       $result = $dbConn->query($sql);
