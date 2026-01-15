@@ -4,15 +4,6 @@
     // expecting a call like "https://strommesser.ch/verbrauch/pico2w_vX.php?TX=pico&TXVER=5"
     // with POST data (url encoded)
 
-    function getDiffs($row_now, $row_before):string {
-      // `con` -> `conDiff`, `gen` -> `genDiff`
-      $sqlString = '';
-      $sqlString .= '`conDiff` = "'.($row_now['con'] - $row_before['con']).'", ';
-      $sqlString .= '`genDiff` = "'.($row_now['gen'] - $row_before['gen']).'", '; 
-    
-      return $sqlString;
-    }
-
     function doReduction($dbConn, int $userid, bool $smlTimeScale):void {
       // possible issues: 
       // - can have lots of entries per hour because of fast readout (usually 30)
@@ -133,7 +124,7 @@
     if ($queryCount === 2) {
       $row_now = $result->fetch_assoc();
       $row_before = $result->fetch_assoc();
-      $valueDiffsSql = getDiffs(row_now:$row_now, row_before:$row_before);
+      $valueDiffsSql = '`conDiff` = "'.($row_now['con'] - $row_before['con']).'", `genDiff` = "'.($row_now['gen'] - $row_before['gen']).'", ';
       $zeitDiff = date_diff(baseObject: date_create(datetime: $row_before['zeit']), targetObject: date_create(datetime: $row_now['zeit']));
       $zeitSecs = $zeitDiff->d*24*3600 + $zeitDiff->h*3600 + $zeitDiff->i*60 + $zeitDiff->s;
       
