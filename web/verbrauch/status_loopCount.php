@@ -2,68 +2,66 @@
 require_once 'functions.php';
 $dbConn = initialize();
 
-function doReduce($dbConn, int $userid):void {
+function doReduce($dbConn, int $userid):bool {
+  // TODO: similar code as used in pico2w.py. Use function...
   $sqlNoThin = "`userid` = $userid AND `thin` = 0";
-  $interval = 25; // hours. Age before doing compacting
   $formatString = 'Y-m-d H:00:00';
-  $thinUpdate = '1';
-  $modifier = '+1 hour';
   // search the oldest one where thinnig has not yet been applied (and is older than 25h)
-  $sql = "SELECT `zeit` FROM `pico_log` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR) ORDER BY `id` ASC LIMIT 1;";
+  $sql = "SELECT `zeit` FROM `pico_log` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL 25 HOUR) ORDER BY `id` ASC LIMIT 1;";
   $result = $dbConn->query($sql);
   if ($result->num_rows < 1) { // if there is no entry older than 25h, there is nothing to do. NB: there is a difference between NOW and last-insert-time
-    return;
+    return false;
   }
   $row = $result->fetch_assoc();
 
   // compact all from the last hour before this entry
   $zeit = date_create(datetime: $row['zeit']); // e.g. 18:43
   $zeitAligned = date_create(datetime: $zeit->format(format: $formatString)); // start of the last hour, e.g. 18:00
-  $zeitAlignedStr = $zeitAligned->format(format: $formatString); // as string: 19:00
-  $zeitAlignedPlus = $zeitAligned->modify(modifier: $modifier); // go one hour/day further, 19:00
+  $zeitAlignedStr = $zeitAligned->format(format:$formatString); // as string: 19:00
+  $zeitAlignedPlus = $zeitAligned->modify(modifier:'+1 hour'); // go one hour/day further, 19:00
   $zeitAlignedPlusStr = $zeitAlignedPlus->format(format: $formatString); // as string: 19:00
   
   // check whether this one is still old enough and thinning is ok
-  $sql = "SELECT `id` FROM `pico_log` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
+  $sql = "SELECT `id` FROM `pico_log` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL 25 HOUR)";
   $sql .= " AND `zeit` >= \"$zeitAlignedPlusStr\"";
   $sql .= " ORDER BY `id` ASC LIMIT 1;";
   $result = $dbConn->query($sql);
   if ($result->num_rows < 1) { // if there is no entry within this hour, there is nothing to do
-    return;
+    return false;
   }
 
-  $sql = "SELECT `id` FROM `pico_log` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL $interval HOUR)";
+  $sql = "SELECT `id` FROM `pico_log` WHERE $sqlNoThin AND `zeit` < DATE_SUB(NOW(), INTERVAL 25 HOUR)";
   $sql .= " AND `zeit` < \"$zeitAlignedPlusStr\" AND `zeit` >= \"$zeitAlignedStr\"";
   $sql .= " ORDER BY `id` DESC LIMIT 1;"; // NB: this is ASC in the reduction code from pico2w_v4. I'm interested in the last one, not the first
   $result = $dbConn->query($sql);
   if ($result->num_rows < 1) { // if there is no entry within this hour, there is nothing to do
-    return;
+    return false;
   }
 
   $row = $result->fetch_assoc();   // -> gets me the ID I want to update with the next commands
   $idToUpdate = $row['id']; // oldest one
   
   // now do the update and then delete the others
-  $sql = 'UPDATE `pico_log` SET `thin` = "'.$thinUpdate.'" WHERE `id` = "'.$idToUpdate.'";';
-  $result = $dbConn->query($sql);
-        
-  $sql = "DELETE FROM `pico_log` WHERE $sqlNoThin AND `zeit` < \"$zeitAlignedPlusStr\";";
-  $result = $dbConn->query($sql);
+  $result = $dbConn->query("UPDATE `pico_log` SET `thin` = \"1\" WHERE `id` = \"$idToUpdate\";");
+  $result = $dbConn->query("DELETE FROM `pico_log` WHERE $sqlNoThin AND `zeit` < \"$zeitAlignedPlusStr\";");
+  return true;
 }
 
 
 $timeSelected = getTimeRange(defaultVal: 7);
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 
-$resultCnt = $dbConn->query('SELECT COUNT(*) as `total` FROM `pico_log` WHERE `userid` = "'.$userid.'" LIMIT 1;'); // guaranteed to return one row
-$resultFreshest = $dbConn->query('SELECT `zeit` FROM `pico_log` WHERE `userid` = "'.$userid.'" ORDER BY `zeit` DESC LIMIT 1;'); // cannot combine those two
+$resultCnt = $dbConn->query(query:"SELECT COUNT(*) as `total` FROM `pico_log` WHERE `userid` = \"$userid\" LIMIT 1;"); // guaranteed to return one row
+$resultFreshest = $dbConn->query(query:"SELECT `zeit` FROM `pico_log` WHERE `userid` = \"$userid\" ORDER BY `zeit` DESC LIMIT 1;"); // cannot combine those two
 
 $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
 $totalCount = $rowCnt['total'];
 
 printBeginOfPage_v2(site:'status_loopCount.php');
-doReduce(dbConn:$dbConn, userid:$userid); // maybe TODO: move the reduction to pico2w_v4
+do {
+  $didReduce = doReduce(dbConn:$dbConn, userid:$userid); 
+} while ($didReduce);
 
 $tabTexts = array (  
   '1'   => array('1',  'Tag',  'border-transparent hover:text-gray-600 hover:border-gray-300'),
