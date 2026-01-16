@@ -39,7 +39,7 @@ def doLogin (driver, username, password):
 # end def
 
 def doLogout (driver):
-  driver.get("https://strommesser.ch/verbrauch/login.php?do=2") # go to the logout page
+  driver.get("https://strommesser.ch/verbrauch/logout.php") # go to the logout page
   time.sleep(1) # wait until menu did appear
 # end def
 

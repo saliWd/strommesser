@@ -42,8 +42,11 @@ def getStatic(driver, testNum):
   subTest = getPage(driver, 'settings', testNum, subTest)
   subTest = getPage(driver, 'statistic', testNum, subTest)
   subTest = getPage(driver, 'now', testNum, subTest)
+  subTest = getPage(driver, 'status', testNum, subTest)
+  subTest = getPage(driver, 'status_loopCount', testNum, subTest)
+  subTest = getPage(driver, 'logout', testNum, subTest)
   
-  doLogout(driver)
+  # doLogout(driver) not required anymore after last 'test'
 
   return True
 # end def
