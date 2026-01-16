@@ -630,9 +630,9 @@ function printNavMenu_v2 (string $site, string $title): void {
   if ($site === 'index.php') {
     $inPageTargets = array(
       '#myChart'    => 'Leistungsübersicht',
-      '#anchorWcons'=> 'Wöchentlich',      
-      '#anchorMcons'=> 'Monatlich',
-      '#anchorYcons'=> 'Jährlich'
+      '#anchorWcon'=> 'Wöchentlich',      
+      '#anchorMcon'=> 'Monatlich',
+      '#anchorYcon'=> 'Jährlich'
     );    
   } elseif ($site === 'statistic.php') {
     $inPageTargets = array(
