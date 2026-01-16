@@ -23,6 +23,21 @@ enum Param
   case gen;
 }
 
+// global variable
+$SITES = [//                 title              graph-js navLink
+  'index.php'            => ['Übersicht',        true,    true],
+  'statistic.php'        => ['Statistiken',      true,    true],
+  'settings.php'         => ['Einstellungen',    false,   true],
+  'now.php'              => ['Aktuelle Werte',   false,   true],
+  'status.php'           => ['Status',           false,   true],
+  'status_loopCount.php' => ['Status LoopCount', true,    true],
+  'login.php'            => ['Login, Logout',    false,   false],
+  '#'                    => ['&nbsp;',           false,   true], // to get some space in the nav menu
+  'logout.php'           => ['Logout',           false,   true],
+  'contact.php'          => ['Kontaktformular',  false,   false]
+];
+
+
 // --------------------------
 // function definitions
 
@@ -547,30 +562,22 @@ function getValues(
 }
 
 // prints header with css/js and body, container-div and h1 title
-function printBeginOfPage_v2(string $site, string $title=''):void {
-  $SITE_PROPERTIES = array(   // title            // requires graph js
-    'index.php'            => ['Übersicht',        true],
-    'settings.php'         => ['Einstellungen',    false],
-    'login.php'            => ['Login, Logout',    false],
-    'statistic.php'        => ['Statistiken',      true],
-    'status.php'           => ['Status',           false],
-    'status_loopCount.php' => ['Status LoopCount', true],
-    'contact.php'          => ['Kontaktformular',  false],
-    'now.php'              => ['Aktuelle Werte',   false]
-  );
+function printBeginOfPage_v2(string $site, string $title=''):void {  
+  global $SITES;
+
   echo '<!DOCTYPE html>
   <html>
   <head>
   <meta charset="utf-8">
   ';
   $scripts = '';
-  if ($SITE_PROPERTIES[$site][1]) {
+  if ($SITES[$site][1]) {
     $scripts = '<script src="../verbrauch/script/chart.umd.js"></script>
   <script src="../verbrauch/script/moment.min.mine.js"></script>
   <script src="../verbrauch/script/chartjs-adapter-moment.mine.js"></script>';
   } 
   
-  echo '<title>StromMesser '.$SITE_PROPERTIES[$site][0].'</title>';
+  echo '<title>StromMesser '.$SITES[$site][0].'</title>';
   if ($site === 'now.php') {
     echo '
   <meta http-equiv="refresh" content="90">';
@@ -595,16 +602,13 @@ function printBeginOfPage_v2(string $site, string $title=''):void {
 }
 
 function printNavMenu_v2 (string $site, string $title): void {
-  $TOP_LEVEL_SITES = array( // NB: partial repetition of SITE_PROPERTIES (but only those within 'verbrauch' directory)
-    'index.php' =>      'Übersicht',
-    'statistic.php' =>  'Statistiken',
-    'settings.php' =>   'Einstellungen',
-    'now.php' =>        'Aktuelle Werte',
-    'status.php' =>     'Status',
-    'status_loopCount.php' => 'Status LoopCount',
-    '#' =>              '&nbsp;',
-    'login.php?do=2' => 'LogOut'
-  );
+  global $SITES; 
+  $navLinks = [];
+  foreach ($SITES as $key => $value) {
+    if ($value[2]) {
+        $navLinks[$key] = $value[0];
+    }
+  }
   echo '
 <nav class="border-gray-400 rounded bg-gray-100 px-2 sm:px-4 fixed w-full top-0 left-0" aria-label="Breadcrumb">
   <ol class="inline-flex items-center mb-3 sm:mb-0">
@@ -616,15 +620,13 @@ function printNavMenu_v2 (string $site, string $title): void {
         </button>
         <div id="dropdown-NavMain" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
           <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefault">';
-  printListItems(items: $TOP_LEVEL_SITES);
+  printListItems(items: $navLinks);
   echo '
           </ul>
         </div> 
       </div>
     </li>';
 
-  $inPageTargets = [];  
-  $siteName = $TOP_LEVEL_SITES[$site];
   if ($site === 'index.php') {
     $inPageTargets = array(
       '#myChart'    => 'Leistungsübersicht',
@@ -644,8 +646,10 @@ function printNavMenu_v2 (string $site, string $title): void {
       '#anchorUserAccount'=> 'Benutzereinstellungen',
       '#anchorDataExport' => 'Daten exportieren'
     );
+  } else{
+    $inPageTargets = [];
   }
-  if ($title) { $siteName = $title; } // required for the login/logout case
+  $siteName = ($title) ? $title : $SITES[$site][0]; // required for the login/logout case
   printInPageNav(inPageTargets:$inPageTargets, siteName:$siteName);
   echo '</ol>
 </nav>';

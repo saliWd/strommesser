@@ -3,11 +3,6 @@ require_once('functions.php');
 session_start(); // this code must precede any HTML output
 $dbConn = get_dbConn(); // do not use initialize here
 
-function sessionAndCookieDelete (): void {
-  $_SESSION['userid'] = 0; // the most important one, make sure it's really 0
-  setcookie('userIdCookie', '0', (time() - 42000), '/verbrauch/', 'strommesser.ch', TRUE, TRUE); // some big enough value in the past to make sure things like summer time changes do not affect it
-}
-
 // returns the userid which matches to the email given. Returns 0 if something went wrong
 function mail2userid (object $dbConn, string $emailUnsafe) : int {
   if (!($result = $dbConn->query('SELECT `id` FROM `kunden` WHERE `email` = "'.mysqli_real_escape_string($dbConn, $emailUnsafe).'";'))) {
@@ -247,10 +242,7 @@ if ($doSafe === 0) {
     passwordUnsafe:filter_var(safeStrFromExt('POST', 'password', 63), FILTER_SANITIZE_STRING), // generic string, max length 63
     setCookieSafe:safeIntFromExt('POST', 'setCookie', 1)
   ); // this redirects on success
-} elseif ($doSafe === 2) {
-  sessionAndCookieDelete();
-  printBeginOfPage_v2(site:'login.php', title:'Log out');
-  echo '<p>log out ok, zurück zur <a href="../index.php" class="underline">Startseite</a></p>';
+// ($doSafe === 2) is now on it's own page logout.php
 } elseif ($doSafe === 3) {    
   printBeginOfPage_v2(site:'login.php', title:'Passwort ändern');
   printLoginForm (reason:'change', formDo:4, submitText:'Neues Passwort speichern');
