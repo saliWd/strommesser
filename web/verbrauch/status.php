@@ -61,11 +61,21 @@
             $dbHistTxt .= "Status ist $statusTxt ($zeitTxt)<br>";
         }
         
-        echo "
+        echo '
+    <div class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+    <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Status LoopCounter</h3>
+    <p class="font-normal text-gray-700">
+    Der loop counter wird alle 5 Sekunden raufgezählt. Auf der <a href="status_loopCount.php" class="font-medium text-blue-600 hover:text-blue-700">LoopCounter-Seite</a> siehst du, ob das für deinen Anschluss zuverlässig funktioniert.
+    </p>    
+    </div><br>';
+
+    echo "
     <div class=\"text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100\">
-    <h3 class=\"mb-2 text-xl font-bold tracking-tight text-gray-900\">Status ist $okOrNotTxt</h3>
-    <p class=\"font-normal text-gray-700\">$output</p>
-    <br>
+    <h3 class=\"mb-2 text-xl font-bold tracking-tight text-gray-900\">Status aller User ist $okOrNotTxt</h3>";
+    if ($output) {
+        echo "<p class=\"font-normal text-gray-700\">$output</p>";
+    }
+    echo "
     <p>
     <i>Status ok</i> bedeutet, dass die letzte Messung für alle User nicht älter als 5 Minuten alt ist.<br>
     Der Status wird stündlich überprüft und gespeichert. Unten werden die Resultate für die letzten 24 Stunden angezeigt.<br>

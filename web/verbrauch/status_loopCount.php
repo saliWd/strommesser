@@ -47,8 +47,6 @@ function doReduce($dbConn, int $userid):bool {
   return true;
 }
 
-
-$timeSelected = getTimeRange(defaultVal: 7);
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 
 $resultCnt = $dbConn->query(query:"SELECT COUNT(*) as `total` FROM `pico_log` WHERE `userid` = \"$userid\" LIMIT 1;"); // guaranteed to return one row
@@ -63,39 +61,18 @@ do {
   $didReduce = doReduce(dbConn:$dbConn, userid:$userid); 
 } while ($didReduce);
 
-$tabTexts = array (  
-  '1'   => array('1',  'Tag',  'border-transparent hover:text-gray-600 hover:border-gray-300'),
-  '7'   => array('7',  'Woche','border-transparent hover:text-gray-600 hover:border-gray-300'),
-  '30'  => array('30', 'Monat','border-transparent hover:text-gray-600 hover:border-gray-300'),
-  '365' => array('365','Jahr', 'border-transparent hover:text-gray-600 hover:border-gray-300')
-);
-$tabTexts[$timeSelected][2]  = 'border-blue-600 text-blue-600 active'; // highlight the selected one
-echo '
-<div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 mb-4">
-    <ul class="flex flex-wrap -mb-px">';
-foreach ($tabTexts as $tabText) {
-  echo '
-        <li class="mr-2">
-            <a href="status_loopCount.php?range='.$tabText[0].'" class="inline-block p-4 border-b-2 rounded-t-lg '.$tabText[2].'">'.$tabText[1].'</a>
-        </li>';
-}
-echo '
-    </ul>
-</div>
-';
-
 if ($totalCount > 0) {// this may be 0
   $zeitNewest = date_create($rowFreshest['zeit']);    
   $zeitOldest = date_create($rowFreshest['zeit']);
-  $zeitOldest->modify('-'.$timeSelected.' days');
+  $zeitOldest->modify(modifier: '-365 days');
   $zeitOldestString = $zeitOldest->format('Y-m-d H:i:s');
   
 
   $QUERY_LIMIT = 10000; // have some upper limit, both for js and db-performance
   $GRAPH_LIMIT = 3; // does not make sense to display a graph otherwise
 
-  $sql = 'SELECT `loopCount`, `zeit` from `pico_log` WHERE `userid` = "'.$userid.'" AND `zeit` > "'.$zeitOldestString.'" ';
-  $sql .= 'ORDER BY `zeit` DESC LIMIT '.$QUERY_LIMIT.';';
+  $sql = "SELECT `loopCount`, `zeit` from `pico_log` WHERE `userid` = \"$userid\" AND `zeit` > \"$zeitOldestString\" ";
+  $sql .= "ORDER BY `zeit` DESC LIMIT $QUERY_LIMIT;";
 
   $result = $dbConn->query($sql);
   $result->data_seek($result->num_rows - 1); // skip to the last entry of the rows
@@ -109,9 +86,19 @@ if ($totalCount > 0) {// this may be 0
   if (date('Y-m-d') === $zeitNewest->format('Y-m-d')) { // same day
     $zeitString = $zeitNewest->format('H:i');
   }
+
   // COLORS: cons: red "text-red-500" = rgb(239 68 68); generation: green "text-green-600" = rgb(22 163 74);
-  echo '<div class="flex">
-    <div class="flex-auto text-left"><b>Latest loopCount: '.$rowNewest['loopCount'].'</b></div>
+  echo '
+  <div class="text-left block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
+    <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Status LoopCounter</h3>
+    <p class="font-normal text-gray-700">
+    Der loop counter wird alle 5 Sekunden raufgezählt. Unten siehst du, ob das für deinen Anschluss in den letzten 365 Tagen zuverlässig funktioniert hat.<br>
+    Wenn der counter wieder bei 0 startet, hat sich der Mikrocontroller am Display neu gestartet. Solange das nur `selten` passiert, ist das soweit kein Problem...
+    </p>
+  </div>
+  <br>
+  <div class="flex">
+    <div class="flex-auto text-left"><b>Aktueller LoopCount: '.$rowNewest['loopCount'].'</b></div>
     <div class="flex-auto text-center">'.$zeitString.'</div>
     <div class="flex-auto text-right">&nbsp;</div>
   </div>
@@ -130,13 +117,6 @@ if ($totalCount > 0) {// this may be 0
     $axis_x = '[ '.substr($axis_x, 0, -2).' ]';
     $val_y_loopCount = '[ '.substr($val_y_loopCount, 0, -2).' ]';
     
-    if ($timeSelected === 1) {
-      $timeUnit = 'unit: "hour"';
-    } elseif ($timeSelected === 7) {
-      $timeUnit = 'unit: "day"';
-    } else {
-      $timeUnit = 'unit: "week"';
-    }
     echo '
     <canvas id="myChart" width="600" height="300" class="mb-2"></canvas>
     <script>
@@ -164,7 +144,7 @@ if ($totalCount > 0) {// this may be 0
         scales: {
           x: { 
             type: "time",
-            time: { '.$timeUnit.' }
+            time: { unit: "week" }
           },
           y: { type: "linear", ticks: {color: "rgb(25, 99, 132)"} }
         }
@@ -172,11 +152,9 @@ if ($totalCount > 0) {// this may be 0
     };
     const myChart = new Chart( document.getElementById("myChart"), config );
     </script>
-    <hr>';
-    
-    
+    <hr>';   
   } else {
-    echo '<br><br> - weniger als '.$GRAPH_LIMIT.' Einträge - <br><br><br>';
+    echo "<br><br> - weniger als $GRAPH_LIMIT Einträge - <br><br><br>";
   }    
 } else {
   echo '<br><br> - noch keine Einträge - <br><br><br>';
