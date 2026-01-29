@@ -51,38 +51,6 @@ CREATE TABLE `status` (
   `ok` tinyint(3) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
-CREATE TABLE `verbrauch` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `userid` int(10) UNSIGNED NOT NULL,
-  `cons` decimal(10,3) NOT NULL,
-  `consDiff` decimal(10,3) NOT NULL,
-  `consNt` decimal(10,3) NOT NULL,
-  `consNtDiff` decimal(10,3) NOT NULL,
-  `consHt` decimal(10,3) NOT NULL,
-  `consHtDiff` decimal(10,3) NOT NULL,
-  `gen` decimal(10,3) NOT NULL,
-  `genDiff` decimal(10,3) NOT NULL,
-  `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
-  `zeitDiff` int(11) NOT NULL,
-  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0,
-  `copied` tinyint(4) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
-
-CREATE TABLE `verbrauchArchive` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `userid` int(10) UNSIGNED NOT NULL,
-  `cons` decimal(10,3) NOT NULL,
-  `consDiff` decimal(10,3) NOT NULL,
-  `consNt` decimal(10,3) NOT NULL,
-  `consNtDiff` decimal(10,3) NOT NULL,
-  `consHt` decimal(10,3) NOT NULL,
-  `consHtDiff` decimal(10,3) NOT NULL,
-  `gen` decimal(10,3) NOT NULL,
-  `genDiff` decimal(10,3) NOT NULL,
-  `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
-  `zeitDiff` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
-
 CREATE TABLE `verbrauch_26` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `userid` int(10) UNSIGNED NOT NULL,
@@ -107,8 +75,7 @@ CREATE TABLE `verbrauch_26Archive` (
   `genDiff` decimal(10,3) NOT NULL,
   `genRate` decimal(5,4) NOT NULL,
   `zeit` timestamp NOT NULL DEFAULT current_timestamp(),
-  `zeitDiff` int(11) NOT NULL,
-  `thin` smallint(5) UNSIGNED NOT NULL DEFAULT 0
+  `zeitDiff` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 
@@ -122,12 +89,6 @@ ALTER TABLE `pwForgot`
   ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `status`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `verbrauch`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `verbrauchArchive`
   ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `verbrauch_26`
@@ -147,12 +108,6 @@ ALTER TABLE `pwForgot`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `status`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `verbrauch`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `verbrauchArchive`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `verbrauch_26`
