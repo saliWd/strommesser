@@ -168,6 +168,12 @@ while True:
 
     feed_wd(wd=wd)
 
+    # clear the area of the rectangle
+    display.set_pen(BLACK)
+    wOutline = Polygon()
+    wOutline.rectangle(1,1,127,36) # same numbers as below for the outline
+    vector.draw(wOutline) # that's actually not just the outline but it's filled
+    
     if wattVal < 0: display.set_pen(COLOR_MINUS)
     else:           display.set_pen(COLOR_PLUS)
     wattVal5digits = min(abs(wattVal), 99999) # limit it to 5 digits, range 0...99999. Sign is lost
@@ -176,8 +182,7 @@ while True:
     txtNum = str(wattVal5digits)
     x, y, w, h = vector.measure_text(txtNum, x=44, y=32, angle=None)
     w = int(w)
-
-    wOutline = Polygon()
+    
     wOutline.rectangle(1,1,127,36, corners=(2, 2, 2, 2), stroke=2)
     vector.draw(wOutline)
     display.set_pen(WHITE)
