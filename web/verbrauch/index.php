@@ -58,7 +58,8 @@ if ($totalCount > 0) {// this may be 0
   $queryCount = $result->num_rows; // this may be < graph-limit ( = display at least the newest) or >= graph-limit ( = all good)
 
   // cost over the whole time range
-  $costTotal = round(num:-1.0 * ( // TODO: is this correct?
+  // need an sql-query for this
+  $costTotal = round(num:-1.0 * ( // FIXME: this is not correct when the con/gen rates differ between oldest and newest
                       ($rowNewest['con']*$rowNewest['conRate'] - $rowOldest['con']*$rowOldest['conRate']) - 
                       ($rowNewest['gen']*$rowOldest['genRate'] - $rowOldest['gen']*$rowOldest['genRate'])
                     ), precision: 2);
@@ -230,12 +231,15 @@ if ($totalCount > 0) {// this may be 0
     $costClass = 'text-red-500';
     $costText  = 'Kosten';
     }
+    /* TODO: disabling this for the moment as the value is wrong
     echo '
     <div class="flex">
     <div class="flex-auto text-left"><b><span class="'.$costClass.'">'.$costText.' [CHF]</span></b></div>
     <div class="flex-auto text-center">&nbsp;</div>
     <div class="flex-auto text-right"><b><span class="'.$costClass.'">'. number_format((float)$costTotal, 2, '.', '').'</span></b></div>
-    </div>      
+    </div>';
+    */
+    echo '
     <canvas id="myChartCost" width="600" height="200" class="mb-2"></canvas>
     <script>
     const ctxCost = document.getElementById("myChartCost");
