@@ -5,8 +5,8 @@ $dbConn = initialize();
 $timeSelected = getTimeRange(defaultVal: 1);
 $userid = getUserid(); // this will get a valid return because if not, the initialize above will already fail (=redirect)
 
-$resultCnt = $dbConn->query('SELECT COUNT(*) as `total` FROM `verbrauch_26` WHERE `userid` = "'.$userid.'" LIMIT 1;'); // guaranteed to return one row
-$resultFreshest = $dbConn->query('SELECT `zeit` FROM `verbrauch_26` WHERE `userid` = "'.$userid.'" ORDER BY `zeit` DESC LIMIT 1;'); // cannot combine those two
+$resultCnt = $dbConn->query("SELECT COUNT(*) as `total` FROM `verbrauch_26` WHERE `userid` = \"$userid\" LIMIT 1;"); // guaranteed to return one row
+$resultFreshest = $dbConn->query("SELECT `zeit` FROM `verbrauch_26` WHERE `userid` = \"$userid\" ORDER BY `zeit` DESC LIMIT 1;"); // cannot combine those two
 
 $rowCnt = $resultCnt->fetch_assoc(); // returns one row only
 $rowFreshest = $resultFreshest->fetch_assoc(); // returns 0 or 1 row
@@ -14,12 +14,12 @@ $totalCount = $rowCnt['total'];
 
 printBeginOfPage_v2(site:'index.php');
 
-$tabTexts = array (  
-  '1'   => array('1',  'Tag',  'border-transparent hover:text-gray-600 hover:border-gray-300'),
-  '7'   => array('7',  'Woche','border-transparent hover:text-gray-600 hover:border-gray-300'),
-  '30'  => array('30', 'Monat','border-transparent hover:text-gray-600 hover:border-gray-300'),
-  '365' => array('365','Jahr', 'border-transparent hover:text-gray-600 hover:border-gray-300')
-);
+$tabTexts = [
+  '1'   => ['1',  'Tag',  'border-transparent hover:text-gray-600 hover:border-gray-300'],
+  '7'   => ['7',  'Woche','border-transparent hover:text-gray-600 hover:border-gray-300'],
+  '30'  => ['30', 'Monat','border-transparent hover:text-gray-600 hover:border-gray-300'],
+  '365' => ['365','Jahr', 'border-transparent hover:text-gray-600 hover:border-gray-300']
+];
 $tabTexts[$timeSelected][2]  = 'border-blue-600 text-blue-600 active'; // highlight the selected one
 echo '
 <div class="text-sm font-medium text-center text-gray-500 border-b border-gray-200 mb-4">
@@ -38,7 +38,7 @@ echo '
 if ($totalCount > 0) {// this may be 0
   $zeitNewest = date_create($rowFreshest['zeit']);    
   $zeitOldest = date_create($rowFreshest['zeit']);
-  $zeitOldest->modify('-'.$timeSelected.' days');
+  $zeitOldest->modify("-$timeSelected days");
   $zeitOldestString = $zeitOldest->format('Y-m-d H:i:s');
   
 
@@ -51,7 +51,7 @@ if ($totalCount > 0) {// this may be 0
 
   // cost over the whole time range
   $sqlCost = 'SELECT SUM(`conDiff`*`conRate`) AS `conCost`, SUM(`genDiff`*`genRate`) AS `genCost` ';
-  $sqlCost .= "from `verbrauch_26` WHERE `userid` = \"$userid\" AND `zeit` > \"$zeitOldestString\" ";
+  $sqlCost .= "from `verbrauch_26` WHERE `userid` = \"$userid\" AND `zeit` > \"$zeitOldestString\" LIMIT 1;"; // only one return
   $resultCost = $dbConn->query(query:$sqlCost);
   $rowCost = $resultCost->fetch_assoc();
   $costTotal = round($rowCost['genCost'] - $rowCost['conCost'], precision: 2); // both are positive values
@@ -156,14 +156,14 @@ if ($totalCount > 0) {// this may be 0
         label: "Verbrauch total [kWh]",
         data: '.$val_yr_con_kwh.',
         yAxisID: "yright",
-        backgroundColor: "rgba(239, 68, 68, 0.2)",
+        backgroundColor: "rgba(241, 107, 107, 0.15)",
         showLine: false
       },
       {
         label: "Einspeisung total [kWh]",
         data: '.$val_yr_gen_kwh.',
         yAxisID: "yright",
-        backgroundColor: "rgba(22, 163, 74, 0.2)",
+        backgroundColor: "rgba(78, 216, 128, 0.15)",
         showLine: false
       },
       {
