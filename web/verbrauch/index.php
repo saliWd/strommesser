@@ -45,9 +45,16 @@ if ($totalCount > 0) {// this may be 0
   $QUERY_LIMIT = 10000; // have some upper limit, both for js and db-performance
   $GRAPH_LIMIT = 3; // does not make sense to display a graph otherwise
 
-  $sql = 'SELECT `con`, `gen`, `zeit`, `conDiff`, `conRate`, `zeitDiff`, `genDiff`, `genRate` ';
+  $sql = 'SELECT `con`, `gen`, `zeit`, `conDiff`, (`conDiff`*`conRate`) AS `conCost`, `zeitDiff`, `genDiff`, (`genDiff`*`genRate`) AS `genCost` ';  
   $sql .= "from `verbrauch_26` WHERE `userid` = \"$userid\" AND `zeit` > \"$zeitOldestString\" ";
   $sql .= "ORDER BY `zeit` DESC LIMIT $QUERY_LIMIT;";
+
+  // cost over the whole time range
+  $sqlCost = 'SELECT SUM(`conDiff`*`conRate`) AS `conCost`, SUM(`genDiff`*`genRate`) AS `genCost` ';
+  $sqlCost .= "from `verbrauch_26` WHERE `userid` = \"$userid\" AND `zeit` > \"$zeitOldestString\" ";
+  $resultCost = $dbConn->query(query:$sqlCost);
+  $rowCost = $resultCost->fetch_assoc();
+  $costTotal = round($rowCost['genCost'] - $rowCost['conCost'], precision: 2); // both are positive values
 
   $result = $dbConn->query(query:$sql);
   $result->data_seek(offset:$result->num_rows - 1); // skip to the last entry of the rows
@@ -56,13 +63,6 @@ if ($totalCount > 0) {// this may be 0
 
   $rowNewest = $result->fetch_assoc();
   $queryCount = $result->num_rows; // this may be < graph-limit ( = display at least the newest) or >= graph-limit ( = all good)
-
-  // cost over the whole time range
-  // need an sql-query for this
-  $costTotal = round(num:-1.0 * ( // FIXME: this is not correct when the con/gen rates differ between oldest and newest
-                      ($rowNewest['con']*$rowNewest['conRate'] - $rowOldest['con']*$rowOldest['conRate']) - 
-                      ($rowNewest['gen']*$rowOldest['genRate'] - $rowOldest['gen']*$rowOldest['genRate'])
-                    ), precision: 2);
 
   if ($rowNewest['zeitDiff'] > 0) { // divide by 0 exception
       $newestCon = round($rowNewest['conDiff']*3600*1000 / $rowNewest['zeitDiff']); // kWh compared to seconds
@@ -102,6 +102,7 @@ if ($totalCount > 0) {// this may be 0
     $val_yl_gen_ave = '';
     $val_yl_con = '';
     $val_yl_gen = '';
+    $costDisp = $costTotal; // to start at 0 (I do reverse the order)
     
     while ($row = $result->fetch_assoc()) { // did already fetch the newest one. At least 2 remaining  
       if ($row['zeitDiff'] > 0) { // divide by 0 exception
@@ -119,13 +120,13 @@ if ($totalCount > 0) {// this may be 0
       $axis_x = 'new Date("'.$row['zeit'].'"), '.$axis_x; // new Date("2020-03-01 12:00:12")
       $val_yr_con_kwh = ($row['con'] - $rowOldest['con']) .', '.$val_yr_con_kwh; // to get a relative value (and not some huge numbers)
       $val_yr_gen_kwh = ($row['gen'] - $rowOldest['gen']) .', '.$val_yr_gen_kwh;
-      $val_yr_cost = -1.0 * 
-                    ((($row['con'] - $rowOldest['con'])*$rowOldest['conRate']) - // TODO
-                     (($row['gen'] - $rowOldest['gen'])*$rowOldest['genRate'])) .', '.$val_yr_cost;
-      $val_yl_con_ave = $aveCon.', '.$val_yl_con_ave;
-      $val_yl_gen_ave = $aveGen.', '.$val_yl_gen_ave;
-      $val_yl_con = $watt.', '.$val_yl_con;
-      $val_yl_gen = $gen.', '.$val_yl_gen;
+      $costChange = round(num:$row['conCost'] - $row['genCost'],precision:6);
+      $costDisp += $costChange;
+      $val_yr_cost = round(num:$costDisp,precision:6).', '.$val_yr_cost;
+      $val_yl_con_ave = "$aveCon ,  $val_yl_con_ave";
+      $val_yl_gen_ave = "$aveGen, $val_yl_gen_ave";
+      $val_yl_con = "$watt, $val_yl_con";
+      $val_yl_gen = "$gen, $val_yl_gen";
     } // while
     // remove the last two caracters (a comma-space) and add the brackets before and after
     $axis_x = '[ '.substr($axis_x, 0, -2).' ]';
@@ -231,15 +232,12 @@ if ($totalCount > 0) {// this may be 0
     $costClass = 'text-red-500';
     $costText  = 'Kosten';
     }
-    /* TODO: disabling this for the moment as the value is wrong
     echo '
     <div class="flex">
     <div class="flex-auto text-left"><b><span class="'.$costClass.'">'.$costText.' [CHF]</span></b></div>
     <div class="flex-auto text-center">&nbsp;</div>
     <div class="flex-auto text-right"><b><span class="'.$costClass.'">'. number_format((float)$costTotal, 2, '.', '').'</span></b></div>
-    </div>';
-    */
-    echo '
+    </div>
     <canvas id="myChartCost" width="600" height="200" class="mb-2"></canvas>
     <script>
     const ctxCost = document.getElementById("myChartCost");
